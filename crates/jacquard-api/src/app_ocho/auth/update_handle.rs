@@ -10,17 +10,28 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Handle;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateHandle<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateHandle<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The new handle.
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub handle: Handle<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.ocho.auth.updateHandle
@@ -28,11 +39,12 @@ pub struct UpdateHandleResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateHandleResponse {
     const NSID: &'static str = "app.ocho.auth.updateHandle";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateHandle<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for UpdateHandle<S> {
     const NSID: &'static str = "app.ocho.auth.updateHandle";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -47,7 +59,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateHandleRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = UpdateHandle<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = UpdateHandle<S>;
     type Response = UpdateHandleResponse;
 }
 
@@ -86,7 +98,7 @@ pub mod update_handle_state {
 /// Builder for constructing an instance of this type
 pub struct UpdateHandleBuilder<'a, S: update_handle_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Handle<'a>>,),
+    _fields: (Option<Handle<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -116,7 +128,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<Handle<'a>>,
+        value: impl Into<Handle<S>>,
     ) -> UpdateHandleBuilder<'a, update_handle_state::SetHandle<S>> {
         self._fields.0 = Option::Some(value.into());
         UpdateHandleBuilder {
@@ -142,10 +154,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> UpdateHandle<'a> {
         UpdateHandle {
             handle: self._fields.0.unwrap(),

@@ -19,12 +19,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle, Datetime, UriValue};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -35,63 +37,77 @@ use crate::social_clippr::actor;
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PreferencesItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PreferencesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.clippr.actor.defs#publishingScopesPref")]
-    PublishingScopesPref(Box<actor::PublishingScopesPref<'a>>),
+    PublishingScopesPref(Box<actor::PublishingScopesPref<S>>),
 }
 
 /// An array of refs to various preferences.
 pub type Preferences<'a> = Vec<PreferencesItem<'a>>;
 /// A view of an actor's profile.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProfileView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///A link to the profile's avatar
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<UriValue<'a>>,
+    pub avatar: Option<UriValue<S>>,
     ///When the profile record was first created
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///The biography associated to the profile
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The DID of the profile
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///The display name associated to the profile
-    #[serde(borrow)]
-    pub display_name: CowStr<'a>,
+    pub display_name: S,
     ///The handle of the profile
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub handle: Handle<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Preferences for an user's publishing scopes.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct PublishingScopesPref<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PublishingScopesPref<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///What publishing scope to mark a clip as by default
-    #[serde(borrow)]
-    pub default_scope: PublishingScopesPrefDefaultScope<'a>,
+    pub default_scope: PublishingScopesPrefDefaultScope<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// What publishing scope to mark a clip as by default
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PublishingScopesPrefDefaultScope<'a> {
+pub enum PublishingScopesPrefDefaultScope<S: Bos<str> + AsRef<str> = DefaultStr> {
     Public,
     Unlisted,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> PublishingScopesPrefDefaultScope<'a> {
+impl<S: Bos<str> + AsRef<str>> PublishingScopesPrefDefaultScope<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -99,70 +115,58 @@ impl<'a> PublishingScopesPrefDefaultScope<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for PublishingScopesPrefDefaultScope<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "public" => Self::Public,
             "unlisted" => Self::Unlisted,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for PublishingScopesPrefDefaultScope<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "unlisted" => Self::Unlisted,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for PublishingScopesPrefDefaultScope<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display
+for PublishingScopesPrefDefaultScope<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for PublishingScopesPrefDefaultScope<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for PublishingScopesPrefDefaultScope<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for PublishingScopesPrefDefaultScope<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for PublishingScopesPrefDefaultScope<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for PublishingScopesPrefDefaultScope<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for PublishingScopesPrefDefaultScope<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for PublishingScopesPrefDefaultScope<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default
+for PublishingScopesPrefDefaultScope<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for PublishingScopesPrefDefaultScope<'_> {
-    type Output = PublishingScopesPrefDefaultScope<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for PublishingScopesPrefDefaultScope<S> {
+    type Output = PublishingScopesPrefDefaultScope<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             PublishingScopesPrefDefaultScope::Public => {
@@ -178,7 +182,7 @@ impl jacquard_common::IntoStatic for PublishingScopesPrefDefaultScope<'_> {
     }
 }
 
-impl<'a> LexiconSchema for ProfileView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileView<S> {
     fn nsid() -> &'static str {
         "social.clippr.actor.defs"
     }
@@ -239,7 +243,7 @@ impl<'a> LexiconSchema for ProfileView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PublishingScopesPref<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PublishingScopesPref<S> {
     fn nsid() -> &'static str {
         "social.clippr.actor.defs"
     }
@@ -264,49 +268,49 @@ pub mod profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DisplayName;
         type Did;
+        type DisplayName;
         type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DisplayName = Unset;
         type Did = Unset;
+        type DisplayName = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type DisplayName = Set<members::display_name>;
-        type Did = S::Did;
-        type Handle = S::Handle;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type DisplayName = S::DisplayName;
         type Did = Set<members::did>;
+        type DisplayName = S::DisplayName;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Did = S::Did;
+        type DisplayName = Set<members::display_name>;
         type Handle = S::Handle;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type DisplayName = S::DisplayName;
         type Did = S::Did;
+        type DisplayName = S::DisplayName;
         type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
         ///Marker type for the `handle` field
         pub struct handle(());
     }
@@ -316,12 +320,12 @@ pub mod profile_view_state {
 pub struct ProfileViewBuilder<'a, S: profile_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<UriValue<'a>>,
+        Option<UriValue<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<Handle<'a>>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<Handle<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -346,12 +350,12 @@ impl<'a> ProfileViewBuilder<'a, profile_view_state::Empty> {
 
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -372,12 +376,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -391,7 +395,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ProfileViewBuilder<'a, profile_view_state::SetDid<S>> {
         self._fields.3 = Option::Some(value.into());
         ProfileViewBuilder {
@@ -410,7 +414,7 @@ where
     /// Set the `displayName` field (required)
     pub fn display_name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProfileViewBuilder<'a, profile_view_state::SetDisplayName<S>> {
         self._fields.4 = Option::Some(value.into());
         ProfileViewBuilder {
@@ -429,7 +433,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<Handle<'a>>,
+        value: impl Into<Handle<S>>,
     ) -> ProfileViewBuilder<'a, profile_view_state::SetHandle<S>> {
         self._fields.5 = Option::Some(value.into());
         ProfileViewBuilder {
@@ -443,8 +447,8 @@ where
 impl<'a, S> ProfileViewBuilder<'a, S>
 where
     S: profile_view_state::State,
-    S::DisplayName: profile_view_state::IsSet,
     S::Did: profile_view_state::IsSet,
+    S::DisplayName: profile_view_state::IsSet,
     S::Handle: profile_view_state::IsSet,
 {
     /// Build the final struct
@@ -462,10 +466,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ProfileView<'a> {
         ProfileView {
             avatar: self._fields.0,

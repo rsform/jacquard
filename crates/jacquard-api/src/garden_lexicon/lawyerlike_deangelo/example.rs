@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,33 +29,41 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// My lexicon description
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "garden.lexicon.lawyerlike-deangelo.example",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Example<'a> {}
+pub struct Example<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ExampleGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExampleGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Example<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Example<S>,
 }
 
-impl<'a> Example<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ExampleRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Example<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ExampleRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -64,18 +74,17 @@ pub struct ExampleRecord;
 impl XrpcResp for ExampleRecord {
     const NSID: &'static str = "garden.lexicon.lawyerlike-deangelo.example";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ExampleGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ExampleGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ExampleGetRecordOutput<'_>> for Example<'_> {
-    fn from(output: ExampleGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ExampleGetRecordOutput<S>> for Example<S> {
+    fn from(output: ExampleGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Example<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Example<S> {
     const NSID: &'static str = "garden.lexicon.lawyerlike-deangelo.example";
     type Record = ExampleRecord;
 }
@@ -85,7 +94,7 @@ impl Collection for ExampleRecord {
     type Record = ExampleRecord;
 }
 
-impl<'a> LexiconSchema for Example<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Example<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.lawyerlike-deangelo.example"
     }

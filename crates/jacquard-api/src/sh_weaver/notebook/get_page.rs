@@ -10,33 +10,47 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::PageView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPage<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub page: AtUri<'a>,
+    pub page: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPageOutput<'a> {
-    #[serde(borrow)]
-    pub entries: Vec<EntryView<'a>>,
-    #[serde(borrow)]
-    pub page: PageView<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPageOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub entries: Vec<EntryView<S>>,
+    pub page: PageView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -45,18 +59,19 @@ pub struct GetPageOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetPageError<'a> {
+pub enum GetPageError {
     #[serde(rename = "PageNotFound")]
-    PageNotFound(Option<CowStr<'a>>),
+    PageNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetPageError<'_> {
+impl core::fmt::Display for GetPageError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::PageNotFound(msg) => {
@@ -66,7 +81,13 @@ impl core::fmt::Display for GetPageError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -76,11 +97,12 @@ pub struct GetPageResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPageResponse {
     const NSID: &'static str = "sh.weaver.notebook.getPage";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPageOutput<'de>;
-    type Err<'de> = GetPageError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetPageOutput<S>;
+    type Err = GetPageError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPage<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetPage<S> {
     const NSID: &'static str = "sh.weaver.notebook.getPage";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPageResponse;
@@ -91,7 +113,7 @@ pub struct GetPageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPageRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getPage";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPage<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetPage<S>;
     type Response = GetPageResponse;
 }
 
@@ -130,7 +152,7 @@ pub mod get_page_state {
 /// Builder for constructing an instance of this type
 pub struct GetPageBuilder<'a, S: get_page_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -160,7 +182,7 @@ where
     /// Set the `page` field (required)
     pub fn page(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetPageBuilder<'a, get_page_state::SetPage<S>> {
         self._fields.0 = Option::Some(value.into());
         GetPageBuilder {

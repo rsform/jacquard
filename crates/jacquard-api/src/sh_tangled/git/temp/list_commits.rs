@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::{IntoStatic, open_union};
@@ -15,19 +15,25 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListCommits<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListCommits<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#ref: Option<CowStr<'a>>,
+    pub r#ref: Option<S>,
     #[serde(borrow)]
-    pub repo: AtUri<'a>,
+    pub repo: AtUri<S>,
 }
 
 
@@ -38,7 +44,6 @@ pub struct ListCommitsOutput {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -47,28 +52,32 @@ pub struct ListCommitsOutput {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListCommitsError<'a> {
+pub enum ListCommitsError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(Option<CowStr<'a>>),
+    RefNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Path not found in repository
     #[serde(rename = "PathNotFound")]
-    PathNotFound(Option<CowStr<'a>>),
+    PathNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for ListCommitsError<'_> {
+impl core::fmt::Display for ListCommitsError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -99,7 +108,13 @@ impl core::fmt::Display for ListCommitsError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -109,18 +124,22 @@ pub struct ListCommitsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListCommitsResponse {
     const NSID: &'static str = "sh.tangled.git.temp.listCommits";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = ListCommitsOutput;
-    type Err<'de> = ListCommitsError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = ListCommitsOutput;
+    type Err = ListCommitsError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(ListCommitsOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -128,7 +147,8 @@ impl jacquard_common::xrpc::XrpcResp for ListCommitsResponse {
     }
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListCommits<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListCommits<S> {
     const NSID: &'static str = "sh.tangled.git.temp.listCommits";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListCommitsResponse;
@@ -139,7 +159,7 @@ pub struct ListCommitsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListCommitsRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.listCommits";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListCommits<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListCommits<S>;
     type Response = ListCommitsResponse;
 }
 
@@ -182,7 +202,7 @@ pub mod list_commits_state {
 /// Builder for constructing an instance of this type
 pub struct ListCommitsBuilder<'a, S: list_commits_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -206,12 +226,12 @@ impl<'a> ListCommitsBuilder<'a, list_commits_state::Empty> {
 
 impl<'a, S: list_commits_state::State> ListCommitsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -232,12 +252,12 @@ impl<'a, S: list_commits_state::State> ListCommitsBuilder<'a, S> {
 
 impl<'a, S: list_commits_state::State> ListCommitsBuilder<'a, S> {
     /// Set the `ref` field (optional)
-    pub fn r#ref(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn r#ref(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
-    pub fn maybe_ref(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_ref(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -251,7 +271,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ListCommitsBuilder<'a, list_commits_state::SetRepo<S>> {
         self._fields.3 = Option::Some(value.into());
         ListCommitsBuilder {

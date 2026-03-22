@@ -11,7 +11,6 @@ use jacquard_common::CowStr;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -20,20 +19,24 @@ use serde::{Serialize, Deserialize};
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteSessionError<'a> {
+pub enum DeleteSessionError {
     #[serde(rename = "InvalidToken")]
-    InvalidToken(Option<CowStr<'a>>),
+    InvalidToken(Option<jacquard_common::deps::smol_str::SmolStr>),
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(Option<CowStr<'a>>),
+    ExpiredToken(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for DeleteSessionError<'_> {
+impl core::fmt::Display for DeleteSessionError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidToken(msg) => {
@@ -50,7 +53,13 @@ impl core::fmt::Display for DeleteSessionError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -64,8 +73,8 @@ pub struct DeleteSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteSessionResponse {
     const NSID: &'static str = "com.atproto.server.deleteSession";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = DeleteSessionError<'de>;
+    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ();
+    type Err = DeleteSessionError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for DeleteSession {
@@ -83,6 +92,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteSessionRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DeleteSession;
+    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = DeleteSession;
     type Response = DeleteSessionResponse;
 }

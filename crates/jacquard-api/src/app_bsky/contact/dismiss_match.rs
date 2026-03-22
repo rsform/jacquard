@@ -10,27 +10,47 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DismissMatch<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DismissMatch<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The subject's DID to dismiss the match with.
-    #[serde(borrow)]
-    pub subject: Did<'a>,
+    pub subject: Did<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DismissMatchOutput<'a> {}
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DismissMatchOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
 
-#[open_union]
+
 #[derive(
     Serialize,
     Deserialize,
@@ -39,20 +59,21 @@ pub struct DismissMatchOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DismissMatchError<'a> {
+pub enum DismissMatchError {
     #[serde(rename = "InvalidDid")]
-    InvalidDid(Option<CowStr<'a>>),
+    InvalidDid(Option<SmolStr>),
     #[serde(rename = "InternalError")]
-    InternalError(Option<CowStr<'a>>),
+    InternalError(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for DismissMatchError<'_> {
+impl core::fmt::Display for DismissMatchError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidDid(msg) => {
@@ -69,7 +90,13 @@ impl core::fmt::Display for DismissMatchError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -79,11 +106,12 @@ pub struct DismissMatchResponse;
 impl jacquard_common::xrpc::XrpcResp for DismissMatchResponse {
     const NSID: &'static str = "app.bsky.contact.dismissMatch";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DismissMatchOutput<'de>;
-    type Err<'de> = DismissMatchError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DismissMatchOutput<S>;
+    type Err = DismissMatchError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DismissMatch<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DismissMatch<S> {
     const NSID: &'static str = "app.bsky.contact.dismissMatch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -98,7 +126,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DismissMatchRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DismissMatch<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DismissMatch<S>;
     type Response = DismissMatchResponse;
 }
 
@@ -137,7 +165,7 @@ pub mod dismiss_match_state {
 /// Builder for constructing an instance of this type
 pub struct DismissMatchBuilder<'a, S: dismiss_match_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -167,7 +195,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> DismissMatchBuilder<'a, dismiss_match_state::SetSubject<S>> {
         self._fields.0 = Option::Some(value.into());
         DismissMatchBuilder {
@@ -193,10 +221,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DismissMatch<'a> {
         DismissMatch {
             subject: self._fields.0.unwrap(),

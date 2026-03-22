@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,46 +30,51 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Metadata for an open mic artist.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "haus.opn.mic.artist", tag = "$type")]
-pub struct Artist<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "haus.opn.mic.artist",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Artist<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artist_pic: Option<BlobRef<'a>>,
+    pub artist_pic: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub bio: Option<CowStr<'a>>,
+    pub bio: Option<S>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub external_links: Option<Vec<UriValue<'a>>>,
+    pub external_links: Option<Vec<UriValue<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genre: Option<Vec<CowStr<'a>>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub genre: Option<Vec<S>>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ArtistGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ArtistGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Artist<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Artist<S>,
 }
 
-impl<'a> Artist<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ArtistRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Artist<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ArtistRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -78,18 +85,17 @@ pub struct ArtistRecord;
 impl XrpcResp for ArtistRecord {
     const NSID: &'static str = "haus.opn.mic.artist";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ArtistGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ArtistGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ArtistGetRecordOutput<'_>> for Artist<'_> {
-    fn from(output: ArtistGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ArtistGetRecordOutput<S>> for Artist<S> {
+    fn from(output: ArtistGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Artist<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Artist<S> {
     const NSID: &'static str = "haus.opn.mic.artist";
     type Record = ArtistRecord;
 }
@@ -99,7 +105,7 @@ impl Collection for ArtistRecord {
     type Record = ArtistRecord;
 }
 
-impl<'a> LexiconSchema for Artist<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Artist<S> {
     fn nsid() -> &'static str {
         "haus.opn.mic.artist"
     }
@@ -221,12 +227,12 @@ pub mod artist_state {
 pub struct ArtistBuilder<'a, S: artist_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
+        Option<BlobRef<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<Vec<UriValue<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<UriValue<S>>>,
+        Option<Vec<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -251,12 +257,12 @@ impl<'a> ArtistBuilder<'a, artist_state::Empty> {
 
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `artistPic` field (optional)
-    pub fn artist_pic(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn artist_pic(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `artistPic` field to an Option value (optional)
-    pub fn maybe_artist_pic(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_artist_pic(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -264,12 +270,12 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
 
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `bio` field (optional)
-    pub fn bio(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn bio(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `bio` field to an Option value (optional)
-    pub fn maybe_bio(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_bio(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -296,15 +302,12 @@ where
 
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `externalLinks` field (optional)
-    pub fn external_links(
-        mut self,
-        value: impl Into<Option<Vec<UriValue<'a>>>>,
-    ) -> Self {
+    pub fn external_links(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `externalLinks` field to an Option value (optional)
-    pub fn maybe_external_links(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
+    pub fn maybe_external_links(mut self, value: Option<Vec<UriValue<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -312,12 +315,12 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
 
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_genre(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -331,7 +334,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ArtistBuilder<'a, artist_state::SetName<S>> {
         self._fields.5 = Option::Some(value.into());
         ArtistBuilder {
@@ -361,13 +364,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Artist<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Artist<'a> {
         Artist {
             artist_pic: self._fields.0,
             bio: self._fields.1,

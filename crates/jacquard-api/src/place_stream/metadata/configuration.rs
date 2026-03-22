@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,44 +32,47 @@ use crate::place_stream::metadata::content_warnings::ContentWarnings;
 use crate::place_stream::metadata::distribution_policy::DistributionPolicy;
 /// Default metadata record for livestream including content warnings, rights, and distribution policy
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "place.stream.metadata.configuration",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Configuration<'a> {
+pub struct Configuration<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_rights: Option<ContentRights<'a>>,
+    pub content_rights: Option<ContentRights<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_warnings: Option<ContentWarnings<'a>>,
+    pub content_warnings: Option<ContentWarnings<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub distribution_policy: Option<DistributionPolicy<'a>>,
+    pub distribution_policy: Option<DistributionPolicy<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ConfigurationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ConfigurationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Configuration<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Configuration<S>,
 }
 
-impl<'a> Configuration<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ConfigurationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Configuration<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ConfigurationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -78,18 +83,18 @@ pub struct ConfigurationRecord;
 impl XrpcResp for ConfigurationRecord {
     const NSID: &'static str = "place.stream.metadata.configuration";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ConfigurationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ConfigurationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ConfigurationGetRecordOutput<'_>> for Configuration<'_> {
-    fn from(output: ConfigurationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ConfigurationGetRecordOutput<S>>
+for Configuration<S> {
+    fn from(output: ConfigurationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Configuration<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Configuration<S> {
     const NSID: &'static str = "place.stream.metadata.configuration";
     type Record = ConfigurationRecord;
 }
@@ -99,7 +104,7 @@ impl Collection for ConfigurationRecord {
     type Record = ConfigurationRecord;
 }
 
-impl<'a> LexiconSchema for Configuration<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Configuration<S> {
     fn nsid() -> &'static str {
         "place.stream.metadata.configuration"
     }
@@ -137,9 +142,9 @@ pub mod configuration_state {
 pub struct ConfigurationBuilder<'a, S: configuration_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ContentRights<'a>>,
-        Option<ContentWarnings<'a>>,
-        Option<DistributionPolicy<'a>>,
+        Option<ContentRights<S>>,
+        Option<ContentWarnings<S>>,
+        Option<DistributionPolicy<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -164,15 +169,12 @@ impl<'a> ConfigurationBuilder<'a, configuration_state::Empty> {
 
 impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
     /// Set the `contentRights` field (optional)
-    pub fn content_rights(
-        mut self,
-        value: impl Into<Option<ContentRights<'a>>>,
-    ) -> Self {
+    pub fn content_rights(mut self, value: impl Into<Option<ContentRights<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `contentRights` field to an Option value (optional)
-    pub fn maybe_content_rights(mut self, value: Option<ContentRights<'a>>) -> Self {
+    pub fn maybe_content_rights(mut self, value: Option<ContentRights<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -182,13 +184,13 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
     /// Set the `contentWarnings` field (optional)
     pub fn content_warnings(
         mut self,
-        value: impl Into<Option<ContentWarnings<'a>>>,
+        value: impl Into<Option<ContentWarnings<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `contentWarnings` field to an Option value (optional)
-    pub fn maybe_content_warnings(mut self, value: Option<ContentWarnings<'a>>) -> Self {
+    pub fn maybe_content_warnings(mut self, value: Option<ContentWarnings<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -198,7 +200,7 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
     /// Set the `distributionPolicy` field (optional)
     pub fn distribution_policy(
         mut self,
-        value: impl Into<Option<DistributionPolicy<'a>>>,
+        value: impl Into<Option<DistributionPolicy<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -206,7 +208,7 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
     /// Set the `distributionPolicy` field to an Option value (optional)
     pub fn maybe_distribution_policy(
         mut self,
-        value: Option<DistributionPolicy<'a>>,
+        value: Option<DistributionPolicy<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -229,10 +231,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Configuration<'a> {
         Configuration {
             content_rights: self._fields.0,

@@ -10,17 +10,25 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::graph::TagView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPopularTags<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPopularTags<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -28,15 +36,22 @@ pub struct GetPopularTags<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPopularTagsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPopularTagsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub tags: Vec<TagView<'a>>,
+    pub cursor: Option<S>,
+    pub tags: Vec<TagView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.graph.getPopularTags
@@ -44,11 +59,12 @@ pub struct GetPopularTagsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPopularTagsResponse {
     const NSID: &'static str = "sh.weaver.graph.getPopularTags";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPopularTagsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetPopularTagsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPopularTags<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetPopularTags<S> {
     const NSID: &'static str = "sh.weaver.graph.getPopularTags";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPopularTagsResponse;
@@ -59,7 +75,7 @@ pub struct GetPopularTagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPopularTagsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getPopularTags";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPopularTags<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetPopularTags<S>;
     type Response = GetPopularTagsResponse;
 }
 
@@ -89,7 +105,7 @@ pub mod get_popular_tags_state {
 /// Builder for constructing an instance of this type
 pub struct GetPopularTagsBuilder<'a, S: get_popular_tags_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -113,12 +129,12 @@ impl<'a> GetPopularTagsBuilder<'a, get_popular_tags_state::Empty> {
 
 impl<'a, S: get_popular_tags_state::State> GetPopularTagsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }

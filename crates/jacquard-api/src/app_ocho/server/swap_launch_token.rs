@@ -10,35 +10,48 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SwapLaunchToken<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SwapLaunchToken<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub launch_token: CowStr<'a>,
+    pub launch_token: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct SwapLaunchTokenOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SwapLaunchTokenOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The did of the user
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub did: Option<Did<'a>>,
+    pub did: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub handle: Option<CowStr<'a>>,
+    pub handle: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub token: CowStr<'a>,
+    pub name: Option<S>,
+    pub token: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.ocho.server.swapLaunchToken
@@ -46,11 +59,12 @@ pub struct SwapLaunchTokenResponse;
 impl jacquard_common::xrpc::XrpcResp for SwapLaunchTokenResponse {
     const NSID: &'static str = "app.ocho.server.swapLaunchToken";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SwapLaunchTokenOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SwapLaunchTokenOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SwapLaunchToken<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SwapLaunchToken<S> {
     const NSID: &'static str = "app.ocho.server.swapLaunchToken";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SwapLaunchTokenResponse;
@@ -61,7 +75,7 @@ pub struct SwapLaunchTokenRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SwapLaunchTokenRequest {
     const PATH: &'static str = "/xrpc/app.ocho.server.swapLaunchToken";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SwapLaunchToken<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SwapLaunchToken<S>;
     type Response = SwapLaunchTokenResponse;
 }
 
@@ -100,7 +114,7 @@ pub mod swap_launch_token_state {
 /// Builder for constructing an instance of this type
 pub struct SwapLaunchTokenBuilder<'a, S: swap_launch_token_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -130,7 +144,7 @@ where
     /// Set the `launchToken` field (required)
     pub fn launch_token(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SwapLaunchTokenBuilder<'a, swap_launch_token_state::SetLaunchToken<S>> {
         self._fields.0 = Option::Some(value.into());
         SwapLaunchTokenBuilder {

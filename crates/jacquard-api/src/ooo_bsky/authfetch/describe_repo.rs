@@ -10,20 +10,30 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Nsid};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DescribeRepoOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DescribeRepoOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The list of collection NSIDs in the hidden repository.
-    #[serde(borrow)]
-    pub collections: Vec<Nsid<'a>>,
+    pub collections: Vec<Nsid<S>>,
     ///The DID of the repository owner.
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// XRPC request marker type.
@@ -35,8 +45,8 @@ pub struct DescribeRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeRepoResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.describeRepo";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DescribeRepoOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DescribeRepoOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for DescribeRepo {
@@ -50,6 +60,6 @@ pub struct DescribeRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeRepoRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.describeRepo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = DescribeRepo;
+    type Request<S: Bos<str> + AsRef<str>> = DescribeRepo;
     type Response = DescribeRepoResponse;
 }

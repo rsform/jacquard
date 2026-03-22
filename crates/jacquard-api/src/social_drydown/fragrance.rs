@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,45 +29,53 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// An individual fragrance with house reference
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.drydown.fragrance", tag = "$type")]
-pub struct Fragrance<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.drydown.fragrance",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Fragrance<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when fragrance was created
     pub created_at: Datetime,
     ///AT URI reference to house record (at://did/social.drydown.house/rkey)
-    #[serde(borrow)]
-    pub house: AtUri<'a>,
+    pub house: AtUri<S>,
     ///Fragrance name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Timestamp of last update
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     ///Year of release (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub year: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct FragranceGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FragranceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Fragrance<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Fragrance<S>,
 }
 
-impl<'a> Fragrance<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, FragranceRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Fragrance<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, FragranceRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -76,18 +86,17 @@ pub struct FragranceRecord;
 impl XrpcResp for FragranceRecord {
     const NSID: &'static str = "social.drydown.fragrance";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = FragranceGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = FragranceGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<FragranceGetRecordOutput<'_>> for Fragrance<'_> {
-    fn from(output: FragranceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<FragranceGetRecordOutput<S>> for Fragrance<S> {
+    fn from(output: FragranceGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Fragrance<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Fragrance<S> {
     const NSID: &'static str = "social.drydown.fragrance";
     type Record = FragranceRecord;
 }
@@ -97,7 +106,7 @@ impl Collection for FragranceRecord {
     type Record = FragranceRecord;
 }
 
-impl<'a> LexiconSchema for Fragrance<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Fragrance<S> {
     fn nsid() -> &'static str {
         "social.drydown.fragrance"
     }
@@ -215,8 +224,8 @@ pub struct FragranceBuilder<'a, S: fragrance_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
+        Option<AtUri<S>>,
+        Option<S>,
         Option<Datetime>,
         Option<i64>,
     ),
@@ -268,7 +277,7 @@ where
     /// Set the `house` field (required)
     pub fn house(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> FragranceBuilder<'a, fragrance_state::SetHouse<S>> {
         self._fields.1 = Option::Some(value.into());
         FragranceBuilder {
@@ -287,7 +296,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> FragranceBuilder<'a, fragrance_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         FragranceBuilder {
@@ -345,10 +354,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Fragrance<'a> {
         Fragrance {
             created_at: self._fields.0.unwrap(),

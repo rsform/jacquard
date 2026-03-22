@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,38 +29,46 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A single board game play
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "ca.jmaingot.boardGamePlay", tag = "$type")]
-pub struct BoardGamePlay<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "ca.jmaingot.boardGamePlay",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BoardGamePlay<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///corresponds to https://boardgamegeek.com/boardgame/<bggId> for the game
-    #[serde(borrow)]
-    pub bgg_id: CowStr<'a>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub bgg_id: S,
+    pub name: S,
     ///ISO 8601 date string
     pub played_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BoardGamePlayGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BoardGamePlayGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: BoardGamePlay<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: BoardGamePlay<S>,
 }
 
-impl<'a> BoardGamePlay<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, BoardGamePlayRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> BoardGamePlay<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, BoardGamePlayRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -69,18 +79,18 @@ pub struct BoardGamePlayRecord;
 impl XrpcResp for BoardGamePlayRecord {
     const NSID: &'static str = "ca.jmaingot.boardGamePlay";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BoardGamePlayGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BoardGamePlayGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<BoardGamePlayGetRecordOutput<'_>> for BoardGamePlay<'_> {
-    fn from(output: BoardGamePlayGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<BoardGamePlayGetRecordOutput<S>>
+for BoardGamePlay<S> {
+    fn from(output: BoardGamePlayGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for BoardGamePlay<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for BoardGamePlay<S> {
     const NSID: &'static str = "ca.jmaingot.boardGamePlay";
     type Record = BoardGamePlayRecord;
 }
@@ -90,7 +100,7 @@ impl Collection for BoardGamePlayRecord {
     type Record = BoardGamePlayRecord;
 }
 
-impl<'a> LexiconSchema for BoardGamePlay<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BoardGamePlay<S> {
     fn nsid() -> &'static str {
         "ca.jmaingot.boardGamePlay"
     }
@@ -115,49 +125,49 @@ pub mod board_game_play_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type BggId;
+        type Name;
         type PlayedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type BggId = Unset;
+        type Name = Unset;
         type PlayedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type BggId = S::BggId;
-        type PlayedAt = S::PlayedAt;
     }
     ///State transition - sets the `bgg_id` field to Set
     pub struct SetBggId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBggId<S> {}
     impl<S: State> State for SetBggId<S> {
-        type Name = S::Name;
         type BggId = Set<members::bgg_id>;
+        type Name = S::Name;
+        type PlayedAt = S::PlayedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type BggId = S::BggId;
+        type Name = Set<members::name>;
         type PlayedAt = S::PlayedAt;
     }
     ///State transition - sets the `played_at` field to Set
     pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
     impl<S: State> State for SetPlayedAt<S> {
-        type Name = S::Name;
         type BggId = S::BggId;
+        type Name = S::Name;
         type PlayedAt = Set<members::played_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `bgg_id` field
         pub struct bgg_id(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `played_at` field
         pub struct played_at(());
     }
@@ -166,7 +176,7 @@ pub mod board_game_play_state {
 /// Builder for constructing an instance of this type
 pub struct BoardGamePlayBuilder<'a, S: board_game_play_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _fields: (Option<S>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -196,7 +206,7 @@ where
     /// Set the `bggId` field (required)
     pub fn bgg_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BoardGamePlayBuilder<'a, board_game_play_state::SetBggId<S>> {
         self._fields.0 = Option::Some(value.into());
         BoardGamePlayBuilder {
@@ -215,7 +225,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BoardGamePlayBuilder<'a, board_game_play_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         BoardGamePlayBuilder {
@@ -248,8 +258,8 @@ where
 impl<'a, S> BoardGamePlayBuilder<'a, S>
 where
     S: board_game_play_state::State,
-    S::Name: board_game_play_state::IsSet,
     S::BggId: board_game_play_state::IsSet,
+    S::Name: board_game_play_state::IsSet,
     S::PlayedAt: board_game_play_state::IsSet,
 {
     /// Build the final struct
@@ -264,10 +274,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BoardGamePlay<'a> {
         BoardGamePlay {
             bgg_id: self._fields.0.unwrap(),

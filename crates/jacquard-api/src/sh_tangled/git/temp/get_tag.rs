@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::{IntoStatic, open_union};
@@ -15,11 +15,17 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTag<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTag<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub repo: AtUri<'a>,
+    pub repo: AtUri<S>,
     #[serde(borrow)]
-    pub tag: CowStr<'a>,
+    pub tag: S,
 }
 
 
@@ -30,7 +36,6 @@ pub struct GetTagOutput {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -39,25 +44,29 @@ pub struct GetTagOutput {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetTagError<'a> {
+pub enum GetTagError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Tag not found
     #[serde(rename = "TagNotFound")]
-    TagNotFound(Option<CowStr<'a>>),
+    TagNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for GetTagError<'_> {
+impl core::fmt::Display for GetTagError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -81,7 +90,13 @@ impl core::fmt::Display for GetTagError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -91,18 +106,22 @@ pub struct GetTagResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTagResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getTag";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = GetTagOutput;
-    type Err<'de> = GetTagError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = GetTagOutput;
+    type Err = GetTagError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(GetTagOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -110,7 +129,8 @@ impl jacquard_common::xrpc::XrpcResp for GetTagResponse {
     }
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTag<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetTag<S> {
     const NSID: &'static str = "sh.tangled.git.temp.getTag";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTagResponse;
@@ -121,7 +141,7 @@ pub struct GetTagRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTagRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getTag";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTag<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetTag<S>;
     type Response = GetTagResponse;
 }
 
@@ -172,7 +192,7 @@ pub mod get_tag_state {
 /// Builder for constructing an instance of this type
 pub struct GetTagBuilder<'a, S: get_tag_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<AtUri<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -202,7 +222,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetTagBuilder<'a, get_tag_state::SetRepo<S>> {
         self._fields.0 = Option::Some(value.into());
         GetTagBuilder {
@@ -221,7 +241,7 @@ where
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetTagBuilder<'a, get_tag_state::SetTag<S>> {
         self._fields.1 = Option::Some(value.into());
         GetTagBuilder {

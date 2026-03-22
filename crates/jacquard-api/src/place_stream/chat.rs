@@ -15,12 +15,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -31,40 +33,47 @@ use crate::app_bsky::actor::ProfileViewBasic;
 use crate::place_stream::chat::profile::Profile;
 use crate::place_stream::chat;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MessageView<'a> {
-    #[serde(borrow)]
-    pub author: ProfileViewBasic<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MessageView<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub author: ProfileViewBasic<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub chat_profile: Option<Profile<'a>>,
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub chat_profile: Option<Profile<S>>,
+    pub cid: Cid<S>,
     ///If true, this message has been deleted or labeled and should be cleared from the cache
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deleted: Option<bool>,
     pub indexed_at: Datetime,
-    #[serde(borrow)]
-    pub record: Data<'a>,
+    pub record: Data<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reply_to: Option<MessageViewReplyTo<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub reply_to: Option<MessageViewReplyTo<S>>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[jacquard_derive::open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum MessageViewReplyTo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum MessageViewReplyTo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "place.stream.chat.defs#messageView")]
-    MessageView(Box<chat::MessageView<'a>>),
+    MessageView(Box<chat::MessageView<S>>),
 }
 
-impl<'a> LexiconSchema for MessageView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for MessageView<S> {
     fn nsid() -> &'static str {
         "place.stream.chat.defs"
     }
@@ -89,85 +98,85 @@ pub mod message_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IndexedAt;
-        type Author;
-        type Cid;
-        type Record;
         type Uri;
+        type Cid;
+        type Author;
+        type IndexedAt;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IndexedAt = Unset;
-        type Author = Unset;
-        type Cid = Unset;
-        type Record = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type IndexedAt = Set<members::indexed_at>;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type IndexedAt = S::IndexedAt;
-        type Author = Set<members::author>;
-        type Cid = S::Cid;
-        type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-        type Cid = Set<members::cid>;
-        type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Record = Set<members::record>;
-        type Uri = S::Uri;
+        type Cid = Unset;
+        type Author = Unset;
+        type IndexedAt = Unset;
+        type Record = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Record = S::Record;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type IndexedAt = S::IndexedAt;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Author = S::Author;
+        type IndexedAt = S::IndexedAt;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
+        type IndexedAt = S::IndexedAt;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type IndexedAt = Set<members::indexed_at>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type IndexedAt = S::IndexedAt;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -175,14 +184,14 @@ pub mod message_view_state {
 pub struct MessageViewBuilder<'a, S: message_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ProfileViewBasic<'a>>,
-        Option<Profile<'a>>,
-        Option<Cid<'a>>,
+        Option<ProfileViewBasic<S>>,
+        Option<Profile<S>>,
+        Option<Cid<S>>,
         Option<bool>,
         Option<Datetime>,
-        Option<Data<'a>>,
-        Option<MessageViewReplyTo<'a>>,
-        Option<AtUri<'a>>,
+        Option<Data<S>>,
+        Option<MessageViewReplyTo<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -213,7 +222,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<S>>,
     ) -> MessageViewBuilder<'a, message_view_state::SetAuthor<S>> {
         self._fields.0 = Option::Some(value.into());
         MessageViewBuilder {
@@ -226,12 +235,12 @@ where
 
 impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
     /// Set the `chatProfile` field (optional)
-    pub fn chat_profile(mut self, value: impl Into<Option<Profile<'a>>>) -> Self {
+    pub fn chat_profile(mut self, value: impl Into<Option<Profile<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `chatProfile` field to an Option value (optional)
-    pub fn maybe_chat_profile(mut self, value: Option<Profile<'a>>) -> Self {
+    pub fn maybe_chat_profile(mut self, value: Option<Profile<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -245,7 +254,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> MessageViewBuilder<'a, message_view_state::SetCid<S>> {
         self._fields.2 = Option::Some(value.into());
         MessageViewBuilder {
@@ -296,7 +305,7 @@ where
     /// Set the `record` field (required)
     pub fn record(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> MessageViewBuilder<'a, message_view_state::SetRecord<S>> {
         self._fields.5 = Option::Some(value.into());
         MessageViewBuilder {
@@ -309,12 +318,12 @@ where
 
 impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
     /// Set the `replyTo` field (optional)
-    pub fn reply_to(mut self, value: impl Into<Option<MessageViewReplyTo<'a>>>) -> Self {
+    pub fn reply_to(mut self, value: impl Into<Option<MessageViewReplyTo<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `replyTo` field to an Option value (optional)
-    pub fn maybe_reply_to(mut self, value: Option<MessageViewReplyTo<'a>>) -> Self {
+    pub fn maybe_reply_to(mut self, value: Option<MessageViewReplyTo<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -328,7 +337,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> MessageViewBuilder<'a, message_view_state::SetUri<S>> {
         self._fields.7 = Option::Some(value.into());
         MessageViewBuilder {
@@ -342,11 +351,11 @@ where
 impl<'a, S> MessageViewBuilder<'a, S>
 where
     S: message_view_state::State,
-    S::IndexedAt: message_view_state::IsSet,
-    S::Author: message_view_state::IsSet,
-    S::Cid: message_view_state::IsSet,
-    S::Record: message_view_state::IsSet,
     S::Uri: message_view_state::IsSet,
+    S::Cid: message_view_state::IsSet,
+    S::Author: message_view_state::IsSet,
+    S::IndexedAt: message_view_state::IsSet,
+    S::Record: message_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageView<'a> {
@@ -365,7 +374,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> MessageView<'a> {
         MessageView {
             author: self._fields.0.unwrap(),

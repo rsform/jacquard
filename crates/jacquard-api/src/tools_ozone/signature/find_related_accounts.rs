@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -28,12 +30,18 @@ use crate::tools_ozone::signature::find_related_accounts;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct FindRelatedAccounts<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FindRelatedAccounts<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -41,27 +49,39 @@ pub struct FindRelatedAccounts<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct FindRelatedAccountsOutput<'a> {
-    #[serde(borrow)]
-    pub accounts: Vec<find_related_accounts::RelatedAccount<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FindRelatedAccountsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub accounts: Vec<find_related_accounts::RelatedAccount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RelatedAccount<'a> {
-    #[serde(borrow)]
-    pub account: AccountView<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RelatedAccount<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub account: AccountView<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub similarities: Option<Vec<SigDetail<'a>>>,
+    pub similarities: Option<Vec<SigDetail<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for tools.ozone.signature.findRelatedAccounts
@@ -69,11 +89,12 @@ pub struct FindRelatedAccountsResponse;
 impl jacquard_common::xrpc::XrpcResp for FindRelatedAccountsResponse {
     const NSID: &'static str = "tools.ozone.signature.findRelatedAccounts";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = FindRelatedAccountsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = FindRelatedAccountsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for FindRelatedAccounts<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for FindRelatedAccounts<S> {
     const NSID: &'static str = "tools.ozone.signature.findRelatedAccounts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = FindRelatedAccountsResponse;
@@ -84,11 +105,11 @@ pub struct FindRelatedAccountsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for FindRelatedAccountsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.signature.findRelatedAccounts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = FindRelatedAccounts<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = FindRelatedAccounts<S>;
     type Response = FindRelatedAccountsResponse;
 }
 
-impl<'a> LexiconSchema for RelatedAccount<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RelatedAccount<S> {
     fn nsid() -> &'static str {
         "tools.ozone.signature.findRelatedAccounts"
     }
@@ -142,7 +163,7 @@ pub mod find_related_accounts_state {
 /// Builder for constructing an instance of this type
 pub struct FindRelatedAccountsBuilder<'a, S: find_related_accounts_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Did<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<Did<S>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -166,12 +187,12 @@ impl<'a> FindRelatedAccountsBuilder<'a, find_related_accounts_state::Empty> {
 
 impl<'a, S: find_related_accounts_state::State> FindRelatedAccountsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -185,7 +206,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> FindRelatedAccountsBuilder<'a, find_related_accounts_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         FindRelatedAccountsBuilder {
@@ -259,7 +280,7 @@ pub mod related_account_state {
 /// Builder for constructing an instance of this type
 pub struct RelatedAccountBuilder<'a, S: related_account_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AccountView<'a>>, Option<Vec<SigDetail<'a>>>),
+    _fields: (Option<AccountView<S>>, Option<Vec<SigDetail<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -289,7 +310,7 @@ where
     /// Set the `account` field (required)
     pub fn account(
         mut self,
-        value: impl Into<AccountView<'a>>,
+        value: impl Into<AccountView<S>>,
     ) -> RelatedAccountBuilder<'a, related_account_state::SetAccount<S>> {
         self._fields.0 = Option::Some(value.into());
         RelatedAccountBuilder {
@@ -302,12 +323,12 @@ where
 
 impl<'a, S: related_account_state::State> RelatedAccountBuilder<'a, S> {
     /// Set the `similarities` field (optional)
-    pub fn similarities(mut self, value: impl Into<Option<Vec<SigDetail<'a>>>>) -> Self {
+    pub fn similarities(mut self, value: impl Into<Option<Vec<SigDetail<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `similarities` field to an Option value (optional)
-    pub fn maybe_similarities(mut self, value: Option<Vec<SigDetail<'a>>>) -> Self {
+    pub fn maybe_similarities(mut self, value: Option<Vec<SigDetail<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -329,10 +350,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RelatedAccount<'a> {
         RelatedAccount {
             account: self._fields.0.unwrap(),

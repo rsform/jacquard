@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,10 +29,17 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A single wearing review of a fragrance
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.drydown.review", tag = "$type")]
-pub struct Review<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.drydown.review",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Review<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Final: Depth and evolution (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub complexity: Option<i64>,
@@ -46,8 +55,7 @@ pub struct Review<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end_rating: Option<i64>,
     ///Reference to the social.drydown.fragrance record
-    #[serde(borrow)]
-    pub fragrance: AtUri<'a>,
+    pub fragrance: AtUri<S>,
     ///Final: Total duration (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub longevity: Option<i64>,
@@ -80,8 +88,7 @@ pub struct Review<'a> {
     pub stage3_temp: Option<i64>,
     ///Written review (max 255 graphemes)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<CowStr<'a>>,
+    pub text: Option<S>,
     ///Daily maximum UV index (0-11+)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uv_index: Option<i64>,
@@ -91,27 +98,30 @@ pub struct Review<'a> {
     ///Calculated final score * 1000 (e.g. 4250 = 4.25)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub weighted_score: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReviewGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReviewGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Review<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Review<S>,
 }
 
-impl<'a> Review<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ReviewRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Review<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ReviewRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -122,18 +132,17 @@ pub struct ReviewRecord;
 impl XrpcResp for ReviewRecord {
     const NSID: &'static str = "social.drydown.review";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReviewGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ReviewGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ReviewGetRecordOutput<'_>> for Review<'_> {
-    fn from(output: ReviewGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ReviewGetRecordOutput<S>> for Review<S> {
+    fn from(output: ReviewGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Review<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Review<S> {
     const NSID: &'static str = "social.drydown.review";
     type Record = ReviewRecord;
 }
@@ -143,7 +152,7 @@ impl Collection for ReviewRecord {
     type Record = ReviewRecord;
 }
 
-impl<'a> LexiconSchema for Review<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Review<S> {
     fn nsid() -> &'static str {
         "social.drydown.review"
     }
@@ -370,37 +379,37 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Fragrance;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Fragrance = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Fragrance = S::Fragrance;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `fragrance` field to Set
     pub struct SetFragrance<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFragrance<S> {}
     impl<S: State> State for SetFragrance<S> {
-        type CreatedAt = S::CreatedAt;
         type Fragrance = Set<members::fragrance>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Fragrance = S::Fragrance;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `fragrance` field
         pub struct fragrance(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -413,7 +422,7 @@ pub struct ReviewBuilder<'a, S: review_state::State> {
         Option<i64>,
         Option<i64>,
         Option<i64>,
-        Option<AtUri<'a>>,
+        Option<AtUri<S>>,
         Option<i64>,
         Option<i64>,
         Option<i64>,
@@ -424,7 +433,7 @@ pub struct ReviewBuilder<'a, S: review_state::State> {
         Option<Datetime>,
         Option<i64>,
         Option<i64>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
         Option<bool>,
         Option<i64>,
@@ -550,7 +559,7 @@ where
     /// Set the `fragrance` field (required)
     pub fn fragrance(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ReviewBuilder<'a, review_state::SetFragrance<S>> {
         self._fields.5 = Option::Some(value.into());
         ReviewBuilder {
@@ -693,12 +702,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `text` field (optional)
-    pub fn text(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn text(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
-    pub fn maybe_text(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_text(mut self, value: Option<S>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -746,8 +755,8 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
-    S::CreatedAt: review_state::IsSet,
     S::Fragrance: review_state::IsSet,
+    S::CreatedAt: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {
@@ -776,13 +785,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Review<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Review<'a> {
         Review {
             complexity: self._fields.0,
             created_at: self._fields.1.unwrap(),

@@ -10,13 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -27,55 +28,69 @@ use crate::games_gamesgamesgamesgames::get_reviews;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetReviews<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetReviews<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `20`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetReviewsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetReviewsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub reviews: Vec<get_reviews::PopfeedReview<'a>>,
+    pub cursor: Option<S>,
+    pub reviews: Vec<get_reviews::PopfeedReview<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PopfeedReview<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PopfeedReview<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contains_spoilers: Option<bool>,
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Data<'a>>>,
+    pub facets: Option<Vec<Data<S>>>,
     pub rating: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<CowStr<'a>>,
+    pub text: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub title: Option<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for games.gamesgamesgamesgames.getReviews
@@ -83,11 +98,12 @@ pub struct GetReviewsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetReviewsResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.getReviews";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetReviewsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetReviewsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetReviews<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetReviews<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.getReviews";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetReviewsResponse;
@@ -98,11 +114,11 @@ pub struct GetReviewsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetReviewsRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.getReviews";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetReviews<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetReviews<S>;
     type Response = GetReviewsResponse;
 }
 
-impl<'a> LexiconSchema for PopfeedReview<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PopfeedReview<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.getReviews"
     }
@@ -176,7 +192,7 @@ pub mod get_reviews_state {
 /// Builder for constructing an instance of this type
 pub struct GetReviewsBuilder<'a, S: get_reviews_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -200,12 +216,12 @@ impl<'a> GetReviewsBuilder<'a, get_reviews_state::Empty> {
 
 impl<'a, S: get_reviews_state::State> GetReviewsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -232,7 +248,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetReviewsBuilder<'a, get_reviews_state::SetUri<S>> {
         self._fields.2 = Option::Some(value.into());
         GetReviewsBuilder {
@@ -338,13 +354,13 @@ pub struct PopfeedReviewBuilder<'a, S: popfeed_review_state::State> {
     _fields: (
         Option<bool>,
         Option<Datetime>,
-        Option<Did<'a>>,
-        Option<Vec<Data<'a>>>,
+        Option<Did<S>>,
+        Option<Vec<Data<S>>>,
         Option<i64>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
+        Option<Vec<S>>,
+        Option<S>,
+        Option<S>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -407,7 +423,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> PopfeedReviewBuilder<'a, popfeed_review_state::SetDid<S>> {
         self._fields.2 = Option::Some(value.into());
         PopfeedReviewBuilder {
@@ -420,12 +436,12 @@ where
 
 impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     /// Set the `facets` field (optional)
-    pub fn facets(mut self, value: impl Into<Option<Vec<Data<'a>>>>) -> Self {
+    pub fn facets(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
-    pub fn maybe_facets(mut self, value: Option<Vec<Data<'a>>>) -> Self {
+    pub fn maybe_facets(mut self, value: Option<Vec<Data<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -452,12 +468,12 @@ where
 
 impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -465,12 +481,12 @@ impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
 
 impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     /// Set the `text` field (optional)
-    pub fn text(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn text(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
-    pub fn maybe_text(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_text(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -478,12 +494,12 @@ impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
 
 impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -497,7 +513,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> PopfeedReviewBuilder<'a, popfeed_review_state::SetUri<S>> {
         self._fields.8 = Option::Some(value.into());
         PopfeedReviewBuilder {
@@ -534,7 +550,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PopfeedReview<'a> {
         PopfeedReview {
             contains_spoilers: self._fields.0,

@@ -10,11 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -22,19 +25,25 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BackgroundImage<'a> {
-    #[serde(borrow)]
-    pub image: BlobRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BackgroundImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub image: BlobRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repeat: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for BackgroundImage<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BackgroundImage<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.theme.backgroundImage"
     }
@@ -124,7 +133,7 @@ pub mod background_image_state {
 /// Builder for constructing an instance of this type
 pub struct BackgroundImageBuilder<'a, S: background_image_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>, Option<bool>, Option<i64>),
+    _fields: (Option<BlobRef<S>>, Option<bool>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -154,7 +163,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> BackgroundImageBuilder<'a, background_image_state::SetImage<S>> {
         self._fields.0 = Option::Some(value.into());
         BackgroundImageBuilder {
@@ -208,10 +217,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BackgroundImage<'a> {
         BackgroundImage {
             image: self._fields.0.unwrap(),

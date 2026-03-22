@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,39 +30,44 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Acceptance of a subscription request.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "sh.weaver.graph.subscribeAccept",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct SubscribeAccept<'a> {
+pub struct SubscribeAccept<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///Reference to the subscribe record being accepted.
-    #[serde(borrow)]
-    pub subscribe: StrongRef<'a>,
+    pub subscribe: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscribeAcceptGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SubscribeAcceptGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: SubscribeAccept<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: SubscribeAccept<S>,
 }
 
-impl<'a> SubscribeAccept<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SubscribeAcceptRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> SubscribeAccept<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SubscribeAcceptRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -71,18 +78,18 @@ pub struct SubscribeAcceptRecord;
 impl XrpcResp for SubscribeAcceptRecord {
     const NSID: &'static str = "sh.weaver.graph.subscribeAccept";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SubscribeAcceptGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SubscribeAcceptGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SubscribeAcceptGetRecordOutput<'_>> for SubscribeAccept<'_> {
-    fn from(output: SubscribeAcceptGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SubscribeAcceptGetRecordOutput<S>>
+for SubscribeAccept<S> {
+    fn from(output: SubscribeAcceptGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for SubscribeAccept<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for SubscribeAccept<S> {
     const NSID: &'static str = "sh.weaver.graph.subscribeAccept";
     type Record = SubscribeAcceptRecord;
 }
@@ -92,7 +99,7 @@ impl Collection for SubscribeAcceptRecord {
     type Record = SubscribeAcceptRecord;
 }
 
-impl<'a> LexiconSchema for SubscribeAccept<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SubscribeAccept<S> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.subscribeAccept"
     }
@@ -154,7 +161,7 @@ pub mod subscribe_accept_state {
 /// Builder for constructing an instance of this type
 pub struct SubscribeAcceptBuilder<'a, S: subscribe_accept_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<StrongRef<'a>>),
+    _fields: (Option<Datetime>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -203,7 +210,7 @@ where
     /// Set the `subscribe` field (required)
     pub fn subscribe(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> SubscribeAcceptBuilder<'a, subscribe_accept_state::SetSubscribe<S>> {
         self._fields.1 = Option::Some(value.into());
         SubscribeAcceptBuilder {
@@ -231,10 +238,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SubscribeAccept<'a> {
         SubscribeAccept {
             created_at: self._fields.0.unwrap(),

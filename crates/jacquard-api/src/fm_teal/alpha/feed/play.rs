@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,92 +29,88 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::fm_teal::alpha::feed::Artist;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "fm.teal.alpha.feed.play", tag = "$type")]
-pub struct Play<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "fm.teal.alpha.feed.play",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Play<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of Musicbrainz artist IDs. Prefer using 'artists'.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artist_mb_ids: Option<Vec<CowStr<'a>>>,
+    pub artist_mb_ids: Option<Vec<S>>,
     ///Array of artist names in order of original appearance. Prefer using 'artists'.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artist_names: Option<Vec<CowStr<'a>>>,
+    pub artist_names: Option<Vec<S>>,
     ///Array of artists in order of original appearance.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artists: Option<Vec<Artist<'a>>>,
+    pub artists: Option<Vec<Artist<S>>>,
     ///The length of the track in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration: Option<i64>,
     ///The ISRC code associated with the recording
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub isrc: Option<CowStr<'a>>,
+    pub isrc: Option<S>,
     ///The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if unavailable or not provided.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub music_service_base_domain: Option<CowStr<'a>>,
+    pub music_service_base_domain: Option<S>,
     ///The URL associated with this track
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub origin_url: Option<CowStr<'a>>,
+    pub origin_url: Option<S>,
     ///The unix timestamp of when the track was played
     #[serde(skip_serializing_if = "Option::is_none")]
     pub played_time: Option<Datetime>,
     ///The Musicbrainz recording ID of the track
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recording_mb_id: Option<CowStr<'a>>,
+    pub recording_mb_id: Option<S>,
     ///Distinguishing information for release variants (e.g. 'Deluxe Edition', 'Remastered', '2023 Remaster', 'Special Edition'). Used to differentiate between different versions of the same base release while maintaining grouping capabilities.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub release_discriminant: Option<CowStr<'a>>,
+    pub release_discriminant: Option<S>,
     ///The Musicbrainz release ID
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub release_mb_id: Option<CowStr<'a>>,
+    pub release_mb_id: Option<S>,
     ///The name of the release/album
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub release_name: Option<CowStr<'a>>,
+    pub release_name: Option<S>,
     ///A metadata string specifying the user agent where the format is `<app-identifier>/<version> (<kernel/OS-base>; <platform/OS-version>; <device-model>)`. If string is provided, only `app-identifier` and `version` are required. `app-identifier` is recommended to be in reverse dns format. Defaults to 'manual/unknown' if unavailable or not provided.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub submission_client_agent: Option<CowStr<'a>>,
+    pub submission_client_agent: Option<S>,
     ///Distinguishing information for track variants (e.g. 'Acoustic Version', 'Live at Wembley', 'Radio Edit', 'Demo'). Used to differentiate between different versions of the same base track while maintaining grouping capabilities.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub track_discriminant: Option<CowStr<'a>>,
+    pub track_discriminant: Option<S>,
     ///The Musicbrainz ID of the track
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub track_mb_id: Option<CowStr<'a>>,
+    pub track_mb_id: Option<S>,
     ///The name of the track
-    #[serde(borrow)]
-    pub track_name: CowStr<'a>,
+    pub track_name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PlayGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PlayGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Play<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Play<S>,
 }
 
-impl<'a> Play<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PlayRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Play<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PlayRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -123,18 +121,17 @@ pub struct PlayRecord;
 impl XrpcResp for PlayRecord {
     const NSID: &'static str = "fm.teal.alpha.feed.play";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PlayGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PlayGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PlayGetRecordOutput<'_>> for Play<'_> {
-    fn from(output: PlayGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PlayGetRecordOutput<S>> for Play<S> {
+    fn from(output: PlayGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Play<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Play<S> {
     const NSID: &'static str = "fm.teal.alpha.feed.play";
     type Record = PlayRecord;
 }
@@ -144,7 +141,7 @@ impl Collection for PlayRecord {
     type Record = PlayRecord;
 }
 
-impl<'a> LexiconSchema for Play<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Play<S> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.feed.play"
     }
@@ -318,22 +315,22 @@ pub mod play_state {
 pub struct PlayBuilder<'a, S: play_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<Artist<'a>>>,
+        Option<Vec<S>>,
+        Option<Vec<S>>,
+        Option<Vec<Artist<S>>>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -375,12 +372,12 @@ impl<'a> PlayBuilder<'a, play_state::Empty> {
 
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `artistMbIds` field (optional)
-    pub fn artist_mb_ids(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn artist_mb_ids(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `artistMbIds` field to an Option value (optional)
-    pub fn maybe_artist_mb_ids(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_artist_mb_ids(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -388,12 +385,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `artistNames` field (optional)
-    pub fn artist_names(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn artist_names(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `artistNames` field to an Option value (optional)
-    pub fn maybe_artist_names(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_artist_names(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -401,12 +398,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `artists` field (optional)
-    pub fn artists(mut self, value: impl Into<Option<Vec<Artist<'a>>>>) -> Self {
+    pub fn artists(mut self, value: impl Into<Option<Vec<Artist<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `artists` field to an Option value (optional)
-    pub fn maybe_artists(mut self, value: Option<Vec<Artist<'a>>>) -> Self {
+    pub fn maybe_artists(mut self, value: Option<Vec<Artist<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -427,12 +424,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `isrc` field (optional)
-    pub fn isrc(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn isrc(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `isrc` field to an Option value (optional)
-    pub fn maybe_isrc(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_isrc(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -440,15 +437,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `musicServiceBaseDomain` field (optional)
-    pub fn music_service_base_domain(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn music_service_base_domain(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `musicServiceBaseDomain` field to an Option value (optional)
-    pub fn maybe_music_service_base_domain(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_music_service_base_domain(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -456,12 +450,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `originUrl` field (optional)
-    pub fn origin_url(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn origin_url(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `originUrl` field to an Option value (optional)
-    pub fn maybe_origin_url(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_origin_url(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -482,12 +476,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `recordingMbId` field (optional)
-    pub fn recording_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn recording_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `recordingMbId` field to an Option value (optional)
-    pub fn maybe_recording_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_recording_mb_id(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -495,12 +489,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `releaseDiscriminant` field (optional)
-    pub fn release_discriminant(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn release_discriminant(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `releaseDiscriminant` field to an Option value (optional)
-    pub fn maybe_release_discriminant(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_release_discriminant(mut self, value: Option<S>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -508,12 +502,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `releaseMbId` field (optional)
-    pub fn release_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn release_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `releaseMbId` field to an Option value (optional)
-    pub fn maybe_release_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_release_mb_id(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -521,12 +515,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `releaseName` field (optional)
-    pub fn release_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn release_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `releaseName` field to an Option value (optional)
-    pub fn maybe_release_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_release_name(mut self, value: Option<S>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -534,15 +528,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `submissionClientAgent` field (optional)
-    pub fn submission_client_agent(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn submission_client_agent(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `submissionClientAgent` field to an Option value (optional)
-    pub fn maybe_submission_client_agent(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_submission_client_agent(mut self, value: Option<S>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -550,12 +541,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `trackDiscriminant` field (optional)
-    pub fn track_discriminant(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn track_discriminant(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `trackDiscriminant` field to an Option value (optional)
-    pub fn maybe_track_discriminant(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_track_discriminant(mut self, value: Option<S>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -563,12 +554,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `trackMbId` field (optional)
-    pub fn track_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn track_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.14 = value.into();
         self
     }
     /// Set the `trackMbId` field to an Option value (optional)
-    pub fn maybe_track_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_track_mb_id(mut self, value: Option<S>) -> Self {
         self._fields.14 = value;
         self
     }
@@ -582,7 +573,7 @@ where
     /// Set the `trackName` field (required)
     pub fn track_name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PlayBuilder<'a, play_state::SetTrackName<S>> {
         self._fields.15 = Option::Some(value.into());
         PlayBuilder {
@@ -621,13 +612,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Play<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Play<'a> {
         Play {
             artist_mb_ids: self._fields.0,
             artist_names: self._fields.1,

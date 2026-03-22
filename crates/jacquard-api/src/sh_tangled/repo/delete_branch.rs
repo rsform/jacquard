@@ -10,19 +10,28 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteBranch<'a> {
-    #[serde(borrow)]
-    pub branch: CowStr<'a>,
-    #[serde(borrow)]
-    pub repo: AtUri<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteBranch<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub branch: S,
+    pub repo: AtUri<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.tangled.repo.deleteBranch
@@ -30,11 +39,12 @@ pub struct DeleteBranchResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteBranchResponse {
     const NSID: &'static str = "sh.tangled.repo.deleteBranch";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteBranch<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DeleteBranch<S> {
     const NSID: &'static str = "sh.tangled.repo.deleteBranch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -49,7 +59,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteBranchRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DeleteBranch<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DeleteBranch<S>;
     type Response = DeleteBranchResponse;
 }
 
@@ -100,7 +110,7 @@ pub mod delete_branch_state {
 /// Builder for constructing an instance of this type
 pub struct DeleteBranchBuilder<'a, S: delete_branch_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -130,7 +140,7 @@ where
     /// Set the `branch` field (required)
     pub fn branch(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DeleteBranchBuilder<'a, delete_branch_state::SetBranch<S>> {
         self._fields.0 = Option::Some(value.into());
         DeleteBranchBuilder {
@@ -149,7 +159,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> DeleteBranchBuilder<'a, delete_branch_state::SetRepo<S>> {
         self._fields.1 = Option::Some(value.into());
         DeleteBranchBuilder {
@@ -177,10 +187,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DeleteBranch<'a> {
         DeleteBranch {
             branch: self._fields.0.unwrap(),

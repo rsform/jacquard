@@ -18,12 +18,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -32,71 +35,107 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Object containing a blob to external data
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LargeBlob<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LargeBlob<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Blob to external data (up to 100MB)
-    #[serde(borrow)]
-    pub blob: BlobRef<'a>,
+    pub blob: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Object containing a large image
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LargeImage<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LargeImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Image (up to 10MB)
-    #[serde(borrow)]
-    pub image: BlobRef<'a>,
+    pub image: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Object containing a blob to external data
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SmallBlob<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SmallBlob<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Blob to external data (up to 10MB)
-    #[serde(borrow)]
-    pub blob: BlobRef<'a>,
+    pub blob: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Object containing a small image
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SmallImage<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SmallImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Image (up to 5MB)
-    #[serde(borrow)]
-    pub image: BlobRef<'a>,
+    pub image: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Object containing a small video
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SmallVideo<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SmallVideo<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Video (up to 20MB)
-    #[serde(borrow)]
-    pub video: BlobRef<'a>,
+    pub video: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Object containing a URI to external data
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Uri<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Uri<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///URI to external data
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+    pub uri: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for LargeBlob<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LargeBlob<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
@@ -151,7 +190,7 @@ impl<'a> LexiconSchema for LargeBlob<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LargeImage<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LargeImage<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
@@ -214,7 +253,7 @@ impl<'a> LexiconSchema for LargeImage<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SmallBlob<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SmallBlob<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
@@ -269,7 +308,7 @@ impl<'a> LexiconSchema for SmallBlob<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SmallImage<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SmallImage<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
@@ -332,7 +371,7 @@ impl<'a> LexiconSchema for SmallImage<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SmallVideo<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SmallVideo<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
@@ -389,7 +428,7 @@ impl<'a> LexiconSchema for SmallVideo<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Uri<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Uri<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
@@ -439,7 +478,7 @@ pub mod large_blob_state {
 /// Builder for constructing an instance of this type
 pub struct LargeBlobBuilder<'a, S: large_blob_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>,),
+    _fields: (Option<BlobRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -469,7 +508,7 @@ where
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> LargeBlobBuilder<'a, large_blob_state::SetBlob<S>> {
         self._fields.0 = Option::Some(value.into());
         LargeBlobBuilder {
@@ -495,10 +534,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LargeBlob<'a> {
         LargeBlob {
             blob: self._fields.0.unwrap(),
@@ -678,7 +714,7 @@ pub mod large_image_state {
 /// Builder for constructing an instance of this type
 pub struct LargeImageBuilder<'a, S: large_image_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>,),
+    _fields: (Option<BlobRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -708,7 +744,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> LargeImageBuilder<'a, large_image_state::SetImage<S>> {
         self._fields.0 = Option::Some(value.into());
         LargeImageBuilder {
@@ -734,10 +770,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LargeImage<'a> {
         LargeImage {
             image: self._fields.0.unwrap(),
@@ -781,7 +814,7 @@ pub mod small_blob_state {
 /// Builder for constructing an instance of this type
 pub struct SmallBlobBuilder<'a, S: small_blob_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>,),
+    _fields: (Option<BlobRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -811,7 +844,7 @@ where
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> SmallBlobBuilder<'a, small_blob_state::SetBlob<S>> {
         self._fields.0 = Option::Some(value.into());
         SmallBlobBuilder {
@@ -837,10 +870,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SmallBlob<'a> {
         SmallBlob {
             blob: self._fields.0.unwrap(),
@@ -884,7 +914,7 @@ pub mod small_image_state {
 /// Builder for constructing an instance of this type
 pub struct SmallImageBuilder<'a, S: small_image_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>,),
+    _fields: (Option<BlobRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -914,7 +944,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> SmallImageBuilder<'a, small_image_state::SetImage<S>> {
         self._fields.0 = Option::Some(value.into());
         SmallImageBuilder {
@@ -940,10 +970,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SmallImage<'a> {
         SmallImage {
             image: self._fields.0.unwrap(),
@@ -987,7 +1014,7 @@ pub mod small_video_state {
 /// Builder for constructing an instance of this type
 pub struct SmallVideoBuilder<'a, S: small_video_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>,),
+    _fields: (Option<BlobRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1017,7 +1044,7 @@ where
     /// Set the `video` field (required)
     pub fn video(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> SmallVideoBuilder<'a, small_video_state::SetVideo<S>> {
         self._fields.0 = Option::Some(value.into());
         SmallVideoBuilder {
@@ -1043,10 +1070,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SmallVideo<'a> {
         SmallVideo {
             video: self._fields.0.unwrap(),
@@ -1090,7 +1114,7 @@ pub mod uri_state {
 /// Builder for constructing an instance of this type
 pub struct UriBuilder<'a, S: uri_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<UriValue<'a>>,),
+    _fields: (Option<UriValue<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1120,7 +1144,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> UriBuilder<'a, uri_state::SetUri<S>> {
         self._fields.0 = Option::Some(value.into());
         UriBuilder {
@@ -1144,13 +1168,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Uri<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Uri<'a> {
         Uri {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

@@ -10,25 +10,41 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::video::JobStatus;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetJobStatus<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetJobStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub job_id: CowStr<'a>,
+    pub job_id: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetJobStatusOutput<'a> {
-    #[serde(borrow)]
-    pub job_status: JobStatus<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetJobStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub job_status: JobStatus<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.video.getJobStatus
@@ -36,11 +52,12 @@ pub struct GetJobStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJobStatusResponse {
     const NSID: &'static str = "app.bsky.video.getJobStatus";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetJobStatusOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetJobStatusOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetJobStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetJobStatus<S> {
     const NSID: &'static str = "app.bsky.video.getJobStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetJobStatusResponse;
@@ -51,7 +68,7 @@ pub struct GetJobStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJobStatusRequest {
     const PATH: &'static str = "/xrpc/app.bsky.video.getJobStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetJobStatus<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetJobStatus<S>;
     type Response = GetJobStatusResponse;
 }
 
@@ -90,7 +107,7 @@ pub mod get_job_status_state {
 /// Builder for constructing an instance of this type
 pub struct GetJobStatusBuilder<'a, S: get_job_status_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -120,7 +137,7 @@ where
     /// Set the `jobId` field (required)
     pub fn job_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetJobStatusBuilder<'a, get_job_status_state::SetJobId<S>> {
         self._fields.0 = Option::Some(value.into());
         GetJobStatusBuilder {

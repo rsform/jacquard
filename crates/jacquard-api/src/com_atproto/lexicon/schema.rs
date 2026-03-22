@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,33 +29,43 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Representation of Lexicon schemas themselves, when published as atproto records. Note that the schema language is not defined in Lexicon; this meta schema currently only includes a single version field ('lexicon'). See the atproto specifications for description of the other expected top-level fields ('id', 'defs', etc).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "com.atproto.lexicon.schema", tag = "$type")]
-pub struct Schema<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "com.atproto.lexicon.schema",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Schema<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Indicates the 'version' of the Lexicon language. Must be '1' for the current atproto/Lexicon schema system.
     pub lexicon: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SchemaGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SchemaGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Schema<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Schema<S>,
 }
 
-impl<'a> Schema<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SchemaRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Schema<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SchemaRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -64,18 +76,17 @@ pub struct SchemaRecord;
 impl XrpcResp for SchemaRecord {
     const NSID: &'static str = "com.atproto.lexicon.schema";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SchemaGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SchemaGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SchemaGetRecordOutput<'_>> for Schema<'_> {
-    fn from(output: SchemaGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SchemaGetRecordOutput<S>> for Schema<S> {
+    fn from(output: SchemaGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Schema<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Schema<S> {
     const NSID: &'static str = "com.atproto.lexicon.schema";
     type Record = SchemaRecord;
 }
@@ -85,7 +96,7 @@ impl Collection for SchemaRecord {
     type Record = SchemaRecord;
 }
 
-impl<'a> LexiconSchema for Schema<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Schema<S> {
     fn nsid() -> &'static str {
         "com.atproto.lexicon.schema"
     }
@@ -189,13 +200,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Schema<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Schema<'a> {
         Schema {
             lexicon: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

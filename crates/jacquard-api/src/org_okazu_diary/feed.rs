@@ -16,11 +16,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -32,39 +34,56 @@ use crate::org_okazu_diary::embed::external::External;
 use crate::org_okazu_diary::embed::record::Record;
 /// A descriptor of a material used to help self-gratification.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Subject<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Subject<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///User-specified self-label values for the material. The Lexicon by its nature assumes the material to be possibly sensitive by default, so the explicit label values are intended to signal that a warning should be put on the material even for the Okazu-Diary.org application users who are willing to see mature contents in general.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<SelfLabels<'a>>,
-    #[serde(borrow)]
-    pub value: SubjectValue<'a>,
+    pub labels: Option<SelfLabels<S>>,
+    pub value: SubjectValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SubjectValue<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SubjectValue<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.okazu-diary.embed.external")]
-    External(Box<External<'a>>),
+    External(Box<External<S>>),
     #[serde(rename = "org.okazu-diary.embed.record")]
-    Record(Box<Record<'a>>),
+    Record(Box<Record<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Tag<'a> {
-    #[serde(borrow)]
-    pub value: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Subject<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Subject<S> {
     fn nsid() -> &'static str {
         "org.okazu-diary.feed.defs"
     }
@@ -79,7 +98,7 @@ impl<'a> LexiconSchema for Subject<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Tag<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tag<S> {
     fn nsid() -> &'static str {
         "org.okazu-diary.feed.defs"
     }
@@ -151,7 +170,7 @@ pub mod subject_state {
 /// Builder for constructing an instance of this type
 pub struct SubjectBuilder<'a, S: subject_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<SelfLabels<'a>>, Option<SubjectValue<'a>>),
+    _fields: (Option<SelfLabels<S>>, Option<SubjectValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -175,12 +194,12 @@ impl<'a> SubjectBuilder<'a, subject_state::Empty> {
 
 impl<'a, S: subject_state::State> SubjectBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -194,7 +213,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<SubjectValue<'a>>,
+        value: impl Into<SubjectValue<S>>,
     ) -> SubjectBuilder<'a, subject_state::SetValue<S>> {
         self._fields.1 = Option::Some(value.into());
         SubjectBuilder {
@@ -221,10 +240,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Subject<'a> {
         Subject {
             labels: self._fields.0,

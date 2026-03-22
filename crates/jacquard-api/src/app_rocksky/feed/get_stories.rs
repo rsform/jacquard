@@ -7,6 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -20,13 +21,24 @@ pub struct GetStories {
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetStoriesOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetStoriesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Data<'a>,
+    pub value: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<S>>,
+    >,
 }
 
 /// Response type for app.rocksky.feed.getStories
@@ -34,8 +46,8 @@ pub struct GetStoriesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStoriesResponse {
     const NSID: &'static str = "app.rocksky.feed.getStories";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetStoriesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetStoriesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetStories {
@@ -49,7 +61,7 @@ pub struct GetStoriesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStoriesRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.feed.getStories";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetStories;
+    type Request<S: Bos<str> + AsRef<str>> = GetStories;
     type Response = GetStoriesResponse;
 }
 

@@ -10,13 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Nsid};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,45 +27,65 @@ use serde::{Serialize, Deserialize};
 use crate::at_inlay::Element;
 use crate::at_inlay::Response;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct List<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct List<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///DID of the service that implements the query.
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///Parameters to pass to the query.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub input: Option<Data<'a>>,
+    pub input: Option<Data<S>>,
     ///XRPC query to call for pages of items.
-    #[serde(borrow)]
-    pub query: Nsid<'a>,
+    pub query: Nsid<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Response<'a>,
+    pub value: Response<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response shape from a List data source query.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Page<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Page<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Opaque pagination token. Absent means no more items.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Elements to render as list rows.
-    #[serde(borrow)]
-    pub items: Vec<Element<'a>>,
+    pub items: Vec<Element<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for org.atsui.List
@@ -72,11 +93,12 @@ pub struct ListResponse;
 impl jacquard_common::xrpc::XrpcResp for ListResponse {
     const NSID: &'static str = "org.atsui.List";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for List<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for List<S> {
     const NSID: &'static str = "org.atsui.List";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -91,11 +113,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = List<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = List<S>;
     type Response = ListResponse;
 }
 
-impl<'a> LexiconSchema for Page<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Page<S> {
     fn nsid() -> &'static str {
         "org.atsui.List"
     }
@@ -167,7 +189,7 @@ pub mod list_state {
 /// Builder for constructing an instance of this type
 pub struct ListBuilder<'a, S: list_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<Data<'a>>, Option<Nsid<'a>>),
+    _fields: (Option<Did<S>>, Option<Data<S>>, Option<Nsid<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -197,7 +219,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ListBuilder<'a, list_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         ListBuilder {
@@ -210,12 +232,12 @@ where
 
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `input` field (optional)
-    pub fn input(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn input(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `input` field to an Option value (optional)
-    pub fn maybe_input(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_input(mut self, value: Option<Data<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -229,7 +251,7 @@ where
     /// Set the `query` field (required)
     pub fn query(
         mut self,
-        value: impl Into<Nsid<'a>>,
+        value: impl Into<Nsid<S>>,
     ) -> ListBuilder<'a, list_state::SetQuery<S>> {
         self._fields.2 = Option::Some(value.into());
         ListBuilder {
@@ -256,10 +278,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> List<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> List<'a> {
         List {
             did: self._fields.0.unwrap(),
             input: self._fields.1,
@@ -304,7 +323,7 @@ pub mod page_state {
 /// Builder for constructing an instance of this type
 pub struct PageBuilder<'a, S: page_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Vec<Element<'a>>>),
+    _fields: (Option<S>, Option<Vec<Element<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -328,12 +347,12 @@ impl<'a> PageBuilder<'a, page_state::Empty> {
 
 impl<'a, S: page_state::State> PageBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -347,7 +366,7 @@ where
     /// Set the `items` field (required)
     pub fn items(
         mut self,
-        value: impl Into<Vec<Element<'a>>>,
+        value: impl Into<Vec<Element<S>>>,
     ) -> PageBuilder<'a, page_state::SetItems<S>> {
         self._fields.1 = Option::Some(value.into());
         PageBuilder {
@@ -372,10 +391,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Page<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Page<'a> {
         Page {
             cursor: self._fields.0,
             items: self._fields.1.unwrap(),

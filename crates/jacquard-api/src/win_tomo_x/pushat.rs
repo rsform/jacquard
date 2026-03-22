@@ -14,12 +14,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Tid, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -27,42 +29,51 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::win_tomo_x::pushat;
-pub type DeviceList<'a> = Vec<pushat::DeviceListItem<'a>>;
+pub type DeviceList<'a> = Vec<pushat::DeviceListItem<S>>;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DeviceListItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeviceListItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// Defaults to `false`.
     #[serde(default = "_default_device_list_item_current")]
     pub current: bool,
     pub id: Tid,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct NotifyBody<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct NotifyBody<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Body text of the notification.
-    #[serde(borrow)]
-    pub body: CowStr<'a>,
+    pub body: S,
     ///The URI of the icon displayed in the notification.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub icon: Option<UriValue<'a>>,
+    pub icon: Option<UriValue<S>>,
     ///Experimental — do not use. The URI to open when the notification is clicked.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub link: Option<UriValue<'a>>,
+    pub link: Option<UriValue<S>>,
     ///Title text of the notification.
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for DeviceListItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DeviceListItem<S> {
     fn nsid() -> &'static str {
         "win.tomo-x.pushat.defs"
     }
@@ -101,7 +112,7 @@ impl<'a> LexiconSchema for DeviceListItem<'a> {
     }
 }
 
-impl<'a> LexiconSchema for NotifyBody<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for NotifyBody<S> {
     fn nsid() -> &'static str {
         "win.tomo-x.pushat.defs"
     }
@@ -130,49 +141,49 @@ pub mod device_list_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Current;
+        type Id;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Current = Unset;
+        type Id = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Current = S::Current;
-        type Name = S::Name;
     }
     ///State transition - sets the `current` field to Set
     pub struct SetCurrent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCurrent<S> {}
     impl<S: State> State for SetCurrent<S> {
-        type Id = S::Id;
         type Current = Set<members::current>;
+        type Id = S::Id;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Current = S::Current;
+        type Id = Set<members::id>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Id = S::Id;
         type Current = S::Current;
+        type Id = S::Id;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `current` field
         pub struct current(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -181,7 +192,7 @@ pub mod device_list_item_state {
 /// Builder for constructing an instance of this type
 pub struct DeviceListItemBuilder<'a, S: device_list_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<Tid>, Option<CowStr<'a>>),
+    _fields: (Option<bool>, Option<Tid>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -249,7 +260,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DeviceListItemBuilder<'a, device_list_item_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         DeviceListItemBuilder {
@@ -263,8 +274,8 @@ where
 impl<'a, S> DeviceListItemBuilder<'a, S>
 where
     S: device_list_item_state::State,
-    S::Id: device_list_item_state::IsSet,
     S::Current: device_list_item_state::IsSet,
+    S::Id: device_list_item_state::IsSet,
     S::Name: device_list_item_state::IsSet,
 {
     /// Build the final struct
@@ -279,10 +290,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DeviceListItem<'a> {
         DeviceListItem {
             current: self._fields.0.unwrap(),

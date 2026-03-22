@@ -13,13 +13,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -29,111 +31,145 @@ use serde::{Serialize, Deserialize};
 use crate::app_greengale::blog;
 /// Metadata for uploaded binary content
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BlobMetadata<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BlobMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alt: Option<CowStr<'a>>,
+    pub alt: Option<S>,
     ///Reference to the blob
-    #[serde(borrow)]
-    pub blobref: BlobRef<'a>,
+    pub blobref: BlobRef<S>,
     ///Content labels (self-labels) for this image
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<blog::SelfLabels<'a>>,
+    pub labels: Option<blog::SelfLabels<S>>,
     ///Original filename
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Custom color values (CSS color strings)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CustomColors<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CustomColors<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Accent/link color
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accent: Option<CowStr<'a>>,
+    pub accent: Option<S>,
     ///Background color
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub background: Option<CowStr<'a>>,
+    pub background: Option<S>,
     ///Code block background color
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub code_background: Option<CowStr<'a>>,
+    pub code_background: Option<S>,
     ///Primary text color
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<CowStr<'a>>,
+    pub text: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Open Graph Protocol metadata for social sharing
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Ogp<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Ogp<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Image height in pixels
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
     ///URL of the OGP image
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
     ///Image width in pixels
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Metadata tag on an atproto resource, published by the author
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SelfLabel<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SelfLabel<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The short string name of the value or type of this label
-    #[serde(borrow)]
-    pub val: CowStr<'a>,
+    pub val: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Metadata tags on an atproto resource, published by the author
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SelfLabels<'a> {
-    #[serde(borrow)]
-    pub values: Vec<blog::SelfLabel<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SelfLabels<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub values: Vec<blog::SelfLabel<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Theme configuration for a blog entry
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Theme<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Theme<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Custom color overrides
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub custom: Option<blog::CustomColors<'a>>,
+    pub custom: Option<blog::CustomColors<S>>,
     ///Predefined color theme
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub preset: Option<CowStr<'a>>,
+    pub preset: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Voice theme configuration for TTS playback
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct VoiceTheme<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct VoiceTheme<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Pitch multiplier x100 (100 = normal, range 50-150)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pitch: Option<i64>,
@@ -142,11 +178,12 @@ pub struct VoiceTheme<'a> {
     pub speed: Option<i64>,
     ///Voice ID for TTS (e.g., 'af_heart', 'am_adam')
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub voice: Option<CowStr<'a>>,
+    pub voice: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for BlobMetadata<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BlobMetadata<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -208,7 +245,7 @@ impl<'a> LexiconSchema for BlobMetadata<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CustomColors<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CustomColors<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -263,7 +300,7 @@ impl<'a> LexiconSchema for CustomColors<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Ogp<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Ogp<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -289,7 +326,7 @@ impl<'a> LexiconSchema for Ogp<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SelfLabel<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SelfLabel<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -315,7 +352,7 @@ impl<'a> LexiconSchema for SelfLabel<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SelfLabels<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SelfLabels<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -341,7 +378,7 @@ impl<'a> LexiconSchema for SelfLabels<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Theme<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Theme<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -366,7 +403,7 @@ impl<'a> LexiconSchema for Theme<'a> {
     }
 }
 
-impl<'a> LexiconSchema for VoiceTheme<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for VoiceTheme<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -426,12 +463,7 @@ pub mod blob_metadata_state {
 /// Builder for constructing an instance of this type
 pub struct BlobMetadataBuilder<'a, S: blob_metadata_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<blog::SelfLabels<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<BlobRef<S>>, Option<blog::SelfLabels<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -455,12 +487,12 @@ impl<'a> BlobMetadataBuilder<'a, blob_metadata_state::Empty> {
 
 impl<'a, S: blob_metadata_state::State> BlobMetadataBuilder<'a, S> {
     /// Set the `alt` field (optional)
-    pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
-    pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_alt(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -474,7 +506,7 @@ where
     /// Set the `blobref` field (required)
     pub fn blobref(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> BlobMetadataBuilder<'a, blob_metadata_state::SetBlobref<S>> {
         self._fields.1 = Option::Some(value.into());
         BlobMetadataBuilder {
@@ -487,12 +519,12 @@ where
 
 impl<'a, S: blob_metadata_state::State> BlobMetadataBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<blog::SelfLabels<'a>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<blog::SelfLabels<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<blog::SelfLabels<'a>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<blog::SelfLabels<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -500,12 +532,12 @@ impl<'a, S: blob_metadata_state::State> BlobMetadataBuilder<'a, S> {
 
 impl<'a, S: blob_metadata_state::State> BlobMetadataBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -529,10 +561,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BlobMetadata<'a> {
         BlobMetadata {
             alt: self._fields.0,
@@ -853,7 +882,7 @@ pub mod ogp_state {
 /// Builder for constructing an instance of this type
 pub struct OgpBuilder<'a, S: ogp_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<UriValue<'a>>, Option<i64>),
+    _fields: (Option<i64>, Option<UriValue<S>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -896,7 +925,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> OgpBuilder<'a, ogp_state::SetUrl<S>> {
         self._fields.1 = Option::Some(value.into());
         OgpBuilder {
@@ -935,13 +964,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Ogp<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Ogp<'a> {
         Ogp {
             height: self._fields.0,
             url: self._fields.1.unwrap(),
@@ -986,7 +1009,7 @@ pub mod self_labels_state {
 /// Builder for constructing an instance of this type
 pub struct SelfLabelsBuilder<'a, S: self_labels_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<blog::SelfLabel<'a>>>,),
+    _fields: (Option<Vec<blog::SelfLabel<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1016,7 +1039,7 @@ where
     /// Set the `values` field (required)
     pub fn values(
         mut self,
-        value: impl Into<Vec<blog::SelfLabel<'a>>>,
+        value: impl Into<Vec<blog::SelfLabel<S>>>,
     ) -> SelfLabelsBuilder<'a, self_labels_state::SetValues<S>> {
         self._fields.0 = Option::Some(value.into());
         SelfLabelsBuilder {
@@ -1042,10 +1065,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SelfLabels<'a> {
         SelfLabels {
             values: self._fields.0.unwrap(),

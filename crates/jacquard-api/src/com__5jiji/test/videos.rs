@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -28,37 +29,44 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A video
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "com.5jiji.test.videos", tag = "$type")]
-pub struct Videos<'a> {
-    #[serde(borrow)]
-    pub creator: Did<'a>,
-    #[serde(borrow)]
-    pub id: Data<'a>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "com.5jiji.test.videos",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Videos<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub creator: Did<S>,
+    pub id: Data<S>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct VideosGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct VideosGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Videos<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Videos<S>,
 }
 
-impl<'a> Videos<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, VideosRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Videos<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, VideosRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -69,18 +77,17 @@ pub struct VideosRecord;
 impl XrpcResp for VideosRecord {
     const NSID: &'static str = "com.5jiji.test.videos";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = VideosGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = VideosGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<VideosGetRecordOutput<'_>> for Videos<'_> {
-    fn from(output: VideosGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<VideosGetRecordOutput<S>> for Videos<S> {
+    fn from(output: VideosGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Videos<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Videos<S> {
     const NSID: &'static str = "com.5jiji.test.videos";
     type Record = VideosRecord;
 }
@@ -90,7 +97,7 @@ impl Collection for VideosRecord {
     type Record = VideosRecord;
 }
 
-impl<'a> LexiconSchema for Videos<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Videos<S> {
     fn nsid() -> &'static str {
         "com.5jiji.test.videos"
     }
@@ -129,57 +136,57 @@ pub mod videos_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Creator;
-        type Title;
         type Id;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Creator = Unset;
-        type Title = Unset;
         type Id = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreator<S> {}
     impl<S: State> State for SetCreator<S> {
         type Creator = Set<members::creator>;
+        type Id = S::Id;
         type Title = S::Title;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Creator = S::Creator;
-        type Title = Set<members::title>;
-        type Id = S::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
         type Creator = S::Creator;
-        type Title = S::Title;
         type Id = Set<members::id>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Creator = S::Creator;
+        type Id = S::Id;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `creator` field
         pub struct creator(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct VideosBuilder<'a, S: videos_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<Data<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Did<S>>, Option<Data<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -209,7 +216,7 @@ where
     /// Set the `creator` field (required)
     pub fn creator(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> VideosBuilder<'a, videos_state::SetCreator<S>> {
         self._fields.0 = Option::Some(value.into());
         VideosBuilder {
@@ -228,7 +235,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> VideosBuilder<'a, videos_state::SetId<S>> {
         self._fields.1 = Option::Some(value.into());
         VideosBuilder {
@@ -247,7 +254,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> VideosBuilder<'a, videos_state::SetTitle<S>> {
         self._fields.2 = Option::Some(value.into());
         VideosBuilder {
@@ -262,8 +269,8 @@ impl<'a, S> VideosBuilder<'a, S>
 where
     S: videos_state::State,
     S::Creator: videos_state::IsSet,
-    S::Title: videos_state::IsSet,
     S::Id: videos_state::IsSet,
+    S::Title: videos_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Videos<'a> {
@@ -275,10 +282,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Videos<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Videos<'a> {
         Videos {
             creator: self._fields.0.unwrap(),
             id: self._fields.1.unwrap(),

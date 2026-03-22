@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,160 +31,173 @@ use serde::{Serialize, Deserialize};
 use crate::app_dropanchor::checkin;
 /// Street address (based on community.lexicon.location.address)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Address<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Address<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The ISO 3166 country code (preferably 2-letter)
-    #[serde(borrow)]
-    pub country: CowStr<'a>,
+    pub country: S,
     ///The locality (city, town, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub locality: Option<CowStr<'a>>,
+    pub locality: Option<S>,
     ///The name of the location
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///The postal code
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub postal_code: Option<CowStr<'a>>,
+    pub postal_code: Option<S>,
     ///The administrative region (state, province, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub region: Option<CowStr<'a>>,
+    pub region: Option<S>,
     ///The street address
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub street: Option<CowStr<'a>>,
+    pub street: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Image attachment with thumbnail and full-size versions
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CheckinImage<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CheckinImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alt: Option<CowStr<'a>>,
+    pub alt: Option<S>,
     ///Full-size version (max 2000px width, ~2MB)
-    #[serde(borrow)]
-    pub fullsize: BlobRef<'a>,
+    pub fullsize: BlobRef<S>,
     ///Thumbnail version (max 800px width, ~300KB)
-    #[serde(borrow)]
-    pub thumb: BlobRef<'a>,
+    pub thumb: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Foursquare venue data (based on community.lexicon.location.fsq)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct FsqPlace<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FsqPlace<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The unique identifier of a Foursquare POI
-    #[serde(borrow)]
-    pub fsq_place_id: CowStr<'a>,
+    pub fsq_place_id: S,
     ///Latitude in decimal degrees
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub latitude: Option<CowStr<'a>>,
+    pub latitude: Option<S>,
     ///Longitude in decimal degrees
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub longitude: Option<CowStr<'a>>,
+    pub longitude: Option<S>,
     ///The name of the location
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Geographic coordinates in WGS84 (based on community.lexicon.location.geo)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Geo<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Geo<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Altitude in meters
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub altitude: Option<CowStr<'a>>,
+    pub altitude: Option<S>,
     ///Latitude in decimal degrees (range: -90 to 90)
-    #[serde(borrow)]
-    pub latitude: CowStr<'a>,
+    pub latitude: S,
     ///Longitude in decimal degrees (range: -180 to 180)
-    #[serde(borrow)]
-    pub longitude: CowStr<'a>,
+    pub longitude: S,
     ///Name of the location
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A location check-in record for the Anchor app
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.dropanchor.checkin", tag = "$type")]
-pub struct Checkin<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.dropanchor.checkin",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Checkin<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Address of the check-in location (based on community.lexicon.location.address)
-    #[serde(borrow)]
-    pub address: checkin::Address<'a>,
+    pub address: checkin::Address<S>,
     ///Place category (e.g., cafe, restaurant)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category: Option<CowStr<'a>>,
+    pub category: Option<S>,
     ///Category group for organization
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category_group: Option<CowStr<'a>>,
+    pub category_group: Option<S>,
     ///Emoji icon for the category
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category_icon: Option<CowStr<'a>>,
+    pub category_icon: Option<S>,
     ///When the check-in was created
     pub created_at: Datetime,
     ///Optional Foursquare venue data (based on community.lexicon.location.fsq)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub fsq: Option<checkin::FsqPlace<'a>>,
+    pub fsq: Option<checkin::FsqPlace<S>>,
     ///Geographic coordinates of the check-in (based on community.lexicon.location.geo)
-    #[serde(borrow)]
-    pub geo: checkin::Geo<'a>,
+    pub geo: checkin::Geo<S>,
     ///Optional image attachment for the check-in
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<checkin::CheckinImage<'a>>,
+    pub image: Option<checkin::CheckinImage<S>>,
     ///The check-in message or note
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CheckinGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CheckinGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Checkin<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Checkin<S>,
 }
 
-impl<'a> Checkin<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CheckinRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Checkin<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CheckinRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Address<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Address<S> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
@@ -269,7 +284,7 @@ impl<'a> LexiconSchema for Address<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CheckinImage<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CheckinImage<S> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
@@ -380,7 +395,7 @@ impl<'a> LexiconSchema for CheckinImage<'a> {
     }
 }
 
-impl<'a> LexiconSchema for FsqPlace<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FsqPlace<S> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
@@ -436,7 +451,7 @@ impl<'a> LexiconSchema for FsqPlace<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Geo<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Geo<S> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
@@ -500,18 +515,17 @@ pub struct CheckinRecord;
 impl XrpcResp for CheckinRecord {
     const NSID: &'static str = "app.dropanchor.checkin";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CheckinGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CheckinGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CheckinGetRecordOutput<'_>> for Checkin<'_> {
-    fn from(output: CheckinGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CheckinGetRecordOutput<S>> for Checkin<S> {
+    fn from(output: CheckinGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Checkin<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Checkin<S> {
     const NSID: &'static str = "app.dropanchor.checkin";
     type Record = CheckinRecord;
 }
@@ -521,7 +535,7 @@ impl Collection for CheckinRecord {
     type Record = CheckinRecord;
 }
 
-impl<'a> LexiconSchema for Checkin<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Checkin<S> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
@@ -950,44 +964,44 @@ pub mod checkin_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Fullsize;
         type Thumb;
+        type Fullsize;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Fullsize = Unset;
         type Thumb = Unset;
-    }
-    ///State transition - sets the `fullsize` field to Set
-    pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFullsize<S> {}
-    impl<S: State> State for SetFullsize<S> {
-        type Fullsize = Set<members::fullsize>;
-        type Thumb = S::Thumb;
+        type Fullsize = Unset;
     }
     ///State transition - sets the `thumb` field to Set
     pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThumb<S> {}
     impl<S: State> State for SetThumb<S> {
-        type Fullsize = S::Fullsize;
         type Thumb = Set<members::thumb>;
+        type Fullsize = S::Fullsize;
+    }
+    ///State transition - sets the `fullsize` field to Set
+    pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFullsize<S> {}
+    impl<S: State> State for SetFullsize<S> {
+        type Thumb = S::Thumb;
+        type Fullsize = Set<members::fullsize>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `fullsize` field
-        pub struct fullsize(());
         ///Marker type for the `thumb` field
         pub struct thumb(());
+        ///Marker type for the `fullsize` field
+        pub struct fullsize(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CheckinImageBuilder<'a, S: checkin_image_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<BlobRef<'a>>, Option<BlobRef<'a>>),
+    _fields: (Option<S>, Option<BlobRef<S>>, Option<BlobRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1011,12 +1025,12 @@ impl<'a> CheckinImageBuilder<'a, checkin_image_state::Empty> {
 
 impl<'a, S: checkin_image_state::State> CheckinImageBuilder<'a, S> {
     /// Set the `alt` field (optional)
-    pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
-    pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_alt(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1030,7 +1044,7 @@ where
     /// Set the `fullsize` field (required)
     pub fn fullsize(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> CheckinImageBuilder<'a, checkin_image_state::SetFullsize<S>> {
         self._fields.1 = Option::Some(value.into());
         CheckinImageBuilder {
@@ -1049,7 +1063,7 @@ where
     /// Set the `thumb` field (required)
     pub fn thumb(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> CheckinImageBuilder<'a, checkin_image_state::SetThumb<S>> {
         self._fields.2 = Option::Some(value.into());
         CheckinImageBuilder {
@@ -1063,8 +1077,8 @@ where
 impl<'a, S> CheckinImageBuilder<'a, S>
 where
     S: checkin_image_state::State,
-    S::Fullsize: checkin_image_state::IsSet,
     S::Thumb: checkin_image_state::IsSet,
+    S::Fullsize: checkin_image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CheckinImage<'a> {
@@ -1078,10 +1092,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CheckinImage<'a> {
         CheckinImage {
             alt: self._fields.0,
@@ -1102,67 +1113,67 @@ pub mod checkin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Address;
-        type CreatedAt;
-        type Geo;
         type Text;
+        type Geo;
+        type CreatedAt;
+        type Address;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Address = Unset;
-        type CreatedAt = Unset;
-        type Geo = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `address` field to Set
-    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddress<S> {}
-    impl<S: State> State for SetAddress<S> {
-        type Address = Set<members::address>;
-        type CreatedAt = S::CreatedAt;
-        type Geo = S::Geo;
-        type Text = S::Text;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Address = S::Address;
-        type CreatedAt = Set<members::created_at>;
-        type Geo = S::Geo;
-        type Text = S::Text;
-    }
-    ///State transition - sets the `geo` field to Set
-    pub struct SetGeo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGeo<S> {}
-    impl<S: State> State for SetGeo<S> {
-        type Address = S::Address;
-        type CreatedAt = S::CreatedAt;
-        type Geo = Set<members::geo>;
-        type Text = S::Text;
+        type Geo = Unset;
+        type CreatedAt = Unset;
+        type Address = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Address = S::Address;
-        type CreatedAt = S::CreatedAt;
-        type Geo = S::Geo;
         type Text = Set<members::text>;
+        type Geo = S::Geo;
+        type CreatedAt = S::CreatedAt;
+        type Address = S::Address;
+    }
+    ///State transition - sets the `geo` field to Set
+    pub struct SetGeo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGeo<S> {}
+    impl<S: State> State for SetGeo<S> {
+        type Text = S::Text;
+        type Geo = Set<members::geo>;
+        type CreatedAt = S::CreatedAt;
+        type Address = S::Address;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Text = S::Text;
+        type Geo = S::Geo;
+        type CreatedAt = Set<members::created_at>;
+        type Address = S::Address;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddress<S> {}
+    impl<S: State> State for SetAddress<S> {
+        type Text = S::Text;
+        type Geo = S::Geo;
+        type CreatedAt = S::CreatedAt;
+        type Address = Set<members::address>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `address` field
-        pub struct address(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `geo` field
-        pub struct geo(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `geo` field
+        pub struct geo(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `address` field
+        pub struct address(());
     }
 }
 
@@ -1170,15 +1181,15 @@ pub mod checkin_state {
 pub struct CheckinBuilder<'a, S: checkin_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<checkin::Address<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<checkin::Address<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
-        Option<checkin::FsqPlace<'a>>,
-        Option<checkin::Geo<'a>>,
-        Option<checkin::CheckinImage<'a>>,
-        Option<CowStr<'a>>,
+        Option<checkin::FsqPlace<S>>,
+        Option<checkin::Geo<S>>,
+        Option<checkin::CheckinImage<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1209,7 +1220,7 @@ where
     /// Set the `address` field (required)
     pub fn address(
         mut self,
-        value: impl Into<checkin::Address<'a>>,
+        value: impl Into<checkin::Address<S>>,
     ) -> CheckinBuilder<'a, checkin_state::SetAddress<S>> {
         self._fields.0 = Option::Some(value.into());
         CheckinBuilder {
@@ -1222,12 +1233,12 @@ where
 
 impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1235,12 +1246,12 @@ impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
 
 impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     /// Set the `categoryGroup` field (optional)
-    pub fn category_group(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn category_group(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `categoryGroup` field to an Option value (optional)
-    pub fn maybe_category_group(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_category_group(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1248,12 +1259,12 @@ impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
 
 impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     /// Set the `categoryIcon` field (optional)
-    pub fn category_icon(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn category_icon(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `categoryIcon` field to an Option value (optional)
-    pub fn maybe_category_icon(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_category_icon(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1280,12 +1291,12 @@ where
 
 impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     /// Set the `fsq` field (optional)
-    pub fn fsq(mut self, value: impl Into<Option<checkin::FsqPlace<'a>>>) -> Self {
+    pub fn fsq(mut self, value: impl Into<Option<checkin::FsqPlace<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `fsq` field to an Option value (optional)
-    pub fn maybe_fsq(mut self, value: Option<checkin::FsqPlace<'a>>) -> Self {
+    pub fn maybe_fsq(mut self, value: Option<checkin::FsqPlace<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -1299,7 +1310,7 @@ where
     /// Set the `geo` field (required)
     pub fn geo(
         mut self,
-        value: impl Into<checkin::Geo<'a>>,
+        value: impl Into<checkin::Geo<S>>,
     ) -> CheckinBuilder<'a, checkin_state::SetGeo<S>> {
         self._fields.6 = Option::Some(value.into());
         CheckinBuilder {
@@ -1312,12 +1323,12 @@ where
 
 impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<checkin::CheckinImage<'a>>>) -> Self {
+    pub fn image(mut self, value: impl Into<Option<checkin::CheckinImage<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<checkin::CheckinImage<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<checkin::CheckinImage<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -1331,7 +1342,7 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CheckinBuilder<'a, checkin_state::SetText<S>> {
         self._fields.8 = Option::Some(value.into());
         CheckinBuilder {
@@ -1345,10 +1356,10 @@ where
 impl<'a, S> CheckinBuilder<'a, S>
 where
     S: checkin_state::State,
-    S::Address: checkin_state::IsSet,
-    S::CreatedAt: checkin_state::IsSet,
-    S::Geo: checkin_state::IsSet,
     S::Text: checkin_state::IsSet,
+    S::Geo: checkin_state::IsSet,
+    S::CreatedAt: checkin_state::IsSet,
+    S::Address: checkin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Checkin<'a> {
@@ -1368,10 +1379,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Checkin<'a> {
         Checkin {
             address: self._fields.0.unwrap(),

@@ -5,11 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::CowStr;
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -18,10 +22,15 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// The strategy used to authenticate fetch requests for private records in a hidden repository.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Strategy<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Strategy<S: Bos<str> + AsRef<str> = DefaultStr> {
     /**The name that identifies the strategy. The following strategies are supported:
 1. `nobody` - Only the author
 2. `author-follows` - Accounts the author follows
@@ -36,11 +45,12 @@ When fetching a private record from the hidden repository, the server will check
 
 Of course, many of these strategies depend on the specifics of `app.bsky.graph.follow` / `app.bsky.feed.post` or similar implementation-defined records. You might need to write some code to get support for non-bsky apps.
 */
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Strategy<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Strategy<S> {
     fn nsid() -> &'static str {
         "ooo.bsky.authfetch.strategy"
     }

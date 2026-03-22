@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -31,64 +33,61 @@ use crate::games_gamesgamesgamesgames::PlatformVersion;
 use crate::games_gamesgamesgamesgames::Website;
 /// A platform for playing video games.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "games.gamesgamesgamesgames.platform",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Platform<'a> {
+pub struct Platform<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub abbreviation: Option<CowStr<'a>>,
+    pub abbreviation: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternative_name: Option<CowStr<'a>>,
+    pub alternative_name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category: Option<PlatformCategory<'a>>,
+    pub category: Option<PlatformCategory<S>>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub family: Option<AtUri<'a>>,
+    pub family: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub generation: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub media: Option<Vec<MediaItem<'a>>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub media: Option<Vec<MediaItem<S>>>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub versions: Option<Vec<PlatformVersion<'a>>>,
+    pub versions: Option<Vec<PlatformVersion<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub websites: Option<Vec<Website<'a>>>,
+    pub websites: Option<Vec<Website<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PlatformGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PlatformGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Platform<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Platform<S>,
 }
 
-impl<'a> Platform<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PlatformRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Platform<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PlatformRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -99,18 +98,17 @@ pub struct PlatformRecord;
 impl XrpcResp for PlatformRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.platform";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PlatformGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PlatformGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PlatformGetRecordOutput<'_>> for Platform<'_> {
-    fn from(output: PlatformGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PlatformGetRecordOutput<S>> for Platform<S> {
+    fn from(output: PlatformGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Platform<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Platform<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.platform";
     type Record = PlatformRecord;
 }
@@ -120,7 +118,7 @@ impl Collection for PlatformRecord {
     type Record = PlatformRecord;
 }
 
-impl<'a> LexiconSchema for Platform<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Platform<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.platform"
     }
@@ -183,17 +181,17 @@ pub mod platform_state {
 pub struct PlatformBuilder<'a, S: platform_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<PlatformCategory<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<PlatformCategory<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
+        Option<S>,
+        Option<AtUri<S>>,
         Option<i64>,
-        Option<Vec<MediaItem<'a>>>,
-        Option<CowStr<'a>>,
-        Option<Vec<PlatformVersion<'a>>>,
-        Option<Vec<Website<'a>>>,
+        Option<Vec<MediaItem<S>>>,
+        Option<S>,
+        Option<Vec<PlatformVersion<S>>>,
+        Option<Vec<Website<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -218,12 +216,12 @@ impl<'a> PlatformBuilder<'a, platform_state::Empty> {
 
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `abbreviation` field (optional)
-    pub fn abbreviation(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn abbreviation(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `abbreviation` field to an Option value (optional)
-    pub fn maybe_abbreviation(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_abbreviation(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -231,12 +229,12 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `alternativeName` field (optional)
-    pub fn alternative_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn alternative_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `alternativeName` field to an Option value (optional)
-    pub fn maybe_alternative_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_alternative_name(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -244,12 +242,12 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(mut self, value: impl Into<Option<PlatformCategory<'a>>>) -> Self {
+    pub fn category(mut self, value: impl Into<Option<PlatformCategory<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<PlatformCategory<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<PlatformCategory<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -276,12 +274,12 @@ where
 
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -289,12 +287,12 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `family` field (optional)
-    pub fn family(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn family(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `family` field to an Option value (optional)
-    pub fn maybe_family(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_family(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -315,12 +313,12 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `media` field (optional)
-    pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<'a>>>>) -> Self {
+    pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<S>>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `media` field to an Option value (optional)
-    pub fn maybe_media(mut self, value: Option<Vec<MediaItem<'a>>>) -> Self {
+    pub fn maybe_media(mut self, value: Option<Vec<MediaItem<S>>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -334,7 +332,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PlatformBuilder<'a, platform_state::SetName<S>> {
         self._fields.8 = Option::Some(value.into());
         PlatformBuilder {
@@ -349,13 +347,13 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `versions` field (optional)
     pub fn versions(
         mut self,
-        value: impl Into<Option<Vec<PlatformVersion<'a>>>>,
+        value: impl Into<Option<Vec<PlatformVersion<S>>>>,
     ) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `versions` field to an Option value (optional)
-    pub fn maybe_versions(mut self, value: Option<Vec<PlatformVersion<'a>>>) -> Self {
+    pub fn maybe_versions(mut self, value: Option<Vec<PlatformVersion<S>>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -363,12 +361,12 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `websites` field (optional)
-    pub fn websites(mut self, value: impl Into<Option<Vec<Website<'a>>>>) -> Self {
+    pub fn websites(mut self, value: impl Into<Option<Vec<Website<S>>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `websites` field to an Option value (optional)
-    pub fn maybe_websites(mut self, value: Option<Vec<Website<'a>>>) -> Self {
+    pub fn maybe_websites(mut self, value: Option<Vec<Website<S>>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -400,10 +398,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Platform<'a> {
         Platform {
             abbreviation: self._fields.0,

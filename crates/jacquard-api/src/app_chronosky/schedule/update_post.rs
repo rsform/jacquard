@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::{Datetime, Language};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -38,56 +40,67 @@ use crate::com_atproto::label::SelfLabels;
 use crate::app_chronosky::schedule::update_post;
 /// Image reference that supports both new blob uploads and existing image CID references.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImageRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text for the image.
-    #[serde(borrow)]
-    pub alt: CowStr<'a>,
+    pub alt: S,
     ///CID of an image blob. Can reference an existing image in the post or a newly uploaded image via media.uploadBlob.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<CowStr<'a>>,
+    pub cid: Option<S>,
     ///New image blob (for newly uploaded images).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<BlobRef<'a>>,
+    pub image: Option<BlobRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Images embed that supports CID references for existing images.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ImagesEmbed<'a> {
-    #[serde(borrow)]
-    pub images: Vec<update_post::ImageRef<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImagesEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub images: Vec<update_post::ImageRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdatePost<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdatePost<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether to disable quote posts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_quote_posts: Option<bool>,
     ///Embedded content (images, external links, records). Use #imagesEmbed to reference existing images by CID.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub embed: Option<UpdatePostEmbed<'a>>,
+    pub embed: Option<UpdatePostEmbed<S>>,
     ///Rich text facets (links, mentions, tags).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Facet<'a>>>,
+    pub facets: Option<Vec<Facet<S>>>,
     ///Post ID to update.
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
     ///Self-applied content labels for content warnings (AT Protocol standard).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<SelfLabels<'a>>,
+    pub labels: Option<SelfLabels<S>>,
     ///Language codes (ISO 639-1).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub langs: Option<Vec<Language>>,
@@ -96,59 +109,80 @@ pub struct UpdatePost<'a> {
     pub scheduled_at: Option<Datetime>,
     ///New post text content.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<CowStr<'a>>,
+    pub text: Option<S>,
     ///Thread gate rules to control who can reply
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub threadgate_rules: Option<Vec<UpdatePostThreadgateRulesItem<'a>>>,
+    pub threadgate_rules: Option<Vec<UpdatePostThreadgateRulesItem<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum UpdatePostEmbed<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum UpdatePostEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.chronosky.schedule.updatePost#imagesEmbed")]
-    ImagesEmbed(Box<update_post::ImagesEmbed<'a>>),
+    ImagesEmbed(Box<update_post::ImagesEmbed<S>>),
     #[serde(rename = "app.bsky.embed.images")]
-    Images(Box<Images<'a>>),
+    Images(Box<Images<S>>),
     #[serde(rename = "app.bsky.embed.external")]
-    External(Box<ExternalRecord<'a>>),
+    External(Box<ExternalRecord<S>>),
     #[serde(rename = "app.bsky.embed.record")]
-    Record(Box<Record<'a>>),
+    Record(Box<Record<S>>),
     #[serde(rename = "app.bsky.embed.video")]
-    Video(Box<Video<'a>>),
+    Video(Box<Video<S>>),
     #[serde(rename = "app.bsky.embed.recordWithMedia")]
-    RecordWithMedia(Box<RecordWithMedia<'a>>),
+    RecordWithMedia(Box<RecordWithMedia<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum UpdatePostThreadgateRulesItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum UpdatePostThreadgateRulesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
-    ThreadgateMentionRule(Box<MentionRule<'a>>),
+    ThreadgateMentionRule(Box<MentionRule<S>>),
     #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
-    ThreadgateFollowerRule(Box<FollowerRule<'a>>),
+    ThreadgateFollowerRule(Box<FollowerRule<S>>),
     #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
-    ThreadgateFollowingRule(Box<FollowingRule<'a>>),
+    ThreadgateFollowingRule(Box<FollowingRule<S>>),
     #[serde(rename = "app.bsky.feed.threadgate#listRule")]
-    ThreadgateListRule(Box<ListRule<'a>>),
+    ThreadgateListRule(Box<ListRule<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdatePostOutput<'a> {
-    #[serde(borrow)]
-    pub post: ScheduledPost<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdatePostOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub post: ScheduledPost<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -157,22 +191,23 @@ pub struct UpdatePostOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UpdatePostError<'a> {
+pub enum UpdatePostError {
     #[serde(rename = "PostNotFound")]
-    PostNotFound(Option<CowStr<'a>>),
+    PostNotFound(Option<SmolStr>),
     #[serde(rename = "PostNotPending")]
-    PostNotPending(Option<CowStr<'a>>),
+    PostNotPending(Option<SmolStr>),
     #[serde(rename = "NoFieldsProvided")]
-    NoFieldsProvided(Option<CowStr<'a>>),
+    NoFieldsProvided(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for UpdatePostError<'_> {
+impl core::fmt::Display for UpdatePostError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::PostNotFound(msg) => {
@@ -196,12 +231,18 @@ impl core::fmt::Display for UpdatePostError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
-impl<'a> LexiconSchema for ImageRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageRef<S> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.updatePost"
     }
@@ -283,7 +324,7 @@ impl<'a> LexiconSchema for ImageRef<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ImagesEmbed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImagesEmbed<S> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.updatePost"
     }
@@ -314,11 +355,12 @@ pub struct UpdatePostResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdatePostResponse {
     const NSID: &'static str = "app.chronosky.schedule.updatePost";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdatePostOutput<'de>;
-    type Err<'de> = UpdatePostError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = UpdatePostOutput<S>;
+    type Err = UpdatePostError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdatePost<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for UpdatePost<S> {
     const NSID: &'static str = "app.chronosky.schedule.updatePost";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -333,7 +375,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdatePostRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = UpdatePost<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = UpdatePost<S>;
     type Response = UpdatePostResponse;
 }
 
@@ -596,7 +638,7 @@ pub mod images_embed_state {
 /// Builder for constructing an instance of this type
 pub struct ImagesEmbedBuilder<'a, S: images_embed_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<update_post::ImageRef<'a>>>,),
+    _fields: (Option<Vec<update_post::ImageRef<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -626,7 +668,7 @@ where
     /// Set the `images` field (required)
     pub fn images(
         mut self,
-        value: impl Into<Vec<update_post::ImageRef<'a>>>,
+        value: impl Into<Vec<update_post::ImageRef<S>>>,
     ) -> ImagesEmbedBuilder<'a, images_embed_state::SetImages<S>> {
         self._fields.0 = Option::Some(value.into());
         ImagesEmbedBuilder {
@@ -652,10 +694,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ImagesEmbed<'a> {
         ImagesEmbed {
             images: self._fields.0.unwrap(),

@@ -20,12 +20,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -45,38 +47,40 @@ impl core::fmt::Display for Abandoned {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Activity<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Activity<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///The hive id of the book
-    #[serde(borrow)]
-    pub hive_id: CowStr<'a>,
+    pub hive_id: S,
     ///The title of the book
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
-    #[serde(borrow)]
-    pub r#type: ActivityType<'a>,
+    pub title: S,
+    pub r#type: ActivityType<S>,
     ///The DID of the user who added the book
-    #[serde(borrow)]
-    pub user_did: CowStr<'a>,
+    pub user_did: S,
     ///The handle of the user who added the book
-    #[serde(borrow)]
-    pub user_handle: CowStr<'a>,
+    pub user_handle: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ActivityType<'a> {
+pub enum ActivityType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Review,
     Rated,
     Started,
     Finished,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ActivityType<'a> {
+impl<S: Bos<str> + AsRef<str>> ActivityType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Review => "review",
@@ -86,74 +90,58 @@ impl<'a> ActivityType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ActivityType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "review" => Self::Review,
             "rated" => Self::Rated,
             "started" => Self::Started,
             "finished" => Self::Finished,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ActivityType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "review" => Self::Review,
-            "rated" => Self::Rated,
-            "started" => Self::Started,
-            "finished" => Self::Finished,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ActivityType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ActivityType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ActivityType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ActivityType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ActivityType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ActivityType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ActivityType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ActivityType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ActivityType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ActivityType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ActivityType<'_> {
-    type Output = ActivityType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ActivityType<S> {
+    type Output = ActivityType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ActivityType::Review => ActivityType::Review,
@@ -167,34 +155,42 @@ impl jacquard_common::IntoStatic for ActivityType<'_> {
 
 /// External identifiers for a book
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct BookIdentifiers<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BookIdentifiers<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Goodreads book ID
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub goodreads_id: Option<CowStr<'a>>,
+    pub goodreads_id: Option<S>,
     ///BookHive's internal ID
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub hive_id: Option<CowStr<'a>>,
+    pub hive_id: Option<S>,
     ///10-digit ISBN
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub isbn10: Option<CowStr<'a>>,
+    pub isbn10: Option<S>,
     ///13-digit ISBN
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub isbn13: Option<CowStr<'a>>,
+    pub isbn13: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Reading progress tracking data
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BookProgress<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BookProgress<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Current chapter the user is on
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current_chapter: Option<i64>,
@@ -212,28 +208,32 @@ pub struct BookProgress<'a> {
     pub total_pages: Option<i64>,
     ///When the progress was last updated
     pub updated_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Comment<'a> {
-    #[serde(borrow)]
-    pub book: StrongRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Comment<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub book: StrongRef<S>,
     ///The content of the comment.
-    #[serde(borrow)]
-    pub comment: CowStr<'a>,
+    pub comment: S,
     ///Client-declared timestamp when this comment was originally created.
     pub created_at: Datetime,
     ///The DID of the user who made the comment
-    #[serde(borrow)]
-    pub did: CowStr<'a>,
+    pub did: S,
     ///The handle of the user who made the comment
-    #[serde(borrow)]
-    pub handle: CowStr<'a>,
-    #[serde(borrow)]
-    pub parent: StrongRef<'a>,
+    pub handle: S,
+    pub parent: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// User has finished reading the book
@@ -257,25 +257,28 @@ impl core::fmt::Display for Owned {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Profile<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<CowStr<'a>>,
+    pub avatar: Option<S>,
     pub books_read: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub display_name: CowStr<'a>,
-    #[serde(borrow)]
-    pub handle: CowStr<'a>,
+    pub description: Option<S>,
+    pub display_name: S,
+    pub handle: S,
     ///Whether the authed user is following this profile
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_following: Option<bool>,
     pub reviews: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// User is currently reading the book
@@ -289,60 +292,63 @@ impl core::fmt::Display for Reading {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Review<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Review<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The date the review was created
     pub created_at: Datetime,
     ///The DID of the user who made the review
-    #[serde(borrow)]
-    pub did: CowStr<'a>,
+    pub did: S,
     ///The handle of the user who made the review
-    #[serde(borrow)]
-    pub handle: CowStr<'a>,
+    pub handle: S,
     ///The review content
-    #[serde(borrow)]
-    pub review: CowStr<'a>,
+    pub review: S,
     ///The number of stars given to the book
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stars: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct UserBook<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UserBook<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The authors of the book (tab separated)
-    #[serde(borrow)]
-    pub authors: CowStr<'a>,
+    pub authors: S,
     ///Progress tracking information for the book
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub book_progress: Option<buzz_bookhive::BookProgress<'a>>,
+    pub book_progress: Option<buzz_bookhive::BookProgress<S>>,
     ///Cover image of the book
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cover: Option<CowStr<'a>>,
+    pub cover: Option<S>,
     pub created_at: Datetime,
     ///Book description/summary
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The date the user finished reading the book
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finished_at: Option<Datetime>,
     ///The book's hive id, used to correlate user's books with the hive
-    #[serde(borrow)]
-    pub hive_id: CowStr<'a>,
+    pub hive_id: S,
     ///Average rating (0-1000)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rating: Option<i64>,
     ///The book's review
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<CowStr<'a>>,
+    pub review: Option<S>,
     ///Number of stars given to the book (1-10) which will be mapped to 1-5 stars
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stars: Option<i64>,
@@ -350,35 +356,32 @@ pub struct UserBook<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub started_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<UserBookStatus<'a>>,
+    pub status: Option<UserBookStatus<S>>,
     ///Cover image of the book
-    #[serde(borrow)]
-    pub thumbnail: CowStr<'a>,
+    pub thumbnail: S,
     ///The title of the book
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
     ///The DID of the user who added the book
-    #[serde(borrow)]
-    pub user_did: CowStr<'a>,
+    pub user_did: S,
     ///The handle of the user who added the book
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub user_handle: Option<CowStr<'a>>,
+    pub user_handle: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum UserBookStatus<'a> {
+pub enum UserBookStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Finished,
     Reading,
     WantToRead,
     Abandoned,
     Owned,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> UserBookStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> UserBookStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Finished => "buzz.bookhive.defs#finished",
@@ -389,76 +392,59 @@ impl<'a> UserBookStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for UserBookStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "buzz.bookhive.defs#finished" => Self::Finished,
             "buzz.bookhive.defs#reading" => Self::Reading,
             "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
             "buzz.bookhive.defs#abandoned" => Self::Abandoned,
             "buzz.bookhive.defs#owned" => Self::Owned,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for UserBookStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "buzz.bookhive.defs#finished" => Self::Finished,
-            "buzz.bookhive.defs#reading" => Self::Reading,
-            "buzz.bookhive.defs#wantToRead" => Self::WantToRead,
-            "buzz.bookhive.defs#abandoned" => Self::Abandoned,
-            "buzz.bookhive.defs#owned" => Self::Owned,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for UserBookStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for UserBookStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for UserBookStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for UserBookStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for UserBookStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for UserBookStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for UserBookStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for UserBookStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for UserBookStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for UserBookStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for UserBookStatus<'_> {
-    type Output = UserBookStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for UserBookStatus<S> {
+    type Output = UserBookStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             UserBookStatus::Finished => UserBookStatus::Finished,
@@ -481,7 +467,7 @@ impl core::fmt::Display for WantToRead {
     }
 }
 
-impl<'a> LexiconSchema for Activity<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Activity<S> {
     fn nsid() -> &'static str {
         "buzz.bookhive.defs"
     }
@@ -496,7 +482,7 @@ impl<'a> LexiconSchema for Activity<'a> {
     }
 }
 
-impl<'a> LexiconSchema for BookIdentifiers<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BookIdentifiers<S> {
     fn nsid() -> &'static str {
         "buzz.bookhive.defs"
     }
@@ -511,7 +497,7 @@ impl<'a> LexiconSchema for BookIdentifiers<'a> {
     }
 }
 
-impl<'a> LexiconSchema for BookProgress<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BookProgress<S> {
     fn nsid() -> &'static str {
         "buzz.bookhive.defs"
     }
@@ -580,7 +566,7 @@ impl<'a> LexiconSchema for BookProgress<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Comment<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Comment<S> {
     fn nsid() -> &'static str {
         "buzz.bookhive.defs"
     }
@@ -619,7 +605,7 @@ impl<'a> LexiconSchema for Comment<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Profile<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Profile<S> {
     fn nsid() -> &'static str {
         "buzz.bookhive.defs"
     }
@@ -654,7 +640,7 @@ impl<'a> LexiconSchema for Profile<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Review<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Review<S> {
     fn nsid() -> &'static str {
         "buzz.bookhive.defs"
     }
@@ -669,7 +655,7 @@ impl<'a> LexiconSchema for Review<'a> {
     }
 }
 
-impl<'a> LexiconSchema for UserBook<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for UserBook<S> {
     fn nsid() -> &'static str {
         "buzz.bookhive.defs"
     }
@@ -796,105 +782,105 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
+        type CreatedAt;
         type UserHandle;
         type HiveId;
-        type UserDid;
-        type CreatedAt;
+        type Type;
         type Title;
+        type UserDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
+        type CreatedAt = Unset;
         type UserHandle = Unset;
         type HiveId = Unset;
-        type UserDid = Unset;
-        type CreatedAt = Unset;
+        type Type = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type UserHandle = S::UserHandle;
-        type HiveId = S::HiveId;
-        type UserDid = S::UserDid;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `user_handle` field to Set
-    pub struct SetUserHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserHandle<S> {}
-    impl<S: State> State for SetUserHandle<S> {
-        type Type = S::Type;
-        type UserHandle = Set<members::user_handle>;
-        type HiveId = S::HiveId;
-        type UserDid = S::UserDid;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `hive_id` field to Set
-    pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHiveId<S> {}
-    impl<S: State> State for SetHiveId<S> {
-        type Type = S::Type;
-        type UserHandle = S::UserHandle;
-        type HiveId = Set<members::hive_id>;
-        type UserDid = S::UserDid;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
-        type Type = S::Type;
-        type UserHandle = S::UserHandle;
-        type HiveId = S::HiveId;
-        type UserDid = Set<members::user_did>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
+        type UserDid = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Type = S::Type;
+        type CreatedAt = Set<members::created_at>;
         type UserHandle = S::UserHandle;
         type HiveId = S::HiveId;
-        type UserDid = S::UserDid;
-        type CreatedAt = Set<members::created_at>;
+        type Type = S::Type;
         type Title = S::Title;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `user_handle` field to Set
+    pub struct SetUserHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserHandle<S> {}
+    impl<S: State> State for SetUserHandle<S> {
+        type CreatedAt = S::CreatedAt;
+        type UserHandle = Set<members::user_handle>;
+        type HiveId = S::HiveId;
+        type Type = S::Type;
+        type Title = S::Title;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `hive_id` field to Set
+    pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiveId<S> {}
+    impl<S: State> State for SetHiveId<S> {
+        type CreatedAt = S::CreatedAt;
+        type UserHandle = S::UserHandle;
+        type HiveId = Set<members::hive_id>;
+        type Type = S::Type;
+        type Title = S::Title;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type CreatedAt = S::CreatedAt;
+        type UserHandle = S::UserHandle;
+        type HiveId = S::HiveId;
+        type Type = Set<members::r#type>;
+        type Title = S::Title;
+        type UserDid = S::UserDid;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Type = S::Type;
+        type CreatedAt = S::CreatedAt;
         type UserHandle = S::UserHandle;
         type HiveId = S::HiveId;
-        type UserDid = S::UserDid;
-        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
         type Title = Set<members::title>;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
+        type CreatedAt = S::CreatedAt;
+        type UserHandle = S::UserHandle;
+        type HiveId = S::HiveId;
+        type Type = S::Type;
+        type Title = S::Title;
+        type UserDid = Set<members::user_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `user_handle` field
         pub struct user_handle(());
         ///Marker type for the `hive_id` field
         pub struct hive_id(());
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
     }
 }
 
@@ -903,11 +889,11 @@ pub struct ActivityBuilder<'a, S: activity_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<ActivityType<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<ActivityType<S>>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -957,7 +943,7 @@ where
     /// Set the `hiveId` field (required)
     pub fn hive_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ActivityBuilder<'a, activity_state::SetHiveId<S>> {
         self._fields.1 = Option::Some(value.into());
         ActivityBuilder {
@@ -976,7 +962,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ActivityBuilder<'a, activity_state::SetTitle<S>> {
         self._fields.2 = Option::Some(value.into());
         ActivityBuilder {
@@ -995,7 +981,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<ActivityType<'a>>,
+        value: impl Into<ActivityType<S>>,
     ) -> ActivityBuilder<'a, activity_state::SetType<S>> {
         self._fields.3 = Option::Some(value.into());
         ActivityBuilder {
@@ -1014,7 +1000,7 @@ where
     /// Set the `userDid` field (required)
     pub fn user_did(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ActivityBuilder<'a, activity_state::SetUserDid<S>> {
         self._fields.4 = Option::Some(value.into());
         ActivityBuilder {
@@ -1033,7 +1019,7 @@ where
     /// Set the `userHandle` field (required)
     pub fn user_handle(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ActivityBuilder<'a, activity_state::SetUserHandle<S>> {
         self._fields.5 = Option::Some(value.into());
         ActivityBuilder {
@@ -1047,12 +1033,12 @@ where
 impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
-    S::Type: activity_state::IsSet,
+    S::CreatedAt: activity_state::IsSet,
     S::UserHandle: activity_state::IsSet,
     S::HiveId: activity_state::IsSet,
-    S::UserDid: activity_state::IsSet,
-    S::CreatedAt: activity_state::IsSet,
+    S::Type: activity_state::IsSet,
     S::Title: activity_state::IsSet,
+    S::UserDid: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
@@ -1069,10 +1055,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Activity<'a> {
         Activity {
             created_at: self._fields.0.unwrap(),
@@ -1831,10 +1814,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BookProgress<'a> {
         BookProgress {
             current_chapter: self._fields.0,
@@ -1858,105 +1838,105 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Parent;
         type Book;
         type Did;
+        type CreatedAt;
+        type Parent;
         type Comment;
         type Handle;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Parent = Unset;
         type Book = Unset;
         type Did = Unset;
+        type CreatedAt = Unset;
+        type Parent = Unset;
         type Comment = Unset;
         type Handle = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `parent` field to Set
-    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParent<S> {}
-    impl<S: State> State for SetParent<S> {
-        type Parent = Set<members::parent>;
-        type Book = S::Book;
-        type Did = S::Did;
-        type Comment = S::Comment;
-        type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `book` field to Set
     pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBook<S> {}
     impl<S: State> State for SetBook<S> {
-        type Parent = S::Parent;
         type Book = Set<members::book>;
         type Did = S::Did;
+        type CreatedAt = S::CreatedAt;
+        type Parent = S::Parent;
         type Comment = S::Comment;
         type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Parent = S::Parent;
         type Book = S::Book;
         type Did = Set<members::did>;
+        type CreatedAt = S::CreatedAt;
+        type Parent = S::Parent;
         type Comment = S::Comment;
         type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `comment` field to Set
-    pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComment<S> {}
-    impl<S: State> State for SetComment<S> {
-        type Parent = S::Parent;
-        type Book = S::Book;
-        type Did = S::Did;
-        type Comment = Set<members::comment>;
-        type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Parent = S::Parent;
-        type Book = S::Book;
-        type Did = S::Did;
-        type Comment = S::Comment;
-        type Handle = Set<members::handle>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Parent = S::Parent;
         type Book = S::Book;
         type Did = S::Did;
+        type CreatedAt = Set<members::created_at>;
+        type Parent = S::Parent;
         type Comment = S::Comment;
         type Handle = S::Handle;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParent<S> {}
+    impl<S: State> State for SetParent<S> {
+        type Book = S::Book;
+        type Did = S::Did;
+        type CreatedAt = S::CreatedAt;
+        type Parent = Set<members::parent>;
+        type Comment = S::Comment;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `comment` field to Set
+    pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetComment<S> {}
+    impl<S: State> State for SetComment<S> {
+        type Book = S::Book;
+        type Did = S::Did;
+        type CreatedAt = S::CreatedAt;
+        type Parent = S::Parent;
+        type Comment = Set<members::comment>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Book = S::Book;
+        type Did = S::Did;
+        type CreatedAt = S::CreatedAt;
+        type Parent = S::Parent;
+        type Comment = S::Comment;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `parent` field
-        pub struct parent(());
         ///Marker type for the `book` field
         pub struct book(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `parent` field
+        pub struct parent(());
         ///Marker type for the `comment` field
         pub struct comment(());
         ///Marker type for the `handle` field
         pub struct handle(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -1964,12 +1944,12 @@ pub mod comment_state {
 pub struct CommentBuilder<'a, S: comment_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<StrongRef<'a>>,
-        Option<CowStr<'a>>,
+        Option<StrongRef<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<StrongRef<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<StrongRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -2000,7 +1980,7 @@ where
     /// Set the `book` field (required)
     pub fn book(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> CommentBuilder<'a, comment_state::SetBook<S>> {
         self._fields.0 = Option::Some(value.into());
         CommentBuilder {
@@ -2019,7 +1999,7 @@ where
     /// Set the `comment` field (required)
     pub fn comment(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CommentBuilder<'a, comment_state::SetComment<S>> {
         self._fields.1 = Option::Some(value.into());
         CommentBuilder {
@@ -2057,7 +2037,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CommentBuilder<'a, comment_state::SetDid<S>> {
         self._fields.3 = Option::Some(value.into());
         CommentBuilder {
@@ -2076,7 +2056,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CommentBuilder<'a, comment_state::SetHandle<S>> {
         self._fields.4 = Option::Some(value.into());
         CommentBuilder {
@@ -2095,7 +2075,7 @@ where
     /// Set the `parent` field (required)
     pub fn parent(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> CommentBuilder<'a, comment_state::SetParent<S>> {
         self._fields.5 = Option::Some(value.into());
         CommentBuilder {
@@ -2109,12 +2089,12 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Parent: comment_state::IsSet,
     S::Book: comment_state::IsSet,
     S::Did: comment_state::IsSet,
+    S::CreatedAt: comment_state::IsSet,
+    S::Parent: comment_state::IsSet,
     S::Comment: comment_state::IsSet,
     S::Handle: comment_state::IsSet,
-    S::CreatedAt: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
@@ -2131,10 +2111,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Comment<'a> {
         Comment {
             book: self._fields.0.unwrap(),
@@ -2158,67 +2135,67 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
+        type Reviews;
         type DisplayName;
         type BooksRead;
-        type Reviews;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
+        type Reviews = Unset;
         type DisplayName = Unset;
         type BooksRead = Unset;
-        type Reviews = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type DisplayName = S::DisplayName;
-        type BooksRead = S::BooksRead;
-        type Reviews = S::Reviews;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type Handle = S::Handle;
-        type DisplayName = Set<members::display_name>;
-        type BooksRead = S::BooksRead;
-        type Reviews = S::Reviews;
-    }
-    ///State transition - sets the `books_read` field to Set
-    pub struct SetBooksRead<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBooksRead<S> {}
-    impl<S: State> State for SetBooksRead<S> {
-        type Handle = S::Handle;
-        type DisplayName = S::DisplayName;
-        type BooksRead = Set<members::books_read>;
-        type Reviews = S::Reviews;
+        type Handle = Unset;
     }
     ///State transition - sets the `reviews` field to Set
     pub struct SetReviews<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReviews<S> {}
     impl<S: State> State for SetReviews<S> {
-        type Handle = S::Handle;
+        type Reviews = Set<members::reviews>;
         type DisplayName = S::DisplayName;
         type BooksRead = S::BooksRead;
-        type Reviews = Set<members::reviews>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Reviews = S::Reviews;
+        type DisplayName = Set<members::display_name>;
+        type BooksRead = S::BooksRead;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `books_read` field to Set
+    pub struct SetBooksRead<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBooksRead<S> {}
+    impl<S: State> State for SetBooksRead<S> {
+        type Reviews = S::Reviews;
+        type DisplayName = S::DisplayName;
+        type BooksRead = Set<members::books_read>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Reviews = S::Reviews;
+        type DisplayName = S::DisplayName;
+        type BooksRead = S::BooksRead;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
+        ///Marker type for the `reviews` field
+        pub struct reviews(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
         ///Marker type for the `books_read` field
         pub struct books_read(());
-        ///Marker type for the `reviews` field
-        pub struct reviews(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -2226,11 +2203,11 @@ pub mod profile_state {
 pub struct ProfileBuilder<'a, S: profile_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<bool>,
         Option<i64>,
     ),
@@ -2257,12 +2234,12 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -2289,12 +2266,12 @@ where
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -2308,7 +2285,7 @@ where
     /// Set the `displayName` field (required)
     pub fn display_name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProfileBuilder<'a, profile_state::SetDisplayName<S>> {
         self._fields.3 = Option::Some(value.into());
         ProfileBuilder {
@@ -2327,7 +2304,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProfileBuilder<'a, profile_state::SetHandle<S>> {
         self._fields.4 = Option::Some(value.into());
         ProfileBuilder {
@@ -2373,10 +2350,10 @@ where
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
-    S::Handle: profile_state::IsSet,
+    S::Reviews: profile_state::IsSet,
     S::DisplayName: profile_state::IsSet,
     S::BooksRead: profile_state::IsSet,
-    S::Reviews: profile_state::IsSet,
+    S::Handle: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
@@ -2394,10 +2371,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Profile<'a> {
         Profile {
             avatar: self._fields.0,
@@ -2423,79 +2397,73 @@ pub mod review_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Review;
+        type CreatedAt;
         type Did;
         type Handle;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Review = Unset;
+        type CreatedAt = Unset;
         type Did = Unset;
         type Handle = Unset;
-        type CreatedAt = Unset;
     }
     ///State transition - sets the `review` field to Set
     pub struct SetReview<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReview<S> {}
     impl<S: State> State for SetReview<S> {
         type Review = Set<members::review>;
+        type CreatedAt = S::CreatedAt;
         type Did = S::Did;
         type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Review = S::Review;
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Review = S::Review;
-        type Did = S::Did;
-        type Handle = Set<members::handle>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Review = S::Review;
+        type CreatedAt = Set<members::created_at>;
         type Did = S::Did;
         type Handle = S::Handle;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Review = S::Review;
+        type CreatedAt = S::CreatedAt;
+        type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Review = S::Review;
+        type CreatedAt = S::CreatedAt;
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `review` field
         pub struct review(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReviewBuilder<'a, S: review_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<S>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -2544,7 +2512,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReviewBuilder<'a, review_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         ReviewBuilder {
@@ -2563,7 +2531,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReviewBuilder<'a, review_state::SetHandle<S>> {
         self._fields.2 = Option::Some(value.into());
         ReviewBuilder {
@@ -2582,7 +2550,7 @@ where
     /// Set the `review` field (required)
     pub fn review(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReviewBuilder<'a, review_state::SetReview<S>> {
         self._fields.3 = Option::Some(value.into());
         ReviewBuilder {
@@ -2610,9 +2578,9 @@ impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
     S::Review: review_state::IsSet,
+    S::CreatedAt: review_state::IsSet,
     S::Did: review_state::IsSet,
     S::Handle: review_state::IsSet,
-    S::CreatedAt: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {
@@ -2626,13 +2594,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Review<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Review<'a> {
         Review {
             created_at: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -2654,105 +2616,105 @@ pub mod user_book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type UserDid;
-        type CreatedAt;
         type HiveId;
-        type Thumbnail;
+        type UserDid;
         type Authors;
+        type Title;
+        type CreatedAt;
+        type Thumbnail;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type UserDid = Unset;
-        type CreatedAt = Unset;
         type HiveId = Unset;
-        type Thumbnail = Unset;
+        type UserDid = Unset;
         type Authors = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type UserDid = S::UserDid;
-        type CreatedAt = S::CreatedAt;
-        type HiveId = S::HiveId;
-        type Thumbnail = S::Thumbnail;
-        type Authors = S::Authors;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
-        type Title = S::Title;
-        type UserDid = Set<members::user_did>;
-        type CreatedAt = S::CreatedAt;
-        type HiveId = S::HiveId;
-        type Thumbnail = S::Thumbnail;
-        type Authors = S::Authors;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type UserDid = S::UserDid;
-        type CreatedAt = Set<members::created_at>;
-        type HiveId = S::HiveId;
-        type Thumbnail = S::Thumbnail;
-        type Authors = S::Authors;
+        type Title = Unset;
+        type CreatedAt = Unset;
+        type Thumbnail = Unset;
     }
     ///State transition - sets the `hive_id` field to Set
     pub struct SetHiveId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHiveId<S> {}
     impl<S: State> State for SetHiveId<S> {
-        type Title = S::Title;
-        type UserDid = S::UserDid;
-        type CreatedAt = S::CreatedAt;
         type HiveId = Set<members::hive_id>;
-        type Thumbnail = S::Thumbnail;
-        type Authors = S::Authors;
-    }
-    ///State transition - sets the `thumbnail` field to Set
-    pub struct SetThumbnail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumbnail<S> {}
-    impl<S: State> State for SetThumbnail<S> {
-        type Title = S::Title;
         type UserDid = S::UserDid;
-        type CreatedAt = S::CreatedAt;
-        type HiveId = S::HiveId;
-        type Thumbnail = Set<members::thumbnail>;
         type Authors = S::Authors;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Thumbnail = S::Thumbnail;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
+        type HiveId = S::HiveId;
+        type UserDid = Set<members::user_did>;
+        type Authors = S::Authors;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Thumbnail = S::Thumbnail;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthors<S> {}
     impl<S: State> State for SetAuthors<S> {
-        type Title = S::Title;
-        type UserDid = S::UserDid;
-        type CreatedAt = S::CreatedAt;
         type HiveId = S::HiveId;
-        type Thumbnail = S::Thumbnail;
+        type UserDid = S::UserDid;
         type Authors = Set<members::authors>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Thumbnail = S::Thumbnail;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type HiveId = S::HiveId;
+        type UserDid = S::UserDid;
+        type Authors = S::Authors;
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+        type Thumbnail = S::Thumbnail;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type HiveId = S::HiveId;
+        type UserDid = S::UserDid;
+        type Authors = S::Authors;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
+        type Thumbnail = S::Thumbnail;
+    }
+    ///State transition - sets the `thumbnail` field to Set
+    pub struct SetThumbnail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumbnail<S> {}
+    impl<S: State> State for SetThumbnail<S> {
+        type HiveId = S::HiveId;
+        type UserDid = S::UserDid;
+        type Authors = S::Authors;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Thumbnail = Set<members::thumbnail>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `hive_id` field
         pub struct hive_id(());
-        ///Marker type for the `thumbnail` field
-        pub struct thumbnail(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
         ///Marker type for the `authors` field
         pub struct authors(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `thumbnail` field
+        pub struct thumbnail(());
     }
 }
 
@@ -2760,22 +2722,22 @@ pub mod user_book_state {
 pub struct UserBookBuilder<'a, S: user_book_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<buzz_bookhive::BookProgress<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<buzz_bookhive::BookProgress<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
         Option<Datetime>,
-        Option<UserBookStatus<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<UserBookStatus<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -2823,7 +2785,7 @@ where
     /// Set the `authors` field (required)
     pub fn authors(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> UserBookBuilder<'a, user_book_state::SetAuthors<S>> {
         self._fields.0 = Option::Some(value.into());
         UserBookBuilder {
@@ -2838,7 +2800,7 @@ impl<'a, S: user_book_state::State> UserBookBuilder<'a, S> {
     /// Set the `bookProgress` field (optional)
     pub fn book_progress(
         mut self,
-        value: impl Into<Option<buzz_bookhive::BookProgress<'a>>>,
+        value: impl Into<Option<buzz_bookhive::BookProgress<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -2846,7 +2808,7 @@ impl<'a, S: user_book_state::State> UserBookBuilder<'a, S> {
     /// Set the `bookProgress` field to an Option value (optional)
     pub fn maybe_book_progress(
         mut self,
-        value: Option<buzz_bookhive::BookProgress<'a>>,
+        value: Option<buzz_bookhive::BookProgress<S>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -2855,12 +2817,12 @@ impl<'a, S: user_book_state::State> UserBookBuilder<'a, S> {
 
 impl<'a, S: user_book_state::State> UserBookBuilder<'a, S> {
     /// Set the `cover` field (optional)
-    pub fn cover(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cover(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `cover` field to an Option value (optional)
-    pub fn maybe_cover(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cover(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -2887,12 +2849,12 @@ where
 
 impl<'a, S: user_book_state::State> UserBookBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -2919,7 +2881,7 @@ where
     /// Set the `hiveId` field (required)
     pub fn hive_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> UserBookBuilder<'a, user_book_state::SetHiveId<S>> {
         self._fields.6 = Option::Some(value.into());
         UserBookBuilder {
@@ -2945,12 +2907,12 @@ impl<'a, S: user_book_state::State> UserBookBuilder<'a, S> {
 
 impl<'a, S: user_book_state::State> UserBookBuilder<'a, S> {
     /// Set the `review` field (optional)
-    pub fn review(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn review(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
-    pub fn maybe_review(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_review(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -2984,12 +2946,12 @@ impl<'a, S: user_book_state::State> UserBookBuilder<'a, S> {
 
 impl<'a, S: user_book_state::State> UserBookBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<UserBookStatus<'a>>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<UserBookStatus<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<UserBookStatus<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<UserBookStatus<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -3003,7 +2965,7 @@ where
     /// Set the `thumbnail` field (required)
     pub fn thumbnail(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> UserBookBuilder<'a, user_book_state::SetThumbnail<S>> {
         self._fields.12 = Option::Some(value.into());
         UserBookBuilder {
@@ -3022,7 +2984,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> UserBookBuilder<'a, user_book_state::SetTitle<S>> {
         self._fields.13 = Option::Some(value.into());
         UserBookBuilder {
@@ -3041,7 +3003,7 @@ where
     /// Set the `userDid` field (required)
     pub fn user_did(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> UserBookBuilder<'a, user_book_state::SetUserDid<S>> {
         self._fields.14 = Option::Some(value.into());
         UserBookBuilder {
@@ -3054,12 +3016,12 @@ where
 
 impl<'a, S: user_book_state::State> UserBookBuilder<'a, S> {
     /// Set the `userHandle` field (optional)
-    pub fn user_handle(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn user_handle(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `userHandle` field to an Option value (optional)
-    pub fn maybe_user_handle(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_user_handle(mut self, value: Option<S>) -> Self {
         self._fields.15 = value;
         self
     }
@@ -3068,12 +3030,12 @@ impl<'a, S: user_book_state::State> UserBookBuilder<'a, S> {
 impl<'a, S> UserBookBuilder<'a, S>
 where
     S: user_book_state::State,
-    S::Title: user_book_state::IsSet,
-    S::UserDid: user_book_state::IsSet,
-    S::CreatedAt: user_book_state::IsSet,
     S::HiveId: user_book_state::IsSet,
-    S::Thumbnail: user_book_state::IsSet,
+    S::UserDid: user_book_state::IsSet,
     S::Authors: user_book_state::IsSet,
+    S::Title: user_book_state::IsSet,
+    S::CreatedAt: user_book_state::IsSet,
+    S::Thumbnail: user_book_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UserBook<'a> {
@@ -3100,10 +3062,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> UserBook<'a> {
         UserBook {
             authors: self._fields.0.unwrap(),

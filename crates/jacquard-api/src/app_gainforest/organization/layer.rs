@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,50 +29,52 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A declaration of a layer for an organization
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.gainforest.organization.layer",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Layer<'a> {
+pub struct Layer<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,
     ///The description of the layer
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The name of the site
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///The type of the layer
-    #[serde(borrow)]
-    pub r#type: CowStr<'a>,
+    pub r#type: S,
     ///The URI of the layer
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+    pub uri: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LayerGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LayerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Layer<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Layer<S>,
 }
 
-impl<'a> Layer<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LayerRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Layer<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LayerRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -81,18 +85,17 @@ pub struct LayerRecord;
 impl XrpcResp for LayerRecord {
     const NSID: &'static str = "app.gainforest.organization.layer";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LayerGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LayerGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LayerGetRecordOutput<'_>> for Layer<'_> {
-    fn from(output: LayerGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LayerGetRecordOutput<S>> for Layer<S> {
+    fn from(output: LayerGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Layer<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Layer<S> {
     const NSID: &'static str = "app.gainforest.organization.layer";
     type Record = LayerRecord;
 }
@@ -102,7 +105,7 @@ impl Collection for LayerRecord {
     type Record = LayerRecord;
 }
 
-impl<'a> LexiconSchema for Layer<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Layer<S> {
     fn nsid() -> &'static str {
         "app.gainforest.organization.layer"
     }
@@ -127,80 +130,74 @@ pub mod layer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Type;
         type Name;
+        type CreatedAt;
         type Uri;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Type = Unset;
         type Name = Unset;
+        type CreatedAt = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Type = S::Type;
-        type Name = S::Name;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = Set<members::r#type>;
-        type Name = S::Name;
-        type Uri = S::Uri;
+        type Type = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
         type Uri = S::Uri;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
+        type Uri = S::Uri;
+        type Type = S::Type;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
         type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
         type Uri = Set<members::uri>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LayerBuilder<'a, S: layer_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<S>, Option<S>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -243,12 +240,12 @@ where
 
 impl<'a, S: layer_state::State> LayerBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -262,7 +259,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LayerBuilder<'a, layer_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         LayerBuilder {
@@ -281,7 +278,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LayerBuilder<'a, layer_state::SetType<S>> {
         self._fields.3 = Option::Some(value.into());
         LayerBuilder {
@@ -300,7 +297,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> LayerBuilder<'a, layer_state::SetUri<S>> {
         self._fields.4 = Option::Some(value.into());
         LayerBuilder {
@@ -314,10 +311,10 @@ where
 impl<'a, S> LayerBuilder<'a, S>
 where
     S: layer_state::State,
-    S::CreatedAt: layer_state::IsSet,
-    S::Type: layer_state::IsSet,
     S::Name: layer_state::IsSet,
+    S::CreatedAt: layer_state::IsSet,
     S::Uri: layer_state::IsSet,
+    S::Type: layer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Layer<'a> {
@@ -331,13 +328,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Layer<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Layer<'a> {
         Layer {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

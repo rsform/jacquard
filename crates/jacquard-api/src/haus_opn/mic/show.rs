@@ -14,14 +14,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -32,38 +34,42 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A recurring open mic show series.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "haus.opn.mic.show", tag = "$type")]
-pub struct Show<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "haus.opn.mic.show",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Show<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The AT-URI of the haus.opn.mic.artist record.
-    #[serde(borrow)]
-    pub artist: AtUri<'a>,
+    pub artist: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cover_art: Option<BlobRef<'a>>,
+    pub cover_art: Option<BlobRef<S>>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub schedule: ShowSchedule<'a>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub description: Option<S>,
+    pub schedule: ShowSchedule<S>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ShowSchedule<'a> {
+pub enum ShowSchedule<S: Bos<str> + AsRef<str> = DefaultStr> {
     Daily,
     Weekly,
     Biweekly,
     Monthly,
     Irregular,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ShowSchedule<'a> {
+impl<S: Bos<str> + AsRef<str>> ShowSchedule<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Daily => "daily",
@@ -74,76 +80,59 @@ impl<'a> ShowSchedule<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ShowSchedule<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "daily" => Self::Daily,
             "weekly" => Self::Weekly,
             "biweekly" => Self::Biweekly,
             "monthly" => Self::Monthly,
             "irregular" => Self::Irregular,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ShowSchedule<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "daily" => Self::Daily,
-            "weekly" => Self::Weekly,
-            "biweekly" => Self::Biweekly,
-            "monthly" => Self::Monthly,
-            "irregular" => Self::Irregular,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ShowSchedule<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ShowSchedule<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ShowSchedule<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ShowSchedule<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ShowSchedule<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ShowSchedule<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ShowSchedule<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ShowSchedule<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ShowSchedule<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ShowSchedule<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ShowSchedule<'_> {
-    type Output = ShowSchedule<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ShowSchedule<S> {
+    type Output = ShowSchedule<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ShowSchedule::Daily => ShowSchedule::Daily,
@@ -159,22 +148,23 @@ impl jacquard_common::IntoStatic for ShowSchedule<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ShowGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ShowGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Show<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Show<S>,
 }
 
-impl<'a> Show<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ShowRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Show<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ShowRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -185,18 +175,17 @@ pub struct ShowRecord;
 impl XrpcResp for ShowRecord {
     const NSID: &'static str = "haus.opn.mic.show";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ShowGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ShowGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ShowGetRecordOutput<'_>> for Show<'_> {
-    fn from(output: ShowGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ShowGetRecordOutput<S>> for Show<S> {
+    fn from(output: ShowGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Show<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Show<S> {
     const NSID: &'static str = "haus.opn.mic.show";
     type Record = ShowRecord;
 }
@@ -206,7 +195,7 @@ impl Collection for ShowRecord {
     type Record = ShowRecord;
 }
 
-impl<'a> LexiconSchema for Show<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Show<S> {
     fn nsid() -> &'static str {
         "haus.opn.mic.show"
     }
@@ -290,65 +279,65 @@ pub mod show_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type CreatedAt;
         type Artist;
+        type Title;
         type Schedule;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type CreatedAt = Unset;
         type Artist = Unset;
+        type Title = Unset;
         type Schedule = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Artist = S::Artist;
-        type Schedule = S::Schedule;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
         type Artist = S::Artist;
+        type Title = S::Title;
         type Schedule = S::Schedule;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtist<S> {}
     impl<S: State> State for SetArtist<S> {
-        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
         type Artist = Set<members::artist>;
+        type Title = S::Title;
+        type Schedule = S::Schedule;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Artist = S::Artist;
+        type Title = Set<members::title>;
         type Schedule = S::Schedule;
     }
     ///State transition - sets the `schedule` field to Set
     pub struct SetSchedule<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchedule<S> {}
     impl<S: State> State for SetSchedule<S> {
-        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
         type Artist = S::Artist;
+        type Title = S::Title;
         type Schedule = Set<members::schedule>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `artist` field
         pub struct artist(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `schedule` field
         pub struct schedule(());
     }
@@ -358,12 +347,12 @@ pub mod show_state {
 pub struct ShowBuilder<'a, S: show_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtUri<'a>>,
-        Option<BlobRef<'a>>,
+        Option<AtUri<S>>,
+        Option<BlobRef<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<ShowSchedule<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<ShowSchedule<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -394,7 +383,7 @@ where
     /// Set the `artist` field (required)
     pub fn artist(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ShowBuilder<'a, show_state::SetArtist<S>> {
         self._fields.0 = Option::Some(value.into());
         ShowBuilder {
@@ -407,12 +396,12 @@ where
 
 impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `coverArt` field (optional)
-    pub fn cover_art(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn cover_art(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `coverArt` field to an Option value (optional)
-    pub fn maybe_cover_art(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_cover_art(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -439,12 +428,12 @@ where
 
 impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -458,7 +447,7 @@ where
     /// Set the `schedule` field (required)
     pub fn schedule(
         mut self,
-        value: impl Into<ShowSchedule<'a>>,
+        value: impl Into<ShowSchedule<S>>,
     ) -> ShowBuilder<'a, show_state::SetSchedule<S>> {
         self._fields.4 = Option::Some(value.into());
         ShowBuilder {
@@ -477,7 +466,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ShowBuilder<'a, show_state::SetTitle<S>> {
         self._fields.5 = Option::Some(value.into());
         ShowBuilder {
@@ -491,9 +480,9 @@ where
 impl<'a, S> ShowBuilder<'a, S>
 where
     S: show_state::State,
-    S::Title: show_state::IsSet,
     S::CreatedAt: show_state::IsSet,
     S::Artist: show_state::IsSet,
+    S::Title: show_state::IsSet,
     S::Schedule: show_state::IsSet,
 {
     /// Build the final struct
@@ -509,13 +498,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Show<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Show<'a> {
         Show {
             artist: self._fields.0.unwrap(),
             cover_art: self._fields.1,

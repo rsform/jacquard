@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -28,94 +30,122 @@ use crate::sh_weaver::embed::PercentSize;
 use crate::sh_weaver::embed::PixelSize;
 use crate::sh_weaver::embed::images;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Image<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///alt text description of the image
-    #[serde(borrow)]
-    pub alt: CowStr<'a>,
+    pub alt: S,
     ///Blurhash string for the image, used for low-resolution placeholders. This must be a valid Blurhash string.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub blurhash: Option<CowStr<'a>>,
+    pub blurhash: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub dimensions: Option<ImageDimensions<'a>>,
-    #[serde(borrow)]
-    pub image: BlobRef<'a>,
+    pub dimensions: Option<ImageDimensions<S>>,
+    pub image: BlobRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageDimensions<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageDimensions<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.embed.defs#aspectRatio")]
-    AspectRatio(Box<AspectRatio<'a>>),
+    AspectRatio(Box<AspectRatio<S>>),
     #[serde(rename = "sh.weaver.embed.defs#percentSize")]
-    PercentSize(Box<PercentSize<'a>>),
+    PercentSize(Box<PercentSize<S>>),
     #[serde(rename = "sh.weaver.embed.defs#pixelSize")]
-    PixelSize(Box<PixelSize<'a>>),
+    PixelSize(Box<PixelSize<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Images<'a> {
-    #[serde(borrow)]
-    pub images: Vec<images::Image<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Images<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub images: Vec<images::Image<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct View<'a> {
-    #[serde(borrow)]
-    pub images: Vec<images::ViewImage<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct View<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub images: Vec<images::ViewImage<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewImage<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ViewImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text description of the image, for accessibility.
-    #[serde(borrow)]
-    pub alt: CowStr<'a>,
+    pub alt: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub dimensions: Option<ViewImageDimensions<'a>>,
+    pub dimensions: Option<ViewImageDimensions<S>>,
     ///Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.
-    #[serde(borrow)]
-    pub fullsize: UriValue<'a>,
+    pub fullsize: UriValue<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.
-    #[serde(borrow)]
-    pub thumb: UriValue<'a>,
+    pub thumb: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ViewImageDimensions<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ViewImageDimensions<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.embed.defs#aspectRatio")]
-    AspectRatio(Box<AspectRatio<'a>>),
+    AspectRatio(Box<AspectRatio<S>>),
     #[serde(rename = "sh.weaver.embed.defs#percentSize")]
-    PercentSize(Box<PercentSize<'a>>),
+    PercentSize(Box<PercentSize<S>>),
     #[serde(rename = "sh.weaver.embed.defs#pixelSize")]
-    PixelSize(Box<PixelSize<'a>>),
+    PixelSize(Box<PixelSize<S>>),
 }
 
-impl<'a> LexiconSchema for Image<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Image<S> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.images"
     }
@@ -190,7 +220,7 @@ impl<'a> LexiconSchema for Image<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Images<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Images<S> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.images"
     }
@@ -216,7 +246,7 @@ impl<'a> LexiconSchema for Images<'a> {
     }
 }
 
-impl<'a> LexiconSchema for View<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for View<S> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.images"
     }
@@ -242,7 +272,7 @@ impl<'a> LexiconSchema for View<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ViewImage<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViewImage<S> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.images"
     }
@@ -315,11 +345,11 @@ pub mod image_state {
 pub struct ImageBuilder<'a, S: image_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<ImageDimensions<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<ImageDimensions<S>>,
+        Option<BlobRef<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -350,7 +380,7 @@ where
     /// Set the `alt` field (required)
     pub fn alt(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ImageBuilder<'a, image_state::SetAlt<S>> {
         self._fields.0 = Option::Some(value.into());
         ImageBuilder {
@@ -363,12 +393,12 @@ where
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `blurhash` field (optional)
-    pub fn blurhash(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn blurhash(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `blurhash` field to an Option value (optional)
-    pub fn maybe_blurhash(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_blurhash(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -376,12 +406,12 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `dimensions` field (optional)
-    pub fn dimensions(mut self, value: impl Into<Option<ImageDimensions<'a>>>) -> Self {
+    pub fn dimensions(mut self, value: impl Into<Option<ImageDimensions<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `dimensions` field to an Option value (optional)
-    pub fn maybe_dimensions(mut self, value: Option<ImageDimensions<'a>>) -> Self {
+    pub fn maybe_dimensions(mut self, value: Option<ImageDimensions<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -395,7 +425,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> ImageBuilder<'a, image_state::SetImage<S>> {
         self._fields.3 = Option::Some(value.into());
         ImageBuilder {
@@ -408,12 +438,12 @@ where
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -437,13 +467,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Image<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Image<'a> {
         Image {
             alt: self._fields.0.unwrap(),
             blurhash: self._fields.1,
@@ -679,7 +703,7 @@ pub mod images_state {
 /// Builder for constructing an instance of this type
 pub struct ImagesBuilder<'a, S: images_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<images::Image<'a>>>,),
+    _fields: (Option<Vec<images::Image<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -709,7 +733,7 @@ where
     /// Set the `images` field (required)
     pub fn images(
         mut self,
-        value: impl Into<Vec<images::Image<'a>>>,
+        value: impl Into<Vec<images::Image<S>>>,
     ) -> ImagesBuilder<'a, images_state::SetImages<S>> {
         self._fields.0 = Option::Some(value.into());
         ImagesBuilder {
@@ -733,13 +757,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Images<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Images<'a> {
         Images {
             images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -782,7 +800,7 @@ pub mod view_state {
 /// Builder for constructing an instance of this type
 pub struct ViewBuilder<'a, S: view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<images::ViewImage<'a>>>,),
+    _fields: (Option<Vec<images::ViewImage<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -812,7 +830,7 @@ where
     /// Set the `images` field (required)
     pub fn images(
         mut self,
-        value: impl Into<Vec<images::ViewImage<'a>>>,
+        value: impl Into<Vec<images::ViewImage<S>>>,
     ) -> ViewBuilder<'a, view_state::SetImages<S>> {
         self._fields.0 = Option::Some(value.into());
         ViewBuilder {
@@ -836,13 +854,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> View<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> View<'a> {
         View {
             images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -860,51 +872,51 @@ pub mod view_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Fullsize;
         type Thumb;
         type Alt;
+        type Fullsize;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Fullsize = Unset;
         type Thumb = Unset;
         type Alt = Unset;
-    }
-    ///State transition - sets the `fullsize` field to Set
-    pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFullsize<S> {}
-    impl<S: State> State for SetFullsize<S> {
-        type Fullsize = Set<members::fullsize>;
-        type Thumb = S::Thumb;
-        type Alt = S::Alt;
+        type Fullsize = Unset;
     }
     ///State transition - sets the `thumb` field to Set
     pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThumb<S> {}
     impl<S: State> State for SetThumb<S> {
-        type Fullsize = S::Fullsize;
         type Thumb = Set<members::thumb>;
         type Alt = S::Alt;
+        type Fullsize = S::Fullsize;
     }
     ///State transition - sets the `alt` field to Set
     pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlt<S> {}
     impl<S: State> State for SetAlt<S> {
-        type Fullsize = S::Fullsize;
         type Thumb = S::Thumb;
         type Alt = Set<members::alt>;
+        type Fullsize = S::Fullsize;
+    }
+    ///State transition - sets the `fullsize` field to Set
+    pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFullsize<S> {}
+    impl<S: State> State for SetFullsize<S> {
+        type Thumb = S::Thumb;
+        type Alt = S::Alt;
+        type Fullsize = Set<members::fullsize>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `fullsize` field
-        pub struct fullsize(());
         ///Marker type for the `thumb` field
         pub struct thumb(());
         ///Marker type for the `alt` field
         pub struct alt(());
+        ///Marker type for the `fullsize` field
+        pub struct fullsize(());
     }
 }
 
@@ -912,11 +924,11 @@ pub mod view_image_state {
 pub struct ViewImageBuilder<'a, S: view_image_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<ViewImageDimensions<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
+        Option<S>,
+        Option<ViewImageDimensions<S>>,
+        Option<UriValue<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -947,7 +959,7 @@ where
     /// Set the `alt` field (required)
     pub fn alt(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ViewImageBuilder<'a, view_image_state::SetAlt<S>> {
         self._fields.0 = Option::Some(value.into());
         ViewImageBuilder {
@@ -962,13 +974,13 @@ impl<'a, S: view_image_state::State> ViewImageBuilder<'a, S> {
     /// Set the `dimensions` field (optional)
     pub fn dimensions(
         mut self,
-        value: impl Into<Option<ViewImageDimensions<'a>>>,
+        value: impl Into<Option<ViewImageDimensions<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `dimensions` field to an Option value (optional)
-    pub fn maybe_dimensions(mut self, value: Option<ViewImageDimensions<'a>>) -> Self {
+    pub fn maybe_dimensions(mut self, value: Option<ViewImageDimensions<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -982,7 +994,7 @@ where
     /// Set the `fullsize` field (required)
     pub fn fullsize(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ViewImageBuilder<'a, view_image_state::SetFullsize<S>> {
         self._fields.2 = Option::Some(value.into());
         ViewImageBuilder {
@@ -995,12 +1007,12 @@ where
 
 impl<'a, S: view_image_state::State> ViewImageBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1014,7 +1026,7 @@ where
     /// Set the `thumb` field (required)
     pub fn thumb(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ViewImageBuilder<'a, view_image_state::SetThumb<S>> {
         self._fields.4 = Option::Some(value.into());
         ViewImageBuilder {
@@ -1028,9 +1040,9 @@ where
 impl<'a, S> ViewImageBuilder<'a, S>
 where
     S: view_image_state::State,
-    S::Fullsize: view_image_state::IsSet,
     S::Thumb: view_image_state::IsSet,
     S::Alt: view_image_state::IsSet,
+    S::Fullsize: view_image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ViewImage<'a> {
@@ -1046,10 +1058,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ViewImage<'a> {
         ViewImage {
             alt: self._fields.0.unwrap(),

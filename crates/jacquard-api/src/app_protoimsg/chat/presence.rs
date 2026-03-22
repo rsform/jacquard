@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,34 +29,41 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// User's current presence status. Lives in their repo, updated by their client. IMPORTANT: visibleTo is intentionally excluded — it is a privacy preference and must remain server-side only. Writing it to the PDS would publicly expose who the user is hiding from.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.protoimsg.chat.presence", tag = "$type")]
-pub struct Presence<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.protoimsg.chat.presence",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Presence<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Custom away message / status text.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub away_message: Option<CowStr<'a>>,
+    pub away_message: Option<S>,
     ///Current presence status.
-    #[serde(borrow)]
-    pub status: PresenceStatus<'a>,
+    pub status: PresenceStatus<S>,
     ///When presence was last updated.
     pub updated_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Current presence status.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PresenceStatus<'a> {
+pub enum PresenceStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Online,
     Away,
     Idle,
     Offline,
     Invisible,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> PresenceStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> PresenceStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Online => "online",
@@ -65,76 +74,59 @@ impl<'a> PresenceStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for PresenceStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "online" => Self::Online,
             "away" => Self::Away,
             "idle" => Self::Idle,
             "offline" => Self::Offline,
             "invisible" => Self::Invisible,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for PresenceStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "online" => Self::Online,
-            "away" => Self::Away,
-            "idle" => Self::Idle,
-            "offline" => Self::Offline,
-            "invisible" => Self::Invisible,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for PresenceStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for PresenceStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for PresenceStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for PresenceStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for PresenceStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for PresenceStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for PresenceStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for PresenceStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for PresenceStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for PresenceStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for PresenceStatus<'_> {
-    type Output = PresenceStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for PresenceStatus<S> {
+    type Output = PresenceStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             PresenceStatus::Online => PresenceStatus::Online,
@@ -150,22 +142,23 @@ impl jacquard_common::IntoStatic for PresenceStatus<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PresenceGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PresenceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Presence<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Presence<S>,
 }
 
-impl<'a> Presence<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PresenceRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Presence<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PresenceRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -176,18 +169,17 @@ pub struct PresenceRecord;
 impl XrpcResp for PresenceRecord {
     const NSID: &'static str = "app.protoimsg.chat.presence";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PresenceGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PresenceGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PresenceGetRecordOutput<'_>> for Presence<'_> {
-    fn from(output: PresenceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PresenceGetRecordOutput<S>> for Presence<S> {
+    fn from(output: PresenceGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Presence<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Presence<S> {
     const NSID: &'static str = "app.protoimsg.chat.presence";
     type Record = PresenceRecord;
 }
@@ -197,7 +189,7 @@ impl Collection for PresenceRecord {
     type Record = PresenceRecord;
 }
 
-impl<'a> LexiconSchema for Presence<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Presence<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.presence"
     }
@@ -269,7 +261,7 @@ pub mod presence_state {
 /// Builder for constructing an instance of this type
 pub struct PresenceBuilder<'a, S: presence_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<PresenceStatus<'a>>, Option<Datetime>),
+    _fields: (Option<S>, Option<PresenceStatus<S>>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -293,12 +285,12 @@ impl<'a> PresenceBuilder<'a, presence_state::Empty> {
 
 impl<'a, S: presence_state::State> PresenceBuilder<'a, S> {
     /// Set the `awayMessage` field (optional)
-    pub fn away_message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn away_message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `awayMessage` field to an Option value (optional)
-    pub fn maybe_away_message(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_away_message(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -312,7 +304,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<PresenceStatus<'a>>,
+        value: impl Into<PresenceStatus<S>>,
     ) -> PresenceBuilder<'a, presence_state::SetStatus<S>> {
         self._fields.1 = Option::Some(value.into());
         PresenceBuilder {
@@ -360,10 +352,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Presence<'a> {
         Presence {
             away_message: self._fields.0,

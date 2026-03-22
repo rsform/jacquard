@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,76 +31,86 @@ use crate::app_gainforest::evaluator::MethodInfo;
 use crate::app_gainforest::evaluator::service;
 /// Definition of a single evaluation type produced by this evaluator.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct EvaluationTypeDefinition<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EvaluationTypeDefinition<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The evaluation type identifier (must match an entry in evaluationTypes).
-    #[serde(borrow)]
-    pub identifier: CowStr<'a>,
+    pub identifier: S,
     ///Human-readable names and descriptions in various languages.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub locales: Option<Vec<service::EvaluationTypeLocale<'a>>>,
+    pub locales: Option<Vec<service::EvaluationTypeLocale<S>>>,
     ///Default method info for this evaluation type (can be overridden per-evaluation).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub method: Option<MethodInfo<'a>>,
+    pub method: Option<MethodInfo<S>>,
     ///The lexicon reference for the result type (e.g., 'app.gainforest.evaluator.defs#speciesIdResult').
-    #[serde(borrow)]
-    pub result_type: CowStr<'a>,
+    pub result_type: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Localized name and description for an evaluation type.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct EvaluationTypeLocale<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EvaluationTypeLocale<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Longer description of what this evaluation type does.
-    #[serde(borrow)]
-    pub description: CowStr<'a>,
+    pub description: S,
     ///Language code (BCP-47, e.g., 'en', 'pt-BR').
-    #[serde(borrow)]
-    pub lang: CowStr<'a>,
+    pub lang: S,
     ///Short human-readable name for this evaluation type.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Policies declaring what this evaluator does and how it operates.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EvaluatorPolicies<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EvaluatorPolicies<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_model: Option<EvaluatorPoliciesAccessModel<'a>>,
+    pub access_model: Option<EvaluatorPoliciesAccessModel<S>>,
     ///Detailed definitions for each evaluation type, including human-readable descriptions.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub evaluation_type_definitions: Option<Vec<service::EvaluationTypeDefinition<'a>>>,
+    pub evaluation_type_definitions: Option<Vec<service::EvaluationTypeDefinition<S>>>,
     ///List of evaluation type identifiers this evaluator produces (e.g., 'species-id', 'data-quality').
-    #[serde(borrow)]
-    pub evaluation_types: Vec<CowStr<'a>>,
+    pub evaluation_types: Vec<S>,
     ///NSIDs of record collections this evaluator can evaluate (e.g., 'app.gainforest.dwc.occurrence').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_collections: Option<Vec<CowStr<'a>>>,
+    pub subject_collections: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EvaluatorPoliciesAccessModel<'a> {
+pub enum EvaluatorPoliciesAccessModel<S: Bos<str> + AsRef<str> = DefaultStr> {
     Open,
     Subscription,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> EvaluatorPoliciesAccessModel<'a> {
+impl<S: Bos<str> + AsRef<str>> EvaluatorPoliciesAccessModel<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Open => "open",
@@ -106,70 +118,56 @@ impl<'a> EvaluatorPoliciesAccessModel<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for EvaluatorPoliciesAccessModel<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "open" => Self::Open,
             "subscription" => Self::Subscription,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for EvaluatorPoliciesAccessModel<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "open" => Self::Open,
-            "subscription" => Self::Subscription,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for EvaluatorPoliciesAccessModel<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for EvaluatorPoliciesAccessModel<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for EvaluatorPoliciesAccessModel<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for EvaluatorPoliciesAccessModel<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for EvaluatorPoliciesAccessModel<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for EvaluatorPoliciesAccessModel<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for EvaluatorPoliciesAccessModel<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for EvaluatorPoliciesAccessModel<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for EvaluatorPoliciesAccessModel<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for EvaluatorPoliciesAccessModel<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for EvaluatorPoliciesAccessModel<'_> {
-    type Output = EvaluatorPoliciesAccessModel<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for EvaluatorPoliciesAccessModel<S> {
+    type Output = EvaluatorPoliciesAccessModel<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             EvaluatorPoliciesAccessModel::Open => EvaluatorPoliciesAccessModel::Open,
@@ -185,44 +183,49 @@ impl jacquard_common::IntoStatic for EvaluatorPoliciesAccessModel<'_> {
 
 /// An evaluator service declaration. Publish at /app.gainforest.evaluator.service/self to declare this account as an evaluator.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.gainforest.evaluator.service",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Service<'a> {
+pub struct Service<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp of when this evaluator service was declared.
     pub created_at: Datetime,
     ///The evaluator's policies including supported evaluation types and access model.
-    #[serde(borrow)]
-    pub policies: service::EvaluatorPolicies<'a>,
+    pub policies: service::EvaluatorPolicies<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ServiceGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ServiceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Service<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Service<S>,
 }
 
-impl<'a> Service<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ServiceRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Service<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ServiceRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for EvaluationTypeDefinition<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for EvaluationTypeDefinition<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.service"
     }
@@ -273,7 +276,7 @@ impl<'a> LexiconSchema for EvaluationTypeDefinition<'a> {
     }
 }
 
-impl<'a> LexiconSchema for EvaluationTypeLocale<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for EvaluationTypeLocale<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.service"
     }
@@ -327,7 +330,7 @@ impl<'a> LexiconSchema for EvaluationTypeLocale<'a> {
     }
 }
 
-impl<'a> LexiconSchema for EvaluatorPolicies<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for EvaluatorPolicies<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.service"
     }
@@ -392,18 +395,17 @@ pub struct ServiceRecord;
 impl XrpcResp for ServiceRecord {
     const NSID: &'static str = "app.gainforest.evaluator.service";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ServiceGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ServiceGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ServiceGetRecordOutput<'_>> for Service<'_> {
-    fn from(output: ServiceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ServiceGetRecordOutput<S>> for Service<S> {
+    fn from(output: ServiceGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Service<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Service<S> {
     const NSID: &'static str = "app.gainforest.evaluator.service";
     type Record = ServiceRecord;
 }
@@ -413,7 +415,7 @@ impl Collection for ServiceRecord {
     type Record = ServiceRecord;
 }
 
-impl<'a> LexiconSchema for Service<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Service<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.service"
     }
@@ -731,10 +733,10 @@ pub mod evaluator_policies_state {
 pub struct EvaluatorPoliciesBuilder<'a, S: evaluator_policies_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<EvaluatorPoliciesAccessModel<'a>>,
-        Option<Vec<service::EvaluationTypeDefinition<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<CowStr<'a>>>,
+        Option<EvaluatorPoliciesAccessModel<S>>,
+        Option<Vec<service::EvaluationTypeDefinition<S>>>,
+        Option<Vec<S>>,
+        Option<Vec<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -761,7 +763,7 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
     /// Set the `accessModel` field (optional)
     pub fn access_model(
         mut self,
-        value: impl Into<Option<EvaluatorPoliciesAccessModel<'a>>>,
+        value: impl Into<Option<EvaluatorPoliciesAccessModel<S>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
@@ -769,7 +771,7 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
     /// Set the `accessModel` field to an Option value (optional)
     pub fn maybe_access_model(
         mut self,
-        value: Option<EvaluatorPoliciesAccessModel<'a>>,
+        value: Option<EvaluatorPoliciesAccessModel<S>>,
     ) -> Self {
         self._fields.0 = value;
         self
@@ -780,7 +782,7 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
     /// Set the `evaluationTypeDefinitions` field (optional)
     pub fn evaluation_type_definitions(
         mut self,
-        value: impl Into<Option<Vec<service::EvaluationTypeDefinition<'a>>>>,
+        value: impl Into<Option<Vec<service::EvaluationTypeDefinition<S>>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -788,7 +790,7 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
     /// Set the `evaluationTypeDefinitions` field to an Option value (optional)
     pub fn maybe_evaluation_type_definitions(
         mut self,
-        value: Option<Vec<service::EvaluationTypeDefinition<'a>>>,
+        value: Option<Vec<service::EvaluationTypeDefinition<S>>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -803,7 +805,7 @@ where
     /// Set the `evaluationTypes` field (required)
     pub fn evaluation_types(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> EvaluatorPoliciesBuilder<'a, evaluator_policies_state::SetEvaluationTypes<S>> {
         self._fields.2 = Option::Some(value.into());
         EvaluatorPoliciesBuilder {
@@ -816,15 +818,12 @@ where
 
 impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
     /// Set the `subjectCollections` field (optional)
-    pub fn subject_collections(
-        mut self,
-        value: impl Into<Option<Vec<CowStr<'a>>>>,
-    ) -> Self {
+    pub fn subject_collections(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `subjectCollections` field to an Option value (optional)
-    pub fn maybe_subject_collections(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_subject_collections(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -848,10 +847,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> EvaluatorPolicies<'a> {
         EvaluatorPolicies {
             access_model: self._fields.0,
@@ -873,44 +869,44 @@ pub mod service_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Policies;
         type CreatedAt;
+        type Policies;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Policies = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `policies` field to Set
-    pub struct SetPolicies<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPolicies<S> {}
-    impl<S: State> State for SetPolicies<S> {
-        type Policies = Set<members::policies>;
-        type CreatedAt = S::CreatedAt;
+        type Policies = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Policies = S::Policies;
         type CreatedAt = Set<members::created_at>;
+        type Policies = S::Policies;
+    }
+    ///State transition - sets the `policies` field to Set
+    pub struct SetPolicies<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPolicies<S> {}
+    impl<S: State> State for SetPolicies<S> {
+        type CreatedAt = S::CreatedAt;
+        type Policies = Set<members::policies>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `policies` field
-        pub struct policies(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `policies` field
+        pub struct policies(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ServiceBuilder<'a, S: service_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<service::EvaluatorPolicies<'a>>),
+    _fields: (Option<Datetime>, Option<service::EvaluatorPolicies<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -959,7 +955,7 @@ where
     /// Set the `policies` field (required)
     pub fn policies(
         mut self,
-        value: impl Into<service::EvaluatorPolicies<'a>>,
+        value: impl Into<service::EvaluatorPolicies<S>>,
     ) -> ServiceBuilder<'a, service_state::SetPolicies<S>> {
         self._fields.1 = Option::Some(value.into());
         ServiceBuilder {
@@ -973,8 +969,8 @@ where
 impl<'a, S> ServiceBuilder<'a, S>
 where
     S: service_state::State,
-    S::Policies: service_state::IsSet,
     S::CreatedAt: service_state::IsSet,
+    S::Policies: service_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Service<'a> {
@@ -987,10 +983,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Service<'a> {
         Service {
             created_at: self._fields.0.unwrap(),

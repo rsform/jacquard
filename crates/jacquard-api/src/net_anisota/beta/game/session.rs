@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,10 +30,15 @@ use serde::{Serialize, Deserialize};
 use crate::net_anisota::beta::game::session;
 /// Summary of activity during this session
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ActivitySummary<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ActivitySummary<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Player's current level at the time of this session update
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current_level: Option<i64>,
@@ -39,26 +46,31 @@ pub struct ActivitySummary<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current_xp: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub game_actions: Option<session::GameActions<'a>>,
+    pub game_actions: Option<session::GameActions<S>>,
     ///List of unique pages/routes visited
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pages_visited: Option<Vec<CowStr<'a>>>,
+    pub pages_visited: Option<Vec<S>>,
     ///Total number of events logged in this session
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_events: Option<i64>,
     ///Total XP gained during this specific session
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp_gained_this_session: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Game-specific actions performed
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct GameActions<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GameActions<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub daily_rewards_claimed: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -71,24 +83,27 @@ pub struct GameActions<'a> {
     pub posts_viewed: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub specimens_collected: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A game session record tracking a continuous period of user engagement with the application
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "net.anisota.beta.game.session",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Session<'a> {
+pub struct Session<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub activity_summary: Option<session::ActivitySummary<'a>>,
+    pub activity_summary: Option<session::ActivitySummary<S>>,
     ///Version of the client application
-    #[serde(borrow)]
-    pub client_version: CowStr<'a>,
+    pub client_version: S,
     ///When the session record was created
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -97,8 +112,7 @@ pub struct Session<'a> {
     pub duration: Option<i64>,
     ///Why the session ended
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub end_reason: Option<CowStr<'a>>,
+    pub end_reason: Option<S>,
     ///When the session ended (ISO 8601)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ended_at: Option<Datetime>,
@@ -106,119 +120,129 @@ pub struct Session<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_activity_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub metadata: Option<session::Metadata<'a>>,
+    pub metadata: Option<session::Metadata<S>>,
     ///URI of the previous session if this is a continuation (e.g., after brief inactivity)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent_session_uri: Option<CowStr<'a>>,
+    pub parent_session_uri: Option<S>,
     ///Platform where the session occurred
-    #[serde(borrow)]
-    pub platform: CowStr<'a>,
+    pub platform: S,
     ///URIs of log records that occurred during this session
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub related_log_uris: Option<Vec<CowStr<'a>>>,
+    pub related_log_uris: Option<Vec<S>>,
     ///URIs of progress records created during this session
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub related_progress_uris: Option<Vec<CowStr<'a>>>,
+    pub related_progress_uris: Option<Vec<S>>,
     ///URIs of related sessions (e.g., same day, same device)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub related_session_uris: Option<Vec<CowStr<'a>>>,
+    pub related_session_uris: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub session_context: Option<session::SessionContext<'a>>,
+    pub session_context: Option<session::SessionContext<S>>,
     ///When the session began (ISO 8601)
     pub started_at: Datetime,
     ///Current status of the session
-    #[serde(borrow)]
-    pub status: CowStr<'a>,
+    pub status: S,
     ///When the session record was last updated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SessionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SessionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Session<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Session<S>,
 }
 
 /// Additional session metadata
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Metadata<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Metadata<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of features used during the session
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub features: Option<Vec<CowStr<'a>>>,
+    pub features: Option<Vec<S>>,
     ///Network condition during session
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub network_condition: Option<CowStr<'a>>,
+    pub network_condition: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub performance_metrics: Option<session::PerformanceMetrics<'a>>,
+    pub performance_metrics: Option<session::PerformanceMetrics<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Performance-related data
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct PerformanceMetrics<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PerformanceMetrics<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Average API response time in milliseconds (rounded to nearest integer)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub average_response_time: Option<i64>,
     ///Number of errors encountered
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error_count: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Context about how the session started
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SessionContext<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SessionContext<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///How the user was authenticated
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub authentication_method: Option<CowStr<'a>>,
+    pub authentication_method: Option<S>,
     ///How the user entered the app
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub entry_point: Option<CowStr<'a>>,
+    pub entry_point: Option<S>,
     ///Whether this was a new user's first session
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_new_user: Option<bool>,
     ///Referrer URL if applicable
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub referrer: Option<CowStr<'a>>,
+    pub referrer: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Session<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SessionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Session<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SessionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for ActivitySummary<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActivitySummary<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
@@ -269,7 +293,7 @@ impl<'a> LexiconSchema for ActivitySummary<'a> {
     }
 }
 
-impl<'a> LexiconSchema for GameActions<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameActions<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
@@ -345,18 +369,17 @@ pub struct SessionRecord;
 impl XrpcResp for SessionRecord {
     const NSID: &'static str = "net.anisota.beta.game.session";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SessionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SessionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SessionGetRecordOutput<'_>> for Session<'_> {
-    fn from(output: SessionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SessionGetRecordOutput<S>> for Session<S> {
+    fn from(output: SessionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Session<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Session<S> {
     const NSID: &'static str = "net.anisota.beta.game.session";
     type Record = SessionRecord;
 }
@@ -366,7 +389,7 @@ impl Collection for SessionRecord {
     type Record = SessionRecord;
 }
 
-impl<'a> LexiconSchema for Session<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Session<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
@@ -390,7 +413,7 @@ impl<'a> LexiconSchema for Session<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Metadata<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Metadata<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
@@ -405,7 +428,7 @@ impl<'a> LexiconSchema for Metadata<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PerformanceMetrics<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PerformanceMetrics<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
@@ -438,7 +461,7 @@ impl<'a> LexiconSchema for PerformanceMetrics<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SessionContext<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SessionContext<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
@@ -910,67 +933,67 @@ pub mod session_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Platform;
-        type ClientVersion;
         type StartedAt;
         type Status;
+        type Platform;
+        type ClientVersion;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Platform = Unset;
-        type ClientVersion = Unset;
         type StartedAt = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlatform<S> {}
-    impl<S: State> State for SetPlatform<S> {
-        type Platform = Set<members::platform>;
-        type ClientVersion = S::ClientVersion;
-        type StartedAt = S::StartedAt;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `client_version` field to Set
-    pub struct SetClientVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClientVersion<S> {}
-    impl<S: State> State for SetClientVersion<S> {
-        type Platform = S::Platform;
-        type ClientVersion = Set<members::client_version>;
-        type StartedAt = S::StartedAt;
-        type Status = S::Status;
+        type Platform = Unset;
+        type ClientVersion = Unset;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartedAt<S> {}
     impl<S: State> State for SetStartedAt<S> {
-        type Platform = S::Platform;
-        type ClientVersion = S::ClientVersion;
         type StartedAt = Set<members::started_at>;
         type Status = S::Status;
+        type Platform = S::Platform;
+        type ClientVersion = S::ClientVersion;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Platform = S::Platform;
-        type ClientVersion = S::ClientVersion;
         type StartedAt = S::StartedAt;
         type Status = Set<members::status>;
+        type Platform = S::Platform;
+        type ClientVersion = S::ClientVersion;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlatform<S> {}
+    impl<S: State> State for SetPlatform<S> {
+        type StartedAt = S::StartedAt;
+        type Status = S::Status;
+        type Platform = Set<members::platform>;
+        type ClientVersion = S::ClientVersion;
+    }
+    ///State transition - sets the `client_version` field to Set
+    pub struct SetClientVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClientVersion<S> {}
+    impl<S: State> State for SetClientVersion<S> {
+        type StartedAt = S::StartedAt;
+        type Status = S::Status;
+        type Platform = S::Platform;
+        type ClientVersion = Set<members::client_version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `platform` field
-        pub struct platform(());
-        ///Marker type for the `client_version` field
-        pub struct client_version(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
+        ///Marker type for the `client_version` field
+        pub struct client_version(());
     }
 }
 
@@ -978,22 +1001,22 @@ pub mod session_state {
 pub struct SessionBuilder<'a, S: session_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<session::ActivitySummary<'a>>,
-        Option<CowStr<'a>>,
+        Option<session::ActivitySummary<S>>,
+        Option<S>,
         Option<Datetime>,
         Option<i64>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
         Option<Datetime>,
-        Option<session::Metadata<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<session::SessionContext<'a>>,
+        Option<session::Metadata<S>>,
+        Option<S>,
+        Option<S>,
+        Option<Vec<S>>,
+        Option<Vec<S>>,
+        Option<Vec<S>>,
+        Option<session::SessionContext<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -1039,7 +1062,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `activitySummary` field (optional)
     pub fn activity_summary(
         mut self,
-        value: impl Into<Option<session::ActivitySummary<'a>>>,
+        value: impl Into<Option<session::ActivitySummary<S>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
@@ -1047,7 +1070,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `activitySummary` field to an Option value (optional)
     pub fn maybe_activity_summary(
         mut self,
-        value: Option<session::ActivitySummary<'a>>,
+        value: Option<session::ActivitySummary<S>>,
     ) -> Self {
         self._fields.0 = value;
         self
@@ -1062,7 +1085,7 @@ where
     /// Set the `clientVersion` field (required)
     pub fn client_version(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SessionBuilder<'a, session_state::SetClientVersion<S>> {
         self._fields.1 = Option::Some(value.into());
         SessionBuilder {
@@ -1101,12 +1124,12 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `endReason` field (optional)
-    pub fn end_reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn end_reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `endReason` field to an Option value (optional)
-    pub fn maybe_end_reason(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_end_reason(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1140,12 +1163,12 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `metadata` field (optional)
-    pub fn metadata(mut self, value: impl Into<Option<session::Metadata<'a>>>) -> Self {
+    pub fn metadata(mut self, value: impl Into<Option<session::Metadata<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
-    pub fn maybe_metadata(mut self, value: Option<session::Metadata<'a>>) -> Self {
+    pub fn maybe_metadata(mut self, value: Option<session::Metadata<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -1153,12 +1176,12 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `parentSessionUri` field (optional)
-    pub fn parent_session_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn parent_session_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `parentSessionUri` field to an Option value (optional)
-    pub fn maybe_parent_session_uri(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_parent_session_uri(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -1172,7 +1195,7 @@ where
     /// Set the `platform` field (required)
     pub fn platform(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SessionBuilder<'a, session_state::SetPlatform<S>> {
         self._fields.9 = Option::Some(value.into());
         SessionBuilder {
@@ -1185,15 +1208,12 @@ where
 
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `relatedLogUris` field (optional)
-    pub fn related_log_uris(
-        mut self,
-        value: impl Into<Option<Vec<CowStr<'a>>>>,
-    ) -> Self {
+    pub fn related_log_uris(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `relatedLogUris` field to an Option value (optional)
-    pub fn maybe_related_log_uris(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_related_log_uris(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -1201,18 +1221,12 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `relatedProgressUris` field (optional)
-    pub fn related_progress_uris(
-        mut self,
-        value: impl Into<Option<Vec<CowStr<'a>>>>,
-    ) -> Self {
+    pub fn related_progress_uris(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `relatedProgressUris` field to an Option value (optional)
-    pub fn maybe_related_progress_uris(
-        mut self,
-        value: Option<Vec<CowStr<'a>>>,
-    ) -> Self {
+    pub fn maybe_related_progress_uris(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -1220,15 +1234,12 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `relatedSessionUris` field (optional)
-    pub fn related_session_uris(
-        mut self,
-        value: impl Into<Option<Vec<CowStr<'a>>>>,
-    ) -> Self {
+    pub fn related_session_uris(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `relatedSessionUris` field to an Option value (optional)
-    pub fn maybe_related_session_uris(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_related_session_uris(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -1238,7 +1249,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `sessionContext` field (optional)
     pub fn session_context(
         mut self,
-        value: impl Into<Option<session::SessionContext<'a>>>,
+        value: impl Into<Option<session::SessionContext<S>>>,
     ) -> Self {
         self._fields.13 = value.into();
         self
@@ -1246,7 +1257,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `sessionContext` field to an Option value (optional)
     pub fn maybe_session_context(
         mut self,
-        value: Option<session::SessionContext<'a>>,
+        value: Option<session::SessionContext<S>>,
     ) -> Self {
         self._fields.13 = value;
         self
@@ -1280,7 +1291,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SessionBuilder<'a, session_state::SetStatus<S>> {
         self._fields.15 = Option::Some(value.into());
         SessionBuilder {
@@ -1307,10 +1318,10 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 impl<'a, S> SessionBuilder<'a, S>
 where
     S: session_state::State,
-    S::Platform: session_state::IsSet,
-    S::ClientVersion: session_state::IsSet,
     S::StartedAt: session_state::IsSet,
     S::Status: session_state::IsSet,
+    S::Platform: session_state::IsSet,
+    S::ClientVersion: session_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Session<'a> {
@@ -1338,10 +1349,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Session<'a> {
         Session {
             activity_summary: self._fields.0,

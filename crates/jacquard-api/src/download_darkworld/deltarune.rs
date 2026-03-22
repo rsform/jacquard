@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,131 +29,237 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::download_darkworld::deltarune;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct LocationElsewhere<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LocationElsewhere<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
 
-#[lexicon]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct LocationHome<'a> {}
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct LocationMathTextbook<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LocationHome<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
 
-#[lexicon]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct LocationOnSkin<'a> {}
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct LocationSchool<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LocationMathTextbook<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LocationOnSkin<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LocationSchool<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Describes an instance of the user drawing the Delta Rune symbol from Undertale/Deltarune.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "download.darkworld.deltarune",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Deltarune<'a> {
+pub struct Deltarune<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub time: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tool: Option<DeltaruneTool<'a>>,
+    pub tool: Option<DeltaruneTool<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#where: Option<DeltaruneWhere<'a>>,
+    pub r#where: Option<DeltaruneWhere<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum DeltaruneTool<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum DeltaruneTool<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "download.darkworld.deltarune#toolPen")]
-    ToolPen(Box<deltarune::ToolPen<'a>>),
+    ToolPen(Box<deltarune::ToolPen<S>>),
     #[serde(rename = "download.darkworld.deltarune#toolPencil")]
-    ToolPencil(Box<deltarune::ToolPencil<'a>>),
+    ToolPencil(Box<deltarune::ToolPencil<S>>),
     #[serde(rename = "download.darkworld.deltarune#toolMarker")]
-    ToolMarker(Box<deltarune::ToolMarker<'a>>),
+    ToolMarker(Box<deltarune::ToolMarker<S>>),
     #[serde(rename = "download.darkworld.deltarune#toolFinger")]
-    ToolFinger(Box<deltarune::ToolFinger<'a>>),
+    ToolFinger(Box<deltarune::ToolFinger<S>>),
     #[serde(rename = "download.darkworld.deltarune#toolOther")]
-    ToolOther(Box<deltarune::ToolOther<'a>>),
+    ToolOther(Box<deltarune::ToolOther<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum DeltaruneWhere<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum DeltaruneWhere<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "download.darkworld.deltarune#locationSchool")]
-    LocationSchool(Box<deltarune::LocationSchool<'a>>),
+    LocationSchool(Box<deltarune::LocationSchool<S>>),
     #[serde(rename = "download.darkworld.deltarune#locationHome")]
-    LocationHome(Box<deltarune::LocationHome<'a>>),
+    LocationHome(Box<deltarune::LocationHome<S>>),
     #[serde(rename = "download.darkworld.deltarune#locationMathTextbook")]
-    LocationMathTextbook(Box<deltarune::LocationMathTextbook<'a>>),
+    LocationMathTextbook(Box<deltarune::LocationMathTextbook<S>>),
     #[serde(rename = "download.darkworld.deltarune#locationOnSkin")]
-    LocationOnSkin(Box<deltarune::LocationOnSkin<'a>>),
+    LocationOnSkin(Box<deltarune::LocationOnSkin<S>>),
     #[serde(rename = "download.darkworld.deltarune#locationElsewhere")]
-    LocationElsewhere(Box<deltarune::LocationElsewhere<'a>>),
+    LocationElsewhere(Box<deltarune::LocationElsewhere<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DeltaruneGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeltaruneGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Deltarune<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Deltarune<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ToolFinger<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ToolFinger<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
 
-#[lexicon]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ToolMarker<'a> {}
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ToolOther<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ToolMarker<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
 
-#[lexicon]
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ToolPen<'a> {}
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ToolPencil<'a> {}
-impl<'a> Deltarune<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DeltaruneRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ToolOther<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ToolPen<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ToolPencil<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+impl<S: Bos<str> + AsRef<str>> Deltarune<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DeltaruneRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for LocationElsewhere<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationElsewhere<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -166,7 +274,7 @@ impl<'a> LexiconSchema for LocationElsewhere<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LocationHome<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationHome<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -181,7 +289,7 @@ impl<'a> LexiconSchema for LocationHome<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LocationMathTextbook<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationMathTextbook<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -196,7 +304,7 @@ impl<'a> LexiconSchema for LocationMathTextbook<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LocationOnSkin<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationOnSkin<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -211,7 +319,7 @@ impl<'a> LexiconSchema for LocationOnSkin<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LocationSchool<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationSchool<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -233,18 +341,17 @@ pub struct DeltaruneRecord;
 impl XrpcResp for DeltaruneRecord {
     const NSID: &'static str = "download.darkworld.deltarune";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeltaruneGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DeltaruneGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DeltaruneGetRecordOutput<'_>> for Deltarune<'_> {
-    fn from(output: DeltaruneGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DeltaruneGetRecordOutput<S>> for Deltarune<S> {
+    fn from(output: DeltaruneGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Deltarune<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Deltarune<S> {
     const NSID: &'static str = "download.darkworld.deltarune";
     type Record = DeltaruneRecord;
 }
@@ -254,7 +361,7 @@ impl Collection for DeltaruneRecord {
     type Record = DeltaruneRecord;
 }
 
-impl<'a> LexiconSchema for Deltarune<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Deltarune<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -269,7 +376,7 @@ impl<'a> LexiconSchema for Deltarune<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ToolFinger<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolFinger<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -284,7 +391,7 @@ impl<'a> LexiconSchema for ToolFinger<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ToolMarker<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolMarker<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -299,7 +406,7 @@ impl<'a> LexiconSchema for ToolMarker<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ToolOther<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolOther<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -314,7 +421,7 @@ impl<'a> LexiconSchema for ToolOther<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ToolPen<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolPen<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -329,7 +436,7 @@ impl<'a> LexiconSchema for ToolPen<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ToolPencil<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolPencil<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -559,7 +666,7 @@ pub mod deltarune_state {
 /// Builder for constructing an instance of this type
 pub struct DeltaruneBuilder<'a, S: deltarune_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<DeltaruneTool<'a>>, Option<DeltaruneWhere<'a>>),
+    _fields: (Option<Datetime>, Option<DeltaruneTool<S>>, Option<DeltaruneWhere<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -602,12 +709,12 @@ where
 
 impl<'a, S: deltarune_state::State> DeltaruneBuilder<'a, S> {
     /// Set the `tool` field (optional)
-    pub fn tool(mut self, value: impl Into<Option<DeltaruneTool<'a>>>) -> Self {
+    pub fn tool(mut self, value: impl Into<Option<DeltaruneTool<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `tool` field to an Option value (optional)
-    pub fn maybe_tool(mut self, value: Option<DeltaruneTool<'a>>) -> Self {
+    pub fn maybe_tool(mut self, value: Option<DeltaruneTool<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -615,12 +722,12 @@ impl<'a, S: deltarune_state::State> DeltaruneBuilder<'a, S> {
 
 impl<'a, S: deltarune_state::State> DeltaruneBuilder<'a, S> {
     /// Set the `where` field (optional)
-    pub fn r#where(mut self, value: impl Into<Option<DeltaruneWhere<'a>>>) -> Self {
+    pub fn r#where(mut self, value: impl Into<Option<DeltaruneWhere<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `where` field to an Option value (optional)
-    pub fn maybe_where(mut self, value: Option<DeltaruneWhere<'a>>) -> Self {
+    pub fn maybe_where(mut self, value: Option<DeltaruneWhere<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -643,10 +750,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Deltarune<'a> {
         Deltarune {
             time: self._fields.0.unwrap(),

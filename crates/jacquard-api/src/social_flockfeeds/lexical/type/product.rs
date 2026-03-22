@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -34,1282 +35,2005 @@ use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::product;
 /// Any offered product or service. For example: a pair of shoes; a concert ticket; the rental of a car; a haircut; or an episode of a TV show streamed online.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Embedded<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_property: Option<EmbeddedAdditionalProperty<'a>>,
+    pub additional_property: Option<EmbeddedAdditionalProperty<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<EmbeddedAdditionalType<'a>>,
+    pub additional_type: Option<EmbeddedAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<EmbeddedAggregateRating<'a>>,
+    pub aggregate_rating: Option<EmbeddedAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<EmbeddedAlternateName<'a>>,
+    pub alternate_name: Option<EmbeddedAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub asin: Option<EmbeddedAsin<'a>>,
+    pub asin: Option<EmbeddedAsin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audience: Option<EmbeddedAudience<'a>>,
+    pub audience: Option<EmbeddedAudience<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<EmbeddedAward<'a>>,
+    pub award: Option<EmbeddedAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<EmbeddedAwards<'a>>,
+    pub awards: Option<EmbeddedAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub brand: Option<EmbeddedBrand<'a>>,
+    pub brand: Option<EmbeddedBrand<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category: Option<EmbeddedCategory<'a>>,
+    pub category: Option<EmbeddedCategory<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub color: Option<EmbeddedColor<'a>>,
+    pub color: Option<EmbeddedColor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub color_swatch: Option<EmbeddedColorSwatch<'a>>,
+    pub color_swatch: Option<EmbeddedColorSwatch<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_assembly: Option<EmbeddedCountryOfAssembly<'a>>,
+    pub country_of_assembly: Option<EmbeddedCountryOfAssembly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_last_processing: Option<EmbeddedCountryOfLastProcessing<'a>>,
+    pub country_of_last_processing: Option<EmbeddedCountryOfLastProcessing<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_origin: Option<EmbeddedCountryOfOrigin<'a>>,
+    pub country_of_origin: Option<EmbeddedCountryOfOrigin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub depth: Option<EmbeddedDepth<'a>>,
+    pub depth: Option<EmbeddedDepth<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<EmbeddedDescription<'a>>,
+    pub description: Option<EmbeddedDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<EmbeddedFunding<'a>>,
+    pub funding: Option<EmbeddedFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin: Option<EmbeddedGtin<'a>>,
+    pub gtin: Option<EmbeddedGtin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin12: Option<EmbeddedGtin12<'a>>,
+    pub gtin12: Option<EmbeddedGtin12<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin13: Option<EmbeddedGtin13<'a>>,
+    pub gtin13: Option<EmbeddedGtin13<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin14: Option<EmbeddedGtin14<'a>>,
+    pub gtin14: Option<EmbeddedGtin14<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin8: Option<EmbeddedGtin8<'a>>,
+    pub gtin8: Option<EmbeddedGtin8<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_adult_consideration: Option<EmbeddedHasAdultConsideration<'a>>,
+    pub has_adult_consideration: Option<EmbeddedHasAdultConsideration<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_certification: Option<EmbeddedHasCertification<'a>>,
+    pub has_certification: Option<EmbeddedHasCertification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_energy_consumption_details: Option<EmbeddedHasEnergyConsumptionDetails<'a>>,
+    pub has_energy_consumption_details: Option<EmbeddedHasEnergyConsumptionDetails<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_gs1_digital_link: Option<EmbeddedHasGs1DigitalLink<'a>>,
+    pub has_gs1_digital_link: Option<EmbeddedHasGs1DigitalLink<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_measurement: Option<EmbeddedHasMeasurement<'a>>,
+    pub has_measurement: Option<EmbeddedHasMeasurement<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_merchant_return_policy: Option<EmbeddedHasMerchantReturnPolicy<'a>>,
+    pub has_merchant_return_policy: Option<EmbeddedHasMerchantReturnPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_product_return_policy: Option<EmbeddedHasProductReturnPolicy<'a>>,
+    pub has_product_return_policy: Option<EmbeddedHasProductReturnPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub height: Option<EmbeddedHeight<'a>>,
+    pub height: Option<EmbeddedHeight<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<EmbeddedIdentifier<'a>>,
+    pub identifier: Option<EmbeddedIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<EmbeddedImage<'a>>,
+    pub image: Option<EmbeddedImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub in_product_group_with_id: Option<EmbeddedInProductGroupWithId<'a>>,
+    pub in_product_group_with_id: Option<EmbeddedInProductGroupWithId<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_accessory_or_spare_part_for: Option<EmbeddedIsAccessoryOrSparePartFor<'a>>,
+    pub is_accessory_or_spare_part_for: Option<EmbeddedIsAccessoryOrSparePartFor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_consumable_for: Option<EmbeddedIsConsumableFor<'a>>,
+    pub is_consumable_for: Option<EmbeddedIsConsumableFor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_family_friendly: Option<EmbeddedIsFamilyFriendly<'a>>,
+    pub is_family_friendly: Option<EmbeddedIsFamilyFriendly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_related_to: Option<EmbeddedIsRelatedTo<'a>>,
+    pub is_related_to: Option<EmbeddedIsRelatedTo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_similar_to: Option<EmbeddedIsSimilarTo<'a>>,
+    pub is_similar_to: Option<EmbeddedIsSimilarTo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_variant_of: Option<EmbeddedIsVariantOf<'a>>,
+    pub is_variant_of: Option<EmbeddedIsVariantOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub item_condition: Option<EmbeddedItemCondition<'a>>,
+    pub item_condition: Option<EmbeddedItemCondition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<EmbeddedKeywords<'a>>,
+    pub keywords: Option<EmbeddedKeywords<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub logo: Option<EmbeddedLogo<'a>>,
+    pub logo: Option<EmbeddedLogo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub manufacturer: Option<EmbeddedManufacturer<'a>>,
+    pub manufacturer: Option<EmbeddedManufacturer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material: Option<EmbeddedMaterial<'a>>,
+    pub material: Option<EmbeddedMaterial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mobile_url: Option<EmbeddedMobileUrl<'a>>,
+    pub mobile_url: Option<EmbeddedMobileUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub model: Option<EmbeddedModel<'a>>,
+    pub model: Option<EmbeddedModel<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mpn: Option<EmbeddedMpn<'a>>,
+    pub mpn: Option<EmbeddedMpn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<EmbeddedName<'a>>,
+    pub name: Option<EmbeddedName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub negative_notes: Option<EmbeddedNegativeNotes<'a>>,
+    pub negative_notes: Option<EmbeddedNegativeNotes<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub nsn: Option<EmbeddedNsn<'a>>,
+    pub nsn: Option<EmbeddedNsn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub offers: Option<EmbeddedOffers<'a>>,
+    pub offers: Option<EmbeddedOffers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pattern: Option<EmbeddedPattern<'a>>,
+    pub pattern: Option<EmbeddedPattern<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub positive_notes: Option<EmbeddedPositiveNotes<'a>>,
+    pub positive_notes: Option<EmbeddedPositiveNotes<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<EmbeddedPotentialAction<'a>>,
+    pub potential_action: Option<EmbeddedPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub product_id: Option<EmbeddedProductId<'a>>,
+    pub product_id: Option<EmbeddedProductId<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub production_date: Option<EmbeddedProductionDate<'a>>,
+    pub production_date: Option<EmbeddedProductionDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub purchase_date: Option<EmbeddedPurchaseDate<'a>>,
+    pub purchase_date: Option<EmbeddedPurchaseDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub release_date: Option<EmbeddedReleaseDate<'a>>,
+    pub release_date: Option<EmbeddedReleaseDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<EmbeddedReview<'a>>,
+    pub review: Option<EmbeddedReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<EmbeddedReviews<'a>>,
+    pub reviews: Option<EmbeddedReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<EmbeddedSameAs<'a>>,
+    pub same_as: Option<EmbeddedSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub size: Option<EmbeddedSize<'a>>,
+    pub size: Option<EmbeddedSize<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sku: Option<EmbeddedSku<'a>>,
+    pub sku: Option<EmbeddedSku<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub slogan: Option<EmbeddedSlogan<'a>>,
+    pub slogan: Option<EmbeddedSlogan<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<EmbeddedSubjectOf<'a>>,
+    pub subject_of: Option<EmbeddedSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<EmbeddedUrl<'a>>,
+    pub url: Option<EmbeddedUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub weight: Option<EmbeddedWeight<'a>>,
+    pub weight: Option<EmbeddedWeight<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub width: Option<EmbeddedWidth<'a>>,
+    pub width: Option<EmbeddedWidth<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAdditionalProperty<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAdditionalProperty<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAsin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAsin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAudience<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedBrand<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedBrand<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Brand#embedded")]
-    BrandEmbedded(Box<brand::Embedded<'a>>),
+    BrandEmbedded(Box<brand::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCategory<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCategory<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedColor<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedColor<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedColorSwatch<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedColorSwatch<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCountryOfAssembly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCountryOfAssembly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCountryOfLastProcessing<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCountryOfLastProcessing<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCountryOfOrigin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDepth<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDepth<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGtin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGtin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGtin12<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGtin12<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGtin13<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGtin13<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGtin14<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGtin14<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGtin8<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGtin8<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasAdultConsideration<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasAdultConsideration<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasCertification<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasCertification<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasEnergyConsumptionDetails<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasEnergyConsumptionDetails<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasGs1DigitalLink<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasGs1DigitalLink<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasMeasurement<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasMeasurement<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasMerchantReturnPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasMerchantReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasProductReturnPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasProductReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHeight<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInProductGroupWithId<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInProductGroupWithId<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsAccessoryOrSparePartFor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsAccessoryOrSparePartFor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    Embedded(Box<product::Embedded<'a>>),
+    Embedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsConsumableFor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsConsumableFor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    Embedded(Box<product::Embedded<'a>>),
+    Embedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsFamilyFriendly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsRelatedTo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsRelatedTo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    Embedded(Box<product::Embedded<'a>>),
+    Embedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsSimilarTo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsSimilarTo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    Embedded(Box<product::Embedded<'a>>),
+    Embedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsVariantOf<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsVariantOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedItemCondition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedItemCondition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedKeywords<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLogo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLogo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedManufacturer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedManufacturer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaterial<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    Embedded(Box<product::Embedded<'a>>),
+    Embedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMobileUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMobileUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedModel<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedModel<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMpn<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMpn<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedNegativeNotes<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedNegativeNotes<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedNsn<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedNsn<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedOffers<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPattern<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPositiveNotes<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPositiveNotes<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedProductId<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedProductId<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedProductionDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedProductionDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPurchaseDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPurchaseDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReleaseDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReleaseDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSize<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSku<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSku<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSlogan<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSlogan<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWeight<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWidth<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWidth<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "social.flockfeeds.lexical.type.Product",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Product<'a> {
+pub struct Product<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_property: Option<ProductAdditionalProperty<'a>>,
+    pub additional_property: Option<ProductAdditionalProperty<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<ProductAdditionalType<'a>>,
+    pub additional_type: Option<ProductAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<ProductAggregateRating<'a>>,
+    pub aggregate_rating: Option<ProductAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<ProductAlternateName<'a>>,
+    pub alternate_name: Option<ProductAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub asin: Option<ProductAsin<'a>>,
+    pub asin: Option<ProductAsin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audience: Option<ProductAudience<'a>>,
+    pub audience: Option<ProductAudience<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<ProductAward<'a>>,
+    pub award: Option<ProductAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<ProductAwards<'a>>,
+    pub awards: Option<ProductAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub brand: Option<ProductBrand<'a>>,
+    pub brand: Option<ProductBrand<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category: Option<ProductCategory<'a>>,
+    pub category: Option<ProductCategory<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub color: Option<ProductColor<'a>>,
+    pub color: Option<ProductColor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub color_swatch: Option<ProductColorSwatch<'a>>,
+    pub color_swatch: Option<ProductColorSwatch<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_assembly: Option<ProductCountryOfAssembly<'a>>,
+    pub country_of_assembly: Option<ProductCountryOfAssembly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_last_processing: Option<ProductCountryOfLastProcessing<'a>>,
+    pub country_of_last_processing: Option<ProductCountryOfLastProcessing<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_origin: Option<ProductCountryOfOrigin<'a>>,
+    pub country_of_origin: Option<ProductCountryOfOrigin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub depth: Option<ProductDepth<'a>>,
+    pub depth: Option<ProductDepth<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<ProductDescription<'a>>,
+    pub description: Option<ProductDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<ProductDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<ProductDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<ProductFunding<'a>>,
+    pub funding: Option<ProductFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin: Option<ProductGtin<'a>>,
+    pub gtin: Option<ProductGtin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin12: Option<ProductGtin12<'a>>,
+    pub gtin12: Option<ProductGtin12<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin13: Option<ProductGtin13<'a>>,
+    pub gtin13: Option<ProductGtin13<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin14: Option<ProductGtin14<'a>>,
+    pub gtin14: Option<ProductGtin14<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin8: Option<ProductGtin8<'a>>,
+    pub gtin8: Option<ProductGtin8<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_adult_consideration: Option<ProductHasAdultConsideration<'a>>,
+    pub has_adult_consideration: Option<ProductHasAdultConsideration<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_certification: Option<ProductHasCertification<'a>>,
+    pub has_certification: Option<ProductHasCertification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_energy_consumption_details: Option<ProductHasEnergyConsumptionDetails<'a>>,
+    pub has_energy_consumption_details: Option<ProductHasEnergyConsumptionDetails<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_gs1_digital_link: Option<ProductHasGs1DigitalLink<'a>>,
+    pub has_gs1_digital_link: Option<ProductHasGs1DigitalLink<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_measurement: Option<ProductHasMeasurement<'a>>,
+    pub has_measurement: Option<ProductHasMeasurement<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_merchant_return_policy: Option<ProductHasMerchantReturnPolicy<'a>>,
+    pub has_merchant_return_policy: Option<ProductHasMerchantReturnPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_product_return_policy: Option<ProductHasProductReturnPolicy<'a>>,
+    pub has_product_return_policy: Option<ProductHasProductReturnPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub height: Option<ProductHeight<'a>>,
+    pub height: Option<ProductHeight<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<ProductIdentifier<'a>>,
+    pub identifier: Option<ProductIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<ProductImage<'a>>,
+    pub image: Option<ProductImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub in_product_group_with_id: Option<ProductInProductGroupWithId<'a>>,
+    pub in_product_group_with_id: Option<ProductInProductGroupWithId<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_accessory_or_spare_part_for: Option<ProductIsAccessoryOrSparePartFor<'a>>,
+    pub is_accessory_or_spare_part_for: Option<ProductIsAccessoryOrSparePartFor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_consumable_for: Option<ProductIsConsumableFor<'a>>,
+    pub is_consumable_for: Option<ProductIsConsumableFor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_family_friendly: Option<ProductIsFamilyFriendly<'a>>,
+    pub is_family_friendly: Option<ProductIsFamilyFriendly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_related_to: Option<ProductIsRelatedTo<'a>>,
+    pub is_related_to: Option<ProductIsRelatedTo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_similar_to: Option<ProductIsSimilarTo<'a>>,
+    pub is_similar_to: Option<ProductIsSimilarTo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_variant_of: Option<ProductIsVariantOf<'a>>,
+    pub is_variant_of: Option<ProductIsVariantOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub item_condition: Option<ProductItemCondition<'a>>,
+    pub item_condition: Option<ProductItemCondition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<ProductKeywords<'a>>,
+    pub keywords: Option<ProductKeywords<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub logo: Option<ProductLogo<'a>>,
+    pub logo: Option<ProductLogo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<ProductMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<ProductMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub manufacturer: Option<ProductManufacturer<'a>>,
+    pub manufacturer: Option<ProductManufacturer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material: Option<ProductMaterial<'a>>,
+    pub material: Option<ProductMaterial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mobile_url: Option<ProductMobileUrl<'a>>,
+    pub mobile_url: Option<ProductMobileUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub model: Option<ProductModel<'a>>,
+    pub model: Option<ProductModel<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mpn: Option<ProductMpn<'a>>,
+    pub mpn: Option<ProductMpn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<ProductName<'a>>,
+    pub name: Option<ProductName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub negative_notes: Option<ProductNegativeNotes<'a>>,
+    pub negative_notes: Option<ProductNegativeNotes<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub nsn: Option<ProductNsn<'a>>,
+    pub nsn: Option<ProductNsn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub offers: Option<ProductOffers<'a>>,
+    pub offers: Option<ProductOffers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pattern: Option<ProductPattern<'a>>,
+    pub pattern: Option<ProductPattern<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub positive_notes: Option<ProductPositiveNotes<'a>>,
+    pub positive_notes: Option<ProductPositiveNotes<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<ProductPotentialAction<'a>>,
+    pub potential_action: Option<ProductPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub product_id: Option<ProductProductId<'a>>,
+    pub product_id: Option<ProductProductId<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub production_date: Option<ProductProductionDate<'a>>,
+    pub production_date: Option<ProductProductionDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub purchase_date: Option<ProductPurchaseDate<'a>>,
+    pub purchase_date: Option<ProductPurchaseDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub release_date: Option<ProductReleaseDate<'a>>,
+    pub release_date: Option<ProductReleaseDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<ProductReview<'a>>,
+    pub review: Option<ProductReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<ProductReviews<'a>>,
+    pub reviews: Option<ProductReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<ProductSameAs<'a>>,
+    pub same_as: Option<ProductSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub size: Option<ProductSize<'a>>,
+    pub size: Option<ProductSize<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sku: Option<ProductSku<'a>>,
+    pub sku: Option<ProductSku<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub slogan: Option<ProductSlogan<'a>>,
+    pub slogan: Option<ProductSlogan<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<ProductSubjectOf<'a>>,
+    pub subject_of: Option<ProductSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<ProductUrl<'a>>,
+    pub url: Option<ProductUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub weight: Option<ProductWeight<'a>>,
+    pub weight: Option<ProductWeight<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub width: Option<ProductWidth<'a>>,
+    pub width: Option<ProductWidth<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductAdditionalProperty<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductAdditionalProperty<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductAsin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductAsin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductAudience<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductBrand<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductBrand<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Brand#embedded")]
-    BrandEmbedded(Box<brand::Embedded<'a>>),
+    BrandEmbedded(Box<brand::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductCategory<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductCategory<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductColor<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductColor<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductColorSwatch<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductColorSwatch<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductCountryOfAssembly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductCountryOfAssembly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductCountryOfLastProcessing<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductCountryOfLastProcessing<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductCountryOfOrigin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductDepth<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductDepth<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductGtin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductGtin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductGtin12<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductGtin12<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductGtin13<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductGtin13<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductGtin14<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductGtin14<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductGtin8<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductGtin8<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductHasAdultConsideration<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductHasAdultConsideration<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductHasCertification<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductHasCertification<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductHasEnergyConsumptionDetails<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductHasEnergyConsumptionDetails<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductHasGs1DigitalLink<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductHasGs1DigitalLink<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductHasMeasurement<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductHasMeasurement<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductHasMerchantReturnPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductHasMerchantReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductHasProductReturnPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductHasProductReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductHeight<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductHeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductInProductGroupWithId<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductInProductGroupWithId<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductIsAccessoryOrSparePartFor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductIsAccessoryOrSparePartFor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    Embedded(Box<product::Embedded<'a>>),
+    Embedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductIsConsumableFor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductIsConsumableFor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    Embedded(Box<product::Embedded<'a>>),
+    Embedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductIsFamilyFriendly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductIsRelatedTo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductIsRelatedTo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    Embedded(Box<product::Embedded<'a>>),
+    Embedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductIsSimilarTo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductIsSimilarTo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    Embedded(Box<product::Embedded<'a>>),
+    Embedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductIsVariantOf<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductIsVariantOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductItemCondition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductItemCondition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductKeywords<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductLogo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductLogo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductManufacturer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductManufacturer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductMaterial<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    Embedded(Box<product::Embedded<'a>>),
+    Embedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductMobileUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductMobileUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductModel<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductModel<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductMpn<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductMpn<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductNegativeNotes<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductNegativeNotes<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductNsn<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductNsn<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductOffers<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductPattern<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductPattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductPositiveNotes<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductPositiveNotes<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductProductId<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductProductId<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductProductionDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductProductionDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductPurchaseDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductPurchaseDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductReleaseDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductReleaseDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductSize<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductSku<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductSku<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductSlogan<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductSlogan<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductWeight<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductWeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ProductWidth<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProductWidth<S: Bos<str> + AsRef<str> = DefaultStr> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ProductGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProductGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Product<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Product<S>,
 }
 
-impl<'a> Product<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ProductRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Product<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ProductRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Embedded<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Embedded<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Product"
     }
@@ -1331,18 +2055,17 @@ pub struct ProductRecord;
 impl XrpcResp for ProductRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Product";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProductGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ProductGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ProductGetRecordOutput<'_>> for Product<'_> {
-    fn from(output: ProductGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ProductGetRecordOutput<S>> for Product<S> {
+    fn from(output: ProductGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Product<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Product<S> {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Product";
     type Record = ProductRecord;
 }
@@ -1352,7 +2075,7 @@ impl Collection for ProductRecord {
     type Record = ProductRecord;
 }
 
-impl<'a> LexiconSchema for Product<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Product<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Product"
     }
@@ -2938,77 +3661,77 @@ pub mod product_state {
 pub struct ProductBuilder<'a, S: product_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ProductAdditionalProperty<'a>>,
-        Option<ProductAdditionalType<'a>>,
-        Option<ProductAggregateRating<'a>>,
-        Option<ProductAlternateName<'a>>,
-        Option<ProductAsin<'a>>,
-        Option<ProductAudience<'a>>,
-        Option<ProductAward<'a>>,
-        Option<ProductAwards<'a>>,
-        Option<ProductBrand<'a>>,
-        Option<ProductCategory<'a>>,
-        Option<ProductColor<'a>>,
-        Option<ProductColorSwatch<'a>>,
-        Option<ProductCountryOfAssembly<'a>>,
-        Option<ProductCountryOfLastProcessing<'a>>,
-        Option<ProductCountryOfOrigin<'a>>,
-        Option<ProductDepth<'a>>,
-        Option<ProductDescription<'a>>,
-        Option<ProductDisambiguatingDescription<'a>>,
-        Option<ProductFunding<'a>>,
-        Option<ProductGtin<'a>>,
-        Option<ProductGtin12<'a>>,
-        Option<ProductGtin13<'a>>,
-        Option<ProductGtin14<'a>>,
-        Option<ProductGtin8<'a>>,
-        Option<ProductHasAdultConsideration<'a>>,
-        Option<ProductHasCertification<'a>>,
-        Option<ProductHasEnergyConsumptionDetails<'a>>,
-        Option<ProductHasGs1DigitalLink<'a>>,
-        Option<ProductHasMeasurement<'a>>,
-        Option<ProductHasMerchantReturnPolicy<'a>>,
-        Option<ProductHasProductReturnPolicy<'a>>,
-        Option<ProductHeight<'a>>,
-        Option<ProductIdentifier<'a>>,
-        Option<ProductImage<'a>>,
-        Option<ProductInProductGroupWithId<'a>>,
-        Option<ProductIsAccessoryOrSparePartFor<'a>>,
-        Option<ProductIsConsumableFor<'a>>,
-        Option<ProductIsFamilyFriendly<'a>>,
-        Option<ProductIsRelatedTo<'a>>,
-        Option<ProductIsSimilarTo<'a>>,
-        Option<ProductIsVariantOf<'a>>,
-        Option<ProductItemCondition<'a>>,
-        Option<ProductKeywords<'a>>,
-        Option<ProductLogo<'a>>,
-        Option<ProductMainEntityOfPage<'a>>,
-        Option<ProductManufacturer<'a>>,
-        Option<ProductMaterial<'a>>,
-        Option<ProductMobileUrl<'a>>,
-        Option<ProductModel<'a>>,
-        Option<ProductMpn<'a>>,
-        Option<ProductName<'a>>,
-        Option<ProductNegativeNotes<'a>>,
-        Option<ProductNsn<'a>>,
-        Option<ProductOffers<'a>>,
-        Option<ProductPattern<'a>>,
-        Option<ProductPositiveNotes<'a>>,
-        Option<ProductPotentialAction<'a>>,
-        Option<ProductProductId<'a>>,
-        Option<ProductProductionDate<'a>>,
-        Option<ProductPurchaseDate<'a>>,
-        Option<ProductReleaseDate<'a>>,
-        Option<ProductReview<'a>>,
-        Option<ProductReviews<'a>>,
-        Option<ProductSameAs<'a>>,
-        Option<ProductSize<'a>>,
-        Option<ProductSku<'a>>,
-        Option<ProductSlogan<'a>>,
-        Option<ProductSubjectOf<'a>>,
-        Option<ProductUrl<'a>>,
-        Option<ProductWeight<'a>>,
-        Option<ProductWidth<'a>>,
+        Option<ProductAdditionalProperty<S>>,
+        Option<ProductAdditionalType<S>>,
+        Option<ProductAggregateRating<S>>,
+        Option<ProductAlternateName<S>>,
+        Option<ProductAsin<S>>,
+        Option<ProductAudience<S>>,
+        Option<ProductAward<S>>,
+        Option<ProductAwards<S>>,
+        Option<ProductBrand<S>>,
+        Option<ProductCategory<S>>,
+        Option<ProductColor<S>>,
+        Option<ProductColorSwatch<S>>,
+        Option<ProductCountryOfAssembly<S>>,
+        Option<ProductCountryOfLastProcessing<S>>,
+        Option<ProductCountryOfOrigin<S>>,
+        Option<ProductDepth<S>>,
+        Option<ProductDescription<S>>,
+        Option<ProductDisambiguatingDescription<S>>,
+        Option<ProductFunding<S>>,
+        Option<ProductGtin<S>>,
+        Option<ProductGtin12<S>>,
+        Option<ProductGtin13<S>>,
+        Option<ProductGtin14<S>>,
+        Option<ProductGtin8<S>>,
+        Option<ProductHasAdultConsideration<S>>,
+        Option<ProductHasCertification<S>>,
+        Option<ProductHasEnergyConsumptionDetails<S>>,
+        Option<ProductHasGs1DigitalLink<S>>,
+        Option<ProductHasMeasurement<S>>,
+        Option<ProductHasMerchantReturnPolicy<S>>,
+        Option<ProductHasProductReturnPolicy<S>>,
+        Option<ProductHeight<S>>,
+        Option<ProductIdentifier<S>>,
+        Option<ProductImage<S>>,
+        Option<ProductInProductGroupWithId<S>>,
+        Option<ProductIsAccessoryOrSparePartFor<S>>,
+        Option<ProductIsConsumableFor<S>>,
+        Option<ProductIsFamilyFriendly<S>>,
+        Option<ProductIsRelatedTo<S>>,
+        Option<ProductIsSimilarTo<S>>,
+        Option<ProductIsVariantOf<S>>,
+        Option<ProductItemCondition<S>>,
+        Option<ProductKeywords<S>>,
+        Option<ProductLogo<S>>,
+        Option<ProductMainEntityOfPage<S>>,
+        Option<ProductManufacturer<S>>,
+        Option<ProductMaterial<S>>,
+        Option<ProductMobileUrl<S>>,
+        Option<ProductModel<S>>,
+        Option<ProductMpn<S>>,
+        Option<ProductName<S>>,
+        Option<ProductNegativeNotes<S>>,
+        Option<ProductNsn<S>>,
+        Option<ProductOffers<S>>,
+        Option<ProductPattern<S>>,
+        Option<ProductPositiveNotes<S>>,
+        Option<ProductPotentialAction<S>>,
+        Option<ProductProductId<S>>,
+        Option<ProductProductionDate<S>>,
+        Option<ProductPurchaseDate<S>>,
+        Option<ProductReleaseDate<S>>,
+        Option<ProductReview<S>>,
+        Option<ProductReviews<S>>,
+        Option<ProductSameAs<S>>,
+        Option<ProductSize<S>>,
+        Option<ProductSku<S>>,
+        Option<ProductSlogan<S>>,
+        Option<ProductSubjectOf<S>>,
+        Option<ProductUrl<S>>,
+        Option<ProductWeight<S>>,
+        Option<ProductWidth<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -3107,7 +3830,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `additionalProperty` field (optional)
     pub fn additional_property(
         mut self,
-        value: impl Into<Option<ProductAdditionalProperty<'a>>>,
+        value: impl Into<Option<ProductAdditionalProperty<S>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
@@ -3115,7 +3838,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `additionalProperty` field to an Option value (optional)
     pub fn maybe_additional_property(
         mut self,
-        value: Option<ProductAdditionalProperty<'a>>,
+        value: Option<ProductAdditionalProperty<S>>,
     ) -> Self {
         self._fields.0 = value;
         self
@@ -3126,7 +3849,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `additionalType` field (optional)
     pub fn additional_type(
         mut self,
-        value: impl Into<Option<ProductAdditionalType<'a>>>,
+        value: impl Into<Option<ProductAdditionalType<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -3134,7 +3857,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `additionalType` field to an Option value (optional)
     pub fn maybe_additional_type(
         mut self,
-        value: Option<ProductAdditionalType<'a>>,
+        value: Option<ProductAdditionalType<S>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -3145,7 +3868,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `aggregateRating` field (optional)
     pub fn aggregate_rating(
         mut self,
-        value: impl Into<Option<ProductAggregateRating<'a>>>,
+        value: impl Into<Option<ProductAggregateRating<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -3153,7 +3876,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `aggregateRating` field to an Option value (optional)
     pub fn maybe_aggregate_rating(
         mut self,
-        value: Option<ProductAggregateRating<'a>>,
+        value: Option<ProductAggregateRating<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -3164,7 +3887,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `alternateName` field (optional)
     pub fn alternate_name(
         mut self,
-        value: impl Into<Option<ProductAlternateName<'a>>>,
+        value: impl Into<Option<ProductAlternateName<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -3172,7 +3895,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `alternateName` field to an Option value (optional)
     pub fn maybe_alternate_name(
         mut self,
-        value: Option<ProductAlternateName<'a>>,
+        value: Option<ProductAlternateName<S>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -3181,12 +3904,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `asin` field (optional)
-    pub fn asin(mut self, value: impl Into<Option<ProductAsin<'a>>>) -> Self {
+    pub fn asin(mut self, value: impl Into<Option<ProductAsin<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `asin` field to an Option value (optional)
-    pub fn maybe_asin(mut self, value: Option<ProductAsin<'a>>) -> Self {
+    pub fn maybe_asin(mut self, value: Option<ProductAsin<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -3194,12 +3917,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `audience` field (optional)
-    pub fn audience(mut self, value: impl Into<Option<ProductAudience<'a>>>) -> Self {
+    pub fn audience(mut self, value: impl Into<Option<ProductAudience<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
-    pub fn maybe_audience(mut self, value: Option<ProductAudience<'a>>) -> Self {
+    pub fn maybe_audience(mut self, value: Option<ProductAudience<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -3207,12 +3930,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `award` field (optional)
-    pub fn award(mut self, value: impl Into<Option<ProductAward<'a>>>) -> Self {
+    pub fn award(mut self, value: impl Into<Option<ProductAward<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
-    pub fn maybe_award(mut self, value: Option<ProductAward<'a>>) -> Self {
+    pub fn maybe_award(mut self, value: Option<ProductAward<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -3220,12 +3943,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `awards` field (optional)
-    pub fn awards(mut self, value: impl Into<Option<ProductAwards<'a>>>) -> Self {
+    pub fn awards(mut self, value: impl Into<Option<ProductAwards<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
-    pub fn maybe_awards(mut self, value: Option<ProductAwards<'a>>) -> Self {
+    pub fn maybe_awards(mut self, value: Option<ProductAwards<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -3233,12 +3956,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `brand` field (optional)
-    pub fn brand(mut self, value: impl Into<Option<ProductBrand<'a>>>) -> Self {
+    pub fn brand(mut self, value: impl Into<Option<ProductBrand<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `brand` field to an Option value (optional)
-    pub fn maybe_brand(mut self, value: Option<ProductBrand<'a>>) -> Self {
+    pub fn maybe_brand(mut self, value: Option<ProductBrand<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -3246,12 +3969,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(mut self, value: impl Into<Option<ProductCategory<'a>>>) -> Self {
+    pub fn category(mut self, value: impl Into<Option<ProductCategory<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<ProductCategory<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<ProductCategory<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -3259,12 +3982,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `color` field (optional)
-    pub fn color(mut self, value: impl Into<Option<ProductColor<'a>>>) -> Self {
+    pub fn color(mut self, value: impl Into<Option<ProductColor<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `color` field to an Option value (optional)
-    pub fn maybe_color(mut self, value: Option<ProductColor<'a>>) -> Self {
+    pub fn maybe_color(mut self, value: Option<ProductColor<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -3274,13 +3997,13 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `colorSwatch` field (optional)
     pub fn color_swatch(
         mut self,
-        value: impl Into<Option<ProductColorSwatch<'a>>>,
+        value: impl Into<Option<ProductColorSwatch<S>>>,
     ) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `colorSwatch` field to an Option value (optional)
-    pub fn maybe_color_swatch(mut self, value: Option<ProductColorSwatch<'a>>) -> Self {
+    pub fn maybe_color_swatch(mut self, value: Option<ProductColorSwatch<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -3290,7 +4013,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `countryOfAssembly` field (optional)
     pub fn country_of_assembly(
         mut self,
-        value: impl Into<Option<ProductCountryOfAssembly<'a>>>,
+        value: impl Into<Option<ProductCountryOfAssembly<S>>>,
     ) -> Self {
         self._fields.12 = value.into();
         self
@@ -3298,7 +4021,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `countryOfAssembly` field to an Option value (optional)
     pub fn maybe_country_of_assembly(
         mut self,
-        value: Option<ProductCountryOfAssembly<'a>>,
+        value: Option<ProductCountryOfAssembly<S>>,
     ) -> Self {
         self._fields.12 = value;
         self
@@ -3309,7 +4032,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `countryOfLastProcessing` field (optional)
     pub fn country_of_last_processing(
         mut self,
-        value: impl Into<Option<ProductCountryOfLastProcessing<'a>>>,
+        value: impl Into<Option<ProductCountryOfLastProcessing<S>>>,
     ) -> Self {
         self._fields.13 = value.into();
         self
@@ -3317,7 +4040,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `countryOfLastProcessing` field to an Option value (optional)
     pub fn maybe_country_of_last_processing(
         mut self,
-        value: Option<ProductCountryOfLastProcessing<'a>>,
+        value: Option<ProductCountryOfLastProcessing<S>>,
     ) -> Self {
         self._fields.13 = value;
         self
@@ -3328,7 +4051,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `countryOfOrigin` field (optional)
     pub fn country_of_origin(
         mut self,
-        value: impl Into<Option<ProductCountryOfOrigin<'a>>>,
+        value: impl Into<Option<ProductCountryOfOrigin<S>>>,
     ) -> Self {
         self._fields.14 = value.into();
         self
@@ -3336,7 +4059,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `countryOfOrigin` field to an Option value (optional)
     pub fn maybe_country_of_origin(
         mut self,
-        value: Option<ProductCountryOfOrigin<'a>>,
+        value: Option<ProductCountryOfOrigin<S>>,
     ) -> Self {
         self._fields.14 = value;
         self
@@ -3345,12 +4068,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `depth` field (optional)
-    pub fn depth(mut self, value: impl Into<Option<ProductDepth<'a>>>) -> Self {
+    pub fn depth(mut self, value: impl Into<Option<ProductDepth<S>>>) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `depth` field to an Option value (optional)
-    pub fn maybe_depth(mut self, value: Option<ProductDepth<'a>>) -> Self {
+    pub fn maybe_depth(mut self, value: Option<ProductDepth<S>>) -> Self {
         self._fields.15 = value;
         self
     }
@@ -3360,13 +4083,13 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
-        value: impl Into<Option<ProductDescription<'a>>>,
+        value: impl Into<Option<ProductDescription<S>>>,
     ) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<ProductDescription<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<ProductDescription<S>>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -3376,7 +4099,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
-        value: impl Into<Option<ProductDisambiguatingDescription<'a>>>,
+        value: impl Into<Option<ProductDisambiguatingDescription<S>>>,
     ) -> Self {
         self._fields.17 = value.into();
         self
@@ -3384,7 +4107,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field to an Option value (optional)
     pub fn maybe_disambiguating_description(
         mut self,
-        value: Option<ProductDisambiguatingDescription<'a>>,
+        value: Option<ProductDisambiguatingDescription<S>>,
     ) -> Self {
         self._fields.17 = value;
         self
@@ -3393,12 +4116,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `funding` field (optional)
-    pub fn funding(mut self, value: impl Into<Option<ProductFunding<'a>>>) -> Self {
+    pub fn funding(mut self, value: impl Into<Option<ProductFunding<S>>>) -> Self {
         self._fields.18 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
-    pub fn maybe_funding(mut self, value: Option<ProductFunding<'a>>) -> Self {
+    pub fn maybe_funding(mut self, value: Option<ProductFunding<S>>) -> Self {
         self._fields.18 = value;
         self
     }
@@ -3406,12 +4129,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `gtin` field (optional)
-    pub fn gtin(mut self, value: impl Into<Option<ProductGtin<'a>>>) -> Self {
+    pub fn gtin(mut self, value: impl Into<Option<ProductGtin<S>>>) -> Self {
         self._fields.19 = value.into();
         self
     }
     /// Set the `gtin` field to an Option value (optional)
-    pub fn maybe_gtin(mut self, value: Option<ProductGtin<'a>>) -> Self {
+    pub fn maybe_gtin(mut self, value: Option<ProductGtin<S>>) -> Self {
         self._fields.19 = value;
         self
     }
@@ -3419,12 +4142,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `gtin12` field (optional)
-    pub fn gtin12(mut self, value: impl Into<Option<ProductGtin12<'a>>>) -> Self {
+    pub fn gtin12(mut self, value: impl Into<Option<ProductGtin12<S>>>) -> Self {
         self._fields.20 = value.into();
         self
     }
     /// Set the `gtin12` field to an Option value (optional)
-    pub fn maybe_gtin12(mut self, value: Option<ProductGtin12<'a>>) -> Self {
+    pub fn maybe_gtin12(mut self, value: Option<ProductGtin12<S>>) -> Self {
         self._fields.20 = value;
         self
     }
@@ -3432,12 +4155,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `gtin13` field (optional)
-    pub fn gtin13(mut self, value: impl Into<Option<ProductGtin13<'a>>>) -> Self {
+    pub fn gtin13(mut self, value: impl Into<Option<ProductGtin13<S>>>) -> Self {
         self._fields.21 = value.into();
         self
     }
     /// Set the `gtin13` field to an Option value (optional)
-    pub fn maybe_gtin13(mut self, value: Option<ProductGtin13<'a>>) -> Self {
+    pub fn maybe_gtin13(mut self, value: Option<ProductGtin13<S>>) -> Self {
         self._fields.21 = value;
         self
     }
@@ -3445,12 +4168,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `gtin14` field (optional)
-    pub fn gtin14(mut self, value: impl Into<Option<ProductGtin14<'a>>>) -> Self {
+    pub fn gtin14(mut self, value: impl Into<Option<ProductGtin14<S>>>) -> Self {
         self._fields.22 = value.into();
         self
     }
     /// Set the `gtin14` field to an Option value (optional)
-    pub fn maybe_gtin14(mut self, value: Option<ProductGtin14<'a>>) -> Self {
+    pub fn maybe_gtin14(mut self, value: Option<ProductGtin14<S>>) -> Self {
         self._fields.22 = value;
         self
     }
@@ -3458,12 +4181,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `gtin8` field (optional)
-    pub fn gtin8(mut self, value: impl Into<Option<ProductGtin8<'a>>>) -> Self {
+    pub fn gtin8(mut self, value: impl Into<Option<ProductGtin8<S>>>) -> Self {
         self._fields.23 = value.into();
         self
     }
     /// Set the `gtin8` field to an Option value (optional)
-    pub fn maybe_gtin8(mut self, value: Option<ProductGtin8<'a>>) -> Self {
+    pub fn maybe_gtin8(mut self, value: Option<ProductGtin8<S>>) -> Self {
         self._fields.23 = value;
         self
     }
@@ -3473,7 +4196,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasAdultConsideration` field (optional)
     pub fn has_adult_consideration(
         mut self,
-        value: impl Into<Option<ProductHasAdultConsideration<'a>>>,
+        value: impl Into<Option<ProductHasAdultConsideration<S>>>,
     ) -> Self {
         self._fields.24 = value.into();
         self
@@ -3481,7 +4204,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasAdultConsideration` field to an Option value (optional)
     pub fn maybe_has_adult_consideration(
         mut self,
-        value: Option<ProductHasAdultConsideration<'a>>,
+        value: Option<ProductHasAdultConsideration<S>>,
     ) -> Self {
         self._fields.24 = value;
         self
@@ -3492,7 +4215,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasCertification` field (optional)
     pub fn has_certification(
         mut self,
-        value: impl Into<Option<ProductHasCertification<'a>>>,
+        value: impl Into<Option<ProductHasCertification<S>>>,
     ) -> Self {
         self._fields.25 = value.into();
         self
@@ -3500,7 +4223,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasCertification` field to an Option value (optional)
     pub fn maybe_has_certification(
         mut self,
-        value: Option<ProductHasCertification<'a>>,
+        value: Option<ProductHasCertification<S>>,
     ) -> Self {
         self._fields.25 = value;
         self
@@ -3511,7 +4234,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasEnergyConsumptionDetails` field (optional)
     pub fn has_energy_consumption_details(
         mut self,
-        value: impl Into<Option<ProductHasEnergyConsumptionDetails<'a>>>,
+        value: impl Into<Option<ProductHasEnergyConsumptionDetails<S>>>,
     ) -> Self {
         self._fields.26 = value.into();
         self
@@ -3519,7 +4242,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasEnergyConsumptionDetails` field to an Option value (optional)
     pub fn maybe_has_energy_consumption_details(
         mut self,
-        value: Option<ProductHasEnergyConsumptionDetails<'a>>,
+        value: Option<ProductHasEnergyConsumptionDetails<S>>,
     ) -> Self {
         self._fields.26 = value;
         self
@@ -3530,7 +4253,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasGS1DigitalLink` field (optional)
     pub fn has_gs1_digital_link(
         mut self,
-        value: impl Into<Option<ProductHasGs1DigitalLink<'a>>>,
+        value: impl Into<Option<ProductHasGs1DigitalLink<S>>>,
     ) -> Self {
         self._fields.27 = value.into();
         self
@@ -3538,7 +4261,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasGS1DigitalLink` field to an Option value (optional)
     pub fn maybe_has_gs1_digital_link(
         mut self,
-        value: Option<ProductHasGs1DigitalLink<'a>>,
+        value: Option<ProductHasGs1DigitalLink<S>>,
     ) -> Self {
         self._fields.27 = value;
         self
@@ -3549,7 +4272,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasMeasurement` field (optional)
     pub fn has_measurement(
         mut self,
-        value: impl Into<Option<ProductHasMeasurement<'a>>>,
+        value: impl Into<Option<ProductHasMeasurement<S>>>,
     ) -> Self {
         self._fields.28 = value.into();
         self
@@ -3557,7 +4280,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasMeasurement` field to an Option value (optional)
     pub fn maybe_has_measurement(
         mut self,
-        value: Option<ProductHasMeasurement<'a>>,
+        value: Option<ProductHasMeasurement<S>>,
     ) -> Self {
         self._fields.28 = value;
         self
@@ -3568,7 +4291,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasMerchantReturnPolicy` field (optional)
     pub fn has_merchant_return_policy(
         mut self,
-        value: impl Into<Option<ProductHasMerchantReturnPolicy<'a>>>,
+        value: impl Into<Option<ProductHasMerchantReturnPolicy<S>>>,
     ) -> Self {
         self._fields.29 = value.into();
         self
@@ -3576,7 +4299,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasMerchantReturnPolicy` field to an Option value (optional)
     pub fn maybe_has_merchant_return_policy(
         mut self,
-        value: Option<ProductHasMerchantReturnPolicy<'a>>,
+        value: Option<ProductHasMerchantReturnPolicy<S>>,
     ) -> Self {
         self._fields.29 = value;
         self
@@ -3587,7 +4310,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasProductReturnPolicy` field (optional)
     pub fn has_product_return_policy(
         mut self,
-        value: impl Into<Option<ProductHasProductReturnPolicy<'a>>>,
+        value: impl Into<Option<ProductHasProductReturnPolicy<S>>>,
     ) -> Self {
         self._fields.30 = value.into();
         self
@@ -3595,7 +4318,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `hasProductReturnPolicy` field to an Option value (optional)
     pub fn maybe_has_product_return_policy(
         mut self,
-        value: Option<ProductHasProductReturnPolicy<'a>>,
+        value: Option<ProductHasProductReturnPolicy<S>>,
     ) -> Self {
         self._fields.30 = value;
         self
@@ -3604,12 +4327,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `height` field (optional)
-    pub fn height(mut self, value: impl Into<Option<ProductHeight<'a>>>) -> Self {
+    pub fn height(mut self, value: impl Into<Option<ProductHeight<S>>>) -> Self {
         self._fields.31 = value.into();
         self
     }
     /// Set the `height` field to an Option value (optional)
-    pub fn maybe_height(mut self, value: Option<ProductHeight<'a>>) -> Self {
+    pub fn maybe_height(mut self, value: Option<ProductHeight<S>>) -> Self {
         self._fields.31 = value;
         self
     }
@@ -3617,15 +4340,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(
-        mut self,
-        value: impl Into<Option<ProductIdentifier<'a>>>,
-    ) -> Self {
+    pub fn identifier(mut self, value: impl Into<Option<ProductIdentifier<S>>>) -> Self {
         self._fields.32 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
-    pub fn maybe_identifier(mut self, value: Option<ProductIdentifier<'a>>) -> Self {
+    pub fn maybe_identifier(mut self, value: Option<ProductIdentifier<S>>) -> Self {
         self._fields.32 = value;
         self
     }
@@ -3633,12 +4353,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<ProductImage<'a>>>) -> Self {
+    pub fn image(mut self, value: impl Into<Option<ProductImage<S>>>) -> Self {
         self._fields.33 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<ProductImage<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<ProductImage<S>>) -> Self {
         self._fields.33 = value;
         self
     }
@@ -3648,7 +4368,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `inProductGroupWithID` field (optional)
     pub fn in_product_group_with_id(
         mut self,
-        value: impl Into<Option<ProductInProductGroupWithId<'a>>>,
+        value: impl Into<Option<ProductInProductGroupWithId<S>>>,
     ) -> Self {
         self._fields.34 = value.into();
         self
@@ -3656,7 +4376,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `inProductGroupWithID` field to an Option value (optional)
     pub fn maybe_in_product_group_with_id(
         mut self,
-        value: Option<ProductInProductGroupWithId<'a>>,
+        value: Option<ProductInProductGroupWithId<S>>,
     ) -> Self {
         self._fields.34 = value;
         self
@@ -3667,7 +4387,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `isAccessoryOrSparePartFor` field (optional)
     pub fn is_accessory_or_spare_part_for(
         mut self,
-        value: impl Into<Option<ProductIsAccessoryOrSparePartFor<'a>>>,
+        value: impl Into<Option<ProductIsAccessoryOrSparePartFor<S>>>,
     ) -> Self {
         self._fields.35 = value.into();
         self
@@ -3675,7 +4395,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `isAccessoryOrSparePartFor` field to an Option value (optional)
     pub fn maybe_is_accessory_or_spare_part_for(
         mut self,
-        value: Option<ProductIsAccessoryOrSparePartFor<'a>>,
+        value: Option<ProductIsAccessoryOrSparePartFor<S>>,
     ) -> Self {
         self._fields.35 = value;
         self
@@ -3686,7 +4406,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `isConsumableFor` field (optional)
     pub fn is_consumable_for(
         mut self,
-        value: impl Into<Option<ProductIsConsumableFor<'a>>>,
+        value: impl Into<Option<ProductIsConsumableFor<S>>>,
     ) -> Self {
         self._fields.36 = value.into();
         self
@@ -3694,7 +4414,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `isConsumableFor` field to an Option value (optional)
     pub fn maybe_is_consumable_for(
         mut self,
-        value: Option<ProductIsConsumableFor<'a>>,
+        value: Option<ProductIsConsumableFor<S>>,
     ) -> Self {
         self._fields.36 = value;
         self
@@ -3705,7 +4425,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `isFamilyFriendly` field (optional)
     pub fn is_family_friendly(
         mut self,
-        value: impl Into<Option<ProductIsFamilyFriendly<'a>>>,
+        value: impl Into<Option<ProductIsFamilyFriendly<S>>>,
     ) -> Self {
         self._fields.37 = value.into();
         self
@@ -3713,7 +4433,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `isFamilyFriendly` field to an Option value (optional)
     pub fn maybe_is_family_friendly(
         mut self,
-        value: Option<ProductIsFamilyFriendly<'a>>,
+        value: Option<ProductIsFamilyFriendly<S>>,
     ) -> Self {
         self._fields.37 = value;
         self
@@ -3724,13 +4444,13 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `isRelatedTo` field (optional)
     pub fn is_related_to(
         mut self,
-        value: impl Into<Option<ProductIsRelatedTo<'a>>>,
+        value: impl Into<Option<ProductIsRelatedTo<S>>>,
     ) -> Self {
         self._fields.38 = value.into();
         self
     }
     /// Set the `isRelatedTo` field to an Option value (optional)
-    pub fn maybe_is_related_to(mut self, value: Option<ProductIsRelatedTo<'a>>) -> Self {
+    pub fn maybe_is_related_to(mut self, value: Option<ProductIsRelatedTo<S>>) -> Self {
         self._fields.38 = value;
         self
     }
@@ -3740,13 +4460,13 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `isSimilarTo` field (optional)
     pub fn is_similar_to(
         mut self,
-        value: impl Into<Option<ProductIsSimilarTo<'a>>>,
+        value: impl Into<Option<ProductIsSimilarTo<S>>>,
     ) -> Self {
         self._fields.39 = value.into();
         self
     }
     /// Set the `isSimilarTo` field to an Option value (optional)
-    pub fn maybe_is_similar_to(mut self, value: Option<ProductIsSimilarTo<'a>>) -> Self {
+    pub fn maybe_is_similar_to(mut self, value: Option<ProductIsSimilarTo<S>>) -> Self {
         self._fields.39 = value;
         self
     }
@@ -3756,13 +4476,13 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `isVariantOf` field (optional)
     pub fn is_variant_of(
         mut self,
-        value: impl Into<Option<ProductIsVariantOf<'a>>>,
+        value: impl Into<Option<ProductIsVariantOf<S>>>,
     ) -> Self {
         self._fields.40 = value.into();
         self
     }
     /// Set the `isVariantOf` field to an Option value (optional)
-    pub fn maybe_is_variant_of(mut self, value: Option<ProductIsVariantOf<'a>>) -> Self {
+    pub fn maybe_is_variant_of(mut self, value: Option<ProductIsVariantOf<S>>) -> Self {
         self._fields.40 = value;
         self
     }
@@ -3772,7 +4492,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `itemCondition` field (optional)
     pub fn item_condition(
         mut self,
-        value: impl Into<Option<ProductItemCondition<'a>>>,
+        value: impl Into<Option<ProductItemCondition<S>>>,
     ) -> Self {
         self._fields.41 = value.into();
         self
@@ -3780,7 +4500,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `itemCondition` field to an Option value (optional)
     pub fn maybe_item_condition(
         mut self,
-        value: Option<ProductItemCondition<'a>>,
+        value: Option<ProductItemCondition<S>>,
     ) -> Self {
         self._fields.41 = value;
         self
@@ -3789,12 +4509,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(mut self, value: impl Into<Option<ProductKeywords<'a>>>) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<ProductKeywords<S>>>) -> Self {
         self._fields.42 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(mut self, value: Option<ProductKeywords<'a>>) -> Self {
+    pub fn maybe_keywords(mut self, value: Option<ProductKeywords<S>>) -> Self {
         self._fields.42 = value;
         self
     }
@@ -3802,12 +4522,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `logo` field (optional)
-    pub fn logo(mut self, value: impl Into<Option<ProductLogo<'a>>>) -> Self {
+    pub fn logo(mut self, value: impl Into<Option<ProductLogo<S>>>) -> Self {
         self._fields.43 = value.into();
         self
     }
     /// Set the `logo` field to an Option value (optional)
-    pub fn maybe_logo(mut self, value: Option<ProductLogo<'a>>) -> Self {
+    pub fn maybe_logo(mut self, value: Option<ProductLogo<S>>) -> Self {
         self._fields.43 = value;
         self
     }
@@ -3817,7 +4537,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
-        value: impl Into<Option<ProductMainEntityOfPage<'a>>>,
+        value: impl Into<Option<ProductMainEntityOfPage<S>>>,
     ) -> Self {
         self._fields.44 = value.into();
         self
@@ -3825,7 +4545,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field to an Option value (optional)
     pub fn maybe_main_entity_of_page(
         mut self,
-        value: Option<ProductMainEntityOfPage<'a>>,
+        value: Option<ProductMainEntityOfPage<S>>,
     ) -> Self {
         self._fields.44 = value;
         self
@@ -3836,13 +4556,13 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `manufacturer` field (optional)
     pub fn manufacturer(
         mut self,
-        value: impl Into<Option<ProductManufacturer<'a>>>,
+        value: impl Into<Option<ProductManufacturer<S>>>,
     ) -> Self {
         self._fields.45 = value.into();
         self
     }
     /// Set the `manufacturer` field to an Option value (optional)
-    pub fn maybe_manufacturer(mut self, value: Option<ProductManufacturer<'a>>) -> Self {
+    pub fn maybe_manufacturer(mut self, value: Option<ProductManufacturer<S>>) -> Self {
         self._fields.45 = value;
         self
     }
@@ -3850,12 +4570,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `material` field (optional)
-    pub fn material(mut self, value: impl Into<Option<ProductMaterial<'a>>>) -> Self {
+    pub fn material(mut self, value: impl Into<Option<ProductMaterial<S>>>) -> Self {
         self._fields.46 = value.into();
         self
     }
     /// Set the `material` field to an Option value (optional)
-    pub fn maybe_material(mut self, value: Option<ProductMaterial<'a>>) -> Self {
+    pub fn maybe_material(mut self, value: Option<ProductMaterial<S>>) -> Self {
         self._fields.46 = value;
         self
     }
@@ -3863,12 +4583,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `mobileUrl` field (optional)
-    pub fn mobile_url(mut self, value: impl Into<Option<ProductMobileUrl<'a>>>) -> Self {
+    pub fn mobile_url(mut self, value: impl Into<Option<ProductMobileUrl<S>>>) -> Self {
         self._fields.47 = value.into();
         self
     }
     /// Set the `mobileUrl` field to an Option value (optional)
-    pub fn maybe_mobile_url(mut self, value: Option<ProductMobileUrl<'a>>) -> Self {
+    pub fn maybe_mobile_url(mut self, value: Option<ProductMobileUrl<S>>) -> Self {
         self._fields.47 = value;
         self
     }
@@ -3876,12 +4596,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `model` field (optional)
-    pub fn model(mut self, value: impl Into<Option<ProductModel<'a>>>) -> Self {
+    pub fn model(mut self, value: impl Into<Option<ProductModel<S>>>) -> Self {
         self._fields.48 = value.into();
         self
     }
     /// Set the `model` field to an Option value (optional)
-    pub fn maybe_model(mut self, value: Option<ProductModel<'a>>) -> Self {
+    pub fn maybe_model(mut self, value: Option<ProductModel<S>>) -> Self {
         self._fields.48 = value;
         self
     }
@@ -3889,12 +4609,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `mpn` field (optional)
-    pub fn mpn(mut self, value: impl Into<Option<ProductMpn<'a>>>) -> Self {
+    pub fn mpn(mut self, value: impl Into<Option<ProductMpn<S>>>) -> Self {
         self._fields.49 = value.into();
         self
     }
     /// Set the `mpn` field to an Option value (optional)
-    pub fn maybe_mpn(mut self, value: Option<ProductMpn<'a>>) -> Self {
+    pub fn maybe_mpn(mut self, value: Option<ProductMpn<S>>) -> Self {
         self._fields.49 = value;
         self
     }
@@ -3902,12 +4622,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<ProductName<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<ProductName<S>>>) -> Self {
         self._fields.50 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<ProductName<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<ProductName<S>>) -> Self {
         self._fields.50 = value;
         self
     }
@@ -3917,7 +4637,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `negativeNotes` field (optional)
     pub fn negative_notes(
         mut self,
-        value: impl Into<Option<ProductNegativeNotes<'a>>>,
+        value: impl Into<Option<ProductNegativeNotes<S>>>,
     ) -> Self {
         self._fields.51 = value.into();
         self
@@ -3925,7 +4645,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `negativeNotes` field to an Option value (optional)
     pub fn maybe_negative_notes(
         mut self,
-        value: Option<ProductNegativeNotes<'a>>,
+        value: Option<ProductNegativeNotes<S>>,
     ) -> Self {
         self._fields.51 = value;
         self
@@ -3934,12 +4654,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `nsn` field (optional)
-    pub fn nsn(mut self, value: impl Into<Option<ProductNsn<'a>>>) -> Self {
+    pub fn nsn(mut self, value: impl Into<Option<ProductNsn<S>>>) -> Self {
         self._fields.52 = value.into();
         self
     }
     /// Set the `nsn` field to an Option value (optional)
-    pub fn maybe_nsn(mut self, value: Option<ProductNsn<'a>>) -> Self {
+    pub fn maybe_nsn(mut self, value: Option<ProductNsn<S>>) -> Self {
         self._fields.52 = value;
         self
     }
@@ -3947,12 +4667,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `offers` field (optional)
-    pub fn offers(mut self, value: impl Into<Option<ProductOffers<'a>>>) -> Self {
+    pub fn offers(mut self, value: impl Into<Option<ProductOffers<S>>>) -> Self {
         self._fields.53 = value.into();
         self
     }
     /// Set the `offers` field to an Option value (optional)
-    pub fn maybe_offers(mut self, value: Option<ProductOffers<'a>>) -> Self {
+    pub fn maybe_offers(mut self, value: Option<ProductOffers<S>>) -> Self {
         self._fields.53 = value;
         self
     }
@@ -3960,12 +4680,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `pattern` field (optional)
-    pub fn pattern(mut self, value: impl Into<Option<ProductPattern<'a>>>) -> Self {
+    pub fn pattern(mut self, value: impl Into<Option<ProductPattern<S>>>) -> Self {
         self._fields.54 = value.into();
         self
     }
     /// Set the `pattern` field to an Option value (optional)
-    pub fn maybe_pattern(mut self, value: Option<ProductPattern<'a>>) -> Self {
+    pub fn maybe_pattern(mut self, value: Option<ProductPattern<S>>) -> Self {
         self._fields.54 = value;
         self
     }
@@ -3975,7 +4695,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `positiveNotes` field (optional)
     pub fn positive_notes(
         mut self,
-        value: impl Into<Option<ProductPositiveNotes<'a>>>,
+        value: impl Into<Option<ProductPositiveNotes<S>>>,
     ) -> Self {
         self._fields.55 = value.into();
         self
@@ -3983,7 +4703,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `positiveNotes` field to an Option value (optional)
     pub fn maybe_positive_notes(
         mut self,
-        value: Option<ProductPositiveNotes<'a>>,
+        value: Option<ProductPositiveNotes<S>>,
     ) -> Self {
         self._fields.55 = value;
         self
@@ -3994,7 +4714,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `potentialAction` field (optional)
     pub fn potential_action(
         mut self,
-        value: impl Into<Option<ProductPotentialAction<'a>>>,
+        value: impl Into<Option<ProductPotentialAction<S>>>,
     ) -> Self {
         self._fields.56 = value.into();
         self
@@ -4002,7 +4722,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `potentialAction` field to an Option value (optional)
     pub fn maybe_potential_action(
         mut self,
-        value: Option<ProductPotentialAction<'a>>,
+        value: Option<ProductPotentialAction<S>>,
     ) -> Self {
         self._fields.56 = value;
         self
@@ -4011,12 +4731,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `productID` field (optional)
-    pub fn product_id(mut self, value: impl Into<Option<ProductProductId<'a>>>) -> Self {
+    pub fn product_id(mut self, value: impl Into<Option<ProductProductId<S>>>) -> Self {
         self._fields.57 = value.into();
         self
     }
     /// Set the `productID` field to an Option value (optional)
-    pub fn maybe_product_id(mut self, value: Option<ProductProductId<'a>>) -> Self {
+    pub fn maybe_product_id(mut self, value: Option<ProductProductId<S>>) -> Self {
         self._fields.57 = value;
         self
     }
@@ -4026,7 +4746,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `productionDate` field (optional)
     pub fn production_date(
         mut self,
-        value: impl Into<Option<ProductProductionDate<'a>>>,
+        value: impl Into<Option<ProductProductionDate<S>>>,
     ) -> Self {
         self._fields.58 = value.into();
         self
@@ -4034,7 +4754,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `productionDate` field to an Option value (optional)
     pub fn maybe_production_date(
         mut self,
-        value: Option<ProductProductionDate<'a>>,
+        value: Option<ProductProductionDate<S>>,
     ) -> Self {
         self._fields.58 = value;
         self
@@ -4045,16 +4765,13 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `purchaseDate` field (optional)
     pub fn purchase_date(
         mut self,
-        value: impl Into<Option<ProductPurchaseDate<'a>>>,
+        value: impl Into<Option<ProductPurchaseDate<S>>>,
     ) -> Self {
         self._fields.59 = value.into();
         self
     }
     /// Set the `purchaseDate` field to an Option value (optional)
-    pub fn maybe_purchase_date(
-        mut self,
-        value: Option<ProductPurchaseDate<'a>>,
-    ) -> Self {
+    pub fn maybe_purchase_date(mut self, value: Option<ProductPurchaseDate<S>>) -> Self {
         self._fields.59 = value;
         self
     }
@@ -4064,13 +4781,13 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `releaseDate` field (optional)
     pub fn release_date(
         mut self,
-        value: impl Into<Option<ProductReleaseDate<'a>>>,
+        value: impl Into<Option<ProductReleaseDate<S>>>,
     ) -> Self {
         self._fields.60 = value.into();
         self
     }
     /// Set the `releaseDate` field to an Option value (optional)
-    pub fn maybe_release_date(mut self, value: Option<ProductReleaseDate<'a>>) -> Self {
+    pub fn maybe_release_date(mut self, value: Option<ProductReleaseDate<S>>) -> Self {
         self._fields.60 = value;
         self
     }
@@ -4078,12 +4795,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `review` field (optional)
-    pub fn review(mut self, value: impl Into<Option<ProductReview<'a>>>) -> Self {
+    pub fn review(mut self, value: impl Into<Option<ProductReview<S>>>) -> Self {
         self._fields.61 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
-    pub fn maybe_review(mut self, value: Option<ProductReview<'a>>) -> Self {
+    pub fn maybe_review(mut self, value: Option<ProductReview<S>>) -> Self {
         self._fields.61 = value;
         self
     }
@@ -4091,12 +4808,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `reviews` field (optional)
-    pub fn reviews(mut self, value: impl Into<Option<ProductReviews<'a>>>) -> Self {
+    pub fn reviews(mut self, value: impl Into<Option<ProductReviews<S>>>) -> Self {
         self._fields.62 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
-    pub fn maybe_reviews(mut self, value: Option<ProductReviews<'a>>) -> Self {
+    pub fn maybe_reviews(mut self, value: Option<ProductReviews<S>>) -> Self {
         self._fields.62 = value;
         self
     }
@@ -4104,12 +4821,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
-    pub fn same_as(mut self, value: impl Into<Option<ProductSameAs<'a>>>) -> Self {
+    pub fn same_as(mut self, value: impl Into<Option<ProductSameAs<S>>>) -> Self {
         self._fields.63 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
-    pub fn maybe_same_as(mut self, value: Option<ProductSameAs<'a>>) -> Self {
+    pub fn maybe_same_as(mut self, value: Option<ProductSameAs<S>>) -> Self {
         self._fields.63 = value;
         self
     }
@@ -4117,12 +4834,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `size` field (optional)
-    pub fn size(mut self, value: impl Into<Option<ProductSize<'a>>>) -> Self {
+    pub fn size(mut self, value: impl Into<Option<ProductSize<S>>>) -> Self {
         self._fields.64 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
-    pub fn maybe_size(mut self, value: Option<ProductSize<'a>>) -> Self {
+    pub fn maybe_size(mut self, value: Option<ProductSize<S>>) -> Self {
         self._fields.64 = value;
         self
     }
@@ -4130,12 +4847,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `sku` field (optional)
-    pub fn sku(mut self, value: impl Into<Option<ProductSku<'a>>>) -> Self {
+    pub fn sku(mut self, value: impl Into<Option<ProductSku<S>>>) -> Self {
         self._fields.65 = value.into();
         self
     }
     /// Set the `sku` field to an Option value (optional)
-    pub fn maybe_sku(mut self, value: Option<ProductSku<'a>>) -> Self {
+    pub fn maybe_sku(mut self, value: Option<ProductSku<S>>) -> Self {
         self._fields.65 = value;
         self
     }
@@ -4143,12 +4860,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `slogan` field (optional)
-    pub fn slogan(mut self, value: impl Into<Option<ProductSlogan<'a>>>) -> Self {
+    pub fn slogan(mut self, value: impl Into<Option<ProductSlogan<S>>>) -> Self {
         self._fields.66 = value.into();
         self
     }
     /// Set the `slogan` field to an Option value (optional)
-    pub fn maybe_slogan(mut self, value: Option<ProductSlogan<'a>>) -> Self {
+    pub fn maybe_slogan(mut self, value: Option<ProductSlogan<S>>) -> Self {
         self._fields.66 = value;
         self
     }
@@ -4156,12 +4873,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(mut self, value: impl Into<Option<ProductSubjectOf<'a>>>) -> Self {
+    pub fn subject_of(mut self, value: impl Into<Option<ProductSubjectOf<S>>>) -> Self {
         self._fields.67 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
-    pub fn maybe_subject_of(mut self, value: Option<ProductSubjectOf<'a>>) -> Self {
+    pub fn maybe_subject_of(mut self, value: Option<ProductSubjectOf<S>>) -> Self {
         self._fields.67 = value;
         self
     }
@@ -4169,12 +4886,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<ProductUrl<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<ProductUrl<S>>>) -> Self {
         self._fields.68 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<ProductUrl<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<ProductUrl<S>>) -> Self {
         self._fields.68 = value;
         self
     }
@@ -4182,12 +4899,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `weight` field (optional)
-    pub fn weight(mut self, value: impl Into<Option<ProductWeight<'a>>>) -> Self {
+    pub fn weight(mut self, value: impl Into<Option<ProductWeight<S>>>) -> Self {
         self._fields.69 = value.into();
         self
     }
     /// Set the `weight` field to an Option value (optional)
-    pub fn maybe_weight(mut self, value: Option<ProductWeight<'a>>) -> Self {
+    pub fn maybe_weight(mut self, value: Option<ProductWeight<S>>) -> Self {
         self._fields.69 = value;
         self
     }
@@ -4195,12 +4912,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `width` field (optional)
-    pub fn width(mut self, value: impl Into<Option<ProductWidth<'a>>>) -> Self {
+    pub fn width(mut self, value: impl Into<Option<ProductWidth<S>>>) -> Self {
         self._fields.70 = value.into();
         self
     }
     /// Set the `width` field to an Option value (optional)
-    pub fn maybe_width(mut self, value: Option<ProductWidth<'a>>) -> Self {
+    pub fn maybe_width(mut self, value: Option<ProductWidth<S>>) -> Self {
         self._fields.70 = value;
         self
     }
@@ -4290,7 +5007,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Product<'a> {
         Product {
             additional_property: self._fields.0,

@@ -7,6 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -14,19 +15,39 @@ use crate::app_rocksky::stats::StatsView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetStats<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetStats<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: AtIdentifier<'a>,
+    pub did: AtIdentifier<S>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetStatsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetStatsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: StatsView<'a>,
+    pub value: StatsView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for app.rocksky.stats.getStats
@@ -34,11 +55,12 @@ pub struct GetStatsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStatsResponse {
     const NSID: &'static str = "app.rocksky.stats.getStats";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetStatsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetStatsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetStats<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetStats<S> {
     const NSID: &'static str = "app.rocksky.stats.getStats";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetStatsResponse;
@@ -49,7 +71,7 @@ pub struct GetStatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStatsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.stats.getStats";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetStats<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetStats<S>;
     type Response = GetStatsResponse;
 }
 
@@ -88,7 +110,7 @@ pub mod get_stats_state {
 /// Builder for constructing an instance of this type
 pub struct GetStatsBuilder<'a, S: get_stats_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>,),
+    _fields: (Option<AtIdentifier<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -118,7 +140,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetStatsBuilder<'a, get_stats_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetStatsBuilder {

@@ -10,40 +10,53 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{Did, Handle, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ResolveMiniDoc<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResolveMiniDoc<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub identifier: AtIdentifier<'a>,
+    pub identifier: AtIdentifier<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ResolveMiniDocOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResolveMiniDocOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///DID, bi-directionally verified if a handle was provided in the query.
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     /**The validated handle of the account or `handle.invalid` if the handle
 did not bi-directionally match the DID document.*/
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub handle: Handle<S>,
     ///The identity's PDS URL
-    #[serde(borrow)]
-    pub pds: UriValue<'a>,
+    pub pds: UriValue<S>,
     /**The atproto signing key publicKeyMultibase
 
 Legacy key encoding not supported. the key is returned directly; `id`,
 `type`, and `controller` are omitted.*/
-    #[serde(borrow)]
-    pub signing_key: CowStr<'a>,
+    pub signing_key: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.bad-example.identity.resolveMiniDoc
@@ -51,11 +64,12 @@ pub struct ResolveMiniDocResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveMiniDocResponse {
     const NSID: &'static str = "com.bad-example.identity.resolveMiniDoc";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveMiniDocOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ResolveMiniDocOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveMiniDoc<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ResolveMiniDoc<S> {
     const NSID: &'static str = "com.bad-example.identity.resolveMiniDoc";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveMiniDocResponse;
@@ -66,7 +80,7 @@ pub struct ResolveMiniDocRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveMiniDocRequest {
     const PATH: &'static str = "/xrpc/com.bad-example.identity.resolveMiniDoc";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ResolveMiniDoc<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ResolveMiniDoc<S>;
     type Response = ResolveMiniDocResponse;
 }
 
@@ -105,7 +119,7 @@ pub mod resolve_mini_doc_state {
 /// Builder for constructing an instance of this type
 pub struct ResolveMiniDocBuilder<'a, S: resolve_mini_doc_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>,),
+    _fields: (Option<AtIdentifier<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -135,7 +149,7 @@ where
     /// Set the `identifier` field (required)
     pub fn identifier(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> ResolveMiniDocBuilder<'a, resolve_mini_doc_state::SetIdentifier<S>> {
         self._fields.0 = Option::Some(value.into());
         ResolveMiniDocBuilder {

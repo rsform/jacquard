@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,56 +31,60 @@ use crate::community_lexicon::location::address::Address;
 use crate::community_lexicon::location::geo::Geo;
 /// A user-created venue definition
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.beaconbits.venue", tag = "$type")]
-pub struct Venue<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.beaconbits.venue",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Venue<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Human-readable address
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub address: Option<CowStr<'a>>,
+    pub address: Option<S>,
     ///Structured address using community lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub address_details: Option<Address<'a>>,
+    pub address_details: Option<Address<S>>,
     ///Venue category (bar, cafe, restaurant, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category: Option<CowStr<'a>>,
+    pub category: Option<S>,
     ///Timestamp when the venue was created
     pub created_at: Datetime,
     ///Structured location using community lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location: Option<Geo<'a>>,
+    pub location: Option<Geo<S>>,
     ///Display name of the venue
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Link to underlying OpenStreetMap entity (osm://node/123)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub osm_uri: Option<UriValue<'a>>,
+    pub osm_uri: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct VenueGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct VenueGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Venue<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Venue<S>,
 }
 
-impl<'a> Venue<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, VenueRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Venue<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, VenueRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -89,18 +95,17 @@ pub struct VenueRecord;
 impl XrpcResp for VenueRecord {
     const NSID: &'static str = "app.beaconbits.venue";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = VenueGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = VenueGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<VenueGetRecordOutput<'_>> for Venue<'_> {
-    fn from(output: VenueGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<VenueGetRecordOutput<S>> for Venue<S> {
+    fn from(output: VenueGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Venue<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Venue<S> {
     const NSID: &'static str = "app.beaconbits.venue";
     type Record = VenueRecord;
 }
@@ -110,7 +115,7 @@ impl Collection for VenueRecord {
     type Record = VenueRecord;
 }
 
-impl<'a> LexiconSchema for Venue<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Venue<S> {
     fn nsid() -> &'static str {
         "app.beaconbits.venue"
     }
@@ -210,13 +215,13 @@ pub mod venue_state {
 pub struct VenueBuilder<'a, S: venue_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<Address<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<Address<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<Geo<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
+        Option<Geo<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -241,12 +246,12 @@ impl<'a> VenueBuilder<'a, venue_state::Empty> {
 
 impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `address` field (optional)
-    pub fn address(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn address(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `address` field to an Option value (optional)
-    pub fn maybe_address(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_address(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -254,12 +259,12 @@ impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
 
 impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `addressDetails` field (optional)
-    pub fn address_details(mut self, value: impl Into<Option<Address<'a>>>) -> Self {
+    pub fn address_details(mut self, value: impl Into<Option<Address<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `addressDetails` field to an Option value (optional)
-    pub fn maybe_address_details(mut self, value: Option<Address<'a>>) -> Self {
+    pub fn maybe_address_details(mut self, value: Option<Address<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -267,12 +272,12 @@ impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
 
 impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -299,12 +304,12 @@ where
 
 impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `location` field (optional)
-    pub fn location(mut self, value: impl Into<Option<Geo<'a>>>) -> Self {
+    pub fn location(mut self, value: impl Into<Option<Geo<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
-    pub fn maybe_location(mut self, value: Option<Geo<'a>>) -> Self {
+    pub fn maybe_location(mut self, value: Option<Geo<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -318,7 +323,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> VenueBuilder<'a, venue_state::SetName<S>> {
         self._fields.5 = Option::Some(value.into());
         VenueBuilder {
@@ -331,12 +336,12 @@ where
 
 impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `osmUri` field (optional)
-    pub fn osm_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn osm_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `osmUri` field to an Option value (optional)
-    pub fn maybe_osm_uri(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_osm_uri(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -362,13 +367,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Venue<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Venue<'a> {
         Venue {
             address: self._fields.0,
             address_details: self._fields.1,

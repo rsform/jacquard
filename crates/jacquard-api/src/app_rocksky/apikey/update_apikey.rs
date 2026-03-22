@@ -10,35 +10,51 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateApikey<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateApikey<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///A new description for the API key.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The ID of the API key to update.
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
     ///The new name of the API key.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateApikeyOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateApikeyOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Data<'a>,
+    pub value: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.apikey.updateApikey
@@ -46,11 +62,12 @@ pub struct UpdateApikeyResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateApikeyResponse {
     const NSID: &'static str = "app.rocksky.apikey.updateApikey";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateApikeyOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = UpdateApikeyOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateApikey<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for UpdateApikey<S> {
     const NSID: &'static str = "app.rocksky.apikey.updateApikey";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -65,6 +82,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateApikeyRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = UpdateApikey<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = UpdateApikey<S>;
     type Response = UpdateApikeyResponse;
 }

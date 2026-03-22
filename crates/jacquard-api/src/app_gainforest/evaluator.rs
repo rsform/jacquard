@@ -15,12 +15,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -30,160 +32,186 @@ use serde::{Serialize, Deserialize};
 use crate::app_gainforest::evaluator;
 /// A candidate taxon identification with confidence score and rank.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CandidateTaxon<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CandidateTaxon<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Confidence score (0-1000, where 1000 = 100.0%).
     pub confidence: i64,
     ///Family of the candidate taxon.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub family: Option<CowStr<'a>>,
+    pub family: Option<S>,
     ///GBIF backbone taxonomy key for the candidate.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gbif_taxon_key: Option<CowStr<'a>>,
+    pub gbif_taxon_key: Option<S>,
     ///Genus of the candidate taxon.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genus: Option<CowStr<'a>>,
+    pub genus: Option<S>,
     ///Kingdom of the candidate taxon.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub kingdom: Option<CowStr<'a>>,
+    pub kingdom: Option<S>,
     ///Rank position among candidates (1 = best match).
     pub rank: i64,
     ///Full scientific name of the candidate taxon.
-    #[serde(borrow)]
-    pub scientific_name: CowStr<'a>,
+    pub scientific_name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Generic categorical classification result (e.g., conservation priority, habitat type).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ClassificationResult<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ClassificationResult<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The classification category (e.g., 'conservation-priority', 'habitat-type').
-    #[serde(borrow)]
-    pub category: CowStr<'a>,
+    pub category: S,
     ///Additional notes about the classification.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub remarks: Option<CowStr<'a>>,
+    pub remarks: Option<S>,
     ///The assigned classification value (e.g., 'critical', 'tropical-rainforest').
-    #[serde(borrow)]
-    pub value: CowStr<'a>,
+    pub value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Data quality assessment result with per-field quality flags.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DataQualityResult<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DataQualityResult<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Overall completeness score (0-1000, where 1000 = 100.0%).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub completeness_score: Option<i64>,
     ///List of quality issues found in the record.
-    #[serde(borrow)]
-    pub flags: Vec<evaluator::QualityFlag<'a>>,
+    pub flags: Vec<evaluator::QualityFlag<S>>,
     ///Additional notes about the quality assessment.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub remarks: Option<CowStr<'a>>,
+    pub remarks: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A single measurement derived by an evaluator from source data.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DerivedMeasurement<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DerivedMeasurement<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Description of the method used to obtain the measurement.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub measurement_method: Option<CowStr<'a>>,
+    pub measurement_method: Option<S>,
     ///The nature of the measurement (e.g., 'canopy cover', 'NDVI', 'tree height').
-    #[serde(borrow)]
-    pub measurement_type: CowStr<'a>,
+    pub measurement_type: S,
     ///The units for the measurement value (e.g., '%', 'm', 'kg').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub measurement_unit: Option<CowStr<'a>>,
+    pub measurement_unit: Option<S>,
     ///The value of the measurement.
-    #[serde(borrow)]
-    pub measurement_value: CowStr<'a>,
+    pub measurement_value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Derived measurements produced by an evaluator from source data (e.g., remote sensing metrics).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MeasurementResult<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MeasurementResult<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of derived measurements.
-    #[serde(borrow)]
-    pub measurements: Vec<evaluator::DerivedMeasurement<'a>>,
+    pub measurements: Vec<evaluator::DerivedMeasurement<S>>,
     ///Additional notes about the measurements.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub remarks: Option<CowStr<'a>>,
+    pub remarks: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Provenance metadata describing the method used to produce an evaluation.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct MethodInfo<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MethodInfo<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Identifier for the specific model checkpoint used (e.g., date or hash).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub model_checkpoint: Option<CowStr<'a>>,
+    pub model_checkpoint: Option<S>,
     ///Human-readable name of the method or model (e.g., 'GainForest BioClassifier').
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///URIs to papers, documentation, or repositories describing this method.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub references: Option<Vec<UriValue<'a>>>,
+    pub references: Option<Vec<UriValue<S>>>,
     ///Version string of the method or model (e.g., '2.1.0').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub version: Option<CowStr<'a>>,
+    pub version: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A single data quality flag indicating an issue with a specific field.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct QualityFlag<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct QualityFlag<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The field name that has the quality issue.
-    #[serde(borrow)]
-    pub field: CowStr<'a>,
+    pub field: S,
     ///Description of the quality issue.
-    #[serde(borrow)]
-    pub issue: CowStr<'a>,
+    pub issue: S,
     ///Severity level of the quality issue.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub severity: Option<QualityFlagSeverity<'a>>,
+    pub severity: Option<QualityFlagSeverity<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Severity level of the quality issue.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum QualityFlagSeverity<'a> {
+pub enum QualityFlagSeverity<S: Bos<str> + AsRef<str> = DefaultStr> {
     Error,
     Warning,
     Info,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> QualityFlagSeverity<'a> {
+impl<S: Bos<str> + AsRef<str>> QualityFlagSeverity<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Error => "error",
@@ -192,72 +220,57 @@ impl<'a> QualityFlagSeverity<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for QualityFlagSeverity<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "error" => Self::Error,
             "warning" => Self::Warning,
             "info" => Self::Info,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for QualityFlagSeverity<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "error" => Self::Error,
-            "warning" => Self::Warning,
-            "info" => Self::Info,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for QualityFlagSeverity<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for QualityFlagSeverity<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for QualityFlagSeverity<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for QualityFlagSeverity<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for QualityFlagSeverity<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for QualityFlagSeverity<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for QualityFlagSeverity<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for QualityFlagSeverity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for QualityFlagSeverity<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for QualityFlagSeverity<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for QualityFlagSeverity<'_> {
-    type Output = QualityFlagSeverity<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for QualityFlagSeverity<S> {
+    type Output = QualityFlagSeverity<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             QualityFlagSeverity::Error => QualityFlagSeverity::Error,
@@ -270,76 +283,87 @@ impl jacquard_common::IntoStatic for QualityFlagSeverity<'_> {
 
 /// AI or human species recognition result with ranked candidate identifications.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SpeciesIdResult<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SpeciesIdResult<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Ranked list of candidate species identifications.
-    #[serde(borrow)]
-    pub candidates: Vec<evaluator::CandidateTaxon<'a>>,
+    pub candidates: Vec<evaluator::CandidateTaxon<S>>,
     ///Which feature of the subject record was used as input (e.g., 'mediaEvidence').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub input_feature: Option<CowStr<'a>>,
+    pub input_feature: Option<S>,
     ///Additional notes about the species identification.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub remarks: Option<CowStr<'a>>,
+    pub remarks: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Reference to a target record that is being evaluated.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SubjectRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SubjectRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///CID pinning the exact version of the target record.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
+    pub cid: Option<Cid<S>>,
     ///AT-URI of the target record.
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Expert verification result for a previous identification or evaluation.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct VerificationResult<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct VerificationResult<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Notes about the verification decision.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub remarks: Option<CowStr<'a>>,
+    pub remarks: Option<S>,
     ///Verification status: confirmed, rejected, or uncertain.
-    #[serde(borrow)]
-    pub status: VerificationResultStatus<'a>,
+    pub status: VerificationResultStatus<S>,
     ///Suggested corrections if the original identification was rejected or uncertain.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub suggested_corrections: Option<CowStr<'a>>,
+    pub suggested_corrections: Option<S>,
     ///Name of the person who performed the verification.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub verified_by: Option<CowStr<'a>>,
+    pub verified_by: Option<S>,
     ///Persistent identifier (e.g., ORCID) of the verifier.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub verified_by_id: Option<CowStr<'a>>,
+    pub verified_by_id: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Verification status: confirmed, rejected, or uncertain.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VerificationResultStatus<'a> {
+pub enum VerificationResultStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Confirmed,
     Rejected,
     Uncertain,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> VerificationResultStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> VerificationResultStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Confirmed => "confirmed",
@@ -348,72 +372,57 @@ impl<'a> VerificationResultStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for VerificationResultStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "confirmed" => Self::Confirmed,
             "rejected" => Self::Rejected,
             "uncertain" => Self::Uncertain,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for VerificationResultStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "confirmed" => Self::Confirmed,
-            "rejected" => Self::Rejected,
-            "uncertain" => Self::Uncertain,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VerificationResultStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VerificationResultStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for VerificationResultStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for VerificationResultStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for VerificationResultStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for VerificationResultStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for VerificationResultStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for VerificationResultStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for VerificationResultStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for VerificationResultStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for VerificationResultStatus<'_> {
-    type Output = VerificationResultStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for VerificationResultStatus<S> {
+    type Output = VerificationResultStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             VerificationResultStatus::Confirmed => VerificationResultStatus::Confirmed,
@@ -426,7 +435,7 @@ impl jacquard_common::IntoStatic for VerificationResultStatus<'_> {
     }
 }
 
-impl<'a> LexiconSchema for CandidateTaxon<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CandidateTaxon<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
@@ -532,7 +541,7 @@ impl<'a> LexiconSchema for CandidateTaxon<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ClassificationResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ClassificationResult<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
@@ -585,7 +594,7 @@ impl<'a> LexiconSchema for ClassificationResult<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DataQualityResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DataQualityResult<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
@@ -641,7 +650,7 @@ impl<'a> LexiconSchema for DataQualityResult<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DerivedMeasurement<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DerivedMeasurement<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
@@ -706,7 +715,7 @@ impl<'a> LexiconSchema for DerivedMeasurement<'a> {
     }
 }
 
-impl<'a> LexiconSchema for MeasurementResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for MeasurementResult<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
@@ -744,7 +753,7 @@ impl<'a> LexiconSchema for MeasurementResult<'a> {
     }
 }
 
-impl<'a> LexiconSchema for MethodInfo<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for MethodInfo<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
@@ -806,7 +815,7 @@ impl<'a> LexiconSchema for MethodInfo<'a> {
     }
 }
 
-impl<'a> LexiconSchema for QualityFlag<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for QualityFlag<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
@@ -859,7 +868,7 @@ impl<'a> LexiconSchema for QualityFlag<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SpeciesIdResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SpeciesIdResult<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
@@ -909,7 +918,7 @@ impl<'a> LexiconSchema for SpeciesIdResult<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SubjectRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SubjectRef<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
@@ -924,7 +933,7 @@ impl<'a> LexiconSchema for SubjectRef<'a> {
     }
 }
 
-impl<'a> LexiconSchema for VerificationResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for VerificationResult<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
@@ -1010,51 +1019,51 @@ pub mod candidate_taxon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Confidence;
         type ScientificName;
         type Rank;
-        type Confidence;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Confidence = Unset;
         type ScientificName = Unset;
         type Rank = Unset;
-        type Confidence = Unset;
-    }
-    ///State transition - sets the `scientific_name` field to Set
-    pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScientificName<S> {}
-    impl<S: State> State for SetScientificName<S> {
-        type ScientificName = Set<members::scientific_name>;
-        type Rank = S::Rank;
-        type Confidence = S::Confidence;
-    }
-    ///State transition - sets the `rank` field to Set
-    pub struct SetRank<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRank<S> {}
-    impl<S: State> State for SetRank<S> {
-        type ScientificName = S::ScientificName;
-        type Rank = Set<members::rank>;
-        type Confidence = S::Confidence;
     }
     ///State transition - sets the `confidence` field to Set
     pub struct SetConfidence<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetConfidence<S> {}
     impl<S: State> State for SetConfidence<S> {
+        type Confidence = Set<members::confidence>;
         type ScientificName = S::ScientificName;
         type Rank = S::Rank;
-        type Confidence = Set<members::confidence>;
+    }
+    ///State transition - sets the `scientific_name` field to Set
+    pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScientificName<S> {}
+    impl<S: State> State for SetScientificName<S> {
+        type Confidence = S::Confidence;
+        type ScientificName = Set<members::scientific_name>;
+        type Rank = S::Rank;
+    }
+    ///State transition - sets the `rank` field to Set
+    pub struct SetRank<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRank<S> {}
+    impl<S: State> State for SetRank<S> {
+        type Confidence = S::Confidence;
+        type ScientificName = S::ScientificName;
+        type Rank = Set<members::rank>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `confidence` field
+        pub struct confidence(());
         ///Marker type for the `scientific_name` field
         pub struct scientific_name(());
         ///Marker type for the `rank` field
         pub struct rank(());
-        ///Marker type for the `confidence` field
-        pub struct confidence(());
     }
 }
 
@@ -1063,12 +1072,12 @@ pub struct CandidateTaxonBuilder<'a, S: candidate_taxon_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<i64>,
-        Option<CowStr<'a>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1112,12 +1121,12 @@ where
 
 impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
     /// Set the `family` field (optional)
-    pub fn family(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn family(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `family` field to an Option value (optional)
-    pub fn maybe_family(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_family(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1125,12 +1134,12 @@ impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
 
 impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
     /// Set the `gbifTaxonKey` field (optional)
-    pub fn gbif_taxon_key(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn gbif_taxon_key(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `gbifTaxonKey` field to an Option value (optional)
-    pub fn maybe_gbif_taxon_key(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_gbif_taxon_key(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1138,12 +1147,12 @@ impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
 
 impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
     /// Set the `genus` field (optional)
-    pub fn genus(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn genus(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `genus` field to an Option value (optional)
-    pub fn maybe_genus(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_genus(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1151,12 +1160,12 @@ impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
 
 impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
     /// Set the `kingdom` field (optional)
-    pub fn kingdom(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn kingdom(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `kingdom` field to an Option value (optional)
-    pub fn maybe_kingdom(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_kingdom(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1189,7 +1198,7 @@ where
     /// Set the `scientificName` field (required)
     pub fn scientific_name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CandidateTaxonBuilder<'a, candidate_taxon_state::SetScientificName<S>> {
         self._fields.6 = Option::Some(value.into());
         CandidateTaxonBuilder {
@@ -1203,9 +1212,9 @@ where
 impl<'a, S> CandidateTaxonBuilder<'a, S>
 where
     S: candidate_taxon_state::State,
+    S::Confidence: candidate_taxon_state::IsSet,
     S::ScientificName: candidate_taxon_state::IsSet,
     S::Rank: candidate_taxon_state::IsSet,
-    S::Confidence: candidate_taxon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CandidateTaxon<'a> {
@@ -1223,10 +1232,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CandidateTaxon<'a> {
         CandidateTaxon {
             confidence: self._fields.0.unwrap(),
@@ -1896,7 +1902,7 @@ pub mod data_quality_result_state {
 /// Builder for constructing an instance of this type
 pub struct DataQualityResultBuilder<'a, S: data_quality_result_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<Vec<evaluator::QualityFlag<'a>>>, Option<CowStr<'a>>),
+    _fields: (Option<i64>, Option<Vec<evaluator::QualityFlag<S>>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1939,7 +1945,7 @@ where
     /// Set the `flags` field (required)
     pub fn flags(
         mut self,
-        value: impl Into<Vec<evaluator::QualityFlag<'a>>>,
+        value: impl Into<Vec<evaluator::QualityFlag<S>>>,
     ) -> DataQualityResultBuilder<'a, data_quality_result_state::SetFlags<S>> {
         self._fields.1 = Option::Some(value.into());
         DataQualityResultBuilder {
@@ -1952,12 +1958,12 @@ where
 
 impl<'a, S: data_quality_result_state::State> DataQualityResultBuilder<'a, S> {
     /// Set the `remarks` field (optional)
-    pub fn remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `remarks` field to an Option value (optional)
-    pub fn maybe_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_remarks(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1980,10 +1986,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DataQualityResult<'a> {
         DataQualityResult {
             completeness_score: self._fields.0,
@@ -2029,7 +2032,7 @@ pub mod measurement_result_state {
 /// Builder for constructing an instance of this type
 pub struct MeasurementResultBuilder<'a, S: measurement_result_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<evaluator::DerivedMeasurement<'a>>>, Option<CowStr<'a>>),
+    _fields: (Option<Vec<evaluator::DerivedMeasurement<S>>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -2059,7 +2062,7 @@ where
     /// Set the `measurements` field (required)
     pub fn measurements(
         mut self,
-        value: impl Into<Vec<evaluator::DerivedMeasurement<'a>>>,
+        value: impl Into<Vec<evaluator::DerivedMeasurement<S>>>,
     ) -> MeasurementResultBuilder<'a, measurement_result_state::SetMeasurements<S>> {
         self._fields.0 = Option::Some(value.into());
         MeasurementResultBuilder {
@@ -2072,12 +2075,12 @@ where
 
 impl<'a, S: measurement_result_state::State> MeasurementResultBuilder<'a, S> {
     /// Set the `remarks` field (optional)
-    pub fn remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `remarks` field to an Option value (optional)
-    pub fn maybe_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_remarks(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -2099,10 +2102,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> MeasurementResult<'a> {
         MeasurementResult {
             measurements: self._fields.0.unwrap(),
@@ -2147,11 +2147,7 @@ pub mod species_id_result_state {
 /// Builder for constructing an instance of this type
 pub struct SpeciesIdResultBuilder<'a, S: species_id_result_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Vec<evaluator::CandidateTaxon<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<Vec<evaluator::CandidateTaxon<S>>>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -2181,7 +2177,7 @@ where
     /// Set the `candidates` field (required)
     pub fn candidates(
         mut self,
-        value: impl Into<Vec<evaluator::CandidateTaxon<'a>>>,
+        value: impl Into<Vec<evaluator::CandidateTaxon<S>>>,
     ) -> SpeciesIdResultBuilder<'a, species_id_result_state::SetCandidates<S>> {
         self._fields.0 = Option::Some(value.into());
         SpeciesIdResultBuilder {
@@ -2194,12 +2190,12 @@ where
 
 impl<'a, S: species_id_result_state::State> SpeciesIdResultBuilder<'a, S> {
     /// Set the `inputFeature` field (optional)
-    pub fn input_feature(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn input_feature(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `inputFeature` field to an Option value (optional)
-    pub fn maybe_input_feature(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_input_feature(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -2207,12 +2203,12 @@ impl<'a, S: species_id_result_state::State> SpeciesIdResultBuilder<'a, S> {
 
 impl<'a, S: species_id_result_state::State> SpeciesIdResultBuilder<'a, S> {
     /// Set the `remarks` field (optional)
-    pub fn remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `remarks` field to an Option value (optional)
-    pub fn maybe_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_remarks(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -2235,10 +2231,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SpeciesIdResult<'a> {
         SpeciesIdResult {
             candidates: self._fields.0.unwrap(),
@@ -2284,7 +2277,7 @@ pub mod subject_ref_state {
 /// Builder for constructing an instance of this type
 pub struct SubjectRefBuilder<'a, S: subject_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -2308,12 +2301,12 @@ impl<'a> SubjectRefBuilder<'a, subject_ref_state::Empty> {
 
 impl<'a, S: subject_ref_state::State> SubjectRefBuilder<'a, S> {
     /// Set the `cid` field (optional)
-    pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
+    pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
-    pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
+    pub fn maybe_cid(mut self, value: Option<Cid<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -2327,7 +2320,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> SubjectRefBuilder<'a, subject_ref_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         SubjectRefBuilder {
@@ -2354,10 +2347,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SubjectRef<'a> {
         SubjectRef {
             cid: self._fields.0,

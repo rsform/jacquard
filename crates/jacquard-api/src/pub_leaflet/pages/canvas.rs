@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -38,12 +40,16 @@ use crate::pub_leaflet::blocks::unordered_list::UnorderedList;
 use crate::pub_leaflet::blocks::website::Website;
 use crate::pub_leaflet::pages::canvas;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Block<'a> {
-    #[serde(borrow)]
-    pub block: BlockBlock<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Block<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub block: BlockBlock<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
     ///The rotation of the block in degrees
@@ -52,75 +58,100 @@ pub struct Block<'a> {
     pub width: i64,
     pub x: i64,
     pub y: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum BlockBlock<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum BlockBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "pub.leaflet.blocks.iframe")]
-    Iframe(Box<Iframe<'a>>),
+    Iframe(Box<Iframe<S>>),
     #[serde(rename = "pub.leaflet.blocks.text")]
-    Text(Box<Text<'a>>),
+    Text(Box<Text<S>>),
     #[serde(rename = "pub.leaflet.blocks.blockquote")]
-    Blockquote(Box<Blockquote<'a>>),
+    Blockquote(Box<Blockquote<S>>),
     #[serde(rename = "pub.leaflet.blocks.header")]
-    Header(Box<Header<'a>>),
+    Header(Box<Header<S>>),
     #[serde(rename = "pub.leaflet.blocks.image")]
-    Image(Box<Image<'a>>),
+    Image(Box<Image<S>>),
     #[serde(rename = "pub.leaflet.blocks.unorderedList")]
-    UnorderedList(Box<UnorderedList<'a>>),
+    UnorderedList(Box<UnorderedList<S>>),
     #[serde(rename = "pub.leaflet.blocks.orderedList")]
-    OrderedList(Box<OrderedList<'a>>),
+    OrderedList(Box<OrderedList<S>>),
     #[serde(rename = "pub.leaflet.blocks.website")]
-    Website(Box<Website<'a>>),
+    Website(Box<Website<S>>),
     #[serde(rename = "pub.leaflet.blocks.math")]
-    Math(Box<Math<'a>>),
+    Math(Box<Math<S>>),
     #[serde(rename = "pub.leaflet.blocks.code")]
-    Code(Box<Code<'a>>),
+    Code(Box<Code<S>>),
     #[serde(rename = "pub.leaflet.blocks.horizontalRule")]
-    HorizontalRule(Box<HorizontalRule<'a>>),
+    HorizontalRule(Box<HorizontalRule<S>>),
     #[serde(rename = "pub.leaflet.blocks.bskyPost")]
-    BskyPost(Box<BskyPost<'a>>),
+    BskyPost(Box<BskyPost<S>>),
     #[serde(rename = "pub.leaflet.blocks.page")]
-    Page(Box<Page<'a>>),
+    Page(Box<Page<S>>),
     #[serde(rename = "pub.leaflet.blocks.poll")]
-    Poll(Box<Poll<'a>>),
+    Poll(Box<Poll<S>>),
     #[serde(rename = "pub.leaflet.blocks.button")]
-    Button(Box<Button<'a>>),
+    Button(Box<Button<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Canvas<'a> {
-    #[serde(borrow)]
-    pub blocks: Vec<canvas::Block<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Canvas<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub blocks: Vec<canvas::Block<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Position<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Position<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub block: Vec<i64>,
     pub offset: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Quote<'a> {
-    #[serde(borrow)]
-    pub end: canvas::Position<'a>,
-    #[serde(borrow)]
-    pub start: canvas::Position<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Quote<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub end: canvas::Position<S>,
+    pub start: canvas::Position<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
@@ -150,7 +181,7 @@ impl core::fmt::Display for TextAlignRight {
     }
 }
 
-impl<'a> LexiconSchema for Block<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Block<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
     }
@@ -165,7 +196,7 @@ impl<'a> LexiconSchema for Block<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Canvas<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Canvas<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
     }
@@ -180,7 +211,7 @@ impl<'a> LexiconSchema for Canvas<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Position<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Position<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
     }
@@ -195,7 +226,7 @@ impl<'a> LexiconSchema for Position<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Quote<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Quote<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
     }
@@ -220,67 +251,67 @@ pub mod block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Y;
-        type Width;
-        type Block;
         type X;
+        type Width;
+        type Y;
+        type Block;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Y = Unset;
-        type Width = Unset;
-        type Block = Unset;
         type X = Unset;
-    }
-    ///State transition - sets the `y` field to Set
-    pub struct SetY<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetY<S> {}
-    impl<S: State> State for SetY<S> {
-        type Y = Set<members::y>;
-        type Width = S::Width;
-        type Block = S::Block;
-        type X = S::X;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Y = S::Y;
-        type Width = Set<members::width>;
-        type Block = S::Block;
-        type X = S::X;
-    }
-    ///State transition - sets the `block` field to Set
-    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlock<S> {}
-    impl<S: State> State for SetBlock<S> {
-        type Y = S::Y;
-        type Width = S::Width;
-        type Block = Set<members::block>;
-        type X = S::X;
+        type Width = Unset;
+        type Y = Unset;
+        type Block = Unset;
     }
     ///State transition - sets the `x` field to Set
     pub struct SetX<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetX<S> {}
     impl<S: State> State for SetX<S> {
-        type Y = S::Y;
-        type Width = S::Width;
-        type Block = S::Block;
         type X = Set<members::x>;
+        type Width = S::Width;
+        type Y = S::Y;
+        type Block = S::Block;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type X = S::X;
+        type Width = Set<members::width>;
+        type Y = S::Y;
+        type Block = S::Block;
+    }
+    ///State transition - sets the `y` field to Set
+    pub struct SetY<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetY<S> {}
+    impl<S: State> State for SetY<S> {
+        type X = S::X;
+        type Width = S::Width;
+        type Y = Set<members::y>;
+        type Block = S::Block;
+    }
+    ///State transition - sets the `block` field to Set
+    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlock<S> {}
+    impl<S: State> State for SetBlock<S> {
+        type X = S::X;
+        type Width = S::Width;
+        type Y = S::Y;
+        type Block = Set<members::block>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `y` field
-        pub struct y(());
-        ///Marker type for the `width` field
-        pub struct width(());
-        ///Marker type for the `block` field
-        pub struct block(());
         ///Marker type for the `x` field
         pub struct x(());
+        ///Marker type for the `width` field
+        pub struct width(());
+        ///Marker type for the `y` field
+        pub struct y(());
+        ///Marker type for the `block` field
+        pub struct block(());
     }
 }
 
@@ -288,7 +319,7 @@ pub mod block_state {
 pub struct BlockBuilder<'a, S: block_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<BlockBlock<'a>>,
+        Option<BlockBlock<S>>,
         Option<i64>,
         Option<i64>,
         Option<i64>,
@@ -324,7 +355,7 @@ where
     /// Set the `block` field (required)
     pub fn block(
         mut self,
-        value: impl Into<BlockBlock<'a>>,
+        value: impl Into<BlockBlock<S>>,
     ) -> BlockBuilder<'a, block_state::SetBlock<S>> {
         self._fields.0 = Option::Some(value.into());
         BlockBuilder {
@@ -415,10 +446,10 @@ where
 impl<'a, S> BlockBuilder<'a, S>
 where
     S: block_state::State,
-    S::Y: block_state::IsSet,
-    S::Width: block_state::IsSet,
-    S::Block: block_state::IsSet,
     S::X: block_state::IsSet,
+    S::Width: block_state::IsSet,
+    S::Y: block_state::IsSet,
+    S::Block: block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Block<'a> {
@@ -433,13 +464,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Block<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Block<'a> {
         Block {
             block: self._fields.0.unwrap(),
             height: self._fields.1,
@@ -668,7 +693,7 @@ pub mod canvas_state {
 /// Builder for constructing an instance of this type
 pub struct CanvasBuilder<'a, S: canvas_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<canvas::Block<'a>>>, Option<CowStr<'a>>),
+    _fields: (Option<Vec<canvas::Block<S>>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -698,7 +723,7 @@ where
     /// Set the `blocks` field (required)
     pub fn blocks(
         mut self,
-        value: impl Into<Vec<canvas::Block<'a>>>,
+        value: impl Into<Vec<canvas::Block<S>>>,
     ) -> CanvasBuilder<'a, canvas_state::SetBlocks<S>> {
         self._fields.0 = Option::Some(value.into());
         CanvasBuilder {
@@ -711,12 +736,12 @@ where
 
 impl<'a, S: canvas_state::State> CanvasBuilder<'a, S> {
     /// Set the `id` field (optional)
-    pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
-    pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_id(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -736,13 +761,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Canvas<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Canvas<'a> {
         Canvas {
             blocks: self._fields.0.unwrap(),
             id: self._fields.1,
@@ -761,37 +780,37 @@ pub mod position_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Block;
         type Offset;
+        type Block;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Block = Unset;
         type Offset = Unset;
-    }
-    ///State transition - sets the `block` field to Set
-    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlock<S> {}
-    impl<S: State> State for SetBlock<S> {
-        type Block = Set<members::block>;
-        type Offset = S::Offset;
+        type Block = Unset;
     }
     ///State transition - sets the `offset` field to Set
     pub struct SetOffset<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOffset<S> {}
     impl<S: State> State for SetOffset<S> {
-        type Block = S::Block;
         type Offset = Set<members::offset>;
+        type Block = S::Block;
+    }
+    ///State transition - sets the `block` field to Set
+    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlock<S> {}
+    impl<S: State> State for SetBlock<S> {
+        type Offset = S::Offset;
+        type Block = Set<members::block>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `block` field
-        pub struct block(());
         ///Marker type for the `offset` field
         pub struct offset(());
+        ///Marker type for the `block` field
+        pub struct block(());
     }
 }
 
@@ -861,8 +880,8 @@ where
 impl<'a, S> PositionBuilder<'a, S>
 where
     S: position_state::State,
-    S::Block: position_state::IsSet,
     S::Offset: position_state::IsSet,
+    S::Block: position_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Position<'a> {
@@ -875,10 +894,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Position<'a> {
         Position {
             block: self._fields.0.unwrap(),
@@ -898,44 +914,44 @@ pub mod quote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type End;
         type Start;
+        type End;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type End = Unset;
         type Start = Unset;
-    }
-    ///State transition - sets the `end` field to Set
-    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnd<S> {}
-    impl<S: State> State for SetEnd<S> {
-        type End = Set<members::end>;
-        type Start = S::Start;
+        type End = Unset;
     }
     ///State transition - sets the `start` field to Set
     pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStart<S> {}
     impl<S: State> State for SetStart<S> {
-        type End = S::End;
         type Start = Set<members::start>;
+        type End = S::End;
+    }
+    ///State transition - sets the `end` field to Set
+    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEnd<S> {}
+    impl<S: State> State for SetEnd<S> {
+        type Start = S::Start;
+        type End = Set<members::end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `end` field
-        pub struct end(());
         ///Marker type for the `start` field
         pub struct start(());
+        ///Marker type for the `end` field
+        pub struct end(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct QuoteBuilder<'a, S: quote_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<canvas::Position<'a>>, Option<canvas::Position<'a>>),
+    _fields: (Option<canvas::Position<S>>, Option<canvas::Position<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -965,7 +981,7 @@ where
     /// Set the `end` field (required)
     pub fn end(
         mut self,
-        value: impl Into<canvas::Position<'a>>,
+        value: impl Into<canvas::Position<S>>,
     ) -> QuoteBuilder<'a, quote_state::SetEnd<S>> {
         self._fields.0 = Option::Some(value.into());
         QuoteBuilder {
@@ -984,7 +1000,7 @@ where
     /// Set the `start` field (required)
     pub fn start(
         mut self,
-        value: impl Into<canvas::Position<'a>>,
+        value: impl Into<canvas::Position<S>>,
     ) -> QuoteBuilder<'a, quote_state::SetStart<S>> {
         self._fields.1 = Option::Some(value.into());
         QuoteBuilder {
@@ -998,8 +1014,8 @@ where
 impl<'a, S> QuoteBuilder<'a, S>
 where
     S: quote_state::State,
-    S::End: quote_state::IsSet,
     S::Start: quote_state::IsSet,
+    S::End: quote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Quote<'a> {
@@ -1010,13 +1026,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Quote<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Quote<'a> {
         Quote {
             end: self._fields.0.unwrap(),
             start: self._fields.1.unwrap(),

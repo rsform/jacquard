@@ -10,36 +10,53 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Cid, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::place_stream::livestream::Livestream;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct StartLivestream<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StartLivestream<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether to create a Bluesky post announcing the livestream.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub create_bluesky_post: Option<bool>,
-    #[serde(borrow)]
-    pub livestream: Livestream<'a>,
+    pub livestream: Livestream<S>,
     ///The DID of the streamer.
-    #[serde(borrow)]
-    pub streamer: Did<'a>,
+    pub streamer: Did<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct StartLivestreamOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StartLivestreamOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The CID of the livestream record.
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///The URI of the livestream record.
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+    pub uri: UriValue<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for place.stream.live.startLivestream
@@ -47,11 +64,12 @@ pub struct StartLivestreamResponse;
 impl jacquard_common::xrpc::XrpcResp for StartLivestreamResponse {
     const NSID: &'static str = "place.stream.live.startLivestream";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StartLivestreamOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StartLivestreamOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for StartLivestream<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for StartLivestream<S> {
     const NSID: &'static str = "place.stream.live.startLivestream";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -66,7 +84,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for StartLivestreamRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = StartLivestream<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = StartLivestream<S>;
     type Response = StartLivestreamResponse;
 }
 
@@ -80,44 +98,44 @@ pub mod start_livestream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type Livestream;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type Livestream = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type Livestream = S::Livestream;
+        type Streamer = Unset;
     }
     ///State transition - sets the `livestream` field to Set
     pub struct SetLivestream<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLivestream<S> {}
     impl<S: State> State for SetLivestream<S> {
-        type Streamer = S::Streamer;
         type Livestream = Set<members::livestream>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type Livestream = S::Livestream;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `livestream` field
         pub struct livestream(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StartLivestreamBuilder<'a, S: start_livestream_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<Livestream<'a>>, Option<Did<'a>>),
+    _fields: (Option<bool>, Option<Livestream<S>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -160,7 +178,7 @@ where
     /// Set the `livestream` field (required)
     pub fn livestream(
         mut self,
-        value: impl Into<Livestream<'a>>,
+        value: impl Into<Livestream<S>>,
     ) -> StartLivestreamBuilder<'a, start_livestream_state::SetLivestream<S>> {
         self._fields.1 = Option::Some(value.into());
         StartLivestreamBuilder {
@@ -179,7 +197,7 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> StartLivestreamBuilder<'a, start_livestream_state::SetStreamer<S>> {
         self._fields.2 = Option::Some(value.into());
         StartLivestreamBuilder {
@@ -193,8 +211,8 @@ where
 impl<'a, S> StartLivestreamBuilder<'a, S>
 where
     S: start_livestream_state::State,
-    S::Streamer: start_livestream_state::IsSet,
     S::Livestream: start_livestream_state::IsSet,
+    S::Streamer: start_livestream_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> StartLivestream<'a> {
@@ -208,10 +226,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> StartLivestream<'a> {
         StartLivestream {
             create_bluesky_post: self._fields.0,

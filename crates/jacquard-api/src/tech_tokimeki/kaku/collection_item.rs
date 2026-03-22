@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,45 +30,49 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// An item in a collection linking to a post
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "tech.tokimeki.kaku.collectionItem",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct CollectionItem<'a> {
+pub struct CollectionItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reference to the collection
-    #[serde(borrow)]
-    pub collection: StrongRef<'a>,
+    pub collection: StrongRef<S>,
     pub created_at: Datetime,
     ///Order within the collection
     #[serde(skip_serializing_if = "Option::is_none")]
     pub order: Option<i64>,
     ///Reference to the post
-    #[serde(borrow)]
-    pub post: StrongRef<'a>,
+    pub post: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionItemGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollectionItemGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: CollectionItem<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: CollectionItem<S>,
 }
 
-impl<'a> CollectionItem<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CollectionItemRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> CollectionItem<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CollectionItemRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -77,18 +83,18 @@ pub struct CollectionItemRecord;
 impl XrpcResp for CollectionItemRecord {
     const NSID: &'static str = "tech.tokimeki.kaku.collectionItem";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollectionItemGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CollectionItemGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CollectionItemGetRecordOutput<'_>> for CollectionItem<'_> {
-    fn from(output: CollectionItemGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CollectionItemGetRecordOutput<S>>
+for CollectionItem<S> {
+    fn from(output: CollectionItemGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for CollectionItem<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for CollectionItem<S> {
     const NSID: &'static str = "tech.tokimeki.kaku.collectionItem";
     type Record = CollectionItemRecord;
 }
@@ -98,7 +104,7 @@ impl Collection for CollectionItemRecord {
     type Record = CollectionItemRecord;
 }
 
-impl<'a> LexiconSchema for CollectionItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionItem<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.collectionItem"
     }
@@ -132,63 +138,58 @@ pub mod collection_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Post;
         type CreatedAt;
         type Collection;
-        type Post;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Post = Unset;
         type CreatedAt = Unset;
         type Collection = Unset;
-        type Post = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Collection = S::Collection;
-        type Post = S::Post;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type CreatedAt = S::CreatedAt;
-        type Collection = Set<members::collection>;
-        type Post = S::Post;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPost<S> {}
     impl<S: State> State for SetPost<S> {
+        type Post = Set<members::post>;
         type CreatedAt = S::CreatedAt;
         type Collection = S::Collection;
-        type Post = Set<members::post>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Post = S::Post;
+        type CreatedAt = Set<members::created_at>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Post = S::Post;
+        type CreatedAt = S::CreatedAt;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `post` field
+        pub struct post(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `collection` field
         pub struct collection(());
-        ///Marker type for the `post` field
-        pub struct post(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CollectionItemBuilder<'a, S: collection_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<StrongRef<'a>>,
-        Option<Datetime>,
-        Option<i64>,
-        Option<StrongRef<'a>>,
-    ),
+    _fields: (Option<StrongRef<S>>, Option<Datetime>, Option<i64>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -218,7 +219,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> CollectionItemBuilder<'a, collection_item_state::SetCollection<S>> {
         self._fields.0 = Option::Some(value.into());
         CollectionItemBuilder {
@@ -269,7 +270,7 @@ where
     /// Set the `post` field (required)
     pub fn post(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> CollectionItemBuilder<'a, collection_item_state::SetPost<S>> {
         self._fields.3 = Option::Some(value.into());
         CollectionItemBuilder {
@@ -283,9 +284,9 @@ where
 impl<'a, S> CollectionItemBuilder<'a, S>
 where
     S: collection_item_state::State,
+    S::Post: collection_item_state::IsSet,
     S::CreatedAt: collection_item_state::IsSet,
     S::Collection: collection_item_state::IsSet,
-    S::Post: collection_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionItem<'a> {
@@ -300,10 +301,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CollectionItem<'a> {
         CollectionItem {
             collection: self._fields.0.unwrap(),

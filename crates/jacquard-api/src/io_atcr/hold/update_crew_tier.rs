@@ -10,34 +10,51 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateCrewTier<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateCrewTier<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Tier rank index (0-based, maps to hold tier list by position).
     pub tier_rank: i64,
     ///DID of the crew member whose tier is being updated.
-    #[serde(borrow)]
-    pub user_did: Did<'a>,
+    pub user_did: Did<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateCrewTierOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateCrewTierOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Resolved tier name on this hold.
-    #[serde(borrow)]
-    pub tier_name: CowStr<'a>,
+    pub tier_name: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -46,22 +63,23 @@ pub struct UpdateCrewTierOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UpdateCrewTierError<'a> {
+pub enum UpdateCrewTierError {
     /// Valid appview token required.
     #[serde(rename = "AuthRequired")]
-    AuthRequired(Option<CowStr<'a>>),
+    AuthRequired(Option<SmolStr>),
     /// User is not a crew member on this hold.
     #[serde(rename = "UserNotFound")]
-    UserNotFound(Option<CowStr<'a>>),
+    UserNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for UpdateCrewTierError<'_> {
+impl core::fmt::Display for UpdateCrewTierError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::AuthRequired(msg) => {
@@ -78,7 +96,13 @@ impl core::fmt::Display for UpdateCrewTierError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -88,11 +112,12 @@ pub struct UpdateCrewTierResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateCrewTierResponse {
     const NSID: &'static str = "io.atcr.hold.updateCrewTier";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateCrewTierOutput<'de>;
-    type Err<'de> = UpdateCrewTierError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = UpdateCrewTierOutput<S>;
+    type Err = UpdateCrewTierError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateCrewTier<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for UpdateCrewTier<S> {
     const NSID: &'static str = "io.atcr.hold.updateCrewTier";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -107,7 +132,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateCrewTierRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = UpdateCrewTier<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = UpdateCrewTier<S>;
     type Response = UpdateCrewTierResponse;
 }
 
@@ -158,7 +183,7 @@ pub mod update_crew_tier_state {
 /// Builder for constructing an instance of this type
 pub struct UpdateCrewTierBuilder<'a, S: update_crew_tier_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<Did<'a>>),
+    _fields: (Option<i64>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -207,7 +232,7 @@ where
     /// Set the `userDid` field (required)
     pub fn user_did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> UpdateCrewTierBuilder<'a, update_crew_tier_state::SetUserDid<S>> {
         self._fields.1 = Option::Some(value.into());
         UpdateCrewTierBuilder {
@@ -235,10 +260,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> UpdateCrewTier<'a> {
         UpdateCrewTier {
             tier_rank: self._fields.0.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,36 +29,45 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A favorite relationship to another user
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.beaconbits.favorite", tag = "$type")]
-pub struct Favorite<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.beaconbits.favorite",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Favorite<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when the favorite was created
     pub created_at: Datetime,
     ///DID of the user being favorited
-    #[serde(borrow)]
-    pub subject: Did<'a>,
+    pub subject: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct FavoriteGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FavoriteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Favorite<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Favorite<S>,
 }
 
-impl<'a> Favorite<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, FavoriteRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Favorite<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, FavoriteRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -67,18 +78,17 @@ pub struct FavoriteRecord;
 impl XrpcResp for FavoriteRecord {
     const NSID: &'static str = "app.beaconbits.favorite";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = FavoriteGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = FavoriteGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<FavoriteGetRecordOutput<'_>> for Favorite<'_> {
-    fn from(output: FavoriteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<FavoriteGetRecordOutput<S>> for Favorite<S> {
+    fn from(output: FavoriteGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Favorite<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Favorite<S> {
     const NSID: &'static str = "app.beaconbits.favorite";
     type Record = FavoriteRecord;
 }
@@ -88,7 +98,7 @@ impl Collection for FavoriteRecord {
     type Record = FavoriteRecord;
 }
 
-impl<'a> LexiconSchema for Favorite<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Favorite<S> {
     fn nsid() -> &'static str {
         "app.beaconbits.favorite"
     }
@@ -150,7 +160,7 @@ pub mod favorite_state {
 /// Builder for constructing an instance of this type
 pub struct FavoriteBuilder<'a, S: favorite_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Did<'a>>),
+    _fields: (Option<Datetime>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -199,7 +209,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> FavoriteBuilder<'a, favorite_state::SetSubject<S>> {
         self._fields.1 = Option::Some(value.into());
         FavoriteBuilder {
@@ -227,10 +237,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Favorite<'a> {
         Favorite {
             created_at: self._fields.0.unwrap(),

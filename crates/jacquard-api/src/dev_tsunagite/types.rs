@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,37 +26,47 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A named value with a numeric index for sorting.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Indexable<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Indexable<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The internal ID for the value, limited to the RecordKey character set.
-    #[serde(borrow)]
-    pub id: RecordKey<Rkey<'a>>,
+    pub id: RecordKey<Rkey<S>>,
     ///The numeric index used for sorting.
     pub index: i64,
     ///The human-readable name of the value for displaying in UIs.
-    #[serde(borrow)]
-    pub name: Data<'a>,
+    pub name: Data<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A typed record reference that does not require a CID hash.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct TypedRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TypedRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The AT URI of the record this object references.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#ref: Option<AtUri<'a>>,
+    pub r#ref: Option<AtUri<S>>,
     ///The type of the record this object references.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<RecordKey<Rkey<'a>>>,
+    pub r#type: Option<RecordKey<Rkey<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Indexable<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Indexable<S> {
     fn nsid() -> &'static str {
         "dev.tsunagite.types"
     }
@@ -91,7 +103,7 @@ impl<'a> LexiconSchema for Indexable<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TypedRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TypedRef<S> {
     fn nsid() -> &'static str {
         "dev.tsunagite.types"
     }
@@ -167,7 +179,7 @@ pub mod indexable_state {
 /// Builder for constructing an instance of this type
 pub struct IndexableBuilder<'a, S: indexable_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<RecordKey<Rkey<'a>>>, Option<i64>, Option<Data<'a>>),
+    _fields: (Option<RecordKey<Rkey<S>>>, Option<i64>, Option<Data<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -197,7 +209,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<RecordKey<Rkey<'a>>>,
+        value: impl Into<RecordKey<Rkey<S>>>,
     ) -> IndexableBuilder<'a, indexable_state::SetId<S>> {
         self._fields.0 = Option::Some(value.into());
         IndexableBuilder {
@@ -235,7 +247,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> IndexableBuilder<'a, indexable_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         IndexableBuilder {
@@ -265,7 +277,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Indexable<'a> {
         Indexable {
             id: self._fields.0.unwrap(),

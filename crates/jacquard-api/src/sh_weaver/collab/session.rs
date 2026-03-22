@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,45 +30,52 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Active real-time collaboration session. Published when joining a collaborative editing session, deleted on disconnect.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.weaver.collab.session", tag = "$type")]
-pub struct Session<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.weaver.collab.session",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Session<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///Session TTL. Should be refreshed periodically while active.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<Datetime>,
     ///iroh NodeId in z-base32 encoding for P2P connection.
-    #[serde(borrow)]
-    pub node_id: CowStr<'a>,
+    pub node_id: S,
     ///DERP relay URL if using relay-only mode (browser clients).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub relay_url: Option<UriValue<'a>>,
+    pub relay_url: Option<UriValue<S>>,
     ///The resource being collaboratively edited.
-    #[serde(borrow)]
-    pub resource: StrongRef<'a>,
+    pub resource: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SessionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SessionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Session<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Session<S>,
 }
 
-impl<'a> Session<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SessionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Session<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SessionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -77,18 +86,17 @@ pub struct SessionRecord;
 impl XrpcResp for SessionRecord {
     const NSID: &'static str = "sh.weaver.collab.session";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SessionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SessionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SessionGetRecordOutput<'_>> for Session<'_> {
-    fn from(output: SessionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SessionGetRecordOutput<S>> for Session<S> {
+    fn from(output: SessionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Session<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Session<S> {
     const NSID: &'static str = "sh.weaver.collab.session";
     type Record = SessionRecord;
 }
@@ -98,7 +106,7 @@ impl Collection for SessionRecord {
     type Record = SessionRecord;
 }
 
-impl<'a> LexiconSchema for Session<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Session<S> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.session"
     }
@@ -123,51 +131,51 @@ pub mod session_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Resource;
         type NodeId;
+        type Resource;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Resource = Unset;
         type NodeId = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Resource = S::Resource;
-        type NodeId = S::NodeId;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type CreatedAt = S::CreatedAt;
-        type Resource = Set<members::resource>;
-        type NodeId = S::NodeId;
+        type Resource = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `node_id` field to Set
     pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNodeId<S> {}
     impl<S: State> State for SetNodeId<S> {
-        type CreatedAt = S::CreatedAt;
-        type Resource = S::Resource;
         type NodeId = Set<members::node_id>;
+        type Resource = S::Resource;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type NodeId = S::NodeId;
+        type Resource = Set<members::resource>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type NodeId = S::NodeId;
+        type Resource = S::Resource;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `resource` field
-        pub struct resource(());
         ///Marker type for the `node_id` field
         pub struct node_id(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -177,9 +185,9 @@ pub struct SessionBuilder<'a, S: session_state::State> {
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<StrongRef<'a>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<StrongRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -242,7 +250,7 @@ where
     /// Set the `nodeId` field (required)
     pub fn node_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SessionBuilder<'a, session_state::SetNodeId<S>> {
         self._fields.2 = Option::Some(value.into());
         SessionBuilder {
@@ -255,12 +263,12 @@ where
 
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `relayUrl` field (optional)
-    pub fn relay_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn relay_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `relayUrl` field to an Option value (optional)
-    pub fn maybe_relay_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_relay_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -274,7 +282,7 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> SessionBuilder<'a, session_state::SetResource<S>> {
         self._fields.4 = Option::Some(value.into());
         SessionBuilder {
@@ -288,9 +296,9 @@ where
 impl<'a, S> SessionBuilder<'a, S>
 where
     S: session_state::State,
-    S::CreatedAt: session_state::IsSet,
-    S::Resource: session_state::IsSet,
     S::NodeId: session_state::IsSet,
+    S::Resource: session_state::IsSet,
+    S::CreatedAt: session_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Session<'a> {
@@ -306,10 +314,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Session<'a> {
         Session {
             created_at: self._fields.0.unwrap(),

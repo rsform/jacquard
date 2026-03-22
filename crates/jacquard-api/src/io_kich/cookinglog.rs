@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -28,44 +29,51 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "io.kich.cookinglog", tag = "$type")]
-pub struct Cookinglog<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "io.kich.cookinglog",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Cookinglog<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When this cooking log was created.
     pub created_at: Datetime,
     ///Optional user notes captured at completion.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notes: Option<CowStr<'a>>,
+    pub notes: Option<S>,
     ///Optional servings value used while cooking.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub scaled_servings: Option<Data<'a>>,
+    pub scaled_servings: Option<Data<S>>,
     ///Reference to the cooked recipe record (io.kich.recipe.recipe).
-    #[serde(borrow)]
-    pub subject: StrongRef<'a>,
+    pub subject: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CookinglogGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CookinglogGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Cookinglog<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Cookinglog<S>,
 }
 
-impl<'a> Cookinglog<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CookinglogRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Cookinglog<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CookinglogRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -76,18 +84,17 @@ pub struct CookinglogRecord;
 impl XrpcResp for CookinglogRecord {
     const NSID: &'static str = "io.kich.cookinglog";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CookinglogGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CookinglogGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CookinglogGetRecordOutput<'_>> for Cookinglog<'_> {
-    fn from(output: CookinglogGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CookinglogGetRecordOutput<S>> for Cookinglog<S> {
+    fn from(output: CookinglogGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Cookinglog<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Cookinglog<S> {
     const NSID: &'static str = "io.kich.cookinglog";
     type Record = CookinglogRecord;
 }
@@ -97,7 +104,7 @@ impl Collection for CookinglogRecord {
     type Record = CookinglogRecord;
 }
 
-impl<'a> LexiconSchema for Cookinglog<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Cookinglog<S> {
     fn nsid() -> &'static str {
         "io.kich.cookinglog"
     }
@@ -169,12 +176,7 @@ pub mod cookinglog_state {
 /// Builder for constructing an instance of this type
 pub struct CookinglogBuilder<'a, S: cookinglog_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Data<'a>>,
-        Option<StrongRef<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<Data<S>>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -217,12 +219,12 @@ where
 
 impl<'a, S: cookinglog_state::State> CookinglogBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
-    pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_notes(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -230,12 +232,12 @@ impl<'a, S: cookinglog_state::State> CookinglogBuilder<'a, S> {
 
 impl<'a, S: cookinglog_state::State> CookinglogBuilder<'a, S> {
     /// Set the `scaledServings` field (optional)
-    pub fn scaled_servings(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn scaled_servings(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `scaledServings` field to an Option value (optional)
-    pub fn maybe_scaled_servings(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_scaled_servings(mut self, value: Option<Data<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -249,7 +251,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> CookinglogBuilder<'a, cookinglog_state::SetSubject<S>> {
         self._fields.3 = Option::Some(value.into());
         CookinglogBuilder {
@@ -279,7 +281,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Cookinglog<'a> {
         Cookinglog {
             created_at: self._fields.0.unwrap(),

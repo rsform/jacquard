@@ -10,25 +10,35 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Handle;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetIdentity;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetIdentityOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetIdentityOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The DID of the user.
-    #[serde(borrow)]
-    pub did: AtIdentifier<'a>,
+    pub did: AtIdentifier<S>,
     ///The handle of the author.
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub handle: Handle<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.shinolabs.pinksea.getIdentity
@@ -36,8 +46,8 @@ pub struct GetIdentityResponse;
 impl jacquard_common::xrpc::XrpcResp for GetIdentityResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getIdentity";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetIdentityOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetIdentityOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetIdentity {
@@ -51,6 +61,6 @@ pub struct GetIdentityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetIdentityRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getIdentity";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetIdentity;
+    type Request<S: Bos<str> + AsRef<str>> = GetIdentity;
     type Response = GetIdentityResponse;
 }

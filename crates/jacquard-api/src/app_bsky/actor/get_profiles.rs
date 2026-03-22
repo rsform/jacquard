@@ -10,25 +10,42 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetProfiles<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetProfiles<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub actors: Vec<AtIdentifier<'a>>,
+    pub actors: Vec<AtIdentifier<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetProfilesOutput<'a> {
-    #[serde(borrow)]
-    pub profiles: Vec<ProfileViewDetailed<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetProfilesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub profiles: Vec<ProfileViewDetailed<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.actor.getProfiles
@@ -36,11 +53,12 @@ pub struct GetProfilesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfilesResponse {
     const NSID: &'static str = "app.bsky.actor.getProfiles";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetProfilesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetProfilesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfiles<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetProfiles<S> {
     const NSID: &'static str = "app.bsky.actor.getProfiles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetProfilesResponse;
@@ -51,7 +69,7 @@ pub struct GetProfilesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfilesRequest {
     const PATH: &'static str = "/xrpc/app.bsky.actor.getProfiles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetProfiles<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetProfiles<S>;
     type Response = GetProfilesResponse;
 }
 
@@ -90,7 +108,7 @@ pub mod get_profiles_state {
 /// Builder for constructing an instance of this type
 pub struct GetProfilesBuilder<'a, S: get_profiles_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<AtIdentifier<'a>>>,),
+    _fields: (Option<Vec<AtIdentifier<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -120,7 +138,7 @@ where
     /// Set the `actors` field (required)
     pub fn actors(
         mut self,
-        value: impl Into<Vec<AtIdentifier<'a>>>,
+        value: impl Into<Vec<AtIdentifier<S>>>,
     ) -> GetProfilesBuilder<'a, get_profiles_state::SetActors<S>> {
         self._fields.0 = Option::Some(value.into());
         GetProfilesBuilder {

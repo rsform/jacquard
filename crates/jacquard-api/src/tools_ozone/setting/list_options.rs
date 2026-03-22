@@ -10,45 +10,60 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Nsid;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::setting::DefsOption;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListOptions<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListOptions<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub keys: Option<Vec<Nsid<'a>>>,
+    pub keys: Option<Vec<Nsid<S>>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub prefix: Option<CowStr<'a>>,
+    pub prefix: Option<S>,
     ///Defaults to `"instance"`.
     #[serde(default = "_default_scope")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub scope: Option<CowStr<'a>>,
+    pub scope: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListOptionsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListOptionsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub options: Vec<DefsOption<'a>>,
+    pub cursor: Option<S>,
+    pub options: Vec<DefsOption<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for tools.ozone.setting.listOptions
@@ -56,11 +71,12 @@ pub struct ListOptionsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListOptionsResponse {
     const NSID: &'static str = "tools.ozone.setting.listOptions";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListOptionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListOptionsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListOptions<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListOptions<S> {
     const NSID: &'static str = "tools.ozone.setting.listOptions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListOptionsResponse;
@@ -71,7 +87,7 @@ pub struct ListOptionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListOptionsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.setting.listOptions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListOptions<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListOptions<S>;
     type Response = ListOptionsResponse;
 }
 
@@ -105,13 +121,7 @@ pub mod list_options_state {
 /// Builder for constructing an instance of this type
 pub struct ListOptionsBuilder<'a, S: list_options_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Vec<Nsid<'a>>>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<Vec<Nsid<S>>>, Option<i64>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -135,12 +145,12 @@ impl<'a> ListOptionsBuilder<'a, list_options_state::Empty> {
 
 impl<'a, S: list_options_state::State> ListOptionsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -148,12 +158,12 @@ impl<'a, S: list_options_state::State> ListOptionsBuilder<'a, S> {
 
 impl<'a, S: list_options_state::State> ListOptionsBuilder<'a, S> {
     /// Set the `keys` field (optional)
-    pub fn keys(mut self, value: impl Into<Option<Vec<Nsid<'a>>>>) -> Self {
+    pub fn keys(mut self, value: impl Into<Option<Vec<Nsid<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `keys` field to an Option value (optional)
-    pub fn maybe_keys(mut self, value: Option<Vec<Nsid<'a>>>) -> Self {
+    pub fn maybe_keys(mut self, value: Option<Vec<Nsid<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -174,12 +184,12 @@ impl<'a, S: list_options_state::State> ListOptionsBuilder<'a, S> {
 
 impl<'a, S: list_options_state::State> ListOptionsBuilder<'a, S> {
     /// Set the `prefix` field (optional)
-    pub fn prefix(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn prefix(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `prefix` field to an Option value (optional)
-    pub fn maybe_prefix(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_prefix(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -187,12 +197,12 @@ impl<'a, S: list_options_state::State> ListOptionsBuilder<'a, S> {
 
 impl<'a, S: list_options_state::State> ListOptionsBuilder<'a, S> {
     /// Set the `scope` field (optional)
-    pub fn scope(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn scope(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `scope` field to an Option value (optional)
-    pub fn maybe_scope(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_scope(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,36 +29,45 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Current execution state of rotation.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.chavatar.state", tag = "$type")]
-pub struct State<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.chavatar.state",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct State<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///TID (ID) of the currently active avatar in the settings array.
-    #[serde(borrow)]
-    pub cursor: CowStr<'a>,
+    pub cursor: S,
     ///When the avatar was last rotated.
     pub last_updated: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StateGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: State<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: State<S>,
 }
 
-impl<'a> State<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, StateRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> State<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, StateRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -67,18 +78,17 @@ pub struct StateRecord;
 impl XrpcResp for StateRecord {
     const NSID: &'static str = "app.chavatar.state";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StateGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StateGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<StateGetRecordOutput<'_>> for State<'_> {
-    fn from(output: StateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<StateGetRecordOutput<S>> for State<S> {
+    fn from(output: StateGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for State<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for State<S> {
     const NSID: &'static str = "app.chavatar.state";
     type Record = StateRecord;
 }
@@ -88,7 +98,7 @@ impl Collection for StateRecord {
     type Record = StateRecord;
 }
 
-impl<'a> LexiconSchema for State<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for State<S> {
     fn nsid() -> &'static str {
         "app.chavatar.state"
     }
@@ -124,44 +134,44 @@ pub mod state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LastUpdated;
         type Cursor;
+        type LastUpdated;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LastUpdated = Unset;
         type Cursor = Unset;
-    }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
-    impl<S: State> State for SetLastUpdated<S> {
-        type LastUpdated = Set<members::last_updated>;
-        type Cursor = S::Cursor;
+        type LastUpdated = Unset;
     }
     ///State transition - sets the `cursor` field to Set
     pub struct SetCursor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCursor<S> {}
     impl<S: State> State for SetCursor<S> {
-        type LastUpdated = S::LastUpdated;
         type Cursor = Set<members::cursor>;
+        type LastUpdated = S::LastUpdated;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
+    impl<S: State> State for SetLastUpdated<S> {
+        type Cursor = S::Cursor;
+        type LastUpdated = Set<members::last_updated>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `last_updated` field
-        pub struct last_updated(());
         ///Marker type for the `cursor` field
         pub struct cursor(());
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StateBuilder<'a, S: state_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Datetime>),
+    _fields: (Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -191,7 +201,7 @@ where
     /// Set the `cursor` field (required)
     pub fn cursor(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> StateBuilder<'a, state_state::SetCursor<S>> {
         self._fields.0 = Option::Some(value.into());
         StateBuilder {
@@ -224,8 +234,8 @@ where
 impl<'a, S> StateBuilder<'a, S>
 where
     S: state_state::State,
-    S::LastUpdated: state_state::IsSet,
     S::Cursor: state_state::IsSet,
+    S::LastUpdated: state_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> State<'a> {
@@ -236,13 +246,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> State<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> State<'a> {
         State {
             cursor: self._fields.0.unwrap(),
             last_updated: self._fields.1.unwrap(),

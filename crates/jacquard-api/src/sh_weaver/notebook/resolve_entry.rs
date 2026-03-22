@@ -10,42 +10,54 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ResolveEntry<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResolveEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub actor: AtIdentifier<'a>,
+    pub actor: AtIdentifier<S>,
     #[serde(borrow)]
-    pub entry: CowStr<'a>,
+    pub entry: S,
     #[serde(borrow)]
-    pub notebook: CowStr<'a>,
+    pub notebook: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ResolveEntryOutput<'a> {
-    #[serde(borrow)]
-    pub entry: EntryView<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResolveEntryOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub entry: EntryView<S>,
     pub notebook_count: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notebooks: Option<Vec<NotebookView<'a>>>,
-    #[serde(borrow)]
-    pub record: Data<'a>,
+    pub notebooks: Option<Vec<NotebookView<S>>>,
+    pub record: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -54,20 +66,21 @@ pub struct ResolveEntryOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ResolveEntryError<'a> {
+pub enum ResolveEntryError {
     #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(Option<CowStr<'a>>),
+    NotebookNotFound(Option<SmolStr>),
     #[serde(rename = "EntryNotFound")]
-    EntryNotFound(Option<CowStr<'a>>),
+    EntryNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for ResolveEntryError<'_> {
+impl core::fmt::Display for ResolveEntryError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::NotebookNotFound(msg) => {
@@ -84,7 +97,13 @@ impl core::fmt::Display for ResolveEntryError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -94,11 +113,12 @@ pub struct ResolveEntryResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveEntryResponse {
     const NSID: &'static str = "sh.weaver.notebook.resolveEntry";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveEntryOutput<'de>;
-    type Err<'de> = ResolveEntryError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ResolveEntryOutput<S>;
+    type Err = ResolveEntryError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveEntry<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ResolveEntry<S> {
     const NSID: &'static str = "sh.weaver.notebook.resolveEntry";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveEntryResponse;
@@ -109,7 +129,7 @@ pub struct ResolveEntryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveEntryRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.resolveEntry";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ResolveEntry<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ResolveEntry<S>;
     type Response = ResolveEntryResponse;
 }
 
@@ -123,58 +143,58 @@ pub mod resolve_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Notebook;
         type Entry;
         type Actor;
-        type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Notebook = Unset;
         type Entry = Unset;
         type Actor = Unset;
-        type Notebook = Unset;
-    }
-    ///State transition - sets the `entry` field to Set
-    pub struct SetEntry<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntry<S> {}
-    impl<S: State> State for SetEntry<S> {
-        type Entry = Set<members::entry>;
-        type Actor = S::Actor;
-        type Notebook = S::Notebook;
-    }
-    ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type Entry = S::Entry;
-        type Actor = Set<members::actor>;
-        type Notebook = S::Notebook;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
+        type Notebook = Set<members::notebook>;
         type Entry = S::Entry;
         type Actor = S::Actor;
-        type Notebook = Set<members::notebook>;
+    }
+    ///State transition - sets the `entry` field to Set
+    pub struct SetEntry<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntry<S> {}
+    impl<S: State> State for SetEntry<S> {
+        type Notebook = S::Notebook;
+        type Entry = Set<members::entry>;
+        type Actor = S::Actor;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type Notebook = S::Notebook;
+        type Entry = S::Entry;
+        type Actor = Set<members::actor>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
         ///Marker type for the `entry` field
         pub struct entry(());
         ///Marker type for the `actor` field
         pub struct actor(());
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ResolveEntryBuilder<'a, S: resolve_entry_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -204,7 +224,7 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> ResolveEntryBuilder<'a, resolve_entry_state::SetActor<S>> {
         self._fields.0 = Option::Some(value.into());
         ResolveEntryBuilder {
@@ -223,7 +243,7 @@ where
     /// Set the `entry` field (required)
     pub fn entry(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ResolveEntryBuilder<'a, resolve_entry_state::SetEntry<S>> {
         self._fields.1 = Option::Some(value.into());
         ResolveEntryBuilder {
@@ -242,7 +262,7 @@ where
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ResolveEntryBuilder<'a, resolve_entry_state::SetNotebook<S>> {
         self._fields.2 = Option::Some(value.into());
         ResolveEntryBuilder {
@@ -256,9 +276,9 @@ where
 impl<'a, S> ResolveEntryBuilder<'a, S>
 where
     S: resolve_entry_state::State,
+    S::Notebook: resolve_entry_state::IsSet,
     S::Entry: resolve_entry_state::IsSet,
     S::Actor: resolve_entry_state::IsSet,
-    S::Notebook: resolve_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResolveEntry<'a> {

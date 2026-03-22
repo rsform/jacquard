@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,40 +30,47 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Record containing a Bookhive comment.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "buzz.bookhive.buzz", tag = "$type")]
-pub struct Buzz<'a> {
-    #[serde(borrow)]
-    pub book: StrongRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "buzz.bookhive.buzz",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Buzz<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub book: StrongRef<S>,
     ///The content of the comment.
-    #[serde(borrow)]
-    pub comment: CowStr<'a>,
+    pub comment: S,
     ///Client-declared timestamp when this comment was originally created.
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub parent: StrongRef<'a>,
+    pub parent: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BuzzGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BuzzGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Buzz<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Buzz<S>,
 }
 
-impl<'a> Buzz<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, BuzzRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Buzz<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, BuzzRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -72,18 +81,17 @@ pub struct BuzzRecord;
 impl XrpcResp for BuzzRecord {
     const NSID: &'static str = "buzz.bookhive.buzz";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BuzzGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BuzzGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<BuzzGetRecordOutput<'_>> for Buzz<'_> {
-    fn from(output: BuzzGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<BuzzGetRecordOutput<S>> for Buzz<S> {
+    fn from(output: BuzzGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Buzz<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Buzz<S> {
     const NSID: &'static str = "buzz.bookhive.buzz";
     type Record = BuzzRecord;
 }
@@ -93,7 +101,7 @@ impl Collection for BuzzRecord {
     type Record = BuzzRecord;
 }
 
-impl<'a> LexiconSchema for Buzz<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Buzz<S> {
     fn nsid() -> &'static str {
         "buzz.bookhive.buzz"
     }
@@ -209,12 +217,7 @@ pub mod buzz_state {
 /// Builder for constructing an instance of this type
 pub struct BuzzBuilder<'a, S: buzz_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<StrongRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-        Option<StrongRef<'a>>,
-    ),
+    _fields: (Option<StrongRef<S>>, Option<S>, Option<Datetime>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -244,7 +247,7 @@ where
     /// Set the `book` field (required)
     pub fn book(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> BuzzBuilder<'a, buzz_state::SetBook<S>> {
         self._fields.0 = Option::Some(value.into());
         BuzzBuilder {
@@ -263,7 +266,7 @@ where
     /// Set the `comment` field (required)
     pub fn comment(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BuzzBuilder<'a, buzz_state::SetComment<S>> {
         self._fields.1 = Option::Some(value.into());
         BuzzBuilder {
@@ -301,7 +304,7 @@ where
     /// Set the `parent` field (required)
     pub fn parent(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> BuzzBuilder<'a, buzz_state::SetParent<S>> {
         self._fields.3 = Option::Some(value.into());
         BuzzBuilder {
@@ -331,13 +334,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Buzz<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Buzz<'a> {
         Buzz {
             book: self._fields.0.unwrap(),
             comment: self._fields.1.unwrap(),

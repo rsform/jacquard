@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,67 +30,89 @@ use serde::{Serialize, Deserialize};
 use crate::social_tophhie::profile;
 /// Granular communication consent flags.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CommunicationPreferences<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CommunicationPreferences<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///True if the user consents to receive marketing communications.
     pub marketing: bool,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.tophhie.profile", tag = "$type")]
-pub struct Profile<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.tophhie.profile",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///User's opt-in/out preferences for communications.
-    #[serde(borrow)]
-    pub communication_preferences: profile::CommunicationPreferences<'a>,
+    pub communication_preferences: profile::CommunicationPreferences<S>,
     ///ISO 8601 timestamp when this profile record was created.
     pub created_at: Datetime,
     ///User's opt-in/out preferences for PDS features.
-    #[serde(borrow)]
-    pub pds_preferences: profile::PdsPreferences<'a>,
+    pub pds_preferences: profile::PdsPreferences<S>,
     ///ISO 8601 timestamp when this profile record was updated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProfileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Profile<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Profile<S>,
 }
 
 /// Granular PDS preference consent flags.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PdsPreferences<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PdsPreferences<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///True if the user participates in accessibility scoring.
     pub accessibility_scoring: bool,
     ///True if the user is shown on the Tophhie Social homepage.
     pub show_on_homepage: bool,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Profile<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ProfileRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Profile<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ProfileRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for CommunicationPreferences<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CommunicationPreferences<S> {
     fn nsid() -> &'static str {
         "social.tophhie.profile"
     }
@@ -110,18 +134,17 @@ pub struct ProfileRecord;
 impl XrpcResp for ProfileRecord {
     const NSID: &'static str = "social.tophhie.profile";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProfileGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ProfileGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
-    fn from(output: ProfileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ProfileGetRecordOutput<S>> for Profile<S> {
+    fn from(output: ProfileGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Profile<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Profile<S> {
     const NSID: &'static str = "social.tophhie.profile";
     type Record = ProfileRecord;
 }
@@ -131,7 +154,7 @@ impl Collection for ProfileRecord {
     type Record = ProfileRecord;
 }
 
-impl<'a> LexiconSchema for Profile<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Profile<S> {
     fn nsid() -> &'static str {
         "social.tophhie.profile"
     }
@@ -146,7 +169,7 @@ impl<'a> LexiconSchema for Profile<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PdsPreferences<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PdsPreferences<S> {
     fn nsid() -> &'static str {
         "social.tophhie.profile"
     }
@@ -261,10 +284,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CommunicationPreferences<'a> {
         CommunicationPreferences {
             marketing: self._fields.0.unwrap(),
@@ -413,51 +433,51 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type PdsPreferences;
         type CommunicationPreferences;
+        type PdsPreferences;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type PdsPreferences = Unset;
         type CommunicationPreferences = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type PdsPreferences = S::PdsPreferences;
-        type CommunicationPreferences = S::CommunicationPreferences;
-    }
-    ///State transition - sets the `pds_preferences` field to Set
-    pub struct SetPdsPreferences<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPdsPreferences<S> {}
-    impl<S: State> State for SetPdsPreferences<S> {
-        type CreatedAt = S::CreatedAt;
-        type PdsPreferences = Set<members::pds_preferences>;
-        type CommunicationPreferences = S::CommunicationPreferences;
+        type PdsPreferences = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `communication_preferences` field to Set
     pub struct SetCommunicationPreferences<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommunicationPreferences<S> {}
     impl<S: State> State for SetCommunicationPreferences<S> {
-        type CreatedAt = S::CreatedAt;
-        type PdsPreferences = S::PdsPreferences;
         type CommunicationPreferences = Set<members::communication_preferences>;
+        type PdsPreferences = S::PdsPreferences;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `pds_preferences` field to Set
+    pub struct SetPdsPreferences<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPdsPreferences<S> {}
+    impl<S: State> State for SetPdsPreferences<S> {
+        type CommunicationPreferences = S::CommunicationPreferences;
+        type PdsPreferences = Set<members::pds_preferences>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CommunicationPreferences = S::CommunicationPreferences;
+        type PdsPreferences = S::PdsPreferences;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `pds_preferences` field
-        pub struct pds_preferences(());
         ///Marker type for the `communication_preferences` field
         pub struct communication_preferences(());
+        ///Marker type for the `pds_preferences` field
+        pub struct pds_preferences(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -465,9 +485,9 @@ pub mod profile_state {
 pub struct ProfileBuilder<'a, S: profile_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<profile::CommunicationPreferences<'a>>,
+        Option<profile::CommunicationPreferences<S>>,
         Option<Datetime>,
-        Option<profile::PdsPreferences<'a>>,
+        Option<profile::PdsPreferences<S>>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -499,7 +519,7 @@ where
     /// Set the `communicationPreferences` field (required)
     pub fn communication_preferences(
         mut self,
-        value: impl Into<profile::CommunicationPreferences<'a>>,
+        value: impl Into<profile::CommunicationPreferences<S>>,
     ) -> ProfileBuilder<'a, profile_state::SetCommunicationPreferences<S>> {
         self._fields.0 = Option::Some(value.into());
         ProfileBuilder {
@@ -537,7 +557,7 @@ where
     /// Set the `pdsPreferences` field (required)
     pub fn pds_preferences(
         mut self,
-        value: impl Into<profile::PdsPreferences<'a>>,
+        value: impl Into<profile::PdsPreferences<S>>,
     ) -> ProfileBuilder<'a, profile_state::SetPdsPreferences<S>> {
         self._fields.2 = Option::Some(value.into());
         ProfileBuilder {
@@ -564,9 +584,9 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
-    S::CreatedAt: profile_state::IsSet,
-    S::PdsPreferences: profile_state::IsSet,
     S::CommunicationPreferences: profile_state::IsSet,
+    S::PdsPreferences: profile_state::IsSet,
+    S::CreatedAt: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
@@ -581,10 +601,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Profile<'a> {
         Profile {
             communication_preferences: self._fields.0.unwrap(),
@@ -606,37 +623,37 @@ pub mod pds_preferences_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShowOnHomepage;
         type AccessibilityScoring;
+        type ShowOnHomepage;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShowOnHomepage = Unset;
         type AccessibilityScoring = Unset;
-    }
-    ///State transition - sets the `show_on_homepage` field to Set
-    pub struct SetShowOnHomepage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShowOnHomepage<S> {}
-    impl<S: State> State for SetShowOnHomepage<S> {
-        type ShowOnHomepage = Set<members::show_on_homepage>;
-        type AccessibilityScoring = S::AccessibilityScoring;
+        type ShowOnHomepage = Unset;
     }
     ///State transition - sets the `accessibility_scoring` field to Set
     pub struct SetAccessibilityScoring<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccessibilityScoring<S> {}
     impl<S: State> State for SetAccessibilityScoring<S> {
-        type ShowOnHomepage = S::ShowOnHomepage;
         type AccessibilityScoring = Set<members::accessibility_scoring>;
+        type ShowOnHomepage = S::ShowOnHomepage;
+    }
+    ///State transition - sets the `show_on_homepage` field to Set
+    pub struct SetShowOnHomepage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShowOnHomepage<S> {}
+    impl<S: State> State for SetShowOnHomepage<S> {
+        type AccessibilityScoring = S::AccessibilityScoring;
+        type ShowOnHomepage = Set<members::show_on_homepage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `show_on_homepage` field
-        pub struct show_on_homepage(());
         ///Marker type for the `accessibility_scoring` field
         pub struct accessibility_scoring(());
+        ///Marker type for the `show_on_homepage` field
+        pub struct show_on_homepage(());
     }
 }
 
@@ -706,8 +723,8 @@ where
 impl<'a, S> PdsPreferencesBuilder<'a, S>
 where
     S: pds_preferences_state::State,
-    S::ShowOnHomepage: pds_preferences_state::IsSet,
     S::AccessibilityScoring: pds_preferences_state::IsSet,
+    S::ShowOnHomepage: pds_preferences_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PdsPreferences<'a> {
@@ -720,10 +737,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PdsPreferences<'a> {
         PdsPreferences {
             accessibility_scoring: self._fields.0.unwrap(),

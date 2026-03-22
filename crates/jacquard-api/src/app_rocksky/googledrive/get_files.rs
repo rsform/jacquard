@@ -7,27 +7,47 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::googledrive::FileListView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetFiles<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetFiles<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub at: Option<CowStr<'a>>,
+    pub at: Option<S>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetFilesOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetFilesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: FileListView<'a>,
+    pub value: FileListView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for app.rocksky.googledrive.getFiles
@@ -35,11 +55,12 @@ pub struct GetFilesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFilesResponse {
     const NSID: &'static str = "app.rocksky.googledrive.getFiles";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFilesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetFilesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetFiles<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetFiles<S> {
     const NSID: &'static str = "app.rocksky.googledrive.getFiles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetFilesResponse;
@@ -50,7 +71,7 @@ pub struct GetFilesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFilesRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.googledrive.getFiles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFiles<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetFiles<S>;
     type Response = GetFilesResponse;
 }
 
@@ -76,7 +97,7 @@ pub mod get_files_state {
 /// Builder for constructing an instance of this type
 pub struct GetFilesBuilder<'a, S: get_files_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -100,12 +121,12 @@ impl<'a> GetFilesBuilder<'a, get_files_state::Empty> {
 
 impl<'a, S: get_files_state::State> GetFilesBuilder<'a, S> {
     /// Set the `at` field (optional)
-    pub fn at(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn at(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `at` field to an Option value (optional)
-    pub fn maybe_at(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_at(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }

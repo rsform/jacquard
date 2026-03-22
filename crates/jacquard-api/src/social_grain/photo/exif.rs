@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,10 +29,17 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Basic EXIF metadata for a photo. Integers are scaled by 1000000 to accommodate decimal values and potentially other tags in the future.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.grain.photo.exif", tag = "$type")]
-pub struct Exif<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.grain.photo.exif",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Exif<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub date_time_original: Option<Datetime>,
@@ -39,47 +48,44 @@ pub struct Exif<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub f_number: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub flash: Option<CowStr<'a>>,
+    pub flash: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub focal_length_in35mm_format: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub i_so: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lens_make: Option<CowStr<'a>>,
+    pub lens_make: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lens_model: Option<CowStr<'a>>,
+    pub lens_model: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub make: Option<CowStr<'a>>,
+    pub make: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub model: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub photo: AtUri<'a>,
+    pub model: Option<S>,
+    pub photo: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ExifGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExifGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Exif<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Exif<S>,
 }
 
-impl<'a> Exif<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ExifRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Exif<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ExifRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -90,18 +96,17 @@ pub struct ExifRecord;
 impl XrpcResp for ExifRecord {
     const NSID: &'static str = "social.grain.photo.exif";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ExifGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ExifGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ExifGetRecordOutput<'_>> for Exif<'_> {
-    fn from(output: ExifGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ExifGetRecordOutput<S>> for Exif<S> {
+    fn from(output: ExifGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Exif<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Exif<S> {
     const NSID: &'static str = "social.grain.photo.exif";
     type Record = ExifRecord;
 }
@@ -111,7 +116,7 @@ impl Collection for ExifRecord {
     type Record = ExifRecord;
 }
 
-impl<'a> LexiconSchema for Exif<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Exif<S> {
     fn nsid() -> &'static str {
         "social.grain.photo.exif"
     }
@@ -178,14 +183,14 @@ pub struct ExifBuilder<'a, S: exif_state::State> {
         Option<Datetime>,
         Option<i64>,
         Option<i64>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -281,12 +286,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `flash` field (optional)
-    pub fn flash(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn flash(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `flash` field to an Option value (optional)
-    pub fn maybe_flash(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_flash(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -320,12 +325,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `lensMake` field (optional)
-    pub fn lens_make(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn lens_make(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `lensMake` field to an Option value (optional)
-    pub fn maybe_lens_make(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_lens_make(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -333,12 +338,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `lensModel` field (optional)
-    pub fn lens_model(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn lens_model(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `lensModel` field to an Option value (optional)
-    pub fn maybe_lens_model(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_lens_model(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -346,12 +351,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `make` field (optional)
-    pub fn make(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn make(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `make` field to an Option value (optional)
-    pub fn maybe_make(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_make(mut self, value: Option<S>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -359,12 +364,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `model` field (optional)
-    pub fn model(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn model(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `model` field to an Option value (optional)
-    pub fn maybe_model(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_model(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -378,7 +383,7 @@ where
     /// Set the `photo` field (required)
     pub fn photo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ExifBuilder<'a, exif_state::SetPhoto<S>> {
         self._fields.11 = Option::Some(value.into());
         ExifBuilder {
@@ -414,13 +419,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Exif<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Exif<'a> {
         Exif {
             created_at: self._fields.0.unwrap(),
             date_time_original: self._fields.1,

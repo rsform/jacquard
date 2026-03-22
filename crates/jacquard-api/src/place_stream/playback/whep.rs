@@ -7,18 +7,24 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct WhepParams<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct WhepParams<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub rendition: CowStr<'a>,
+    pub rendition: S,
     #[serde(borrow)]
-    pub streamer: CowStr<'a>,
+    pub streamer: S,
 }
 
 
@@ -36,7 +42,6 @@ pub struct WhepOutput {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -45,19 +50,23 @@ pub struct WhepOutput {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum WhepError<'a> {
+pub enum WhepError {
     /// This user may not play this stream.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(Option<CowStr<'a>>),
+    Unauthorized(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for WhepError<'_> {
+impl core::fmt::Display for WhepError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Unauthorized(msg) => {
@@ -67,7 +76,13 @@ impl core::fmt::Display for WhepError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -77,18 +92,22 @@ pub struct WhepResponse;
 impl jacquard_common::xrpc::XrpcResp for WhepResponse {
     const NSID: &'static str = "place.stream.playback.whep";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = WhepOutput;
-    type Err<'de> = WhepError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = WhepOutput;
+    type Err = WhepError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(WhepOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -109,7 +128,7 @@ impl jacquard_common::xrpc::XrpcRequest for Whep {
         body: &'de [u8],
     ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
     where
-        Self: serde::Deserialize<'de>,
+        Self: Deserialize<'de>,
     {
         Ok(
             Box::new(Self {
@@ -126,7 +145,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for WhepRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "*/*",
     );
-    type Request<'de> = Whep;
+    type Request<S: Bos<str> + AsRef<str>> = Whep;
     type Response = WhepResponse;
 }
 
@@ -177,7 +196,7 @@ pub mod whep_params_state {
 /// Builder for constructing an instance of this type
 pub struct WhepParamsBuilder<'a, S: whep_params_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -207,7 +226,7 @@ where
     /// Set the `rendition` field (required)
     pub fn rendition(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> WhepParamsBuilder<'a, whep_params_state::SetRendition<S>> {
         self._fields.0 = Option::Some(value.into());
         WhepParamsBuilder {
@@ -226,7 +245,7 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> WhepParamsBuilder<'a, whep_params_state::SetStreamer<S>> {
         self._fields.1 = Option::Some(value.into());
         WhepParamsBuilder {

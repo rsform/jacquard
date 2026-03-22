@@ -10,41 +10,64 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::labeler::LabelerView;
 use crate::app_bsky::labeler::LabelerViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetServices<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetServices<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// Defaults to `false`.
     #[serde(default = "_default_detailed")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub detailed: Option<bool>,
     #[serde(borrow)]
-    pub dids: Vec<Did<'a>>,
+    pub dids: Vec<Did<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetServicesOutput<'a> {
-    #[serde(borrow)]
-    pub views: Vec<GetServicesOutputViewsItem<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetServicesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub views: Vec<GetServicesOutputViewsItem<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum GetServicesOutputViewsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum GetServicesOutputViewsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.labeler.defs#labelerView")]
-    LabelerView(Box<LabelerView<'a>>),
+    LabelerView(Box<LabelerView<S>>),
     #[serde(rename = "app.bsky.labeler.defs#labelerViewDetailed")]
-    LabelerViewDetailed(Box<LabelerViewDetailed<'a>>),
+    LabelerViewDetailed(Box<LabelerViewDetailed<S>>),
 }
 
 /// Response type for app.bsky.labeler.getServices
@@ -52,11 +75,12 @@ pub struct GetServicesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetServicesResponse {
     const NSID: &'static str = "app.bsky.labeler.getServices";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetServicesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetServicesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetServices<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetServices<S> {
     const NSID: &'static str = "app.bsky.labeler.getServices";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetServicesResponse;
@@ -67,7 +91,7 @@ pub struct GetServicesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetServicesRequest {
     const PATH: &'static str = "/xrpc/app.bsky.labeler.getServices";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetServices<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetServices<S>;
     type Response = GetServicesResponse;
 }
 
@@ -110,7 +134,7 @@ pub mod get_services_state {
 /// Builder for constructing an instance of this type
 pub struct GetServicesBuilder<'a, S: get_services_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<Vec<Did<'a>>>),
+    _fields: (Option<bool>, Option<Vec<Did<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -153,7 +177,7 @@ where
     /// Set the `dids` field (required)
     pub fn dids(
         mut self,
-        value: impl Into<Vec<Did<'a>>>,
+        value: impl Into<Vec<Did<S>>>,
     ) -> GetServicesBuilder<'a, get_services_state::SetDids<S>> {
         self._fields.1 = Option::Some(value.into());
         GetServicesBuilder {

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,60 +29,63 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Tracks user interactions — chat messages, senate hearings launched, and individual sim comments during hearings.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "org.simocracy.event", tag = "$type")]
-pub struct Event<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.simocracy.event",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Event<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///DID of the user who triggered the event
-    #[serde(borrow)]
-    pub actor_did: CowStr<'a>,
+    pub actor_did: S,
     ///The actual content — sim response for chat, sim opinion for comment
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content: Option<CowStr<'a>>,
+    pub content: Option<S>,
     pub created_at: Datetime,
     ///Title of the proposal (for hearing/comment events)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub proposal_title: Option<CowStr<'a>>,
+    pub proposal_title: Option<S>,
     ///Hearing round: 1=evaluation, 2=response, 3=summary (for comment events)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub round: Option<i64>,
     ///Names of sims involved
-    #[serde(borrow)]
-    pub sim_names: Vec<CowStr<'a>>,
+    pub sim_names: Vec<S>,
     ///AT-URIs of sims involved
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sim_uris: Option<Vec<CowStr<'a>>>,
+    pub sim_uris: Option<Vec<S>>,
     ///Event type: chat, hearing, or comment
-    #[serde(borrow)]
-    pub r#type: CowStr<'a>,
+    pub r#type: S,
     ///User's message that prompted the response (for chat events)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub user_message: Option<CowStr<'a>>,
+    pub user_message: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EventGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EventGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Event<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Event<S>,
 }
 
-impl<'a> Event<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, EventRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Event<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, EventRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -91,18 +96,17 @@ pub struct EventRecord;
 impl XrpcResp for EventRecord {
     const NSID: &'static str = "org.simocracy.event";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = EventGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = EventGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<EventGetRecordOutput<'_>> for Event<'_> {
-    fn from(output: EventGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<EventGetRecordOutput<S>> for Event<S> {
+    fn from(output: EventGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Event<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Event<S> {
     const NSID: &'static str = "org.simocracy.event";
     type Record = EventRecord;
 }
@@ -112,7 +116,7 @@ impl Collection for EventRecord {
     type Record = EventRecord;
 }
 
-impl<'a> LexiconSchema for Event<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Event<S> {
     fn nsid() -> &'static str {
         "org.simocracy.event"
     }
@@ -194,67 +198,67 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Type;
+        type SimNames;
         type ActorDid;
         type CreatedAt;
-        type SimNames;
-        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Type = Unset;
+        type SimNames = Unset;
         type ActorDid = Unset;
         type CreatedAt = Unset;
-        type SimNames = Unset;
-        type Type = Unset;
-    }
-    ///State transition - sets the `actor_did` field to Set
-    pub struct SetActorDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActorDid<S> {}
-    impl<S: State> State for SetActorDid<S> {
-        type ActorDid = Set<members::actor_did>;
-        type CreatedAt = S::CreatedAt;
-        type SimNames = S::SimNames;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type ActorDid = S::ActorDid;
-        type CreatedAt = Set<members::created_at>;
-        type SimNames = S::SimNames;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `sim_names` field to Set
-    pub struct SetSimNames<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSimNames<S> {}
-    impl<S: State> State for SetSimNames<S> {
-        type ActorDid = S::ActorDid;
-        type CreatedAt = S::CreatedAt;
-        type SimNames = Set<members::sim_names>;
-        type Type = S::Type;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
+        type Type = Set<members::r#type>;
+        type SimNames = S::SimNames;
         type ActorDid = S::ActorDid;
         type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `sim_names` field to Set
+    pub struct SetSimNames<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSimNames<S> {}
+    impl<S: State> State for SetSimNames<S> {
+        type Type = S::Type;
+        type SimNames = Set<members::sim_names>;
+        type ActorDid = S::ActorDid;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `actor_did` field to Set
+    pub struct SetActorDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActorDid<S> {}
+    impl<S: State> State for SetActorDid<S> {
+        type Type = S::Type;
         type SimNames = S::SimNames;
-        type Type = Set<members::r#type>;
+        type ActorDid = Set<members::actor_did>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Type = S::Type;
+        type SimNames = S::SimNames;
+        type ActorDid = S::ActorDid;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `sim_names` field
+        pub struct sim_names(());
         ///Marker type for the `actor_did` field
         pub struct actor_did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `sim_names` field
-        pub struct sim_names(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
     }
 }
 
@@ -262,15 +266,15 @@ pub mod event_state {
 pub struct EventBuilder<'a, S: event_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<Vec<S>>,
+        Option<Vec<S>>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -301,7 +305,7 @@ where
     /// Set the `actorDid` field (required)
     pub fn actor_did(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EventBuilder<'a, event_state::SetActorDid<S>> {
         self._fields.0 = Option::Some(value.into());
         EventBuilder {
@@ -314,12 +318,12 @@ where
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `content` field (optional)
-    pub fn content(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn content(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
-    pub fn maybe_content(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_content(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -346,12 +350,12 @@ where
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `proposalTitle` field (optional)
-    pub fn proposal_title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn proposal_title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `proposalTitle` field to an Option value (optional)
-    pub fn maybe_proposal_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_proposal_title(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -378,7 +382,7 @@ where
     /// Set the `simNames` field (required)
     pub fn sim_names(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> EventBuilder<'a, event_state::SetSimNames<S>> {
         self._fields.5 = Option::Some(value.into());
         EventBuilder {
@@ -391,12 +395,12 @@ where
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `simUris` field (optional)
-    pub fn sim_uris(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn sim_uris(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `simUris` field to an Option value (optional)
-    pub fn maybe_sim_uris(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_sim_uris(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -410,7 +414,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EventBuilder<'a, event_state::SetType<S>> {
         self._fields.7 = Option::Some(value.into());
         EventBuilder {
@@ -423,12 +427,12 @@ where
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `userMessage` field (optional)
-    pub fn user_message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn user_message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `userMessage` field to an Option value (optional)
-    pub fn maybe_user_message(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_user_message(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -437,10 +441,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
+    S::Type: event_state::IsSet,
+    S::SimNames: event_state::IsSet,
     S::ActorDid: event_state::IsSet,
     S::CreatedAt: event_state::IsSet,
-    S::SimNames: event_state::IsSet,
-    S::Type: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -458,13 +462,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Event<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Event<'a> {
         Event {
             actor_did: self._fields.0.unwrap(),
             content: self._fields.1,

@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
@@ -29,48 +30,51 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// An image uploaded to the garden.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "coop.hypha.spores.content.image",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Image<'a> {
+pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Client-declared timestamp when the image was uploaded.
     pub created_at: Datetime,
     ///Optional Bluesky-compatible image embed payload.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub embed: Option<Data<'a>>,
+    pub embed: Option<Data<S>>,
     ///The image blob.
-    #[serde(borrow)]
-    pub image: BlobRef<'a>,
+    pub image: BlobRef<S>,
     ///Optional title for the image.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImageGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Image<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Image<S>,
 }
 
-impl<'a> Image<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ImageRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Image<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ImageRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -81,18 +85,17 @@ pub struct ImageRecord;
 impl XrpcResp for ImageRecord {
     const NSID: &'static str = "coop.hypha.spores.content.image";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ImageGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ImageGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ImageGetRecordOutput<'_>> for Image<'_> {
-    fn from(output: ImageGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ImageGetRecordOutput<S>> for Image<S> {
+    fn from(output: ImageGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Image<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Image<S> {
     const NSID: &'static str = "coop.hypha.spores.content.image";
     type Record = ImageRecord;
 }
@@ -102,7 +105,7 @@ impl Collection for ImageRecord {
     type Record = ImageRecord;
 }
 
-impl<'a> LexiconSchema for Image<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Image<S> {
     fn nsid() -> &'static str {
         "coop.hypha.spores.content.image"
     }
@@ -189,49 +192,44 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Image;
         type CreatedAt;
+        type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Image = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Image = Set<members::image>;
-        type CreatedAt = S::CreatedAt;
+        type Image = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Image = S::Image;
         type CreatedAt = Set<members::created_at>;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type CreatedAt = S::CreatedAt;
+        type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image` field
-        pub struct image(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `image` field
+        pub struct image(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ImageBuilder<'a, S: image_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<Data<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<Data<S>>, Option<BlobRef<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -274,12 +272,12 @@ where
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `embed` field (optional)
-    pub fn embed(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn embed(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `embed` field to an Option value (optional)
-    pub fn maybe_embed(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_embed(mut self, value: Option<Data<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -293,7 +291,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> ImageBuilder<'a, image_state::SetImage<S>> {
         self._fields.2 = Option::Some(value.into());
         ImageBuilder {
@@ -306,12 +304,12 @@ where
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -320,8 +318,8 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 impl<'a, S> ImageBuilder<'a, S>
 where
     S: image_state::State,
-    S::Image: image_state::IsSet,
     S::CreatedAt: image_state::IsSet,
+    S::Image: image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Image<'a> {
@@ -334,10 +332,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Image<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Image<'a> {
         Image {
             created_at: self._fields.0.unwrap(),
             embed: self._fields.1,

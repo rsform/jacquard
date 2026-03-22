@@ -10,11 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -22,17 +25,23 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Iframe<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Iframe<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Iframe<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Iframe<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.iframe"
     }
@@ -100,7 +109,7 @@ pub mod iframe_state {
 /// Builder for constructing an instance of this type
 pub struct IframeBuilder<'a, S: iframe_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<UriValue<'a>>),
+    _fields: (Option<i64>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -143,7 +152,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> IframeBuilder<'a, iframe_state::SetUrl<S>> {
         self._fields.1 = Option::Some(value.into());
         IframeBuilder {
@@ -168,13 +177,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Iframe<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Iframe<'a> {
         Iframe {
             height: self._fields.0,
             url: self._fields.1.unwrap(),

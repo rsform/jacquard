@@ -10,11 +10,12 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -33,10 +34,15 @@ use crate::science_alt::dataset::storage_s3::StorageS3;
 use crate::science_alt::dataset::entry;
 /// Information about dataset size
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DatasetSize<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DatasetSize<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Total size in bytes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bytes: Option<i64>,
@@ -46,105 +52,119 @@ pub struct DatasetSize<'a> {
     ///Number of WebDataset shards
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shards: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Index entry for a WebDataset-backed dataset with references to storage location and sample schema
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "science.alt.dataset.entry", tag = "$type")]
-pub struct Entry<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "science.alt.dataset.entry",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Dataset-level content metadata (e.g., instrument settings, acquisition parameters). Structure is validated against the schema referenced by metadataSchemaRef when present. Stored as an open JSON object.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_metadata: Option<Data<'a>>,
+    pub content_metadata: Option<Data<S>>,
     ///Timestamp when this dataset entry was created
     pub created_at: Datetime,
     ///Human-readable description of the dataset
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///License identifier or URL. SPDX identifiers recommended (e.g., MIT, Apache-2.0, CC-BY-4.0) or full SPDX URLs (e.g., http://spdx.org/licenses/MIT). Aligns with Schema.org license property.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub license: Option<CowStr<'a>>,
+    pub license: Option<S>,
     ///Msgpack-encoded metadata dict for arbitrary extended key-value pairs. Use this for additional metadata beyond the core top-level fields (license, tags, size). Top-level fields are preferred for discoverable/searchable metadata.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
     pub metadata: Option<Bytes>,
     ///Optional AT-URI reference to a schema record defining the structure of this dataset's content metadata. When present, contentMetadata is validated against this schema at write time.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub metadata_schema_ref: Option<AtUri<'a>>,
+    pub metadata_schema_ref: Option<AtUri<S>>,
     ///Human-readable dataset name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///AT-URI reference to the schema record for this dataset's samples
-    #[serde(borrow)]
-    pub schema_ref: AtUri<'a>,
+    pub schema_ref: AtUri<S>,
     ///Dataset size information (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub size: Option<entry::DatasetSize<'a>>,
+    pub size: Option<entry::DatasetSize<S>>,
     ///Storage location for dataset files (WebDataset tar archives)
-    #[serde(borrow)]
-    pub storage: EntryStorage<'a>,
+    pub storage: EntryStorage<S>,
     ///Searchable tags for dataset discovery. Aligns with Schema.org keywords property.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EntryStorage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EntryStorage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "science.alt.dataset.storageHttp")]
-    StorageHttp(Box<StorageHttp<'a>>),
+    StorageHttp(Box<StorageHttp<S>>),
     #[serde(rename = "science.alt.dataset.storageS3")]
-    StorageS3(Box<StorageS3<'a>>),
+    StorageS3(Box<StorageS3<S>>),
     #[serde(rename = "science.alt.dataset.storageBlobs")]
-    StorageBlobs(Box<StorageBlobs<'a>>),
+    StorageBlobs(Box<StorageBlobs<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EntryGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EntryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Entry<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Entry<S>,
 }
 
 /// Content hash for shard integrity verification. Algorithm is flexible to allow SHA-256, BLAKE3, or other hash functions.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ShardChecksum<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ShardChecksum<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Hash algorithm identifier (e.g., 'sha256', 'blake3')
-    #[serde(borrow)]
-    pub algorithm: CowStr<'a>,
+    pub algorithm: S,
     ///Hex-encoded hash digest
-    #[serde(borrow)]
-    pub digest: CowStr<'a>,
+    pub digest: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Entry<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, EntryRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Entry<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, EntryRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for DatasetSize<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DatasetSize<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.entry"
     }
@@ -193,18 +213,17 @@ pub struct EntryRecord;
 impl XrpcResp for EntryRecord {
     const NSID: &'static str = "science.alt.dataset.entry";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = EntryGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = EntryGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<EntryGetRecordOutput<'_>> for Entry<'_> {
-    fn from(output: EntryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<EntryGetRecordOutput<S>> for Entry<S> {
+    fn from(output: EntryGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Entry<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Entry<S> {
     const NSID: &'static str = "science.alt.dataset.entry";
     type Record = EntryRecord;
 }
@@ -214,7 +233,7 @@ impl Collection for EntryRecord {
     type Record = EntryRecord;
 }
 
-impl<'a> LexiconSchema for Entry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entry<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.entry"
     }
@@ -291,7 +310,7 @@ impl<'a> LexiconSchema for Entry<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ShardChecksum<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ShardChecksum<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.entry"
     }
@@ -585,67 +604,67 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SchemaRef;
-        type Name;
         type CreatedAt;
         type Storage;
+        type SchemaRef;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SchemaRef = Unset;
-        type Name = Unset;
         type CreatedAt = Unset;
         type Storage = Unset;
-    }
-    ///State transition - sets the `schema_ref` field to Set
-    pub struct SetSchemaRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSchemaRef<S> {}
-    impl<S: State> State for SetSchemaRef<S> {
-        type SchemaRef = Set<members::schema_ref>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-        type Storage = S::Storage;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type SchemaRef = S::SchemaRef;
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type Storage = S::Storage;
+        type SchemaRef = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type SchemaRef = S::SchemaRef;
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
         type Storage = S::Storage;
+        type SchemaRef = S::SchemaRef;
+        type Name = S::Name;
     }
     ///State transition - sets the `storage` field to Set
     pub struct SetStorage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStorage<S> {}
     impl<S: State> State for SetStorage<S> {
-        type SchemaRef = S::SchemaRef;
-        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
         type Storage = Set<members::storage>;
+        type SchemaRef = S::SchemaRef;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `schema_ref` field to Set
+    pub struct SetSchemaRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSchemaRef<S> {}
+    impl<S: State> State for SetSchemaRef<S> {
+        type CreatedAt = S::CreatedAt;
+        type Storage = S::Storage;
+        type SchemaRef = Set<members::schema_ref>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Storage = S::Storage;
+        type SchemaRef = S::SchemaRef;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `schema_ref` field
-        pub struct schema_ref(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `storage` field
         pub struct storage(());
+        ///Marker type for the `schema_ref` field
+        pub struct schema_ref(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -653,17 +672,17 @@ pub mod entry_state {
 pub struct EntryBuilder<'a, S: entry_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Data<'a>>,
+        Option<Data<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
         Option<Bytes>,
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<entry::DatasetSize<'a>>,
-        Option<EntryStorage<'a>>,
-        Option<Vec<CowStr<'a>>>,
+        Option<AtUri<S>>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<entry::DatasetSize<S>>,
+        Option<EntryStorage<S>>,
+        Option<Vec<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -688,12 +707,12 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `contentMetadata` field (optional)
-    pub fn content_metadata(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn content_metadata(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `contentMetadata` field to an Option value (optional)
-    pub fn maybe_content_metadata(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_content_metadata(mut self, value: Option<Data<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -720,12 +739,12 @@ where
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -733,12 +752,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `license` field (optional)
-    pub fn license(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn license(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
-    pub fn maybe_license(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_license(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -759,12 +778,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `metadataSchemaRef` field (optional)
-    pub fn metadata_schema_ref(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn metadata_schema_ref(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `metadataSchemaRef` field to an Option value (optional)
-    pub fn maybe_metadata_schema_ref(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_metadata_schema_ref(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -778,7 +797,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EntryBuilder<'a, entry_state::SetName<S>> {
         self._fields.6 = Option::Some(value.into());
         EntryBuilder {
@@ -797,7 +816,7 @@ where
     /// Set the `schemaRef` field (required)
     pub fn schema_ref(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> EntryBuilder<'a, entry_state::SetSchemaRef<S>> {
         self._fields.7 = Option::Some(value.into());
         EntryBuilder {
@@ -810,12 +829,12 @@ where
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `size` field (optional)
-    pub fn size(mut self, value: impl Into<Option<entry::DatasetSize<'a>>>) -> Self {
+    pub fn size(mut self, value: impl Into<Option<entry::DatasetSize<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
-    pub fn maybe_size(mut self, value: Option<entry::DatasetSize<'a>>) -> Self {
+    pub fn maybe_size(mut self, value: Option<entry::DatasetSize<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -829,7 +848,7 @@ where
     /// Set the `storage` field (required)
     pub fn storage(
         mut self,
-        value: impl Into<EntryStorage<'a>>,
+        value: impl Into<EntryStorage<S>>,
     ) -> EntryBuilder<'a, entry_state::SetStorage<S>> {
         self._fields.9 = Option::Some(value.into());
         EntryBuilder {
@@ -842,12 +861,12 @@ where
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -856,10 +875,10 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::SchemaRef: entry_state::IsSet,
-    S::Name: entry_state::IsSet,
     S::CreatedAt: entry_state::IsSet,
     S::Storage: entry_state::IsSet,
+    S::SchemaRef: entry_state::IsSet,
+    S::Name: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
@@ -879,10 +898,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Entry<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Entry<'a> {
         Entry {
             content_metadata: self._fields.0,
             created_at: self._fields.1.unwrap(),

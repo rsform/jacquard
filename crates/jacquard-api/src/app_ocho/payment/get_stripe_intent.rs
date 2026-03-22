@@ -10,45 +10,57 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetStripeIntent<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetStripeIntent<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub amount: i64,
     #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
     #[serde(borrow)]
-    pub iss: Did<'a>,
+    pub iss: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub token: Option<CowStr<'a>>,
+    pub token: Option<S>,
 }
 
 /// The intent data
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetStripeIntentOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetStripeIntentOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The customer ID for the payment intent
-    #[serde(borrow)]
-    pub customer: CowStr<'a>,
+    pub customer: S,
     ///The customer session ID for the payment intent
-    #[serde(borrow)]
-    pub customer_session: CowStr<'a>,
+    pub customer_session: S,
     ///The ephemeral key for the payment intent
-    #[serde(borrow)]
-    pub ephemeral_key: CowStr<'a>,
+    pub ephemeral_key: S,
     ///The payment intent ID
-    #[serde(borrow)]
-    pub payment_intent: CowStr<'a>,
+    pub payment_intent: S,
     ///The publishable key for the payment intent
-    #[serde(borrow)]
-    pub publishable_key: CowStr<'a>,
+    pub publishable_key: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.ocho.payment.getStripeIntent
@@ -56,11 +68,12 @@ pub struct GetStripeIntentResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStripeIntentResponse {
     const NSID: &'static str = "app.ocho.payment.getStripeIntent";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetStripeIntentOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetStripeIntentOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetStripeIntent<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetStripeIntent<S> {
     const NSID: &'static str = "app.ocho.payment.getStripeIntent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetStripeIntentResponse;
@@ -71,7 +84,7 @@ pub struct GetStripeIntentRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStripeIntentRequest {
     const PATH: &'static str = "/xrpc/app.ocho.payment.getStripeIntent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetStripeIntent<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetStripeIntent<S>;
     type Response = GetStripeIntentResponse;
 }
 
@@ -136,7 +149,7 @@ pub mod get_stripe_intent_state {
 /// Builder for constructing an instance of this type
 pub struct GetStripeIntentBuilder<'a, S: get_stripe_intent_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<CowStr<'a>>, Option<Did<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<i64>, Option<S>, Option<Did<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -185,7 +198,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetId<S>> {
         self._fields.1 = Option::Some(value.into());
         GetStripeIntentBuilder {
@@ -204,7 +217,7 @@ where
     /// Set the `iss` field (required)
     pub fn iss(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetIss<S>> {
         self._fields.2 = Option::Some(value.into());
         GetStripeIntentBuilder {
@@ -217,12 +230,12 @@ where
 
 impl<'a, S: get_stripe_intent_state::State> GetStripeIntentBuilder<'a, S> {
     /// Set the `token` field (optional)
-    pub fn token(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn token(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `token` field to an Option value (optional)
-    pub fn maybe_token(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_token(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }

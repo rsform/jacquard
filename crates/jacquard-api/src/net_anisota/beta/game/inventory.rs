@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -29,29 +30,29 @@ use serde::{Serialize, Deserialize};
 use crate::net_anisota::beta::game::inventory;
 /// Beta version: Record representing an item in a player's game inventory
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "net.anisota.beta.game.inventory",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Inventory<'a> {
+pub struct Inventory<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When the item was acquired
     pub acquired_at: Datetime,
     ///When the record was created
     pub created_at: Datetime,
     ///Unique identifier for the item from gameItems.json
-    #[serde(borrow)]
-    pub item_id: CowStr<'a>,
+    pub item_id: S,
     ///Display name of the item
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub item_name: Option<CowStr<'a>>,
+    pub item_name: Option<S>,
     ///Type category of the item (consumable, tool, equipment, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub item_type: Option<CowStr<'a>>,
+    pub item_type: Option<S>,
     ///Base value of the item in game currency
     #[serde(skip_serializing_if = "Option::is_none")]
     pub item_value: Option<i64>,
@@ -60,71 +61,74 @@ pub struct Inventory<'a> {
     pub last_modified: Option<Datetime>,
     ///URI of the game.log record that documents the acquisition of this item
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub log_record_uri: Option<CowStr<'a>>,
+    pub log_record_uri: Option<S>,
     ///Maximum stack size for this item
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_stack: Option<i64>,
     ///Additional item-specific data (stats, attributes, enchantments, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub metadata: Option<Data<'a>>,
+    pub metadata: Option<Data<S>>,
     ///Number of items in the stack
     pub quantity: i64,
     ///Rarity level of the item
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rarity: Option<CowStr<'a>>,
+    pub rarity: Option<S>,
     ///How the item was acquired
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source: Option<CowStr<'a>>,
+    pub source: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_details: Option<inventory::SourceDetails<'a>>,
+    pub source_details: Option<inventory::SourceDetails<S>>,
     ///Whether this item can be stacked with others of the same type
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stackable: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct InventoryGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct InventoryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Inventory<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Inventory<S>,
 }
 
 /// Additional details about how the item was acquired
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SourceDetails<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SourceDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///URI of the game card that provided this item
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub game_card_uri: Option<CowStr<'a>>,
+    pub game_card_uri: Option<S>,
     ///ID of the quest that rewarded this item
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub quest_id: Option<CowStr<'a>>,
+    pub quest_id: Option<S>,
     ///Daily reward streak when item was acquired
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reward_streak: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Inventory<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, InventoryRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Inventory<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, InventoryRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -135,18 +139,17 @@ pub struct InventoryRecord;
 impl XrpcResp for InventoryRecord {
     const NSID: &'static str = "net.anisota.beta.game.inventory";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = InventoryGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = InventoryGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<InventoryGetRecordOutput<'_>> for Inventory<'_> {
-    fn from(output: InventoryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<InventoryGetRecordOutput<S>> for Inventory<S> {
+    fn from(output: InventoryGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Inventory<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Inventory<S> {
     const NSID: &'static str = "net.anisota.beta.game.inventory";
     type Record = InventoryRecord;
 }
@@ -156,7 +159,7 @@ impl Collection for InventoryRecord {
     type Record = InventoryRecord;
 }
 
-impl<'a> LexiconSchema for Inventory<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Inventory<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.inventory"
     }
@@ -230,7 +233,7 @@ impl<'a> LexiconSchema for Inventory<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SourceDetails<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SourceDetails<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.inventory"
     }
@@ -255,67 +258,67 @@ pub mod inventory_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Quantity;
         type ItemId;
+        type Quantity;
         type AcquiredAt;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Quantity = Unset;
         type ItemId = Unset;
+        type Quantity = Unset;
         type AcquiredAt = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Quantity = S::Quantity;
-        type ItemId = S::ItemId;
-        type AcquiredAt = S::AcquiredAt;
-    }
-    ///State transition - sets the `quantity` field to Set
-    pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuantity<S> {}
-    impl<S: State> State for SetQuantity<S> {
-        type CreatedAt = S::CreatedAt;
-        type Quantity = Set<members::quantity>;
-        type ItemId = S::ItemId;
-        type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `item_id` field to Set
     pub struct SetItemId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetItemId<S> {}
     impl<S: State> State for SetItemId<S> {
-        type CreatedAt = S::CreatedAt;
-        type Quantity = S::Quantity;
         type ItemId = Set<members::item_id>;
+        type Quantity = S::Quantity;
         type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `quantity` field to Set
+    pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuantity<S> {}
+    impl<S: State> State for SetQuantity<S> {
+        type ItemId = S::ItemId;
+        type Quantity = Set<members::quantity>;
+        type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `acquired_at` field to Set
     pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
     impl<S: State> State for SetAcquiredAt<S> {
-        type CreatedAt = S::CreatedAt;
-        type Quantity = S::Quantity;
         type ItemId = S::ItemId;
+        type Quantity = S::Quantity;
         type AcquiredAt = Set<members::acquired_at>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ItemId = S::ItemId;
+        type Quantity = S::Quantity;
+        type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `quantity` field
-        pub struct quantity(());
         ///Marker type for the `item_id` field
         pub struct item_id(());
+        ///Marker type for the `quantity` field
+        pub struct quantity(());
         ///Marker type for the `acquired_at` field
         pub struct acquired_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -325,18 +328,18 @@ pub struct InventoryBuilder<'a, S: inventory_state::State> {
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<i64>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
-        Option<Data<'a>>,
+        Option<Data<S>>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<inventory::SourceDetails<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<inventory::SourceDetails<S>>,
         Option<bool>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -422,7 +425,7 @@ where
     /// Set the `itemId` field (required)
     pub fn item_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> InventoryBuilder<'a, inventory_state::SetItemId<S>> {
         self._fields.2 = Option::Some(value.into());
         InventoryBuilder {
@@ -435,12 +438,12 @@ where
 
 impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `itemName` field (optional)
-    pub fn item_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn item_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `itemName` field to an Option value (optional)
-    pub fn maybe_item_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_item_name(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -448,12 +451,12 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
 
 impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `itemType` field (optional)
-    pub fn item_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn item_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `itemType` field to an Option value (optional)
-    pub fn maybe_item_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_item_type(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -487,12 +490,12 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
 
 impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `logRecordUri` field (optional)
-    pub fn log_record_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn log_record_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `logRecordUri` field to an Option value (optional)
-    pub fn maybe_log_record_uri(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_log_record_uri(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -513,12 +516,12 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
 
 impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `metadata` field (optional)
-    pub fn metadata(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn metadata(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
-    pub fn maybe_metadata(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_metadata(mut self, value: Option<Data<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -545,12 +548,12 @@ where
 
 impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `rarity` field (optional)
-    pub fn rarity(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn rarity(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `rarity` field to an Option value (optional)
-    pub fn maybe_rarity(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_rarity(mut self, value: Option<S>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -558,12 +561,12 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
 
 impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
-    pub fn maybe_source(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_source(mut self, value: Option<S>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -573,7 +576,7 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `sourceDetails` field (optional)
     pub fn source_details(
         mut self,
-        value: impl Into<Option<inventory::SourceDetails<'a>>>,
+        value: impl Into<Option<inventory::SourceDetails<S>>>,
     ) -> Self {
         self._fields.13 = value.into();
         self
@@ -581,7 +584,7 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     /// Set the `sourceDetails` field to an Option value (optional)
     pub fn maybe_source_details(
         mut self,
-        value: Option<inventory::SourceDetails<'a>>,
+        value: Option<inventory::SourceDetails<S>>,
     ) -> Self {
         self._fields.13 = value;
         self
@@ -604,10 +607,10 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
 impl<'a, S> InventoryBuilder<'a, S>
 where
     S: inventory_state::State,
-    S::CreatedAt: inventory_state::IsSet,
-    S::Quantity: inventory_state::IsSet,
     S::ItemId: inventory_state::IsSet,
+    S::Quantity: inventory_state::IsSet,
     S::AcquiredAt: inventory_state::IsSet,
+    S::CreatedAt: inventory_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Inventory<'a> {
@@ -633,7 +636,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Inventory<'a> {
         Inventory {
             acquired_at: self._fields.0.unwrap(),

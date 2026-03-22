@@ -10,54 +10,73 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateGroupParams<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateGroupParams<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateGroup<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateGroup<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub display: Option<S>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public: Option<bool>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateGroupOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateGroupOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cuid: Option<CowStr<'a>>,
+    pub cuid: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display: Option<CowStr<'a>>,
+    pub display: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public: Option<bool>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.blebbit.authr.group.updateGroup
@@ -65,11 +84,12 @@ pub struct UpdateGroupResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateGroupResponse {
     const NSID: &'static str = "app.blebbit.authr.group.updateGroup";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateGroupOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = UpdateGroupOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateGroup<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for UpdateGroup<S> {
     const NSID: &'static str = "app.blebbit.authr.group.updateGroup";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -84,7 +104,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateGroupRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = UpdateGroup<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = UpdateGroup<S>;
     type Response = UpdateGroupResponse;
 }
 
@@ -110,7 +130,7 @@ pub mod update_group_params_state {
 /// Builder for constructing an instance of this type
 pub struct UpdateGroupParamsBuilder<'a, S: update_group_params_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -134,12 +154,12 @@ impl<'a> UpdateGroupParamsBuilder<'a, update_group_params_state::Empty> {
 
 impl<'a, S: update_group_params_state::State> UpdateGroupParamsBuilder<'a, S> {
     /// Set the `id` field (optional)
-    pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
-    pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_id(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }

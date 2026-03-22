@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::types::string::Did;
 use jacquard_derive::IntoStatic;
@@ -15,11 +15,17 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetLaunchAsset<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetLaunchAsset<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     #[serde(borrow)]
-    pub platform: CowStr<'a>,
+    pub platform: S,
 }
 
 /// The launch asset for the plugin, which is the main JavaScript bundle.
@@ -35,18 +41,22 @@ pub struct GetLaunchAssetResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLaunchAssetResponse {
     const NSID: &'static str = "app.ocho.plugin.getLaunchAsset";
     const ENCODING: &'static str = "text/javascript";
-    type Output<'de> = GetLaunchAssetOutput;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = GetLaunchAssetOutput;
+    type Err = jacquard_common::xrpc::GenericError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(GetLaunchAssetOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -54,7 +64,8 @@ impl jacquard_common::xrpc::XrpcResp for GetLaunchAssetResponse {
     }
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetLaunchAsset<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetLaunchAsset<S> {
     const NSID: &'static str = "app.ocho.plugin.getLaunchAsset";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLaunchAssetResponse;
@@ -65,7 +76,7 @@ pub struct GetLaunchAssetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLaunchAssetRequest {
     const PATH: &'static str = "/xrpc/app.ocho.plugin.getLaunchAsset";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetLaunchAsset<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetLaunchAsset<S>;
     type Response = GetLaunchAssetResponse;
 }
 
@@ -79,44 +90,44 @@ pub mod get_launch_asset_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Platform;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Platform = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Platform = S::Platform;
+        type Did = Unset;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlatform<S> {}
     impl<S: State> State for SetPlatform<S> {
-        type Did = S::Did;
         type Platform = Set<members::platform>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Platform = S::Platform;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `platform` field
         pub struct platform(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetLaunchAssetBuilder<'a, S: get_launch_asset_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Did<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -146,7 +157,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetLaunchAssetBuilder<'a, get_launch_asset_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetLaunchAssetBuilder {
@@ -165,7 +176,7 @@ where
     /// Set the `platform` field (required)
     pub fn platform(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetLaunchAssetBuilder<'a, get_launch_asset_state::SetPlatform<S>> {
         self._fields.1 = Option::Some(value.into());
         GetLaunchAssetBuilder {
@@ -179,8 +190,8 @@ where
 impl<'a, S> GetLaunchAssetBuilder<'a, S>
 where
     S: get_launch_asset_state::State,
-    S::Did: get_launch_asset_state::IsSet,
     S::Platform: get_launch_asset_state::IsSet,
+    S::Did: get_launch_asset_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetLaunchAsset<'a> {

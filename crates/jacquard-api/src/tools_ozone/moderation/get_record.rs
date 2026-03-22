@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
@@ -15,26 +15,45 @@ use crate::tools_ozone::moderation::RecordViewDetail;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRecord<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
+    pub cid: Option<Cid<S>>,
     #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRecordOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: RecordViewDetail<'a>,
+    pub value: RecordViewDetail<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -43,18 +62,22 @@ pub struct GetRecordOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRecordError<'a> {
+pub enum GetRecordError {
     #[serde(rename = "RecordNotFound")]
-    RecordNotFound(Option<CowStr<'a>>),
+    RecordNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for GetRecordError<'_> {
+impl core::fmt::Display for GetRecordError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RecordNotFound(msg) => {
@@ -64,7 +87,13 @@ impl core::fmt::Display for GetRecordError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -74,11 +103,12 @@ pub struct GetRecordResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecordResponse {
     const NSID: &'static str = "tools.ozone.moderation.getRecord";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRecordOutput<'de>;
-    type Err<'de> = GetRecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetRecordOutput<S>;
+    type Err = GetRecordError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecord<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetRecord<S> {
     const NSID: &'static str = "tools.ozone.moderation.getRecord";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecordResponse;
@@ -89,7 +119,7 @@ pub struct GetRecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecordRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.getRecord";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRecord<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetRecord<S>;
     type Response = GetRecordResponse;
 }
 
@@ -128,7 +158,7 @@ pub mod get_record_state {
 /// Builder for constructing an instance of this type
 pub struct GetRecordBuilder<'a, S: get_record_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -152,12 +182,12 @@ impl<'a> GetRecordBuilder<'a, get_record_state::Empty> {
 
 impl<'a, S: get_record_state::State> GetRecordBuilder<'a, S> {
     /// Set the `cid` field (optional)
-    pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
+    pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
-    pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
+    pub fn maybe_cid(mut self, value: Option<Cid<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -171,7 +201,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetRecordBuilder<'a, get_record_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         GetRecordBuilder {

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,41 +30,45 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Marks an answer as answering a given question
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "fyi.questionable.selectedAnswer",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct SelectedAnswer<'a> {
-    #[serde(borrow)]
-    pub answer_ref: StrongRef<'a>,
+pub struct SelectedAnswer<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub answer_ref: StrongRef<S>,
     ///Client-declared timestamp when this vote was originally created.
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub question_ref: StrongRef<'a>,
+    pub question_ref: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SelectedAnswerGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SelectedAnswerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: SelectedAnswer<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: SelectedAnswer<S>,
 }
 
-impl<'a> SelectedAnswer<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SelectedAnswerRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> SelectedAnswer<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SelectedAnswerRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -73,18 +79,18 @@ pub struct SelectedAnswerRecord;
 impl XrpcResp for SelectedAnswerRecord {
     const NSID: &'static str = "fyi.questionable.selectedAnswer";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SelectedAnswerGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SelectedAnswerGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SelectedAnswerGetRecordOutput<'_>> for SelectedAnswer<'_> {
-    fn from(output: SelectedAnswerGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SelectedAnswerGetRecordOutput<S>>
+for SelectedAnswer<S> {
+    fn from(output: SelectedAnswerGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for SelectedAnswer<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for SelectedAnswer<S> {
     const NSID: &'static str = "fyi.questionable.selectedAnswer";
     type Record = SelectedAnswerRecord;
 }
@@ -94,7 +100,7 @@ impl Collection for SelectedAnswerRecord {
     type Record = SelectedAnswerRecord;
 }
 
-impl<'a> LexiconSchema for SelectedAnswer<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SelectedAnswer<S> {
     fn nsid() -> &'static str {
         "fyi.questionable.selectedAnswer"
     }
@@ -120,57 +126,57 @@ pub mod selected_answer_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type AnswerRef;
-        type CreatedAt;
         type QuestionRef;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type AnswerRef = Unset;
-        type CreatedAt = Unset;
         type QuestionRef = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `answer_ref` field to Set
     pub struct SetAnswerRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnswerRef<S> {}
     impl<S: State> State for SetAnswerRef<S> {
         type AnswerRef = Set<members::answer_ref>;
+        type QuestionRef = S::QuestionRef;
         type CreatedAt = S::CreatedAt;
-        type QuestionRef = S::QuestionRef;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type AnswerRef = S::AnswerRef;
-        type CreatedAt = Set<members::created_at>;
-        type QuestionRef = S::QuestionRef;
     }
     ///State transition - sets the `question_ref` field to Set
     pub struct SetQuestionRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuestionRef<S> {}
     impl<S: State> State for SetQuestionRef<S> {
         type AnswerRef = S::AnswerRef;
-        type CreatedAt = S::CreatedAt;
         type QuestionRef = Set<members::question_ref>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type AnswerRef = S::AnswerRef;
+        type QuestionRef = S::QuestionRef;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `answer_ref` field
         pub struct answer_ref(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `question_ref` field
         pub struct question_ref(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SelectedAnswerBuilder<'a, S: selected_answer_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>, Option<Datetime>, Option<StrongRef<'a>>),
+    _fields: (Option<StrongRef<S>>, Option<Datetime>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -200,7 +206,7 @@ where
     /// Set the `answerRef` field (required)
     pub fn answer_ref(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> SelectedAnswerBuilder<'a, selected_answer_state::SetAnswerRef<S>> {
         self._fields.0 = Option::Some(value.into());
         SelectedAnswerBuilder {
@@ -238,7 +244,7 @@ where
     /// Set the `questionRef` field (required)
     pub fn question_ref(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> SelectedAnswerBuilder<'a, selected_answer_state::SetQuestionRef<S>> {
         self._fields.2 = Option::Some(value.into());
         SelectedAnswerBuilder {
@@ -253,8 +259,8 @@ impl<'a, S> SelectedAnswerBuilder<'a, S>
 where
     S: selected_answer_state::State,
     S::AnswerRef: selected_answer_state::IsSet,
-    S::CreatedAt: selected_answer_state::IsSet,
     S::QuestionRef: selected_answer_state::IsSet,
+    S::CreatedAt: selected_answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SelectedAnswer<'a> {
@@ -268,10 +274,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SelectedAnswer<'a> {
         SelectedAnswer {
             answer_ref: self._fields.0.unwrap(),

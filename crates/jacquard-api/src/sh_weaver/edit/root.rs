@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,35 +31,43 @@ use serde::{Serialize, Deserialize};
 use crate::sh_weaver::edit::DocRef;
 /// The starting point for edit history on a notebook.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.weaver.edit.root", tag = "$type")]
-pub struct Root<'a> {
-    #[serde(borrow)]
-    pub doc: DocRef<'a>,
-    #[serde(borrow)]
-    pub snapshot: BlobRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.weaver.edit.root",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Root<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub doc: DocRef<S>,
+    pub snapshot: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RootGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RootGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Root<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Root<S>,
 }
 
-impl<'a> Root<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, RootRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Root<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, RootRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -68,18 +78,17 @@ pub struct RootRecord;
 impl XrpcResp for RootRecord {
     const NSID: &'static str = "sh.weaver.edit.root";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RootGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RootGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<RootGetRecordOutput<'_>> for Root<'_> {
-    fn from(output: RootGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<RootGetRecordOutput<S>> for Root<S> {
+    fn from(output: RootGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Root<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Root<S> {
     const NSID: &'static str = "sh.weaver.edit.root";
     type Record = RootRecord;
 }
@@ -89,7 +98,7 @@ impl Collection for RootRecord {
     type Record = RootRecord;
 }
 
-impl<'a> LexiconSchema for Root<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Root<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.root"
     }
@@ -154,44 +163,44 @@ pub mod root_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Doc;
         type Snapshot;
+        type Doc;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Doc = Unset;
         type Snapshot = Unset;
-    }
-    ///State transition - sets the `doc` field to Set
-    pub struct SetDoc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDoc<S> {}
-    impl<S: State> State for SetDoc<S> {
-        type Doc = Set<members::doc>;
-        type Snapshot = S::Snapshot;
+        type Doc = Unset;
     }
     ///State transition - sets the `snapshot` field to Set
     pub struct SetSnapshot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSnapshot<S> {}
     impl<S: State> State for SetSnapshot<S> {
-        type Doc = S::Doc;
         type Snapshot = Set<members::snapshot>;
+        type Doc = S::Doc;
+    }
+    ///State transition - sets the `doc` field to Set
+    pub struct SetDoc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDoc<S> {}
+    impl<S: State> State for SetDoc<S> {
+        type Snapshot = S::Snapshot;
+        type Doc = Set<members::doc>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `doc` field
-        pub struct doc(());
         ///Marker type for the `snapshot` field
         pub struct snapshot(());
+        ///Marker type for the `doc` field
+        pub struct doc(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RootBuilder<'a, S: root_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<DocRef<'a>>, Option<BlobRef<'a>>),
+    _fields: (Option<DocRef<S>>, Option<BlobRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -221,7 +230,7 @@ where
     /// Set the `doc` field (required)
     pub fn doc(
         mut self,
-        value: impl Into<DocRef<'a>>,
+        value: impl Into<DocRef<S>>,
     ) -> RootBuilder<'a, root_state::SetDoc<S>> {
         self._fields.0 = Option::Some(value.into());
         RootBuilder {
@@ -240,7 +249,7 @@ where
     /// Set the `snapshot` field (required)
     pub fn snapshot(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> RootBuilder<'a, root_state::SetSnapshot<S>> {
         self._fields.1 = Option::Some(value.into());
         RootBuilder {
@@ -254,8 +263,8 @@ where
 impl<'a, S> RootBuilder<'a, S>
 where
     S: root_state::State,
-    S::Doc: root_state::IsSet,
     S::Snapshot: root_state::IsSet,
+    S::Doc: root_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Root<'a> {
@@ -266,13 +275,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Root<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Root<'a> {
         Root {
             doc: self._fields.0.unwrap(),
             snapshot: self._fields.1.unwrap(),

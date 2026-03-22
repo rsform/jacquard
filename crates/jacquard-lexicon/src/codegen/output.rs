@@ -301,10 +301,12 @@ impl<'c> CodeGenerator<'c> {
 
             // Format code
             let file: syn::File = syn::parse2(file_output.tokens.clone()).map_err(|e| {
+                let tokens = file_output.tokens.to_string();
+                eprintln!("Failed to parse generated tokens for {:?}:\n{}", path, tokens);
                 CodegenError::TokenParseError {
                     path: path.clone(),
                     source: e,
-                    tokens: file_output.tokens.to_string(),
+                    tokens,
                 }
             })?;
             let mut formatted = prettyplease::unparse(&file);

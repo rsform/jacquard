@@ -10,18 +10,28 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateAccountHandle<'a> {
-    #[serde(borrow)]
-    pub did: Did<'a>,
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateAccountHandle<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub did: Did<S>,
+    pub handle: Handle<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.atproto.admin.updateAccountHandle
@@ -29,11 +39,12 @@ pub struct UpdateAccountHandleResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateAccountHandleResponse {
     const NSID: &'static str = "com.atproto.admin.updateAccountHandle";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateAccountHandle<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for UpdateAccountHandle<S> {
     const NSID: &'static str = "com.atproto.admin.updateAccountHandle";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -48,7 +59,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountHandleRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = UpdateAccountHandle<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = UpdateAccountHandle<S>;
     type Response = UpdateAccountHandleResponse;
 }
 
@@ -62,44 +73,44 @@ pub mod update_account_handle_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
         type Handle = Set<members::handle>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct UpdateAccountHandleBuilder<'a, S: update_account_handle_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<Handle<'a>>),
+    _fields: (Option<Did<S>>, Option<Handle<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -129,7 +140,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> UpdateAccountHandleBuilder<'a, update_account_handle_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         UpdateAccountHandleBuilder {
@@ -148,7 +159,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<Handle<'a>>,
+        value: impl Into<Handle<S>>,
     ) -> UpdateAccountHandleBuilder<'a, update_account_handle_state::SetHandle<S>> {
         self._fields.1 = Option::Some(value.into());
         UpdateAccountHandleBuilder {
@@ -162,8 +173,8 @@ where
 impl<'a, S> UpdateAccountHandleBuilder<'a, S>
 where
     S: update_account_handle_state::State,
-    S::Did: update_account_handle_state::IsSet,
     S::Handle: update_account_handle_state::IsSet,
+    S::Did: update_account_handle_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateAccountHandle<'a> {
@@ -176,10 +187,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> UpdateAccountHandle<'a> {
         UpdateAccountHandle {
             did: self._fields.0.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,53 +28,57 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "diy.razorgirl.winter.fact", tag = "$type")]
-pub struct Fact<'a> {
-    #[serde(borrow)]
-    pub args: Vec<CowStr<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "diy.razorgirl.winter.fact",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Fact<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub args: Vec<S>,
     ///0.0-1.0 as string (Soufflé compat)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub confidence: Option<CowStr<'a>>,
+    pub confidence: Option<S>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<Datetime>,
-    #[serde(borrow)]
-    pub predicate: CowStr<'a>,
+    pub predicate: S,
     ///CID of source record
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source: Option<CowStr<'a>>,
+    pub source: Option<S>,
     ///CID of superseded fact
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub supersedes: Option<CowStr<'a>>,
+    pub supersedes: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct FactGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FactGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Fact<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Fact<S>,
 }
 
-impl<'a> Fact<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, FactRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Fact<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, FactRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -83,18 +89,17 @@ pub struct FactRecord;
 impl XrpcResp for FactRecord {
     const NSID: &'static str = "diy.razorgirl.winter.fact";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = FactGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = FactGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<FactGetRecordOutput<'_>> for Fact<'_> {
-    fn from(output: FactGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<FactGetRecordOutput<S>> for Fact<S> {
+    fn from(output: FactGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Fact<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Fact<S> {
     const NSID: &'static str = "diy.razorgirl.winter.fact";
     type Record = FactRecord;
 }
@@ -104,7 +109,7 @@ impl Collection for FactRecord {
     type Record = FactRecord;
 }
 
-impl<'a> LexiconSchema for Fact<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Fact<S> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.fact"
     }
@@ -162,50 +167,50 @@ pub mod fact_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Predicate;
-        type CreatedAt;
         type Args;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Predicate = Unset;
-        type CreatedAt = Unset;
         type Args = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `predicate` field to Set
     pub struct SetPredicate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPredicate<S> {}
     impl<S: State> State for SetPredicate<S> {
         type Predicate = Set<members::predicate>;
+        type Args = S::Args;
         type CreatedAt = S::CreatedAt;
-        type Args = S::Args;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Predicate = S::Predicate;
-        type CreatedAt = Set<members::created_at>;
-        type Args = S::Args;
     }
     ///State transition - sets the `args` field to Set
     pub struct SetArgs<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArgs<S> {}
     impl<S: State> State for SetArgs<S> {
         type Predicate = S::Predicate;
-        type CreatedAt = S::CreatedAt;
         type Args = Set<members::args>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Predicate = S::Predicate;
+        type Args = S::Args;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `predicate` field
         pub struct predicate(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `args` field
         pub struct args(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -213,14 +218,14 @@ pub mod fact_state {
 pub struct FactBuilder<'a, S: fact_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<S>>,
+        Option<S>,
         Option<Datetime>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<CowStr<'a>>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Vec<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -251,7 +256,7 @@ where
     /// Set the `args` field (required)
     pub fn args(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> FactBuilder<'a, fact_state::SetArgs<S>> {
         self._fields.0 = Option::Some(value.into());
         FactBuilder {
@@ -264,12 +269,12 @@ where
 
 impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     /// Set the `confidence` field (optional)
-    pub fn confidence(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn confidence(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `confidence` field to an Option value (optional)
-    pub fn maybe_confidence(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_confidence(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -315,7 +320,7 @@ where
     /// Set the `predicate` field (required)
     pub fn predicate(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> FactBuilder<'a, fact_state::SetPredicate<S>> {
         self._fields.4 = Option::Some(value.into());
         FactBuilder {
@@ -328,12 +333,12 @@ where
 
 impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
-    pub fn maybe_source(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_source(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -341,12 +346,12 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
 
 impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     /// Set the `supersedes` field (optional)
-    pub fn supersedes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn supersedes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `supersedes` field to an Option value (optional)
-    pub fn maybe_supersedes(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_supersedes(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -354,12 +359,12 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
 
 impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -369,8 +374,8 @@ impl<'a, S> FactBuilder<'a, S>
 where
     S: fact_state::State,
     S::Predicate: fact_state::IsSet,
-    S::CreatedAt: fact_state::IsSet,
     S::Args: fact_state::IsSet,
+    S::CreatedAt: fact_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fact<'a> {
@@ -387,13 +392,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Fact<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Fact<'a> {
         Fact {
             args: self._fields.0.unwrap(),
             confidence: self._fields.1,

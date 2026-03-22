@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,34 +29,45 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::dev_vielle::dnd::astral;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "dev.vielle.dnd.astral", tag = "$type")]
-pub struct Astral<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "dev.vielle.dnd.astral",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Astral<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// Defaults to `0`.
     #[serde(default = "_default_astral_points")]
     pub points: i64,
-    #[serde(borrow)]
-    pub powers: Vec<astral::Power<'a>>,
+    pub powers: Vec<astral::Power<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AstralGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AstralGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Astral<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Astral<S>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Power<'a> {
+pub enum Power<S: Bos<str> + AsRef<str> = DefaultStr> {
     DevVielleDndPowerEldritchAdaptability,
     DevVielleDndPowerEldritchAssault,
     DevVielleDndPowerRuneSeeker,
@@ -72,10 +85,10 @@ pub enum Power<'a> {
     DevVielleDndPowerBond,
     DevVielleDndPowerClaw,
     DevVielleDndPowerInvalid,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> Power<'a> {
+impl<S: Bos<str> + AsRef<str>> Power<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::DevVielleDndPowerEldritchAdaptability => {
@@ -106,11 +119,9 @@ impl<'a> Power<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for Power<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "dev.vielle.dnd.power#eldritchAdaptability" => {
                 Self::DevVielleDndPowerEldritchAdaptability
             }
@@ -136,80 +147,44 @@ impl<'a> From<&'a str> for Power<'a> {
             "dev.vielle.dnd.power#bond" => Self::DevVielleDndPowerBond,
             "dev.vielle.dnd.power#claw" => Self::DevVielleDndPowerClaw,
             "dev.vielle.dnd.power#invalid" => Self::DevVielleDndPowerInvalid,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for Power<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "dev.vielle.dnd.power#eldritchAdaptability" => {
-                Self::DevVielleDndPowerEldritchAdaptability
-            }
-            "dev.vielle.dnd.power#eldritchAssault" => {
-                Self::DevVielleDndPowerEldritchAssault
-            }
-            "dev.vielle.dnd.power#runeSeeker" => Self::DevVielleDndPowerRuneSeeker,
-            "dev.vielle.dnd.power#fateScriber" => Self::DevVielleDndPowerFateScriber,
-            "dev.vielle.dnd.power#faceless" => Self::DevVielleDndPowerFaceless,
-            "dev.vielle.dnd.power#bind" => Self::DevVielleDndPowerBind,
-            "dev.vielle.dnd.power#spray" => Self::DevVielleDndPowerSpray,
-            "dev.vielle.dnd.power#acursed" => Self::DevVielleDndPowerAcursed,
-            "dev.vielle.dnd.power#darksight" => Self::DevVielleDndPowerDarksight,
-            "dev.vielle.dnd.power#eldritchVisage" => {
-                Self::DevVielleDndPowerEldritchVisage
-            }
-            "dev.vielle.dnd.power#regenerate" => Self::DevVielleDndPowerRegenerate,
-            "dev.vielle.dnd.power#instil" => Self::DevVielleDndPowerInstil,
-            "dev.vielle.dnd.power#eldritchEnchantment" => {
-                Self::DevVielleDndPowerEldritchEnchantment
-            }
-            "dev.vielle.dnd.power#whisper" => Self::DevVielleDndPowerWhisper,
-            "dev.vielle.dnd.power#bond" => Self::DevVielleDndPowerBond,
-            "dev.vielle.dnd.power#claw" => Self::DevVielleDndPowerClaw,
-            "dev.vielle.dnd.power#invalid" => Self::DevVielleDndPowerInvalid,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Power<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for Power<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for Power<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Power<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for Power<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for Power<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for Power<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Power<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for Power<'_> {
-    type Output = Power<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for Power<S> {
+    type Output = Power<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             Power::DevVielleDndPowerEldritchAdaptability => {
@@ -242,11 +217,9 @@ impl jacquard_common::IntoStatic for Power<'_> {
     }
 }
 
-impl<'a> Astral<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AstralRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Astral<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AstralRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -257,18 +230,17 @@ pub struct AstralRecord;
 impl XrpcResp for AstralRecord {
     const NSID: &'static str = "dev.vielle.dnd.astral";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AstralGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AstralGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AstralGetRecordOutput<'_>> for Astral<'_> {
-    fn from(output: AstralGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AstralGetRecordOutput<S>> for Astral<S> {
+    fn from(output: AstralGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Astral<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Astral<S> {
     const NSID: &'static str = "dev.vielle.dnd.astral";
     type Record = AstralRecord;
 }
@@ -278,7 +250,7 @@ impl Collection for AstralRecord {
     type Record = AstralRecord;
 }
 
-impl<'a> LexiconSchema for Astral<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Astral<S> {
     fn nsid() -> &'static str {
         "dev.vielle.dnd.astral"
     }
@@ -344,7 +316,7 @@ pub mod astral_state {
 /// Builder for constructing an instance of this type
 pub struct AstralBuilder<'a, S: astral_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<Vec<astral::Power<'a>>>),
+    _fields: (Option<i64>, Option<Vec<astral::Power<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -393,7 +365,7 @@ where
     /// Set the `powers` field (required)
     pub fn powers(
         mut self,
-        value: impl Into<Vec<astral::Power<'a>>>,
+        value: impl Into<Vec<astral::Power<S>>>,
     ) -> AstralBuilder<'a, astral_state::SetPowers<S>> {
         self._fields.1 = Option::Some(value.into());
         AstralBuilder {
@@ -419,13 +391,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Astral<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Astral<'a> {
         Astral {
             points: self._fields.0.unwrap(),
             powers: self._fields.1.unwrap(),

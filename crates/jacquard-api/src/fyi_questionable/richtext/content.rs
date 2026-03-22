@@ -10,10 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -31,43 +34,55 @@ use crate::fyi_questionable::richtext::math::Math;
 use crate::fyi_questionable::richtext::text::Text;
 use crate::fyi_questionable::richtext::website::Website;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Content<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Content<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of content blocks
-    #[serde(borrow)]
-    pub items: Vec<ContentItemsItem<'a>>,
+    pub items: Vec<ContentItemsItem<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ContentItemsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ContentItemsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "fyi.questionable.richtext.text")]
-    Text(Box<Text<'a>>),
+    Text(Box<Text<S>>),
     #[serde(rename = "fyi.questionable.richtext.blockquote")]
-    Blockquote(Box<Blockquote<'a>>),
+    Blockquote(Box<Blockquote<S>>),
     #[serde(rename = "fyi.questionable.richtext.bskyPost")]
-    BskyPost(Box<BskyPost<'a>>),
+    BskyPost(Box<BskyPost<S>>),
     #[serde(rename = "fyi.questionable.richtext.code")]
-    Code(Box<Code<'a>>),
+    Code(Box<Code<S>>),
     #[serde(rename = "fyi.questionable.richtext.header")]
-    Header(Box<Header<'a>>),
+    Header(Box<Header<S>>),
     #[serde(rename = "fyi.questionable.richtext.horizontalRule")]
-    HorizontalRule(Box<HorizontalRule<'a>>),
+    HorizontalRule(Box<HorizontalRule<S>>),
     #[serde(rename = "fyi.questionable.richtext.image")]
-    Image(Box<Image<'a>>),
+    Image(Box<Image<S>>),
     #[serde(rename = "fyi.questionable.richtext.math")]
-    Math(Box<Math<'a>>),
+    Math(Box<Math<S>>),
     #[serde(rename = "fyi.questionable.richtext.list")]
-    List(Box<List<'a>>),
+    List(Box<List<S>>),
     #[serde(rename = "fyi.questionable.richtext.website")]
-    Website(Box<Website<'a>>),
+    Website(Box<Website<S>>),
 }
 
-impl<'a> LexiconSchema for Content<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Content<S> {
     fn nsid() -> &'static str {
         "fyi.questionable.richtext.content"
     }
@@ -128,7 +143,7 @@ pub mod content_state {
 /// Builder for constructing an instance of this type
 pub struct ContentBuilder<'a, S: content_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<ContentItemsItem<'a>>>,),
+    _fields: (Option<Vec<ContentItemsItem<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -158,7 +173,7 @@ where
     /// Set the `items` field (required)
     pub fn items(
         mut self,
-        value: impl Into<Vec<ContentItemsItem<'a>>>,
+        value: impl Into<Vec<ContentItemsItem<S>>>,
     ) -> ContentBuilder<'a, content_state::SetItems<S>> {
         self._fields.0 = Option::Some(value.into());
         ContentBuilder {
@@ -184,10 +199,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Content<'a> {
         Content {
             items: self._fields.0.unwrap(),

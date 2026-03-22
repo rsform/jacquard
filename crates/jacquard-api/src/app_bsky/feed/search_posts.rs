@@ -10,25 +10,33 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{Language, UriValue};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::PostView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchPosts<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchPosts<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub author: Option<AtIdentifier<'a>>,
+    pub author: Option<AtIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub domain: Option<CowStr<'a>>,
+    pub domain: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lang: Option<Language>,
     ///Defaults to `25`. Min: 1. Max: 100.
@@ -37,45 +45,51 @@ pub struct SearchPosts<'a> {
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub mentions: Option<AtIdentifier<'a>>,
+    pub mentions: Option<AtIdentifier<S>>,
     #[serde(borrow)]
-    pub q: CowStr<'a>,
+    pub q: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub since: Option<CowStr<'a>>,
+    pub since: Option<S>,
     ///Defaults to `"latest"`.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort: Option<CowStr<'a>>,
+    pub sort: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub tag: Option<Vec<CowStr<'a>>>,
+    pub tag: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub until: Option<CowStr<'a>>,
+    pub until: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub url: Option<UriValue<'a>>,
+    pub url: Option<UriValue<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchPostsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchPostsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hits_total: Option<i64>,
-    #[serde(borrow)]
-    pub posts: Vec<PostView<'a>>,
+    pub posts: Vec<PostView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -84,18 +98,19 @@ pub struct SearchPostsOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SearchPostsError<'a> {
+pub enum SearchPostsError {
     #[serde(rename = "BadQueryString")]
-    BadQueryString(Option<CowStr<'a>>),
+    BadQueryString(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for SearchPostsError<'_> {
+impl core::fmt::Display for SearchPostsError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::BadQueryString(msg) => {
@@ -105,7 +120,13 @@ impl core::fmt::Display for SearchPostsError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -115,11 +136,12 @@ pub struct SearchPostsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchPostsResponse {
     const NSID: &'static str = "app.bsky.feed.searchPosts";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchPostsOutput<'de>;
-    type Err<'de> = SearchPostsError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SearchPostsOutput<S>;
+    type Err = SearchPostsError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchPosts<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SearchPosts<S> {
     const NSID: &'static str = "app.bsky.feed.searchPosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchPostsResponse;
@@ -130,7 +152,7 @@ pub struct SearchPostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchPostsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.searchPosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchPosts<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SearchPosts<S>;
     type Response = SearchPostsResponse;
 }
 
@@ -178,18 +200,18 @@ pub mod search_posts_state {
 pub struct SearchPostsBuilder<'a, S: search_posts_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtIdentifier<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<AtIdentifier<S>>,
+        Option<S>,
+        Option<S>,
         Option<Language>,
         Option<i64>,
-        Option<AtIdentifier<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
+        Option<AtIdentifier<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Vec<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -227,12 +249,12 @@ impl<'a> SearchPostsBuilder<'a, search_posts_state::Empty> {
 
 impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     /// Set the `author` field (optional)
-    pub fn author(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
+    pub fn author(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
-    pub fn maybe_author(mut self, value: Option<AtIdentifier<'a>>) -> Self {
+    pub fn maybe_author(mut self, value: Option<AtIdentifier<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -240,12 +262,12 @@ impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
 
 impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -253,12 +275,12 @@ impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
 
 impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     /// Set the `domain` field (optional)
-    pub fn domain(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn domain(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `domain` field to an Option value (optional)
-    pub fn maybe_domain(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_domain(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -292,12 +314,12 @@ impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
 
 impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     /// Set the `mentions` field (optional)
-    pub fn mentions(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
+    pub fn mentions(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
-    pub fn maybe_mentions(mut self, value: Option<AtIdentifier<'a>>) -> Self {
+    pub fn maybe_mentions(mut self, value: Option<AtIdentifier<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -311,7 +333,7 @@ where
     /// Set the `q` field (required)
     pub fn q(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SearchPostsBuilder<'a, search_posts_state::SetQ<S>> {
         self._fields.6 = Option::Some(value.into());
         SearchPostsBuilder {
@@ -324,12 +346,12 @@ where
 
 impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     /// Set the `since` field (optional)
-    pub fn since(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn since(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `since` field to an Option value (optional)
-    pub fn maybe_since(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_since(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -337,12 +359,12 @@ impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
 
 impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -350,12 +372,12 @@ impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
 
 impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     /// Set the `tag` field (optional)
-    pub fn tag(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tag(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `tag` field to an Option value (optional)
-    pub fn maybe_tag(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tag(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -363,12 +385,12 @@ impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
 
 impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     /// Set the `until` field (optional)
-    pub fn until(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn until(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `until` field to an Option value (optional)
-    pub fn maybe_until(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_until(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -376,12 +398,12 @@ impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
 
 impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.11 = value;
         self
     }

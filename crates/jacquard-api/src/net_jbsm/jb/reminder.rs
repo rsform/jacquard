@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,10 +29,17 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A reminder scheduled to trigger at a specific time
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "net.jbsm.jb.reminder", tag = "$type")]
-pub struct Reminder<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "net.jbsm.jb.reminder",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Reminder<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when the reminder was created
     pub created_at: Datetime,
     ///Whether the reminder has been triggered  Defaults to `false`.
@@ -39,37 +48,37 @@ pub struct Reminder<'a> {
     pub occurred: Option<bool>,
     ///AT-URI of the original post/message that triggered this reminder
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub origin_uri: Option<AtUri<'a>>,
+    pub origin_uri: Option<AtUri<S>>,
     ///DID of the user who created the reminder
-    #[serde(borrow)]
-    pub requester: Did<'a>,
+    pub requester: Did<S>,
     ///The reminder message/content
-    #[serde(borrow)]
-    pub subject: CowStr<'a>,
+    pub subject: S,
     ///Timestamp when the reminder should fire
     pub trigger_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReminderGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReminderGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Reminder<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Reminder<S>,
 }
 
-impl<'a> Reminder<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ReminderRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Reminder<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ReminderRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -80,18 +89,17 @@ pub struct ReminderRecord;
 impl XrpcResp for ReminderRecord {
     const NSID: &'static str = "net.jbsm.jb.reminder";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReminderGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ReminderGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ReminderGetRecordOutput<'_>> for Reminder<'_> {
-    fn from(output: ReminderGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ReminderGetRecordOutput<S>> for Reminder<S> {
+    fn from(output: ReminderGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Reminder<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Reminder<S> {
     const NSID: &'static str = "net.jbsm.jb.reminder";
     type Record = ReminderRecord;
 }
@@ -101,7 +109,7 @@ impl Collection for ReminderRecord {
     type Record = ReminderRecord;
 }
 
-impl<'a> LexiconSchema for Reminder<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Reminder<S> {
     fn nsid() -> &'static str {
         "net.jbsm.jb.reminder"
     }
@@ -141,67 +149,67 @@ pub mod reminder_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TriggerAt;
+        type Subject;
         type Requester;
         type CreatedAt;
-        type Subject;
+        type TriggerAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TriggerAt = Unset;
+        type Subject = Unset;
         type Requester = Unset;
         type CreatedAt = Unset;
-        type Subject = Unset;
-    }
-    ///State transition - sets the `trigger_at` field to Set
-    pub struct SetTriggerAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTriggerAt<S> {}
-    impl<S: State> State for SetTriggerAt<S> {
-        type TriggerAt = Set<members::trigger_at>;
-        type Requester = S::Requester;
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `requester` field to Set
-    pub struct SetRequester<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRequester<S> {}
-    impl<S: State> State for SetRequester<S> {
-        type TriggerAt = S::TriggerAt;
-        type Requester = Set<members::requester>;
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type TriggerAt = S::TriggerAt;
-        type Requester = S::Requester;
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type TriggerAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type TriggerAt = S::TriggerAt;
+        type Subject = Set<members::subject>;
         type Requester = S::Requester;
         type CreatedAt = S::CreatedAt;
-        type Subject = Set<members::subject>;
+        type TriggerAt = S::TriggerAt;
+    }
+    ///State transition - sets the `requester` field to Set
+    pub struct SetRequester<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRequester<S> {}
+    impl<S: State> State for SetRequester<S> {
+        type Subject = S::Subject;
+        type Requester = Set<members::requester>;
+        type CreatedAt = S::CreatedAt;
+        type TriggerAt = S::TriggerAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type Requester = S::Requester;
+        type CreatedAt = Set<members::created_at>;
+        type TriggerAt = S::TriggerAt;
+    }
+    ///State transition - sets the `trigger_at` field to Set
+    pub struct SetTriggerAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTriggerAt<S> {}
+    impl<S: State> State for SetTriggerAt<S> {
+        type Subject = S::Subject;
+        type Requester = S::Requester;
+        type CreatedAt = S::CreatedAt;
+        type TriggerAt = Set<members::trigger_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `trigger_at` field
-        pub struct trigger_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `requester` field
         pub struct requester(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
+        ///Marker type for the `trigger_at` field
+        pub struct trigger_at(());
     }
 }
 
@@ -211,9 +219,9 @@ pub struct ReminderBuilder<'a, S: reminder_state::State> {
     _fields: (
         Option<Datetime>,
         Option<bool>,
-        Option<AtUri<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
+        Option<AtUri<S>>,
+        Option<Did<S>>,
+        Option<S>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -271,12 +279,12 @@ impl<'a, S: reminder_state::State> ReminderBuilder<'a, S> {
 
 impl<'a, S: reminder_state::State> ReminderBuilder<'a, S> {
     /// Set the `originUri` field (optional)
-    pub fn origin_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn origin_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `originUri` field to an Option value (optional)
-    pub fn maybe_origin_uri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_origin_uri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -290,7 +298,7 @@ where
     /// Set the `requester` field (required)
     pub fn requester(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ReminderBuilder<'a, reminder_state::SetRequester<S>> {
         self._fields.3 = Option::Some(value.into());
         ReminderBuilder {
@@ -309,7 +317,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReminderBuilder<'a, reminder_state::SetSubject<S>> {
         self._fields.4 = Option::Some(value.into());
         ReminderBuilder {
@@ -342,10 +350,10 @@ where
 impl<'a, S> ReminderBuilder<'a, S>
 where
     S: reminder_state::State,
-    S::TriggerAt: reminder_state::IsSet,
+    S::Subject: reminder_state::IsSet,
     S::Requester: reminder_state::IsSet,
     S::CreatedAt: reminder_state::IsSet,
-    S::Subject: reminder_state::IsSet,
+    S::TriggerAt: reminder_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Reminder<'a> {
@@ -362,10 +370,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Reminder<'a> {
         Reminder {
             created_at: self._fields.0.unwrap(),

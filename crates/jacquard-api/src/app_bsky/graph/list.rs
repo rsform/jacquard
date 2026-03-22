@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -31,50 +33,54 @@ use crate::app_bsky::richtext::facet::Facet;
 use crate::com_atproto::label::SelfLabels;
 /// Record representing a list of accounts (actors). Scope includes both moderation-oriented lists and curration-oriented lists.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.bsky.graph.list", tag = "$type")]
-pub struct List<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.bsky.graph.list",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct List<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
+    pub avatar: Option<BlobRef<S>>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description_facets: Option<Vec<Facet<'a>>>,
+    pub description_facets: Option<Vec<Facet<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<SelfLabels<'a>>,
+    pub labels: Option<SelfLabels<S>>,
     ///Display name for list; can not be empty.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Defines the purpose of the list (aka, moderation-oriented or curration-oriented)
-    #[serde(borrow)]
-    pub purpose: ListPurpose<'a>,
+    pub purpose: ListPurpose<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ListGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: List<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: List<S>,
 }
 
-impl<'a> List<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ListRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> List<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ListRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -85,18 +91,17 @@ pub struct ListRecord;
 impl XrpcResp for ListRecord {
     const NSID: &'static str = "app.bsky.graph.list";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ListGetRecordOutput<'_>> for List<'_> {
-    fn from(output: ListGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ListGetRecordOutput<S>> for List<S> {
+    fn from(output: ListGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for List<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for List<S> {
     const NSID: &'static str = "app.bsky.graph.list";
     type Record = ListRecord;
 }
@@ -106,7 +111,7 @@ impl Collection for ListRecord {
     type Record = ListRecord;
 }
 
-impl<'a> LexiconSchema for List<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for List<S> {
     fn nsid() -> &'static str {
         "app.bsky.graph.list"
     }
@@ -215,51 +220,51 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
         type Purpose;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
         type Purpose = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Purpose = S::Purpose;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
         type Purpose = S::Purpose;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `purpose` field to Set
     pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPurpose<S> {}
     impl<S: State> State for SetPurpose<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
         type Purpose = Set<members::purpose>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Purpose = S::Purpose;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `purpose` field
         pub struct purpose(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -267,13 +272,13 @@ pub mod list_state {
 pub struct ListBuilder<'a, S: list_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<BlobRef<'a>>,
+        Option<BlobRef<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<SelfLabels<'a>>,
-        Option<CowStr<'a>>,
-        Option<ListPurpose<'a>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<SelfLabels<S>>,
+        Option<S>,
+        Option<ListPurpose<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -298,12 +303,12 @@ impl<'a> ListBuilder<'a, list_state::Empty> {
 
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -330,12 +335,12 @@ where
 
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -345,13 +350,13 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
-        value: impl Into<Option<Vec<Facet<'a>>>>,
+        value: impl Into<Option<Vec<Facet<S>>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
-    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -359,12 +364,12 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
 
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -378,7 +383,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ListBuilder<'a, list_state::SetName<S>> {
         self._fields.5 = Option::Some(value.into());
         ListBuilder {
@@ -397,7 +402,7 @@ where
     /// Set the `purpose` field (required)
     pub fn purpose(
         mut self,
-        value: impl Into<ListPurpose<'a>>,
+        value: impl Into<ListPurpose<S>>,
     ) -> ListBuilder<'a, list_state::SetPurpose<S>> {
         self._fields.6 = Option::Some(value.into());
         ListBuilder {
@@ -411,9 +416,9 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::CreatedAt: list_state::IsSet,
     S::Name: list_state::IsSet,
     S::Purpose: list_state::IsSet,
+    S::CreatedAt: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -429,13 +434,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> List<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> List<'a> {
         List {
             avatar: self._fields.0,
             created_at: self._fields.1.unwrap(),

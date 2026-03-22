@@ -7,26 +7,46 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::dropbox::FileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetMetadata<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub path: CowStr<'a>,
+    pub path: S,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetMetadataOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetMetadataOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: FileView<'a>,
+    pub value: FileView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for app.rocksky.dropbox.getMetadata
@@ -34,11 +54,12 @@ pub struct GetMetadataResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMetadataResponse {
     const NSID: &'static str = "app.rocksky.dropbox.getMetadata";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetMetadataOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetMetadataOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetMetadata<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetMetadata<S> {
     const NSID: &'static str = "app.rocksky.dropbox.getMetadata";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetMetadataResponse;
@@ -49,7 +70,7 @@ pub struct GetMetadataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMetadataRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.dropbox.getMetadata";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetMetadata<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetMetadata<S>;
     type Response = GetMetadataResponse;
 }
 
@@ -88,7 +109,7 @@ pub mod get_metadata_state {
 /// Builder for constructing an instance of this type
 pub struct GetMetadataBuilder<'a, S: get_metadata_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -118,7 +139,7 @@ where
     /// Set the `path` field (required)
     pub fn path(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetMetadataBuilder<'a, get_metadata_state::SetPath<S>> {
         self._fields.0 = Option::Some(value.into());
         GetMetadataBuilder {

@@ -10,29 +10,45 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::actor::ProfileViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetResourceParticipants<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetResourceParticipants<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub resource: AtUri<'a>,
+    pub resource: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetResourceParticipantsOutput<'a> {
-    #[serde(borrow)]
-    pub owner: ProfileViewBasic<'a>,
-    #[serde(borrow)]
-    pub participants: Vec<ProfileViewBasic<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetResourceParticipantsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub owner: ProfileViewBasic<S>,
+    pub participants: Vec<ProfileViewBasic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub viewer_can_edit: Option<bool>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.collab.getResourceParticipants
@@ -40,11 +56,12 @@ pub struct GetResourceParticipantsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetResourceParticipantsResponse {
     const NSID: &'static str = "sh.weaver.collab.getResourceParticipants";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetResourceParticipantsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetResourceParticipantsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetResourceParticipants<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetResourceParticipants<S> {
     const NSID: &'static str = "sh.weaver.collab.getResourceParticipants";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetResourceParticipantsResponse;
@@ -55,7 +72,7 @@ pub struct GetResourceParticipantsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetResourceParticipantsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.collab.getResourceParticipants";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetResourceParticipants<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetResourceParticipants<S>;
     type Response = GetResourceParticipantsResponse;
 }
 
@@ -97,7 +114,7 @@ pub struct GetResourceParticipantsBuilder<
     S: get_resource_participants_state::State,
 > {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -130,7 +147,7 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetResourceParticipantsBuilder<
         'a,
         get_resource_participants_state::SetResource<S>,

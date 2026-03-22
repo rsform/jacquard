@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,58 +31,61 @@ use crate::com_whtwnd::blog::BlobMetadata;
 use crate::com_whtwnd::blog::Ogp;
 /// A declaration of a post.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "com.whtwnd.blog.entry", tag = "$type")]
-pub struct Entry<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "com.whtwnd.blog.entry",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub blobs: Option<Vec<BlobMetadata<'a>>>,
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
+    pub blobs: Option<Vec<BlobMetadata<S>>>,
+    pub content: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///(DEPRECATED) Marks this entry as draft to tell AppViews not to show it to anyone except for the author
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_draft: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ogp: Option<Ogp<'a>>,
+    pub ogp: Option<Ogp<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subtitle: Option<CowStr<'a>>,
+    pub subtitle: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub theme: Option<CowStr<'a>>,
+    pub theme: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     ///Tells the visibility of the article to AppView.  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_entry_visibility")]
-    #[serde(borrow)]
-    pub visibility: Option<CowStr<'a>>,
+    pub visibility: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EntryGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EntryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Entry<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Entry<S>,
 }
 
-impl<'a> Entry<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, EntryRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Entry<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, EntryRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -91,18 +96,17 @@ pub struct EntryRecord;
 impl XrpcResp for EntryRecord {
     const NSID: &'static str = "com.whtwnd.blog.entry";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = EntryGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = EntryGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<EntryGetRecordOutput<'_>> for Entry<'_> {
-    fn from(output: EntryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<EntryGetRecordOutput<S>> for Entry<S> {
+    fn from(output: EntryGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Entry<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Entry<S> {
     const NSID: &'static str = "com.whtwnd.blog.entry";
     type Record = EntryRecord;
 }
@@ -112,7 +116,7 @@ impl Collection for EntryRecord {
     type Record = EntryRecord;
 }
 
-impl<'a> LexiconSchema for Entry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entry<S> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.entry"
     }
@@ -158,8 +162,8 @@ impl<'a> LexiconSchema for Entry<'a> {
     }
 }
 
-fn _default_entry_visibility() -> Option<CowStr<'static>> {
-    Some(CowStr::from("public"))
+fn _default_entry_visibility<S: From<&'static str>>() -> ::core::option::Option<S> {
+    Some(S::from("public"))
 }
 
 pub mod entry_state {
@@ -198,15 +202,15 @@ pub mod entry_state {
 pub struct EntryBuilder<'a, S: entry_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<BlobMetadata<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<BlobMetadata<S>>>,
+        Option<S>,
         Option<Datetime>,
         Option<bool>,
-        Option<Ogp<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<Ogp<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -231,12 +235,12 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `blobs` field (optional)
-    pub fn blobs(mut self, value: impl Into<Option<Vec<BlobMetadata<'a>>>>) -> Self {
+    pub fn blobs(mut self, value: impl Into<Option<Vec<BlobMetadata<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `blobs` field to an Option value (optional)
-    pub fn maybe_blobs(mut self, value: Option<Vec<BlobMetadata<'a>>>) -> Self {
+    pub fn maybe_blobs(mut self, value: Option<Vec<BlobMetadata<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -250,7 +254,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EntryBuilder<'a, entry_state::SetContent<S>> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
@@ -289,12 +293,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `ogp` field (optional)
-    pub fn ogp(mut self, value: impl Into<Option<Ogp<'a>>>) -> Self {
+    pub fn ogp(mut self, value: impl Into<Option<Ogp<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `ogp` field to an Option value (optional)
-    pub fn maybe_ogp(mut self, value: Option<Ogp<'a>>) -> Self {
+    pub fn maybe_ogp(mut self, value: Option<Ogp<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -302,12 +306,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `subtitle` field (optional)
-    pub fn subtitle(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn subtitle(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `subtitle` field to an Option value (optional)
-    pub fn maybe_subtitle(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_subtitle(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -315,12 +319,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `theme` field (optional)
-    pub fn theme(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn theme(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
-    pub fn maybe_theme(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_theme(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -328,12 +332,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -341,12 +345,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn visibility(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
-    pub fn maybe_visibility(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_visibility(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -373,13 +377,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Entry<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Entry<'a> {
         Entry {
             blobs: self._fields.0,
             content: self._fields.1.unwrap(),

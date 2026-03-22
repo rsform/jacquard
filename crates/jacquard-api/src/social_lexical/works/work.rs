@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,102 +29,95 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 ///
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.lexical.works.work", tag = "$type")]
-pub struct Work<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.lexical.works.work",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Work<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
     ///
-    #[serde(borrow)]
-    pub work_type: WorkWorkType<'a>,
+    pub work_type: WorkWorkType<S>,
     ///
     #[serde(skip_serializing_if = "Option::is_none")]
     pub year: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 ///
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WorkWorkType<'a> {
+pub enum WorkWorkType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Movie,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> WorkWorkType<'a> {
+impl<S: Bos<str> + AsRef<str>> WorkWorkType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Movie => "Movie",
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for WorkWorkType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "Movie" => Self::Movie,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for WorkWorkType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "Movie" => Self::Movie,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WorkWorkType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WorkWorkType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for WorkWorkType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for WorkWorkType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for WorkWorkType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for WorkWorkType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for WorkWorkType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for WorkWorkType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for WorkWorkType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for WorkWorkType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for WorkWorkType<'_> {
-    type Output = WorkWorkType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for WorkWorkType<S> {
+    type Output = WorkWorkType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             WorkWorkType::Movie => WorkWorkType::Movie,
@@ -134,22 +129,23 @@ impl jacquard_common::IntoStatic for WorkWorkType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct WorkGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct WorkGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Work<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Work<S>,
 }
 
-impl<'a> Work<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, WorkRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Work<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, WorkRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -160,18 +156,17 @@ pub struct WorkRecord;
 impl XrpcResp for WorkRecord {
     const NSID: &'static str = "social.lexical.works.work";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = WorkGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = WorkGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<WorkGetRecordOutput<'_>> for Work<'_> {
-    fn from(output: WorkGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<WorkGetRecordOutput<S>> for Work<S> {
+    fn from(output: WorkGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Work<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Work<S> {
     const NSID: &'static str = "social.lexical.works.work";
     type Record = WorkRecord;
 }
@@ -181,7 +176,7 @@ impl Collection for WorkRecord {
     type Record = WorkRecord;
 }
 
-impl<'a> LexiconSchema for Work<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Work<S> {
     fn nsid() -> &'static str {
         "social.lexical.works.work"
     }
@@ -331,12 +326,7 @@ pub mod work_state {
 /// Builder for constructing an instance of this type
 pub struct WorkBuilder<'a, S: work_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<WorkWorkType<'a>>,
-        Option<i64>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<WorkWorkType<S>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -360,12 +350,12 @@ impl<'a> WorkBuilder<'a, work_state::Empty> {
 
 impl<'a, S: work_state::State> WorkBuilder<'a, S> {
     /// Set the `id` field (optional)
-    pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
-    pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_id(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -379,7 +369,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> WorkBuilder<'a, work_state::SetTitle<S>> {
         self._fields.1 = Option::Some(value.into());
         WorkBuilder {
@@ -398,7 +388,7 @@ where
     /// Set the `workType` field (required)
     pub fn work_type(
         mut self,
-        value: impl Into<WorkWorkType<'a>>,
+        value: impl Into<WorkWorkType<S>>,
     ) -> WorkBuilder<'a, work_state::SetWorkType<S>> {
         self._fields.2 = Option::Some(value.into());
         WorkBuilder {
@@ -439,13 +429,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Work<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Work<'a> {
         Work {
             id: self._fields.0,
             title: self._fields.1.unwrap(),

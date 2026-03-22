@@ -10,39 +10,54 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::RepoView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchRepos<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchRepos<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub q: Option<CowStr<'a>>,
+    pub q: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub term: Option<CowStr<'a>>,
+    pub term: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchReposOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchReposOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub repos: Vec<RepoView<'a>>,
+    pub cursor: Option<S>,
+    pub repos: Vec<RepoView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for tools.ozone.moderation.searchRepos
@@ -50,11 +65,12 @@ pub struct SearchReposResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchReposResponse {
     const NSID: &'static str = "tools.ozone.moderation.searchRepos";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchReposOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SearchReposOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchRepos<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SearchRepos<S> {
     const NSID: &'static str = "tools.ozone.moderation.searchRepos";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchReposResponse;
@@ -65,7 +81,7 @@ pub struct SearchReposRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchReposRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.searchRepos";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchRepos<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SearchRepos<S>;
     type Response = SearchReposResponse;
 }
 
@@ -95,7 +111,7 @@ pub mod search_repos_state {
 /// Builder for constructing an instance of this type
 pub struct SearchReposBuilder<'a, S: search_repos_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -119,12 +135,12 @@ impl<'a> SearchReposBuilder<'a, search_repos_state::Empty> {
 
 impl<'a, S: search_repos_state::State> SearchReposBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -145,12 +161,12 @@ impl<'a, S: search_repos_state::State> SearchReposBuilder<'a, S> {
 
 impl<'a, S: search_repos_state::State> SearchReposBuilder<'a, S> {
     /// Set the `q` field (optional)
-    pub fn q(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn q(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `q` field to an Option value (optional)
-    pub fn maybe_q(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_q(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -158,12 +174,12 @@ impl<'a, S: search_repos_state::State> SearchReposBuilder<'a, S> {
 
 impl<'a, S: search_repos_state::State> SearchReposBuilder<'a, S> {
     /// Set the `term` field (optional)
-    pub fn term(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn term(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `term` field to an Option value (optional)
-    pub fn maybe_term(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_term(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }

@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -38,28 +40,33 @@ use crate::pub_leaflet::blocks::unordered_list::UnorderedList;
 use crate::pub_leaflet::blocks::website::Website;
 use crate::pub_leaflet::pages::linear_document;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Block<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Block<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alignment: Option<BlockAlignment<'a>>,
-    #[serde(borrow)]
-    pub block: BlockBlock<'a>,
+    pub alignment: Option<BlockAlignment<S>>,
+    pub block: BlockBlock<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum BlockAlignment<'a> {
+pub enum BlockAlignment<S: Bos<str> + AsRef<str> = DefaultStr> {
     TextAlignLeft,
     TextAlignCenter,
     TextAlignRight,
     TextAlignJustify,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> BlockAlignment<'a> {
+impl<S: Bos<str> + AsRef<str>> BlockAlignment<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::TextAlignLeft => "#textAlignLeft",
@@ -69,74 +76,58 @@ impl<'a> BlockAlignment<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for BlockAlignment<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "#textAlignLeft" => Self::TextAlignLeft,
             "#textAlignCenter" => Self::TextAlignCenter,
             "#textAlignRight" => Self::TextAlignRight,
             "#textAlignJustify" => Self::TextAlignJustify,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for BlockAlignment<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "#textAlignLeft" => Self::TextAlignLeft,
-            "#textAlignCenter" => Self::TextAlignCenter,
-            "#textAlignRight" => Self::TextAlignRight,
-            "#textAlignJustify" => Self::TextAlignJustify,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for BlockAlignment<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for BlockAlignment<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for BlockAlignment<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for BlockAlignment<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for BlockAlignment<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for BlockAlignment<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for BlockAlignment<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for BlockAlignment<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for BlockAlignment<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for BlockAlignment<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for BlockAlignment<'_> {
-    type Output = BlockAlignment<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for BlockAlignment<S> {
+    type Output = BlockAlignment<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             BlockAlignment::TextAlignLeft => BlockAlignment::TextAlignLeft,
@@ -151,70 +142,93 @@ impl jacquard_common::IntoStatic for BlockAlignment<'_> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum BlockBlock<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum BlockBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "pub.leaflet.blocks.iframe")]
-    Iframe(Box<Iframe<'a>>),
+    Iframe(Box<Iframe<S>>),
     #[serde(rename = "pub.leaflet.blocks.text")]
-    Text(Box<Text<'a>>),
+    Text(Box<Text<S>>),
     #[serde(rename = "pub.leaflet.blocks.blockquote")]
-    Blockquote(Box<Blockquote<'a>>),
+    Blockquote(Box<Blockquote<S>>),
     #[serde(rename = "pub.leaflet.blocks.header")]
-    Header(Box<Header<'a>>),
+    Header(Box<Header<S>>),
     #[serde(rename = "pub.leaflet.blocks.image")]
-    Image(Box<Image<'a>>),
+    Image(Box<Image<S>>),
     #[serde(rename = "pub.leaflet.blocks.unorderedList")]
-    UnorderedList(Box<UnorderedList<'a>>),
+    UnorderedList(Box<UnorderedList<S>>),
     #[serde(rename = "pub.leaflet.blocks.orderedList")]
-    OrderedList(Box<OrderedList<'a>>),
+    OrderedList(Box<OrderedList<S>>),
     #[serde(rename = "pub.leaflet.blocks.website")]
-    Website(Box<Website<'a>>),
+    Website(Box<Website<S>>),
     #[serde(rename = "pub.leaflet.blocks.math")]
-    Math(Box<Math<'a>>),
+    Math(Box<Math<S>>),
     #[serde(rename = "pub.leaflet.blocks.code")]
-    Code(Box<Code<'a>>),
+    Code(Box<Code<S>>),
     #[serde(rename = "pub.leaflet.blocks.horizontalRule")]
-    HorizontalRule(Box<HorizontalRule<'a>>),
+    HorizontalRule(Box<HorizontalRule<S>>),
     #[serde(rename = "pub.leaflet.blocks.bskyPost")]
-    BskyPost(Box<BskyPost<'a>>),
+    BskyPost(Box<BskyPost<S>>),
     #[serde(rename = "pub.leaflet.blocks.page")]
-    Page(Box<Page<'a>>),
+    Page(Box<Page<S>>),
     #[serde(rename = "pub.leaflet.blocks.poll")]
-    Poll(Box<Poll<'a>>),
+    Poll(Box<Poll<S>>),
     #[serde(rename = "pub.leaflet.blocks.button")]
-    Button(Box<Button<'a>>),
+    Button(Box<Button<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LinearDocument<'a> {
-    #[serde(borrow)]
-    pub blocks: Vec<linear_document::Block<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LinearDocument<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub blocks: Vec<linear_document::Block<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Position<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Position<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub block: Vec<i64>,
     pub offset: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Quote<'a> {
-    #[serde(borrow)]
-    pub end: linear_document::Position<'a>,
-    #[serde(borrow)]
-    pub start: linear_document::Position<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Quote<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub end: linear_document::Position<S>,
+    pub start: linear_document::Position<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
@@ -253,7 +267,7 @@ impl core::fmt::Display for TextAlignRight {
     }
 }
 
-impl<'a> LexiconSchema for Block<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Block<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.linearDocument"
     }
@@ -268,7 +282,7 @@ impl<'a> LexiconSchema for Block<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LinearDocument<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LinearDocument<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.linearDocument"
     }
@@ -283,7 +297,7 @@ impl<'a> LexiconSchema for LinearDocument<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Position<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Position<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.linearDocument"
     }
@@ -298,7 +312,7 @@ impl<'a> LexiconSchema for Position<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Quote<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Quote<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.linearDocument"
     }
@@ -348,7 +362,7 @@ pub mod block_state {
 /// Builder for constructing an instance of this type
 pub struct BlockBuilder<'a, S: block_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlockAlignment<'a>>, Option<BlockBlock<'a>>),
+    _fields: (Option<BlockAlignment<S>>, Option<BlockBlock<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -372,12 +386,12 @@ impl<'a> BlockBuilder<'a, block_state::Empty> {
 
 impl<'a, S: block_state::State> BlockBuilder<'a, S> {
     /// Set the `alignment` field (optional)
-    pub fn alignment(mut self, value: impl Into<Option<BlockAlignment<'a>>>) -> Self {
+    pub fn alignment(mut self, value: impl Into<Option<BlockAlignment<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alignment` field to an Option value (optional)
-    pub fn maybe_alignment(mut self, value: Option<BlockAlignment<'a>>) -> Self {
+    pub fn maybe_alignment(mut self, value: Option<BlockAlignment<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -391,7 +405,7 @@ where
     /// Set the `block` field (required)
     pub fn block(
         mut self,
-        value: impl Into<BlockBlock<'a>>,
+        value: impl Into<BlockBlock<S>>,
     ) -> BlockBuilder<'a, block_state::SetBlock<S>> {
         self._fields.1 = Option::Some(value.into());
         BlockBuilder {
@@ -416,13 +430,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Block<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Block<'a> {
         Block {
             alignment: self._fields.0,
             block: self._fields.1.unwrap(),
@@ -620,7 +628,7 @@ pub mod linear_document_state {
 /// Builder for constructing an instance of this type
 pub struct LinearDocumentBuilder<'a, S: linear_document_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<linear_document::Block<'a>>>, Option<CowStr<'a>>),
+    _fields: (Option<Vec<linear_document::Block<S>>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -650,7 +658,7 @@ where
     /// Set the `blocks` field (required)
     pub fn blocks(
         mut self,
-        value: impl Into<Vec<linear_document::Block<'a>>>,
+        value: impl Into<Vec<linear_document::Block<S>>>,
     ) -> LinearDocumentBuilder<'a, linear_document_state::SetBlocks<S>> {
         self._fields.0 = Option::Some(value.into());
         LinearDocumentBuilder {
@@ -663,12 +671,12 @@ where
 
 impl<'a, S: linear_document_state::State> LinearDocumentBuilder<'a, S> {
     /// Set the `id` field (optional)
-    pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
-    pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_id(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -690,10 +698,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LinearDocument<'a> {
         LinearDocument {
             blocks: self._fields.0.unwrap(),
@@ -713,37 +718,37 @@ pub mod position_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Offset;
         type Block;
+        type Offset;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Offset = Unset;
         type Block = Unset;
-    }
-    ///State transition - sets the `offset` field to Set
-    pub struct SetOffset<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOffset<S> {}
-    impl<S: State> State for SetOffset<S> {
-        type Offset = Set<members::offset>;
-        type Block = S::Block;
+        type Offset = Unset;
     }
     ///State transition - sets the `block` field to Set
     pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlock<S> {}
     impl<S: State> State for SetBlock<S> {
-        type Offset = S::Offset;
         type Block = Set<members::block>;
+        type Offset = S::Offset;
+    }
+    ///State transition - sets the `offset` field to Set
+    pub struct SetOffset<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOffset<S> {}
+    impl<S: State> State for SetOffset<S> {
+        type Block = S::Block;
+        type Offset = Set<members::offset>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `offset` field
-        pub struct offset(());
         ///Marker type for the `block` field
         pub struct block(());
+        ///Marker type for the `offset` field
+        pub struct offset(());
     }
 }
 
@@ -813,8 +818,8 @@ where
 impl<'a, S> PositionBuilder<'a, S>
 where
     S: position_state::State,
-    S::Offset: position_state::IsSet,
     S::Block: position_state::IsSet,
+    S::Offset: position_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Position<'a> {
@@ -827,10 +832,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Position<'a> {
         Position {
             block: self._fields.0.unwrap(),
@@ -850,37 +852,37 @@ pub mod quote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type End;
         type Start;
+        type End;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type End = Unset;
         type Start = Unset;
-    }
-    ///State transition - sets the `end` field to Set
-    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnd<S> {}
-    impl<S: State> State for SetEnd<S> {
-        type End = Set<members::end>;
-        type Start = S::Start;
+        type End = Unset;
     }
     ///State transition - sets the `start` field to Set
     pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStart<S> {}
     impl<S: State> State for SetStart<S> {
-        type End = S::End;
         type Start = Set<members::start>;
+        type End = S::End;
+    }
+    ///State transition - sets the `end` field to Set
+    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEnd<S> {}
+    impl<S: State> State for SetEnd<S> {
+        type Start = S::Start;
+        type End = Set<members::end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `end` field
-        pub struct end(());
         ///Marker type for the `start` field
         pub struct start(());
+        ///Marker type for the `end` field
+        pub struct end(());
     }
 }
 
@@ -888,8 +890,8 @@ pub mod quote_state {
 pub struct QuoteBuilder<'a, S: quote_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<linear_document::Position<'a>>,
-        Option<linear_document::Position<'a>>,
+        Option<linear_document::Position<S>>,
+        Option<linear_document::Position<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -920,7 +922,7 @@ where
     /// Set the `end` field (required)
     pub fn end(
         mut self,
-        value: impl Into<linear_document::Position<'a>>,
+        value: impl Into<linear_document::Position<S>>,
     ) -> QuoteBuilder<'a, quote_state::SetEnd<S>> {
         self._fields.0 = Option::Some(value.into());
         QuoteBuilder {
@@ -939,7 +941,7 @@ where
     /// Set the `start` field (required)
     pub fn start(
         mut self,
-        value: impl Into<linear_document::Position<'a>>,
+        value: impl Into<linear_document::Position<S>>,
     ) -> QuoteBuilder<'a, quote_state::SetStart<S>> {
         self._fields.1 = Option::Some(value.into());
         QuoteBuilder {
@@ -953,8 +955,8 @@ where
 impl<'a, S> QuoteBuilder<'a, S>
 where
     S: quote_state::State,
-    S::End: quote_state::IsSet,
     S::Start: quote_state::IsSet,
+    S::End: quote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Quote<'a> {
@@ -965,13 +967,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Quote<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Quote<'a> {
         Quote {
             end: self._fields.0.unwrap(),
             start: self._fields.1.unwrap(),

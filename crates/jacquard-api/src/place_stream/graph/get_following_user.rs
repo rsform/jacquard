@@ -10,28 +10,45 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetFollowingUser<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetFollowingUser<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub subject_did: Did<'a>,
+    pub subject_did: Did<S>,
     #[serde(borrow)]
-    pub user_did: Did<'a>,
+    pub user_did: Did<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetFollowingUserOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetFollowingUserOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub follow: Option<StrongRef<'a>>,
+    pub follow: Option<StrongRef<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for place.stream.graph.getFollowingUser
@@ -39,11 +56,12 @@ pub struct GetFollowingUserResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFollowingUserResponse {
     const NSID: &'static str = "place.stream.graph.getFollowingUser";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFollowingUserOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetFollowingUserOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetFollowingUser<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetFollowingUser<S> {
     const NSID: &'static str = "place.stream.graph.getFollowingUser";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetFollowingUserResponse;
@@ -54,7 +72,7 @@ pub struct GetFollowingUserRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFollowingUserRequest {
     const PATH: &'static str = "/xrpc/place.stream.graph.getFollowingUser";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFollowingUser<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetFollowingUser<S>;
     type Response = GetFollowingUserResponse;
 }
 
@@ -105,7 +123,7 @@ pub mod get_following_user_state {
 /// Builder for constructing an instance of this type
 pub struct GetFollowingUserBuilder<'a, S: get_following_user_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<Did<'a>>),
+    _fields: (Option<Did<S>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -135,7 +153,7 @@ where
     /// Set the `subjectDID` field (required)
     pub fn subject_did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetFollowingUserBuilder<'a, get_following_user_state::SetSubjectDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetFollowingUserBuilder {
@@ -154,7 +172,7 @@ where
     /// Set the `userDID` field (required)
     pub fn user_did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetFollowingUserBuilder<'a, get_following_user_state::SetUserDid<S>> {
         self._fields.1 = Option::Some(value.into());
         GetFollowingUserBuilder {

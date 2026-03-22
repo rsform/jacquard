@@ -10,7 +10,10 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::graph::StarterPackView;
 
@@ -24,12 +27,22 @@ pub struct GetOnboardingSuggestedStarterPacks {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetOnboardingSuggestedStarterPacksOutput<'a> {
-    #[serde(borrow)]
-    pub starter_packs: Vec<StarterPackView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetOnboardingSuggestedStarterPacksOutput<
+    S: Bos<str> + AsRef<str> = DefaultStr,
+> {
+    pub starter_packs: Vec<StarterPackView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.unspecced.getOnboardingSuggestedStarterPacks
@@ -37,8 +50,8 @@ pub struct GetOnboardingSuggestedStarterPacksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetOnboardingSuggestedStarterPacksResponse {
     const NSID: &'static str = "app.bsky.unspecced.getOnboardingSuggestedStarterPacks";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetOnboardingSuggestedStarterPacksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetOnboardingSuggestedStarterPacksOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetOnboardingSuggestedStarterPacks {
@@ -52,7 +65,7 @@ pub struct GetOnboardingSuggestedStarterPacksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetOnboardingSuggestedStarterPacksRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getOnboardingSuggestedStarterPacks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetOnboardingSuggestedStarterPacks;
+    type Request<S: Bos<str> + AsRef<str>> = GetOnboardingSuggestedStarterPacks;
     type Response = GetOnboardingSuggestedStarterPacksResponse;
 }
 

@@ -10,13 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Nsid};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -28,12 +29,18 @@ use crate::ooo_bsky::authfetch::list_records;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListRecords<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListRecords<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub collection: Nsid<'a>,
+    pub collection: Nsid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -43,32 +50,43 @@ pub struct ListRecords<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListRecordsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListRecordsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub records: Vec<list_records::Record<'a>>,
+    pub cursor: Option<S>,
+    pub records: Vec<list_records::Record<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A record in the hidden repository.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Record<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Record<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The strategy used to authenticate fetch requests for this record.
-    #[serde(borrow)]
-    pub strategy: Strategy<'a>,
+    pub strategy: Strategy<S>,
     ///The AT URI of the record.
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
     ///The stored private record value.
-    #[serde(borrow)]
-    pub value: Data<'a>,
+    pub value: Data<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for ooo.bsky.authfetch.listRecords
@@ -76,11 +94,12 @@ pub struct ListRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListRecordsResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.listRecords";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListRecordsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListRecordsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListRecords<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListRecords<S> {
     const NSID: &'static str = "ooo.bsky.authfetch.listRecords";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListRecordsResponse;
@@ -91,11 +110,11 @@ pub struct ListRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListRecordsRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.listRecords";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListRecords<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListRecords<S>;
     type Response = ListRecordsResponse;
 }
 
-impl<'a> LexiconSchema for Record<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Record<S> {
     fn nsid() -> &'static str {
         "ooo.bsky.authfetch.listRecords"
     }
@@ -149,7 +168,7 @@ pub mod list_records_state {
 /// Builder for constructing an instance of this type
 pub struct ListRecordsBuilder<'a, S: list_records_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Nsid<'a>>, Option<CowStr<'a>>, Option<i64>, Option<bool>),
+    _fields: (Option<Nsid<S>>, Option<S>, Option<i64>, Option<bool>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -179,7 +198,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<Nsid<'a>>,
+        value: impl Into<Nsid<S>>,
     ) -> ListRecordsBuilder<'a, list_records_state::SetCollection<S>> {
         self._fields.0 = Option::Some(value.into());
         ListRecordsBuilder {
@@ -192,12 +211,12 @@ where
 
 impl<'a, S: list_records_state::State> ListRecordsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -255,58 +274,58 @@ pub mod record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
         type Strategy;
         type Value;
-        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
         type Strategy = Unset;
         type Value = Unset;
-        type Uri = Unset;
-    }
-    ///State transition - sets the `strategy` field to Set
-    pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStrategy<S> {}
-    impl<S: State> State for SetStrategy<S> {
-        type Strategy = Set<members::strategy>;
-        type Value = S::Value;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Strategy = S::Strategy;
-        type Value = Set<members::value>;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
         type Strategy = S::Strategy;
         type Value = S::Value;
-        type Uri = Set<members::uri>;
+    }
+    ///State transition - sets the `strategy` field to Set
+    pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStrategy<S> {}
+    impl<S: State> State for SetStrategy<S> {
+        type Uri = S::Uri;
+        type Strategy = Set<members::strategy>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Uri = S::Uri;
+        type Strategy = S::Strategy;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `strategy` field
         pub struct strategy(());
         ///Marker type for the `value` field
         pub struct value(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RecordBuilder<'a, S: record_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Strategy<'a>>, Option<AtUri<'a>>, Option<Data<'a>>),
+    _fields: (Option<Strategy<S>>, Option<AtUri<S>>, Option<Data<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -336,7 +355,7 @@ where
     /// Set the `strategy` field (required)
     pub fn strategy(
         mut self,
-        value: impl Into<Strategy<'a>>,
+        value: impl Into<Strategy<S>>,
     ) -> RecordBuilder<'a, record_state::SetStrategy<S>> {
         self._fields.0 = Option::Some(value.into());
         RecordBuilder {
@@ -355,7 +374,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> RecordBuilder<'a, record_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         RecordBuilder {
@@ -374,7 +393,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> RecordBuilder<'a, record_state::SetValue<S>> {
         self._fields.2 = Option::Some(value.into());
         RecordBuilder {
@@ -388,9 +407,9 @@ where
 impl<'a, S> RecordBuilder<'a, S>
 where
     S: record_state::State,
+    S::Uri: record_state::IsSet,
     S::Strategy: record_state::IsSet,
     S::Value: record_state::IsSet,
-    S::Uri: record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Record<'a> {
@@ -402,10 +421,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Record<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Record<'a> {
         Record {
             strategy: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),

@@ -10,32 +10,49 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid, RecordKey, Rkey};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::systems_timker::hawlt::note::Note;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct PutNote<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PutNote<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The note record to write.
-    #[serde(borrow)]
-    pub record: Note<'a>,
+    pub record: Note<S>,
     ///The record key (TID) for this note.
-    #[serde(borrow)]
-    pub rkey: RecordKey<Rkey<'a>>,
+    pub rkey: RecordKey<Rkey<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct PutNoteOutput<'a> {
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PutNoteOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub cid: Cid<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for systems.timker.hawlt.putNote
@@ -43,11 +60,12 @@ pub struct PutNoteResponse;
 impl jacquard_common::xrpc::XrpcResp for PutNoteResponse {
     const NSID: &'static str = "systems.timker.hawlt.putNote";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PutNoteOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PutNoteOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for PutNote<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for PutNote<S> {
     const NSID: &'static str = "systems.timker.hawlt.putNote";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -62,7 +80,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for PutNoteRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = PutNote<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = PutNote<S>;
     type Response = PutNoteResponse;
 }
 
@@ -113,7 +131,7 @@ pub mod put_note_state {
 /// Builder for constructing an instance of this type
 pub struct PutNoteBuilder<'a, S: put_note_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Note<'a>>, Option<RecordKey<Rkey<'a>>>),
+    _fields: (Option<Note<S>>, Option<RecordKey<Rkey<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -143,7 +161,7 @@ where
     /// Set the `record` field (required)
     pub fn record(
         mut self,
-        value: impl Into<Note<'a>>,
+        value: impl Into<Note<S>>,
     ) -> PutNoteBuilder<'a, put_note_state::SetRecord<S>> {
         self._fields.0 = Option::Some(value.into());
         PutNoteBuilder {
@@ -162,7 +180,7 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<RecordKey<Rkey<'a>>>,
+        value: impl Into<RecordKey<Rkey<S>>>,
     ) -> PutNoteBuilder<'a, put_note_state::SetRkey<S>> {
         self._fields.1 = Option::Some(value.into());
         PutNoteBuilder {
@@ -190,10 +208,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PutNote<'a> {
         PutNote {
             record: self._fields.0.unwrap(),

@@ -10,8 +10,10 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -24,12 +26,20 @@ pub struct GetContinueReading {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetContinueReadingOutput<'a> {
-    #[serde(borrow)]
-    pub items: Vec<Data<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetContinueReadingOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub items: Vec<Data<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.notebook.getContinueReading
@@ -37,8 +47,8 @@ pub struct GetContinueReadingResponse;
 impl jacquard_common::xrpc::XrpcResp for GetContinueReadingResponse {
     const NSID: &'static str = "sh.weaver.notebook.getContinueReading";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetContinueReadingOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetContinueReadingOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetContinueReading {
@@ -52,7 +62,7 @@ pub struct GetContinueReadingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetContinueReadingRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getContinueReading";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetContinueReading;
+    type Request<S: Bos<str> + AsRef<str>> = GetContinueReading;
     type Response = GetContinueReadingResponse;
 }
 

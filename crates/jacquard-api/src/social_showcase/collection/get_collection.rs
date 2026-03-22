@@ -7,6 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -14,19 +15,39 @@ use crate::social_showcase::CollectionView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetCollection<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetCollection<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetCollectionOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetCollectionOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: CollectionView<'a>,
+    pub value: CollectionView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for social.showcase.collection.getCollection
@@ -34,11 +55,12 @@ pub struct GetCollectionResponse;
 impl jacquard_common::xrpc::XrpcResp for GetCollectionResponse {
     const NSID: &'static str = "social.showcase.collection.getCollection";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetCollectionOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetCollectionOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetCollection<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetCollection<S> {
     const NSID: &'static str = "social.showcase.collection.getCollection";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetCollectionResponse;
@@ -49,7 +71,7 @@ pub struct GetCollectionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetCollectionRequest {
     const PATH: &'static str = "/xrpc/social.showcase.collection.getCollection";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetCollection<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetCollection<S>;
     type Response = GetCollectionResponse;
 }
 
@@ -88,7 +110,7 @@ pub mod get_collection_state {
 /// Builder for constructing an instance of this type
 pub struct GetCollectionBuilder<'a, S: get_collection_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -118,7 +140,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetCollectionBuilder<'a, get_collection_state::SetUri<S>> {
         self._fields.0 = Option::Some(value.into());
         GetCollectionBuilder {

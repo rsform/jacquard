@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,46 +29,50 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// An external server for rebroadcasting a Streamplace stream
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "place.stream.multistream.target",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Target<'a> {
+pub struct Target<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether this target is currently active.
     pub active: bool,
     ///When this target was created.
     pub created_at: Datetime,
     ///A user-friendly name for this target.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///The rtmp:// or rtmps:// url of the target server.
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TargetGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TargetGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Target<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Target<S>,
 }
 
-impl<'a> Target<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TargetRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Target<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TargetRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -77,18 +83,17 @@ pub struct TargetRecord;
 impl XrpcResp for TargetRecord {
     const NSID: &'static str = "place.stream.multistream.target";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TargetGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TargetGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TargetGetRecordOutput<'_>> for Target<'_> {
-    fn from(output: TargetGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TargetGetRecordOutput<S>> for Target<S> {
+    fn from(output: TargetGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Target<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Target<S> {
     const NSID: &'static str = "place.stream.multistream.target";
     type Record = TargetRecord;
 }
@@ -98,7 +103,7 @@ impl Collection for TargetRecord {
     type Record = TargetRecord;
 }
 
-impl<'a> LexiconSchema for Target<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Target<S> {
     fn nsid() -> &'static str {
         "place.stream.multistream.target"
     }
@@ -134,57 +139,57 @@ pub mod target_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Active;
-        type CreatedAt;
         type Url;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Active = Unset;
-        type CreatedAt = Unset;
         type Url = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActive<S> {}
     impl<S: State> State for SetActive<S> {
         type Active = Set<members::active>;
+        type Url = S::Url;
         type CreatedAt = S::CreatedAt;
-        type Url = S::Url;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Active = S::Active;
-        type CreatedAt = Set<members::created_at>;
-        type Url = S::Url;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
         type Active = S::Active;
-        type CreatedAt = S::CreatedAt;
         type Url = Set<members::url>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Active = S::Active;
+        type Url = S::Url;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `active` field
         pub struct active(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TargetBuilder<'a, S: target_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<Datetime>, Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _fields: (Option<bool>, Option<Datetime>, Option<S>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -246,12 +251,12 @@ where
 
 impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -265,7 +270,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> TargetBuilder<'a, target_state::SetUrl<S>> {
         self._fields.3 = Option::Some(value.into());
         TargetBuilder {
@@ -280,8 +285,8 @@ impl<'a, S> TargetBuilder<'a, S>
 where
     S: target_state::State,
     S::Active: target_state::IsSet,
-    S::CreatedAt: target_state::IsSet,
     S::Url: target_state::IsSet,
+    S::CreatedAt: target_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Target<'a> {
@@ -294,13 +299,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Target<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Target<'a> {
         Target {
             active: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

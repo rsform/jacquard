@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,32 +29,36 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::at_margin::preferences;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct LabelPreference<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LabelPreference<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The label identifier (e.g. sexual, violence, spam).
-    #[serde(borrow)]
-    pub label: CowStr<'a>,
+    pub label: S,
     ///DID of the labeler service.
-    #[serde(borrow)]
-    pub labeler_did: CowStr<'a>,
+    pub labeler_did: S,
     ///How to handle content with this label: hide, warn, or ignore.
-    #[serde(borrow)]
-    pub visibility: LabelPreferenceVisibility<'a>,
+    pub visibility: LabelPreferenceVisibility<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// How to handle content with this label: hide, warn, or ignore.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LabelPreferenceVisibility<'a> {
+pub enum LabelPreferenceVisibility<S: Bos<str> + AsRef<str> = DefaultStr> {
     Hide,
     Warn,
     Ignore,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> LabelPreferenceVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> LabelPreferenceVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Hide => "hide",
@@ -61,72 +67,57 @@ impl<'a> LabelPreferenceVisibility<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for LabelPreferenceVisibility<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "hide" => Self::Hide,
             "warn" => Self::Warn,
             "ignore" => Self::Ignore,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for LabelPreferenceVisibility<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "hide" => Self::Hide,
-            "warn" => Self::Warn,
-            "ignore" => Self::Ignore,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for LabelPreferenceVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for LabelPreferenceVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for LabelPreferenceVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for LabelPreferenceVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for LabelPreferenceVisibility<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for LabelPreferenceVisibility<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for LabelPreferenceVisibility<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for LabelPreferenceVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for LabelPreferenceVisibility<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for LabelPreferenceVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for LabelPreferenceVisibility<'_> {
-    type Output = LabelPreferenceVisibility<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for LabelPreferenceVisibility<S> {
+    type Output = LabelPreferenceVisibility<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             LabelPreferenceVisibility::Hide => LabelPreferenceVisibility::Hide,
@@ -140,62 +131,75 @@ impl jacquard_common::IntoStatic for LabelPreferenceVisibility<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct LabelerSubscription<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LabelerSubscription<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///DID of the labeler service.
-    #[serde(borrow)]
-    pub did: CowStr<'a>,
+    pub did: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// User preferences for the Margin application.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "at.margin.preferences", tag = "$type")]
-pub struct Preferences<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "at.margin.preferences",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Preferences<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///If true, do not show the confirmation modal when opening external links.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_external_link_warning: Option<bool>,
     ///List of hostnames to skip the external link warning modal for.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub external_link_skipped_hostnames: Option<Vec<CowStr<'a>>>,
+    pub external_link_skipped_hostnames: Option<Vec<S>>,
     ///Per-label visibility preferences for subscribed labelers.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub label_preferences: Option<Vec<preferences::LabelPreference<'a>>>,
+    pub label_preferences: Option<Vec<preferences::LabelPreference<S>>>,
     ///List of labeler services the user subscribes to for content moderation.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subscribed_labelers: Option<Vec<preferences::LabelerSubscription<'a>>>,
+    pub subscribed_labelers: Option<Vec<preferences::LabelerSubscription<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PreferencesGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PreferencesGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Preferences<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Preferences<S>,
 }
 
-impl<'a> Preferences<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PreferencesRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Preferences<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PreferencesRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for LabelPreference<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LabelPreference<S> {
     fn nsid() -> &'static str {
         "at.margin.preferences"
     }
@@ -210,7 +214,7 @@ impl<'a> LexiconSchema for LabelPreference<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LabelerSubscription<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LabelerSubscription<S> {
     fn nsid() -> &'static str {
         "at.margin.preferences"
     }
@@ -232,18 +236,17 @@ pub struct PreferencesRecord;
 impl XrpcResp for PreferencesRecord {
     const NSID: &'static str = "at.margin.preferences";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PreferencesGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PreferencesGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PreferencesGetRecordOutput<'_>> for Preferences<'_> {
-    fn from(output: PreferencesGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PreferencesGetRecordOutput<S>> for Preferences<S> {
+    fn from(output: PreferencesGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Preferences<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Preferences<S> {
     const NSID: &'static str = "at.margin.preferences";
     type Record = PreferencesRecord;
 }
@@ -253,7 +256,7 @@ impl Collection for PreferencesRecord {
     type Record = PreferencesRecord;
 }
 
-impl<'a> LexiconSchema for Preferences<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Preferences<S> {
     fn nsid() -> &'static str {
         "at.margin.preferences"
     }
@@ -504,9 +507,9 @@ pub struct PreferencesBuilder<'a, S: preferences_state::State> {
     _fields: (
         Option<Datetime>,
         Option<bool>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<preferences::LabelPreference<'a>>>,
-        Option<Vec<preferences::LabelerSubscription<'a>>>,
+        Option<Vec<S>>,
+        Option<Vec<preferences::LabelPreference<S>>>,
+        Option<Vec<preferences::LabelerSubscription<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -568,7 +571,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `externalLinkSkippedHostnames` field (optional)
     pub fn external_link_skipped_hostnames(
         mut self,
-        value: impl Into<Option<Vec<CowStr<'a>>>>,
+        value: impl Into<Option<Vec<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -576,7 +579,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `externalLinkSkippedHostnames` field to an Option value (optional)
     pub fn maybe_external_link_skipped_hostnames(
         mut self,
-        value: Option<Vec<CowStr<'a>>>,
+        value: Option<Vec<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -587,7 +590,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `labelPreferences` field (optional)
     pub fn label_preferences(
         mut self,
-        value: impl Into<Option<Vec<preferences::LabelPreference<'a>>>>,
+        value: impl Into<Option<Vec<preferences::LabelPreference<S>>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -595,7 +598,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `labelPreferences` field to an Option value (optional)
     pub fn maybe_label_preferences(
         mut self,
-        value: Option<Vec<preferences::LabelPreference<'a>>>,
+        value: Option<Vec<preferences::LabelPreference<S>>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -606,7 +609,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `subscribedLabelers` field (optional)
     pub fn subscribed_labelers(
         mut self,
-        value: impl Into<Option<Vec<preferences::LabelerSubscription<'a>>>>,
+        value: impl Into<Option<Vec<preferences::LabelerSubscription<S>>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
@@ -614,7 +617,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `subscribedLabelers` field to an Option value (optional)
     pub fn maybe_subscribed_labelers(
         mut self,
-        value: Option<Vec<preferences::LabelerSubscription<'a>>>,
+        value: Option<Vec<preferences::LabelerSubscription<S>>>,
     ) -> Self {
         self._fields.4 = value;
         self
@@ -640,10 +643,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Preferences<'a> {
         Preferences {
             created_at: self._fields.0.unwrap(),

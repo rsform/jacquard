@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,111 +29,143 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::sh_tangled::git::ref_update;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CommitCountBreakdown<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CommitCountBreakdown<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub by_email: Option<Vec<ref_update::IndividualEmailCommitCount<'a>>>,
+    pub by_email: Option<Vec<ref_update::IndividualEmailCommitCount<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct IndividualEmailCommitCount<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct IndividualEmailCommitCount<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub count: i64,
-    #[serde(borrow)]
-    pub email: CowStr<'a>,
+    pub email: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct IndividualLanguageSize<'a> {
-    #[serde(borrow)]
-    pub lang: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct IndividualLanguageSize<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub lang: S,
     pub size: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct LangBreakdown<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LangBreakdown<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub inputs: Option<Vec<ref_update::IndividualLanguageSize<'a>>>,
+    pub inputs: Option<Vec<ref_update::IndividualLanguageSize<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// An update to a git repository, emitted by knots.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.tangled.git.refUpdate", tag = "$type")]
-pub struct RefUpdate<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.tangled.git.refUpdate",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RefUpdate<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///did of the user that pushed this ref
-    #[serde(borrow)]
-    pub committer_did: Did<'a>,
-    #[serde(borrow)]
-    pub meta: ref_update::Meta<'a>,
+    pub committer_did: Did<S>,
+    pub meta: ref_update::Meta<S>,
     ///new SHA of this ref
-    #[serde(borrow)]
-    pub new_sha: CowStr<'a>,
+    pub new_sha: S,
     ///old SHA of this ref
-    #[serde(borrow)]
-    pub old_sha: CowStr<'a>,
+    pub old_sha: S,
     ///Ref being updated
-    #[serde(borrow)]
-    pub r#ref: CowStr<'a>,
+    pub r#ref: S,
     ///did of the owner of the repo
-    #[serde(borrow)]
-    pub repo_did: Did<'a>,
+    pub repo_did: Did<S>,
     ///name of the repo
-    #[serde(borrow)]
-    pub repo_name: CowStr<'a>,
+    pub repo_name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RefUpdateGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RefUpdateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: RefUpdate<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: RefUpdate<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Meta<'a> {
-    #[serde(borrow)]
-    pub commit_count: ref_update::CommitCountBreakdown<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Meta<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub commit_count: ref_update::CommitCountBreakdown<S>,
     /// Defaults to `false`.
     #[serde(default = "_default_meta_is_default_ref")]
     pub is_default_ref: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lang_breakdown: Option<ref_update::LangBreakdown<'a>>,
+    pub lang_breakdown: Option<ref_update::LangBreakdown<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> RefUpdate<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, RefUpdateRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> RefUpdate<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, RefUpdateRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for CommitCountBreakdown<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CommitCountBreakdown<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
@@ -146,7 +180,7 @@ impl<'a> LexiconSchema for CommitCountBreakdown<'a> {
     }
 }
 
-impl<'a> LexiconSchema for IndividualEmailCommitCount<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for IndividualEmailCommitCount<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
@@ -161,7 +195,7 @@ impl<'a> LexiconSchema for IndividualEmailCommitCount<'a> {
     }
 }
 
-impl<'a> LexiconSchema for IndividualLanguageSize<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for IndividualLanguageSize<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
@@ -176,7 +210,7 @@ impl<'a> LexiconSchema for IndividualLanguageSize<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LangBreakdown<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LangBreakdown<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
@@ -198,18 +232,17 @@ pub struct RefUpdateRecord;
 impl XrpcResp for RefUpdateRecord {
     const NSID: &'static str = "sh.tangled.git.refUpdate";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RefUpdateGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RefUpdateGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<RefUpdateGetRecordOutput<'_>> for RefUpdate<'_> {
-    fn from(output: RefUpdateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<RefUpdateGetRecordOutput<S>> for RefUpdate<S> {
+    fn from(output: RefUpdateGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for RefUpdate<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for RefUpdate<S> {
     const NSID: &'static str = "sh.tangled.git.refUpdate";
     type Record = RefUpdateRecord;
 }
@@ -219,7 +252,7 @@ impl Collection for RefUpdateRecord {
     type Record = RefUpdateRecord;
 }
 
-impl<'a> LexiconSchema for RefUpdate<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RefUpdate<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
@@ -302,7 +335,7 @@ impl<'a> LexiconSchema for RefUpdate<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Meta<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Meta<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.refUpdate"
     }
@@ -606,7 +639,7 @@ pub struct IndividualEmailCommitCountBuilder<
     S: individual_email_commit_count_state::State,
 > {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -663,7 +696,7 @@ where
     /// Set the `email` field (required)
     pub fn email(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> IndividualEmailCommitCountBuilder<
         'a,
         individual_email_commit_count_state::SetEmail<S>,
@@ -694,10 +727,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> IndividualEmailCommitCount<'a> {
         IndividualEmailCommitCount {
             count: self._fields.0.unwrap(),
@@ -717,44 +747,44 @@ pub mod individual_language_size_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Size;
         type Lang;
+        type Size;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Size = Unset;
         type Lang = Unset;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Size = Set<members::size>;
-        type Lang = S::Lang;
+        type Size = Unset;
     }
     ///State transition - sets the `lang` field to Set
     pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLang<S> {}
     impl<S: State> State for SetLang<S> {
-        type Size = S::Size;
         type Lang = Set<members::lang>;
+        type Size = S::Size;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Lang = S::Lang;
+        type Size = Set<members::size>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `lang` field
         pub struct lang(());
+        ///Marker type for the `size` field
+        pub struct size(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct IndividualLanguageSizeBuilder<'a, S: individual_language_size_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -787,7 +817,7 @@ where
     /// Set the `lang` field (required)
     pub fn lang(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> IndividualLanguageSizeBuilder<'a, individual_language_size_state::SetLang<S>> {
         self._fields.0 = Option::Some(value.into());
         IndividualLanguageSizeBuilder {
@@ -820,8 +850,8 @@ where
 impl<'a, S> IndividualLanguageSizeBuilder<'a, S>
 where
     S: individual_language_size_state::State,
-    S::Size: individual_language_size_state::IsSet,
     S::Lang: individual_language_size_state::IsSet,
+    S::Size: individual_language_size_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IndividualLanguageSize<'a> {
@@ -834,10 +864,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> IndividualLanguageSize<'a> {
         IndividualLanguageSize {
             lang: self._fields.0.unwrap(),
@@ -857,125 +884,125 @@ pub mod ref_update_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
-        type Meta;
         type OldSha;
-        type RepoDid;
-        type CommitterDid;
         type NewSha;
+        type CommitterDid;
+        type Meta;
+        type Ref;
+        type RepoDid;
         type RepoName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
-        type Meta = Unset;
         type OldSha = Unset;
-        type RepoDid = Unset;
-        type CommitterDid = Unset;
         type NewSha = Unset;
+        type CommitterDid = Unset;
+        type Meta = Unset;
+        type Ref = Unset;
+        type RepoDid = Unset;
         type RepoName = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type Meta = S::Meta;
-        type OldSha = S::OldSha;
-        type RepoDid = S::RepoDid;
-        type CommitterDid = S::CommitterDid;
-        type NewSha = S::NewSha;
-        type RepoName = S::RepoName;
-    }
-    ///State transition - sets the `meta` field to Set
-    pub struct SetMeta<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMeta<S> {}
-    impl<S: State> State for SetMeta<S> {
-        type Ref = S::Ref;
-        type Meta = Set<members::meta>;
-        type OldSha = S::OldSha;
-        type RepoDid = S::RepoDid;
-        type CommitterDid = S::CommitterDid;
-        type NewSha = S::NewSha;
-        type RepoName = S::RepoName;
     }
     ///State transition - sets the `old_sha` field to Set
     pub struct SetOldSha<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOldSha<S> {}
     impl<S: State> State for SetOldSha<S> {
-        type Ref = S::Ref;
-        type Meta = S::Meta;
         type OldSha = Set<members::old_sha>;
-        type RepoDid = S::RepoDid;
+        type NewSha = S::NewSha;
         type CommitterDid = S::CommitterDid;
-        type NewSha = S::NewSha;
-        type RepoName = S::RepoName;
-    }
-    ///State transition - sets the `repo_did` field to Set
-    pub struct SetRepoDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepoDid<S> {}
-    impl<S: State> State for SetRepoDid<S> {
-        type Ref = S::Ref;
         type Meta = S::Meta;
-        type OldSha = S::OldSha;
-        type RepoDid = Set<members::repo_did>;
-        type CommitterDid = S::CommitterDid;
-        type NewSha = S::NewSha;
-        type RepoName = S::RepoName;
-    }
-    ///State transition - sets the `committer_did` field to Set
-    pub struct SetCommitterDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommitterDid<S> {}
-    impl<S: State> State for SetCommitterDid<S> {
         type Ref = S::Ref;
-        type Meta = S::Meta;
-        type OldSha = S::OldSha;
         type RepoDid = S::RepoDid;
-        type CommitterDid = Set<members::committer_did>;
-        type NewSha = S::NewSha;
         type RepoName = S::RepoName;
     }
     ///State transition - sets the `new_sha` field to Set
     pub struct SetNewSha<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNewSha<S> {}
     impl<S: State> State for SetNewSha<S> {
-        type Ref = S::Ref;
-        type Meta = S::Meta;
         type OldSha = S::OldSha;
-        type RepoDid = S::RepoDid;
-        type CommitterDid = S::CommitterDid;
         type NewSha = Set<members::new_sha>;
+        type CommitterDid = S::CommitterDid;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+    }
+    ///State transition - sets the `committer_did` field to Set
+    pub struct SetCommitterDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommitterDid<S> {}
+    impl<S: State> State for SetCommitterDid<S> {
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+        type CommitterDid = Set<members::committer_did>;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+    }
+    ///State transition - sets the `meta` field to Set
+    pub struct SetMeta<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMeta<S> {}
+    impl<S: State> State for SetMeta<S> {
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+        type CommitterDid = S::CommitterDid;
+        type Meta = Set<members::meta>;
+        type Ref = S::Ref;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+        type CommitterDid = S::CommitterDid;
+        type Meta = S::Meta;
+        type Ref = Set<members::r#ref>;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+    }
+    ///State transition - sets the `repo_did` field to Set
+    pub struct SetRepoDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepoDid<S> {}
+    impl<S: State> State for SetRepoDid<S> {
+        type OldSha = S::OldSha;
+        type NewSha = S::NewSha;
+        type CommitterDid = S::CommitterDid;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type RepoDid = Set<members::repo_did>;
         type RepoName = S::RepoName;
     }
     ///State transition - sets the `repo_name` field to Set
     pub struct SetRepoName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepoName<S> {}
     impl<S: State> State for SetRepoName<S> {
-        type Ref = S::Ref;
-        type Meta = S::Meta;
         type OldSha = S::OldSha;
-        type RepoDid = S::RepoDid;
-        type CommitterDid = S::CommitterDid;
         type NewSha = S::NewSha;
+        type CommitterDid = S::CommitterDid;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type RepoDid = S::RepoDid;
         type RepoName = Set<members::repo_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
-        ///Marker type for the `meta` field
-        pub struct meta(());
         ///Marker type for the `old_sha` field
         pub struct old_sha(());
-        ///Marker type for the `repo_did` field
-        pub struct repo_did(());
-        ///Marker type for the `committer_did` field
-        pub struct committer_did(());
         ///Marker type for the `new_sha` field
         pub struct new_sha(());
+        ///Marker type for the `committer_did` field
+        pub struct committer_did(());
+        ///Marker type for the `meta` field
+        pub struct meta(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
+        ///Marker type for the `repo_did` field
+        pub struct repo_did(());
         ///Marker type for the `repo_name` field
         pub struct repo_name(());
     }
@@ -985,13 +1012,13 @@ pub mod ref_update_state {
 pub struct RefUpdateBuilder<'a, S: ref_update_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Did<'a>>,
-        Option<ref_update::Meta<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
+        Option<Did<S>>,
+        Option<ref_update::Meta<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1022,7 +1049,7 @@ where
     /// Set the `committerDid` field (required)
     pub fn committer_did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetCommitterDid<S>> {
         self._fields.0 = Option::Some(value.into());
         RefUpdateBuilder {
@@ -1041,7 +1068,7 @@ where
     /// Set the `meta` field (required)
     pub fn meta(
         mut self,
-        value: impl Into<ref_update::Meta<'a>>,
+        value: impl Into<ref_update::Meta<S>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetMeta<S>> {
         self._fields.1 = Option::Some(value.into());
         RefUpdateBuilder {
@@ -1060,7 +1087,7 @@ where
     /// Set the `newSha` field (required)
     pub fn new_sha(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetNewSha<S>> {
         self._fields.2 = Option::Some(value.into());
         RefUpdateBuilder {
@@ -1079,7 +1106,7 @@ where
     /// Set the `oldSha` field (required)
     pub fn old_sha(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetOldSha<S>> {
         self._fields.3 = Option::Some(value.into());
         RefUpdateBuilder {
@@ -1098,7 +1125,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetRef<S>> {
         self._fields.4 = Option::Some(value.into());
         RefUpdateBuilder {
@@ -1117,7 +1144,7 @@ where
     /// Set the `repoDid` field (required)
     pub fn repo_did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetRepoDid<S>> {
         self._fields.5 = Option::Some(value.into());
         RefUpdateBuilder {
@@ -1136,7 +1163,7 @@ where
     /// Set the `repoName` field (required)
     pub fn repo_name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetRepoName<S>> {
         self._fields.6 = Option::Some(value.into());
         RefUpdateBuilder {
@@ -1150,12 +1177,12 @@ where
 impl<'a, S> RefUpdateBuilder<'a, S>
 where
     S: ref_update_state::State,
-    S::Ref: ref_update_state::IsSet,
-    S::Meta: ref_update_state::IsSet,
     S::OldSha: ref_update_state::IsSet,
-    S::RepoDid: ref_update_state::IsSet,
-    S::CommitterDid: ref_update_state::IsSet,
     S::NewSha: ref_update_state::IsSet,
+    S::CommitterDid: ref_update_state::IsSet,
+    S::Meta: ref_update_state::IsSet,
+    S::Ref: ref_update_state::IsSet,
+    S::RepoDid: ref_update_state::IsSet,
     S::RepoName: ref_update_state::IsSet,
 {
     /// Build the final struct
@@ -1174,10 +1201,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RefUpdate<'a> {
         RefUpdate {
             committer_did: self._fields.0.unwrap(),
@@ -1206,37 +1230,37 @@ pub mod meta_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IsDefaultRef;
         type CommitCount;
+        type IsDefaultRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IsDefaultRef = Unset;
         type CommitCount = Unset;
-    }
-    ///State transition - sets the `is_default_ref` field to Set
-    pub struct SetIsDefaultRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsDefaultRef<S> {}
-    impl<S: State> State for SetIsDefaultRef<S> {
-        type IsDefaultRef = Set<members::is_default_ref>;
-        type CommitCount = S::CommitCount;
+        type IsDefaultRef = Unset;
     }
     ///State transition - sets the `commit_count` field to Set
     pub struct SetCommitCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommitCount<S> {}
     impl<S: State> State for SetCommitCount<S> {
-        type IsDefaultRef = S::IsDefaultRef;
         type CommitCount = Set<members::commit_count>;
+        type IsDefaultRef = S::IsDefaultRef;
+    }
+    ///State transition - sets the `is_default_ref` field to Set
+    pub struct SetIsDefaultRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsDefaultRef<S> {}
+    impl<S: State> State for SetIsDefaultRef<S> {
+        type CommitCount = S::CommitCount;
+        type IsDefaultRef = Set<members::is_default_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `is_default_ref` field
-        pub struct is_default_ref(());
         ///Marker type for the `commit_count` field
         pub struct commit_count(());
+        ///Marker type for the `is_default_ref` field
+        pub struct is_default_ref(());
     }
 }
 
@@ -1244,9 +1268,9 @@ pub mod meta_state {
 pub struct MetaBuilder<'a, S: meta_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ref_update::CommitCountBreakdown<'a>>,
+        Option<ref_update::CommitCountBreakdown<S>>,
         Option<bool>,
-        Option<ref_update::LangBreakdown<'a>>,
+        Option<ref_update::LangBreakdown<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1277,7 +1301,7 @@ where
     /// Set the `commitCount` field (required)
     pub fn commit_count(
         mut self,
-        value: impl Into<ref_update::CommitCountBreakdown<'a>>,
+        value: impl Into<ref_update::CommitCountBreakdown<S>>,
     ) -> MetaBuilder<'a, meta_state::SetCommitCount<S>> {
         self._fields.0 = Option::Some(value.into());
         MetaBuilder {
@@ -1311,7 +1335,7 @@ impl<'a, S: meta_state::State> MetaBuilder<'a, S> {
     /// Set the `langBreakdown` field (optional)
     pub fn lang_breakdown(
         mut self,
-        value: impl Into<Option<ref_update::LangBreakdown<'a>>>,
+        value: impl Into<Option<ref_update::LangBreakdown<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -1319,7 +1343,7 @@ impl<'a, S: meta_state::State> MetaBuilder<'a, S> {
     /// Set the `langBreakdown` field to an Option value (optional)
     pub fn maybe_lang_breakdown(
         mut self,
-        value: Option<ref_update::LangBreakdown<'a>>,
+        value: Option<ref_update::LangBreakdown<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -1329,8 +1353,8 @@ impl<'a, S: meta_state::State> MetaBuilder<'a, S> {
 impl<'a, S> MetaBuilder<'a, S>
 where
     S: meta_state::State,
-    S::IsDefaultRef: meta_state::IsSet,
     S::CommitCount: meta_state::IsSet,
+    S::IsDefaultRef: meta_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Meta<'a> {
@@ -1342,13 +1366,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Meta<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Meta<'a> {
         Meta {
             commit_count: self._fields.0.unwrap(),
             is_default_ref: self._fields.1.unwrap(),

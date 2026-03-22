@@ -14,11 +14,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Datetime};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -28,49 +31,57 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewBasic;
 /// An invite granting a DID access with profile information
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct InviteView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct InviteView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When this invitation was created
     pub created_at: Datetime,
     ///The DID being invited
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///Optional expiration date for this invitation
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<Datetime>,
     ///Profile of the invitee
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub profile: Option<ProfileViewBasic<'a>>,
+    pub profile: Option<ProfileViewBasic<S>>,
     ///The AT URI of the slice this invite is for
-    #[serde(borrow)]
-    pub slice: AtUri<'a>,
+    pub slice: AtUri<S>,
     ///The AT URI of this invite record
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A request to join the waitlist with profile information
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RequestView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RequestView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When the user joined the waitlist
     pub created_at: Datetime,
     ///Profile of the requester
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub profile: Option<ProfileViewBasic<'a>>,
+    pub profile: Option<ProfileViewBasic<S>>,
     ///The AT URI of the slice being requested access to
-    #[serde(borrow)]
-    pub slice: AtUri<'a>,
+    pub slice: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for InviteView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for InviteView<S> {
     fn nsid() -> &'static str {
         "network.slices.waitlist.defs"
     }
@@ -85,7 +96,7 @@ impl<'a> LexiconSchema for InviteView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RequestView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RequestView<S> {
     fn nsid() -> &'static str {
         "network.slices.waitlist.defs"
     }
@@ -110,51 +121,51 @@ pub mod invite_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slice;
-        type CreatedAt;
         type Did;
+        type CreatedAt;
+        type Slice;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slice = Unset;
-        type CreatedAt = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `slice` field to Set
-    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlice<S> {}
-    impl<S: State> State for SetSlice<S> {
-        type Slice = Set<members::slice>;
-        type CreatedAt = S::CreatedAt;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Slice = S::Slice;
-        type CreatedAt = Set<members::created_at>;
-        type Did = S::Did;
+        type CreatedAt = Unset;
+        type Slice = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Slice = S::Slice;
-        type CreatedAt = S::CreatedAt;
         type Did = Set<members::did>;
+        type CreatedAt = S::CreatedAt;
+        type Slice = S::Slice;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Did = S::Did;
+        type CreatedAt = Set<members::created_at>;
+        type Slice = S::Slice;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlice<S> {}
+    impl<S: State> State for SetSlice<S> {
+        type Did = S::Did;
+        type CreatedAt = S::CreatedAt;
+        type Slice = Set<members::slice>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slice` field
-        pub struct slice(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `slice` field
+        pub struct slice(());
     }
 }
 
@@ -163,11 +174,11 @@ pub struct InviteViewBuilder<'a, S: invite_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<Did<'a>>,
+        Option<Did<S>>,
         Option<Datetime>,
-        Option<ProfileViewBasic<'a>>,
-        Option<AtUri<'a>>,
-        Option<AtUri<'a>>,
+        Option<ProfileViewBasic<S>>,
+        Option<AtUri<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -217,7 +228,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         InviteViewBuilder {
@@ -243,12 +254,12 @@ impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
 
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `profile` field (optional)
-    pub fn profile(mut self, value: impl Into<Option<ProfileViewBasic<'a>>>) -> Self {
+    pub fn profile(mut self, value: impl Into<Option<ProfileViewBasic<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `profile` field to an Option value (optional)
-    pub fn maybe_profile(mut self, value: Option<ProfileViewBasic<'a>>) -> Self {
+    pub fn maybe_profile(mut self, value: Option<ProfileViewBasic<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -262,7 +273,7 @@ where
     /// Set the `slice` field (required)
     pub fn slice(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetSlice<S>> {
         self._fields.4 = Option::Some(value.into());
         InviteViewBuilder {
@@ -275,12 +286,12 @@ where
 
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `uri` field (optional)
-    pub fn uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
-    pub fn maybe_uri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_uri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -289,9 +300,9 @@ impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
 impl<'a, S> InviteViewBuilder<'a, S>
 where
     S: invite_view_state::State,
-    S::Slice: invite_view_state::IsSet,
-    S::CreatedAt: invite_view_state::IsSet,
     S::Did: invite_view_state::IsSet,
+    S::CreatedAt: invite_view_state::IsSet,
+    S::Slice: invite_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> InviteView<'a> {
@@ -308,10 +319,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> InviteView<'a> {
         InviteView {
             created_at: self._fields.0.unwrap(),
@@ -489,44 +497,44 @@ pub mod request_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slice;
         type CreatedAt;
+        type Slice;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slice = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `slice` field to Set
-    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlice<S> {}
-    impl<S: State> State for SetSlice<S> {
-        type Slice = Set<members::slice>;
-        type CreatedAt = S::CreatedAt;
+        type Slice = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Slice = S::Slice;
         type CreatedAt = Set<members::created_at>;
+        type Slice = S::Slice;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlice<S> {}
+    impl<S: State> State for SetSlice<S> {
+        type CreatedAt = S::CreatedAt;
+        type Slice = Set<members::slice>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slice` field
-        pub struct slice(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `slice` field
+        pub struct slice(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RequestViewBuilder<'a, S: request_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<ProfileViewBasic<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<Datetime>, Option<ProfileViewBasic<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -569,12 +577,12 @@ where
 
 impl<'a, S: request_view_state::State> RequestViewBuilder<'a, S> {
     /// Set the `profile` field (optional)
-    pub fn profile(mut self, value: impl Into<Option<ProfileViewBasic<'a>>>) -> Self {
+    pub fn profile(mut self, value: impl Into<Option<ProfileViewBasic<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `profile` field to an Option value (optional)
-    pub fn maybe_profile(mut self, value: Option<ProfileViewBasic<'a>>) -> Self {
+    pub fn maybe_profile(mut self, value: Option<ProfileViewBasic<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -588,7 +596,7 @@ where
     /// Set the `slice` field (required)
     pub fn slice(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> RequestViewBuilder<'a, request_view_state::SetSlice<S>> {
         self._fields.2 = Option::Some(value.into());
         RequestViewBuilder {
@@ -602,8 +610,8 @@ where
 impl<'a, S> RequestViewBuilder<'a, S>
 where
     S: request_view_state::State,
-    S::Slice: request_view_state::IsSet,
     S::CreatedAt: request_view_state::IsSet,
+    S::Slice: request_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RequestView<'a> {
@@ -617,10 +625,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RequestView<'a> {
         RequestView {
             created_at: self._fields.0.unwrap(),

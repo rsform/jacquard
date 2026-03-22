@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,48 +31,50 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::games_gamesgamesgamesgames::CreditEntry;
 /// A relationship between a game and a profile.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "games.gamesgamesgamesgames.actor.credit",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Credit<'a> {
+pub struct Credit<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub actor: Option<StrongRef<'a>>,
+    pub actor: Option<StrongRef<S>>,
     ///The roles this profile played in the creation of the game.
-    #[serde(borrow)]
-    pub credits: Vec<CreditEntry<'a>>,
+    pub credits: Vec<CreditEntry<S>>,
     ///The name to be used if there is no profile associated with this credit, or the profile is inaccessible.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     ///The game to which this profile is being credited.
-    #[serde(borrow)]
-    pub game: StrongRef<'a>,
+    pub game: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CreditGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreditGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Credit<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Credit<S>,
 }
 
-impl<'a> Credit<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CreditRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Credit<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CreditRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -81,18 +85,17 @@ pub struct CreditRecord;
 impl XrpcResp for CreditRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.actor.credit";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreditGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CreditGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CreditGetRecordOutput<'_>> for Credit<'_> {
-    fn from(output: CreditGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CreditGetRecordOutput<S>> for Credit<S> {
+    fn from(output: CreditGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Credit<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Credit<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.actor.credit";
     type Record = CreditRecord;
 }
@@ -102,7 +105,7 @@ impl Collection for CreditRecord {
     type Record = CreditRecord;
 }
 
-impl<'a> LexiconSchema for Credit<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Credit<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.actor.credit"
     }
@@ -175,10 +178,10 @@ pub mod credit_state {
 pub struct CreditBuilder<'a, S: credit_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<StrongRef<'a>>,
-        Option<Vec<CreditEntry<'a>>>,
-        Option<CowStr<'a>>,
-        Option<StrongRef<'a>>,
+        Option<StrongRef<S>>,
+        Option<Vec<CreditEntry<S>>>,
+        Option<S>,
+        Option<StrongRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -203,12 +206,12 @@ impl<'a> CreditBuilder<'a, credit_state::Empty> {
 
 impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
     /// Set the `actor` field (optional)
-    pub fn actor(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn actor(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
-    pub fn maybe_actor(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_actor(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -222,7 +225,7 @@ where
     /// Set the `credits` field (required)
     pub fn credits(
         mut self,
-        value: impl Into<Vec<CreditEntry<'a>>>,
+        value: impl Into<Vec<CreditEntry<S>>>,
     ) -> CreditBuilder<'a, credit_state::SetCredits<S>> {
         self._fields.1 = Option::Some(value.into());
         CreditBuilder {
@@ -235,12 +238,12 @@ where
 
 impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -254,7 +257,7 @@ where
     /// Set the `game` field (required)
     pub fn game(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> CreditBuilder<'a, credit_state::SetGame<S>> {
         self._fields.3 = Option::Some(value.into());
         CreditBuilder {
@@ -282,13 +285,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Credit<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Credit<'a> {
         Credit {
             actor: self._fields.0,
             credits: self._fields.1.unwrap(),

@@ -10,26 +10,42 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::org_passingreads::book::StatefulBook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetBooks<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetBooks<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub ids: CowStr<'a>,
+    pub ids: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetBooksOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetBooksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of books found. Missing books are omitted.
-    #[serde(borrow)]
-    pub books: Vec<StatefulBook<'a>>,
+    pub books: Vec<StatefulBook<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for org.passingreads.book.getBooks
@@ -37,11 +53,12 @@ pub struct GetBooksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBooksResponse {
     const NSID: &'static str = "org.passingreads.book.getBooks";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetBooksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetBooksOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetBooks<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetBooks<S> {
     const NSID: &'static str = "org.passingreads.book.getBooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBooksResponse;
@@ -52,7 +69,7 @@ pub struct GetBooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBooksRequest {
     const PATH: &'static str = "/xrpc/org.passingreads.book.getBooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBooks<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetBooks<S>;
     type Response = GetBooksResponse;
 }
 
@@ -91,7 +108,7 @@ pub mod get_books_state {
 /// Builder for constructing an instance of this type
 pub struct GetBooksBuilder<'a, S: get_books_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -121,7 +138,7 @@ where
     /// Set the `ids` field (required)
     pub fn ids(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetBooksBuilder<'a, get_books_state::SetIds<S>> {
         self._fields.0 = Option::Some(value.into());
         GetBooksBuilder {

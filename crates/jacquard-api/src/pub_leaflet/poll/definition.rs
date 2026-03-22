@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,47 +30,61 @@ use serde::{Serialize, Deserialize};
 use crate::pub_leaflet::poll::definition;
 /// Record declaring a poll
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "pub.leaflet.poll.definition", tag = "$type")]
-pub struct Definition<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "pub.leaflet.poll.definition",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Definition<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end_date: Option<Datetime>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
-    #[serde(borrow)]
-    pub options: Vec<definition::DefinitionOption<'a>>,
+    pub name: S,
+    pub options: Vec<definition::DefinitionOption<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DefinitionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DefinitionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Definition<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Definition<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DefinitionOption<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DefinitionOption<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<CowStr<'a>>,
+    pub text: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Definition<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DefinitionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Definition<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DefinitionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -79,18 +95,17 @@ pub struct DefinitionRecord;
 impl XrpcResp for DefinitionRecord {
     const NSID: &'static str = "pub.leaflet.poll.definition";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DefinitionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DefinitionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DefinitionGetRecordOutput<'_>> for Definition<'_> {
-    fn from(output: DefinitionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DefinitionGetRecordOutput<S>> for Definition<S> {
+    fn from(output: DefinitionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Definition<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Definition<S> {
     const NSID: &'static str = "pub.leaflet.poll.definition";
     type Record = DefinitionRecord;
 }
@@ -100,7 +115,7 @@ impl Collection for DefinitionRecord {
     type Record = DefinitionRecord;
 }
 
-impl<'a> LexiconSchema for Definition<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Definition<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.poll.definition"
     }
@@ -139,7 +154,7 @@ impl<'a> LexiconSchema for Definition<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DefinitionOption<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DefinitionOption<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.poll.definition"
     }
@@ -223,11 +238,7 @@ pub mod definition_state {
 /// Builder for constructing an instance of this type
 pub struct DefinitionBuilder<'a, S: definition_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Vec<definition::DefinitionOption<'a>>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<Vec<definition::DefinitionOption<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -270,7 +281,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DefinitionBuilder<'a, definition_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         DefinitionBuilder {
@@ -289,7 +300,7 @@ where
     /// Set the `options` field (required)
     pub fn options(
         mut self,
-        value: impl Into<Vec<definition::DefinitionOption<'a>>>,
+        value: impl Into<Vec<definition::DefinitionOption<S>>>,
     ) -> DefinitionBuilder<'a, definition_state::SetOptions<S>> {
         self._fields.2 = Option::Some(value.into());
         DefinitionBuilder {
@@ -318,10 +329,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Definition<'a> {
         Definition {
             end_date: self._fields.0,

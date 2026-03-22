@@ -5,11 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::CowStr;
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -18,20 +22,26 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Distribution and rebroadcast policy.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DistributionPolicy<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DistributionPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of did:webs of the broadcasters you want to allow to distribute your content. "*" allows anyone. Starting a line with a "!" bans that broadcaster.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub allowed_broadcasters: Option<Vec<CowStr<'a>>>,
+    pub allowed_broadcasters: Option<Vec<S>>,
     ///Duration in seconds after which segments should be deleted. Each segment will expire N seconds after its creation time. -1 to allow indefinite archival.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub delete_after: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for DistributionPolicy<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DistributionPolicy<S> {
     fn nsid() -> &'static str {
         "place.stream.metadata.distributionPolicy"
     }

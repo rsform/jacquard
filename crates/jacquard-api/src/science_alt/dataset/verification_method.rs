@@ -41,15 +41,17 @@ impl core::fmt::Display for FormalProof {
 /// Verification method identifier for lens verification records. Known values correspond to token definitions in this Lexicon. New verification methods can be added as tokens without breaking changes.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VerificationMethod<'a> {
+pub enum VerificationMethod<
+    S: jacquard_common::Bos<str> + AsRef<str> = jacquard_common::DefaultStr,
+> {
     CodeReview,
     FormalProof,
     SignedHash,
     AutomatedTest,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> VerificationMethod<'a> {
+impl<S: jacquard_common::Bos<str> + AsRef<str>> VerificationMethod<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::CodeReview => "codeReview",
@@ -59,68 +61,53 @@ impl<'a> VerificationMethod<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for VerificationMethod<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "codeReview" => Self::CodeReview,
             "formalProof" => Self::FormalProof,
             "signedHash" => Self::SignedHash,
             "automatedTest" => Self::AutomatedTest,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for VerificationMethod<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "codeReview" => Self::CodeReview,
-            "formalProof" => Self::FormalProof,
-            "signedHash" => Self::SignedHash,
-            "automatedTest" => Self::AutomatedTest,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for VerificationMethod<'a> {
+impl<S: jacquard_common::Bos<str> + AsRef<str>> AsRef<str> for VerificationMethod<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for VerificationMethod<'a> {
+impl<S: jacquard_common::Bos<str> + AsRef<str>> core::fmt::Display
+for VerificationMethod<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for VerificationMethod<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: jacquard_common::Bos<str> + AsRef<str>> Serialize for VerificationMethod<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for VerificationMethod<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + jacquard_common::Bos<str> + AsRef<str>> Deserialize<'de>
+for VerificationMethod<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for VerificationMethod<'_> {
-    type Output = VerificationMethod<'static>;
+impl<S: jacquard_common::Bos<str> + AsRef<str>> IntoStatic for VerificationMethod<S> {
+    type Output = VerificationMethod<jacquard_common::DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             VerificationMethod::CodeReview => VerificationMethod::CodeReview,

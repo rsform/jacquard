@@ -7,6 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -14,19 +15,39 @@ use crate::sh_weaver::edit::EditTreeView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetEditTree<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetEditTree<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub resource: AtUri<'a>,
+    pub resource: AtUri<S>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetEditTreeOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetEditTreeOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: EditTreeView<'a>,
+    pub value: EditTreeView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for sh.weaver.edit.getEditTree
@@ -34,11 +55,12 @@ pub struct GetEditTreeResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEditTreeResponse {
     const NSID: &'static str = "sh.weaver.edit.getEditTree";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetEditTreeOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetEditTreeOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetEditTree<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetEditTree<S> {
     const NSID: &'static str = "sh.weaver.edit.getEditTree";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEditTreeResponse;
@@ -49,7 +71,7 @@ pub struct GetEditTreeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEditTreeRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.edit.getEditTree";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetEditTree<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetEditTree<S>;
     type Response = GetEditTreeResponse;
 }
 
@@ -88,7 +110,7 @@ pub mod get_edit_tree_state {
 /// Builder for constructing an instance of this type
 pub struct GetEditTreeBuilder<'a, S: get_edit_tree_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -118,7 +140,7 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetEditTreeBuilder<'a, get_edit_tree_state::SetResource<S>> {
         self._fields.0 = Option::Some(value.into());
         GetEditTreeBuilder {

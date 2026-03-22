@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -32,79 +34,83 @@ use crate::org_hypercerts::Uri;
 use crate::pub_leaflet::pages::linear_document::LinearDocument;
 /// An attachment providing commentary, context, evidence, or documentary material related to a hypercert record (e.g. an activity, project, claim, or evaluation).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.hypercerts.context.attachment",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Attachment<'a> {
+pub struct Attachment<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The files, documents, or external references included in this attachment record.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content: Option<Vec<AttachmentContentItem<'a>>>,
+    pub content: Option<Vec<AttachmentContentItem<S>>>,
     ///The type of attachment, e.g. report, audit, evidence, testimonial, methodology, etc.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_type: Option<CowStr<'a>>,
+    pub content_type: Option<S>,
     ///Client-declared timestamp when this record was originally created.
     pub created_at: Datetime,
     ///Rich-text description, represented as a Leaflet linear document.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<LinearDocument<'a>>,
+    pub description: Option<LinearDocument<S>>,
     ///A strong reference to the location where this attachment's subject matter occurred. The record referenced must conform with the lexicon app.certified.location.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location: Option<StrongRef<'a>>,
+    pub location: Option<StrongRef<S>>,
     ///Short summary of this attachment, suitable for previews and list views. Rich text annotations may be provided via `shortDescriptionFacets`.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub short_description: Option<CowStr<'a>>,
+    pub short_description: Option<S>,
     ///Rich text annotations for `shortDescription` (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub short_description_facets: Option<Vec<Facet<'a>>>,
+    pub short_description_facets: Option<Vec<Facet<S>>>,
     ///References to the subject(s) the attachment is connected to—this may be an activity claim, outcome claim, measurement, evaluation, or even another attachment. This is optional as the attachment can exist before the claim is recorded.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subjects: Option<Vec<StrongRef<'a>>>,
+    pub subjects: Option<Vec<StrongRef<S>>>,
     ///Display title for this attachment (e.g. 'Impact Assessment Report', 'Audit Findings')
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum AttachmentContentItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum AttachmentContentItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallBlob")]
-    SmallBlob(Box<SmallBlob<'a>>),
+    SmallBlob(Box<SmallBlob<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AttachmentGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AttachmentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Attachment<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Attachment<S>,
 }
 
-impl<'a> Attachment<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AttachmentRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Attachment<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AttachmentRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -115,18 +121,17 @@ pub struct AttachmentRecord;
 impl XrpcResp for AttachmentRecord {
     const NSID: &'static str = "org.hypercerts.context.attachment";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AttachmentGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AttachmentGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AttachmentGetRecordOutput<'_>> for Attachment<'_> {
-    fn from(output: AttachmentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AttachmentGetRecordOutput<S>> for Attachment<S> {
+    fn from(output: AttachmentGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Attachment<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Attachment<S> {
     const NSID: &'static str = "org.hypercerts.context.attachment";
     type Record = AttachmentRecord;
 }
@@ -136,7 +141,7 @@ impl Collection for AttachmentRecord {
     type Record = AttachmentRecord;
 }
 
-impl<'a> LexiconSchema for Attachment<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Attachment<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.context.attachment"
     }
@@ -262,15 +267,15 @@ pub mod attachment_state {
 pub struct AttachmentBuilder<'a, S: attachment_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<AttachmentContentItem<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<AttachmentContentItem<S>>>,
+        Option<S>,
         Option<Datetime>,
-        Option<LinearDocument<'a>>,
-        Option<StrongRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<Vec<StrongRef<'a>>>,
-        Option<CowStr<'a>>,
+        Option<LinearDocument<S>>,
+        Option<StrongRef<S>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<Vec<StrongRef<S>>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -297,7 +302,7 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `content` field (optional)
     pub fn content(
         mut self,
-        value: impl Into<Option<Vec<AttachmentContentItem<'a>>>>,
+        value: impl Into<Option<Vec<AttachmentContentItem<S>>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
@@ -305,7 +310,7 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `content` field to an Option value (optional)
     pub fn maybe_content(
         mut self,
-        value: Option<Vec<AttachmentContentItem<'a>>>,
+        value: Option<Vec<AttachmentContentItem<S>>>,
     ) -> Self {
         self._fields.0 = value;
         self
@@ -314,12 +319,12 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
 
 impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `contentType` field (optional)
-    pub fn content_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn content_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `contentType` field to an Option value (optional)
-    pub fn maybe_content_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_content_type(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -346,12 +351,12 @@ where
 
 impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<LinearDocument<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<LinearDocument<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<LinearDocument<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<LinearDocument<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -359,12 +364,12 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
 
 impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `location` field (optional)
-    pub fn location(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn location(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
-    pub fn maybe_location(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_location(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -372,12 +377,12 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
 
 impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `shortDescription` field (optional)
-    pub fn short_description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn short_description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `shortDescription` field to an Option value (optional)
-    pub fn maybe_short_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_short_description(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -387,7 +392,7 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `shortDescriptionFacets` field (optional)
     pub fn short_description_facets(
         mut self,
-        value: impl Into<Option<Vec<Facet<'a>>>>,
+        value: impl Into<Option<Vec<Facet<S>>>>,
     ) -> Self {
         self._fields.6 = value.into();
         self
@@ -395,7 +400,7 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `shortDescriptionFacets` field to an Option value (optional)
     pub fn maybe_short_description_facets(
         mut self,
-        value: Option<Vec<Facet<'a>>>,
+        value: Option<Vec<Facet<S>>>,
     ) -> Self {
         self._fields.6 = value;
         self
@@ -404,12 +409,12 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
 
 impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `subjects` field (optional)
-    pub fn subjects(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
+    pub fn subjects(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `subjects` field to an Option value (optional)
-    pub fn maybe_subjects(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
+    pub fn maybe_subjects(mut self, value: Option<Vec<StrongRef<S>>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -423,7 +428,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AttachmentBuilder<'a, attachment_state::SetTitle<S>> {
         self._fields.8 = Option::Some(value.into());
         AttachmentBuilder {
@@ -458,10 +463,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Attachment<'a> {
         Attachment {
             content: self._fields.0,

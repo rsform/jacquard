@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,46 +29,52 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::blog_pckt::block::image::ImageAttrs;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blog.pckt.gallery", tag = "$type")]
-pub struct Gallery<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "blog.pckt.gallery",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Gallery<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional caption for the entire gallery
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub caption: Option<CowStr<'a>>,
+    pub caption: Option<S>,
     ///Array of image blocks in display order
-    #[serde(borrow)]
-    pub images: Vec<ImageAttrs<'a>>,
+    pub images: Vec<ImageAttrs<S>>,
     ///Layout style for rendering the gallery (e.g. grid, carousel, masonry, list)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub layout: Option<CowStr<'a>>,
+    pub layout: Option<S>,
     ///Optional title for the gallery
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GalleryGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GalleryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Gallery<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Gallery<S>,
 }
 
-impl<'a> Gallery<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, GalleryRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Gallery<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, GalleryRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -77,18 +85,17 @@ pub struct GalleryRecord;
 impl XrpcResp for GalleryRecord {
     const NSID: &'static str = "blog.pckt.gallery";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GalleryGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GalleryGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<GalleryGetRecordOutput<'_>> for Gallery<'_> {
-    fn from(output: GalleryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<GalleryGetRecordOutput<S>> for Gallery<S> {
+    fn from(output: GalleryGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Gallery<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Gallery<S> {
     const NSID: &'static str = "blog.pckt.gallery";
     type Record = GalleryRecord;
 }
@@ -98,7 +105,7 @@ impl Collection for GalleryRecord {
     type Record = GalleryRecord;
 }
 
-impl<'a> LexiconSchema for Gallery<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Gallery<S> {
     fn nsid() -> &'static str {
         "blog.pckt.gallery"
     }
@@ -212,12 +219,7 @@ pub mod gallery_state {
 /// Builder for constructing an instance of this type
 pub struct GalleryBuilder<'a, S: gallery_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Vec<ImageAttrs<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<Vec<ImageAttrs<S>>>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -241,12 +243,12 @@ impl<'a> GalleryBuilder<'a, gallery_state::Empty> {
 
 impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
     /// Set the `caption` field (optional)
-    pub fn caption(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn caption(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `caption` field to an Option value (optional)
-    pub fn maybe_caption(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_caption(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -260,7 +262,7 @@ where
     /// Set the `images` field (required)
     pub fn images(
         mut self,
-        value: impl Into<Vec<ImageAttrs<'a>>>,
+        value: impl Into<Vec<ImageAttrs<S>>>,
     ) -> GalleryBuilder<'a, gallery_state::SetImages<S>> {
         self._fields.1 = Option::Some(value.into());
         GalleryBuilder {
@@ -273,12 +275,12 @@ where
 
 impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
     /// Set the `layout` field (optional)
-    pub fn layout(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn layout(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `layout` field to an Option value (optional)
-    pub fn maybe_layout(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_layout(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -286,12 +288,12 @@ impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
 
 impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -315,10 +317,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Gallery<'a> {
         Gallery {
             caption: self._fields.0,

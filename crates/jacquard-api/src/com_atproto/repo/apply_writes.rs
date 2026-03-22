@@ -10,14 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Nsid, Cid, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -28,43 +29,51 @@ use crate::com_atproto::repo::CommitMeta;
 use crate::com_atproto::repo::apply_writes;
 /// Operation which creates a new record.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Create<'a> {
-    #[serde(borrow)]
-    pub collection: Nsid<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Create<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub collection: Nsid<S>,
     ///NOTE: maxLength is redundant with record-key format. Keeping it temporarily to ensure backwards compatibility.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rkey: Option<RecordKey<Rkey<'a>>>,
-    #[serde(borrow)]
-    pub value: Data<'a>,
+    pub rkey: Option<RecordKey<Rkey<S>>>,
+    pub value: Data<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateResult<'a> {
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateResult<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub cid: Cid<S>,
+    pub uri: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub validation_status: Option<CreateResultValidationStatus<'a>>,
+    pub validation_status: Option<CreateResultValidationStatus<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CreateResultValidationStatus<'a> {
+pub enum CreateResultValidationStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Valid,
     Unknown,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> CreateResultValidationStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> CreateResultValidationStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Valid => "valid",
@@ -72,70 +81,56 @@ impl<'a> CreateResultValidationStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for CreateResultValidationStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "valid" => Self::Valid,
             "unknown" => Self::Unknown,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for CreateResultValidationStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "valid" => Self::Valid,
-            "unknown" => Self::Unknown,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CreateResultValidationStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CreateResultValidationStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for CreateResultValidationStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for CreateResultValidationStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for CreateResultValidationStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for CreateResultValidationStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for CreateResultValidationStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for CreateResultValidationStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for CreateResultValidationStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for CreateResultValidationStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for CreateResultValidationStatus<'_> {
-    type Output = CreateResultValidationStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for CreateResultValidationStatus<S> {
+    type Output = CreateResultValidationStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             CreateResultValidationStatus::Valid => CreateResultValidationStatus::Valid,
@@ -151,81 +146,117 @@ impl jacquard_common::IntoStatic for CreateResultValidationStatus<'_> {
 
 /// Operation which deletes an existing record.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Delete<'a> {
-    #[serde(borrow)]
-    pub collection: Nsid<'a>,
-    #[serde(borrow)]
-    pub rkey: RecordKey<Rkey<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Delete<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub collection: Nsid<S>,
+    pub rkey: RecordKey<Rkey<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DeleteResult<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteResult<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
 
-#[lexicon]
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ApplyWrites<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ApplyWrites<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The handle or DID of the repo (aka, current account).
-    #[serde(borrow)]
-    pub repo: AtIdentifier<'a>,
+    pub repo: AtIdentifier<S>,
     ///If provided, the entire operation will fail if the current repo commit CID does not match this value. Used to prevent conflicting repo mutations.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub swap_commit: Option<Cid<'a>>,
+    pub swap_commit: Option<Cid<S>>,
     ///Can be set to 'false' to skip Lexicon schema validation of record data across all operations, 'true' to require it, or leave unset to validate only for known Lexicons.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub validate: Option<bool>,
-    #[serde(borrow)]
-    pub writes: Vec<ApplyWritesWritesItem<'a>>,
+    pub writes: Vec<ApplyWritesWritesItem<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ApplyWritesWritesItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ApplyWritesWritesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.atproto.repo.applyWrites#create")]
-    Create(Box<apply_writes::Create<'a>>),
+    Create(Box<apply_writes::Create<S>>),
     #[serde(rename = "com.atproto.repo.applyWrites#update")]
-    Update(Box<apply_writes::Update<'a>>),
+    Update(Box<apply_writes::Update<S>>),
     #[serde(rename = "com.atproto.repo.applyWrites#delete")]
-    Delete(Box<apply_writes::Delete<'a>>),
+    Delete(Box<apply_writes::Delete<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct ApplyWritesOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ApplyWritesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub commit: Option<CommitMeta<'a>>,
+    pub commit: Option<CommitMeta<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub results: Option<Vec<ApplyWritesOutputResultsItem<'a>>>,
+    pub results: Option<Vec<ApplyWritesOutputResultsItem<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ApplyWritesOutputResultsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ApplyWritesOutputResultsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.atproto.repo.applyWrites#createResult")]
-    CreateResult(Box<apply_writes::CreateResult<'a>>),
+    CreateResult(Box<apply_writes::CreateResult<S>>),
     #[serde(rename = "com.atproto.repo.applyWrites#updateResult")]
-    UpdateResult(Box<apply_writes::UpdateResult<'a>>),
+    UpdateResult(Box<apply_writes::UpdateResult<S>>),
     #[serde(rename = "com.atproto.repo.applyWrites#deleteResult")]
-    DeleteResult(Box<apply_writes::DeleteResult<'a>>),
+    DeleteResult(Box<apply_writes::DeleteResult<S>>),
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -234,19 +265,20 @@ pub enum ApplyWritesOutputResultsItem<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ApplyWritesError<'a> {
+pub enum ApplyWritesError {
     /// Indicates that the 'swapCommit' parameter did not match current commit.
     #[serde(rename = "InvalidSwap")]
-    InvalidSwap(Option<CowStr<'a>>),
+    InvalidSwap(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for ApplyWritesError<'_> {
+impl core::fmt::Display for ApplyWritesError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidSwap(msg) => {
@@ -256,48 +288,62 @@ impl core::fmt::Display for ApplyWritesError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
 /// Operation which updates an existing record.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Update<'a> {
-    #[serde(borrow)]
-    pub collection: Nsid<'a>,
-    #[serde(borrow)]
-    pub rkey: RecordKey<Rkey<'a>>,
-    #[serde(borrow)]
-    pub value: Data<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Update<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub collection: Nsid<S>,
+    pub rkey: RecordKey<Rkey<S>>,
+    pub value: Data<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct UpdateResult<'a> {
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateResult<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub cid: Cid<S>,
+    pub uri: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub validation_status: Option<UpdateResultValidationStatus<'a>>,
+    pub validation_status: Option<UpdateResultValidationStatus<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum UpdateResultValidationStatus<'a> {
+pub enum UpdateResultValidationStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Valid,
     Unknown,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> UpdateResultValidationStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> UpdateResultValidationStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Valid => "valid",
@@ -305,70 +351,56 @@ impl<'a> UpdateResultValidationStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for UpdateResultValidationStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "valid" => Self::Valid,
             "unknown" => Self::Unknown,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for UpdateResultValidationStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "valid" => Self::Valid,
-            "unknown" => Self::Unknown,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for UpdateResultValidationStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for UpdateResultValidationStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for UpdateResultValidationStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for UpdateResultValidationStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for UpdateResultValidationStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for UpdateResultValidationStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for UpdateResultValidationStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for UpdateResultValidationStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for UpdateResultValidationStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for UpdateResultValidationStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for UpdateResultValidationStatus<'_> {
-    type Output = UpdateResultValidationStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for UpdateResultValidationStatus<S> {
+    type Output = UpdateResultValidationStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             UpdateResultValidationStatus::Valid => UpdateResultValidationStatus::Valid,
@@ -382,7 +414,7 @@ impl jacquard_common::IntoStatic for UpdateResultValidationStatus<'_> {
     }
 }
 
-impl<'a> LexiconSchema for Create<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Create<S> {
     fn nsid() -> &'static str {
         "com.atproto.repo.applyWrites"
     }
@@ -407,7 +439,7 @@ impl<'a> LexiconSchema for Create<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CreateResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CreateResult<S> {
     fn nsid() -> &'static str {
         "com.atproto.repo.applyWrites"
     }
@@ -422,7 +454,7 @@ impl<'a> LexiconSchema for CreateResult<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Delete<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Delete<S> {
     fn nsid() -> &'static str {
         "com.atproto.repo.applyWrites"
     }
@@ -437,7 +469,7 @@ impl<'a> LexiconSchema for Delete<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DeleteResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DeleteResult<S> {
     fn nsid() -> &'static str {
         "com.atproto.repo.applyWrites"
     }
@@ -457,11 +489,12 @@ pub struct ApplyWritesResponse;
 impl jacquard_common::xrpc::XrpcResp for ApplyWritesResponse {
     const NSID: &'static str = "com.atproto.repo.applyWrites";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ApplyWritesOutput<'de>;
-    type Err<'de> = ApplyWritesError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ApplyWritesOutput<S>;
+    type Err = ApplyWritesError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ApplyWrites<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ApplyWrites<S> {
     const NSID: &'static str = "com.atproto.repo.applyWrites";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -476,11 +509,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for ApplyWritesRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = ApplyWrites<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ApplyWrites<S>;
     type Response = ApplyWritesResponse;
 }
 
-impl<'a> LexiconSchema for Update<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Update<S> {
     fn nsid() -> &'static str {
         "com.atproto.repo.applyWrites"
     }
@@ -495,7 +528,7 @@ impl<'a> LexiconSchema for Update<'a> {
     }
 }
 
-impl<'a> LexiconSchema for UpdateResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for UpdateResult<S> {
     fn nsid() -> &'static str {
         "com.atproto.repo.applyWrites"
     }
@@ -557,7 +590,7 @@ pub mod create_state {
 /// Builder for constructing an instance of this type
 pub struct CreateBuilder<'a, S: create_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Nsid<'a>>, Option<RecordKey<Rkey<'a>>>, Option<Data<'a>>),
+    _fields: (Option<Nsid<S>>, Option<RecordKey<Rkey<S>>>, Option<Data<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -587,7 +620,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<Nsid<'a>>,
+        value: impl Into<Nsid<S>>,
     ) -> CreateBuilder<'a, create_state::SetCollection<S>> {
         self._fields.0 = Option::Some(value.into());
         CreateBuilder {
@@ -600,12 +633,12 @@ where
 
 impl<'a, S: create_state::State> CreateBuilder<'a, S> {
     /// Set the `rkey` field (optional)
-    pub fn rkey(mut self, value: impl Into<Option<RecordKey<Rkey<'a>>>>) -> Self {
+    pub fn rkey(mut self, value: impl Into<Option<RecordKey<Rkey<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `rkey` field to an Option value (optional)
-    pub fn maybe_rkey(mut self, value: Option<RecordKey<Rkey<'a>>>) -> Self {
+    pub fn maybe_rkey(mut self, value: Option<RecordKey<Rkey<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -619,7 +652,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> CreateBuilder<'a, create_state::SetValue<S>> {
         self._fields.2 = Option::Some(value.into());
         CreateBuilder {
@@ -646,10 +679,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Create<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Create<'a> {
         Create {
             collection: self._fields.0.unwrap(),
             rkey: self._fields.1,
@@ -987,11 +1017,7 @@ pub mod create_result_state {
 /// Builder for constructing an instance of this type
 pub struct CreateResultBuilder<'a, S: create_result_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Cid<'a>>,
-        Option<AtUri<'a>>,
-        Option<CreateResultValidationStatus<'a>>,
-    ),
+    _fields: (Option<Cid<S>>, Option<AtUri<S>>, Option<CreateResultValidationStatus<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1021,7 +1047,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> CreateResultBuilder<'a, create_result_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         CreateResultBuilder {
@@ -1040,7 +1066,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> CreateResultBuilder<'a, create_result_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         CreateResultBuilder {
@@ -1055,7 +1081,7 @@ impl<'a, S: create_result_state::State> CreateResultBuilder<'a, S> {
     /// Set the `validationStatus` field (optional)
     pub fn validation_status(
         mut self,
-        value: impl Into<Option<CreateResultValidationStatus<'a>>>,
+        value: impl Into<Option<CreateResultValidationStatus<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -1063,7 +1089,7 @@ impl<'a, S: create_result_state::State> CreateResultBuilder<'a, S> {
     /// Set the `validationStatus` field to an Option value (optional)
     pub fn maybe_validation_status(
         mut self,
-        value: Option<CreateResultValidationStatus<'a>>,
+        value: Option<CreateResultValidationStatus<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -1088,7 +1114,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CreateResult<'a> {
         CreateResult {
             cid: self._fields.0.unwrap(),
@@ -1146,7 +1172,7 @@ pub mod delete_state {
 /// Builder for constructing an instance of this type
 pub struct DeleteBuilder<'a, S: delete_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Nsid<'a>>, Option<RecordKey<Rkey<'a>>>),
+    _fields: (Option<Nsid<S>>, Option<RecordKey<Rkey<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1176,7 +1202,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<Nsid<'a>>,
+        value: impl Into<Nsid<S>>,
     ) -> DeleteBuilder<'a, delete_state::SetCollection<S>> {
         self._fields.0 = Option::Some(value.into());
         DeleteBuilder {
@@ -1195,7 +1221,7 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<RecordKey<Rkey<'a>>>,
+        value: impl Into<RecordKey<Rkey<S>>>,
     ) -> DeleteBuilder<'a, delete_state::SetRkey<S>> {
         self._fields.1 = Option::Some(value.into());
         DeleteBuilder {
@@ -1221,10 +1247,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Delete<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Delete<'a> {
         Delete {
             collection: self._fields.0.unwrap(),
             rkey: self._fields.1.unwrap(),
@@ -1243,37 +1266,37 @@ pub mod apply_writes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Writes;
         type Repo;
+        type Writes;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Writes = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `writes` field to Set
-    pub struct SetWrites<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWrites<S> {}
-    impl<S: State> State for SetWrites<S> {
-        type Writes = Set<members::writes>;
-        type Repo = S::Repo;
+        type Writes = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Writes = S::Writes;
         type Repo = Set<members::repo>;
+        type Writes = S::Writes;
+    }
+    ///State transition - sets the `writes` field to Set
+    pub struct SetWrites<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWrites<S> {}
+    impl<S: State> State for SetWrites<S> {
+        type Repo = S::Repo;
+        type Writes = Set<members::writes>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `writes` field
-        pub struct writes(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `writes` field
+        pub struct writes(());
     }
 }
 
@@ -1281,10 +1304,10 @@ pub mod apply_writes_state {
 pub struct ApplyWritesBuilder<'a, S: apply_writes_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtIdentifier<'a>>,
-        Option<Cid<'a>>,
+        Option<AtIdentifier<S>>,
+        Option<Cid<S>>,
         Option<bool>,
-        Option<Vec<ApplyWritesWritesItem<'a>>>,
+        Option<Vec<ApplyWritesWritesItem<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1315,7 +1338,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> ApplyWritesBuilder<'a, apply_writes_state::SetRepo<S>> {
         self._fields.0 = Option::Some(value.into());
         ApplyWritesBuilder {
@@ -1328,12 +1351,12 @@ where
 
 impl<'a, S: apply_writes_state::State> ApplyWritesBuilder<'a, S> {
     /// Set the `swapCommit` field (optional)
-    pub fn swap_commit(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
+    pub fn swap_commit(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `swapCommit` field to an Option value (optional)
-    pub fn maybe_swap_commit(mut self, value: Option<Cid<'a>>) -> Self {
+    pub fn maybe_swap_commit(mut self, value: Option<Cid<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1360,7 +1383,7 @@ where
     /// Set the `writes` field (required)
     pub fn writes(
         mut self,
-        value: impl Into<Vec<ApplyWritesWritesItem<'a>>>,
+        value: impl Into<Vec<ApplyWritesWritesItem<S>>>,
     ) -> ApplyWritesBuilder<'a, apply_writes_state::SetWrites<S>> {
         self._fields.3 = Option::Some(value.into());
         ApplyWritesBuilder {
@@ -1374,8 +1397,8 @@ where
 impl<'a, S> ApplyWritesBuilder<'a, S>
 where
     S: apply_writes_state::State,
-    S::Writes: apply_writes_state::IsSet,
     S::Repo: apply_writes_state::IsSet,
+    S::Writes: apply_writes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ApplyWrites<'a> {
@@ -1390,7 +1413,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ApplyWrites<'a> {
         ApplyWrites {
             repo: self._fields.0.unwrap(),
@@ -1412,49 +1435,49 @@ pub mod update_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
         type Rkey;
+        type Collection;
         type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
         type Rkey = Unset;
+        type Collection = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type Rkey = S::Rkey;
-        type Value = S::Value;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Collection = S::Collection;
         type Rkey = Set<members::rkey>;
+        type Collection = S::Collection;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Rkey = S::Rkey;
+        type Collection = Set<members::collection>;
         type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Collection = S::Collection;
         type Rkey = S::Rkey;
+        type Collection = S::Collection;
         type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `value` field
         pub struct value(());
     }
@@ -1463,7 +1486,7 @@ pub mod update_state {
 /// Builder for constructing an instance of this type
 pub struct UpdateBuilder<'a, S: update_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Nsid<'a>>, Option<RecordKey<Rkey<'a>>>, Option<Data<'a>>),
+    _fields: (Option<Nsid<S>>, Option<RecordKey<Rkey<S>>>, Option<Data<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1493,7 +1516,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<Nsid<'a>>,
+        value: impl Into<Nsid<S>>,
     ) -> UpdateBuilder<'a, update_state::SetCollection<S>> {
         self._fields.0 = Option::Some(value.into());
         UpdateBuilder {
@@ -1512,7 +1535,7 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<RecordKey<Rkey<'a>>>,
+        value: impl Into<RecordKey<Rkey<S>>>,
     ) -> UpdateBuilder<'a, update_state::SetRkey<S>> {
         self._fields.1 = Option::Some(value.into());
         UpdateBuilder {
@@ -1531,7 +1554,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> UpdateBuilder<'a, update_state::SetValue<S>> {
         self._fields.2 = Option::Some(value.into());
         UpdateBuilder {
@@ -1545,8 +1568,8 @@ where
 impl<'a, S> UpdateBuilder<'a, S>
 where
     S: update_state::State,
-    S::Collection: update_state::IsSet,
     S::Rkey: update_state::IsSet,
+    S::Collection: update_state::IsSet,
     S::Value: update_state::IsSet,
 {
     /// Build the final struct
@@ -1559,10 +1582,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Update<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Update<'a> {
         Update {
             collection: self._fields.0.unwrap(),
             rkey: self._fields.1.unwrap(),
@@ -1582,48 +1602,44 @@ pub mod update_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct UpdateResultBuilder<'a, S: update_result_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Cid<'a>>,
-        Option<AtUri<'a>>,
-        Option<UpdateResultValidationStatus<'a>>,
-    ),
+    _fields: (Option<Cid<S>>, Option<AtUri<S>>, Option<UpdateResultValidationStatus<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1653,7 +1669,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> UpdateResultBuilder<'a, update_result_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         UpdateResultBuilder {
@@ -1672,7 +1688,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> UpdateResultBuilder<'a, update_result_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         UpdateResultBuilder {
@@ -1687,7 +1703,7 @@ impl<'a, S: update_result_state::State> UpdateResultBuilder<'a, S> {
     /// Set the `validationStatus` field (optional)
     pub fn validation_status(
         mut self,
-        value: impl Into<Option<UpdateResultValidationStatus<'a>>>,
+        value: impl Into<Option<UpdateResultValidationStatus<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -1695,7 +1711,7 @@ impl<'a, S: update_result_state::State> UpdateResultBuilder<'a, S> {
     /// Set the `validationStatus` field to an Option value (optional)
     pub fn maybe_validation_status(
         mut self,
-        value: Option<UpdateResultValidationStatus<'a>>,
+        value: Option<UpdateResultValidationStatus<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -1705,8 +1721,8 @@ impl<'a, S: update_result_state::State> UpdateResultBuilder<'a, S> {
 impl<'a, S> UpdateResultBuilder<'a, S>
 where
     S: update_result_state::State,
-    S::Uri: update_result_state::IsSet,
     S::Cid: update_result_state::IsSet,
+    S::Uri: update_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateResult<'a> {
@@ -1720,7 +1736,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> UpdateResult<'a> {
         UpdateResult {
             cid: self._fields.0.unwrap(),

@@ -7,6 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -14,19 +15,39 @@ use crate::app_rocksky::album::AlbumViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetAlbum<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetAlbum<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetAlbumOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetAlbumOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: AlbumViewDetailed<'a>,
+    pub value: AlbumViewDetailed<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for app.rocksky.album.getAlbum
@@ -34,11 +55,12 @@ pub struct GetAlbumResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAlbumResponse {
     const NSID: &'static str = "app.rocksky.album.getAlbum";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetAlbumOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetAlbumOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetAlbum<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetAlbum<S> {
     const NSID: &'static str = "app.rocksky.album.getAlbum";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAlbumResponse;
@@ -49,7 +71,7 @@ pub struct GetAlbumRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAlbumRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.album.getAlbum";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetAlbum<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetAlbum<S>;
     type Response = GetAlbumResponse;
 }
 
@@ -88,7 +110,7 @@ pub mod get_album_state {
 /// Builder for constructing an instance of this type
 pub struct GetAlbumBuilder<'a, S: get_album_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -118,7 +140,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetAlbumBuilder<'a, get_album_state::SetUri<S>> {
         self._fields.0 = Option::Some(value.into());
         GetAlbumBuilder {

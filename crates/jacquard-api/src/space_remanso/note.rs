@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,27 +30,38 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::space_remanso::note;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Image<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text for the image.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alt: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub image: BlobRef<'a>,
+    pub alt: Option<S>,
+    pub image: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A markdown blog post with LaTeX, GitHub notes, Mermaid, YouTube and Bluesky extensions.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "space.remanso.note", tag = "$type")]
-pub struct Note<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "space.remanso.note",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Note<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Markdown content. Local image paths are replaced with blob CIDs at publish time.
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
+    pub content: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///Whether the note can be discovered by others in public listings. Defaults to true.
@@ -56,33 +69,30 @@ pub struct Note<'a> {
     pub discoverable: Option<bool>,
     ///Font family name available from Coollabs.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub font_family: Option<CowStr<'a>>,
+    pub font_family: Option<S>,
     ///Font size in points. Recommended range: 9–21, but clients may allow larger sizes for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub font_size: Option<i64>,
     ///Blob references for images embedded in the markdown content.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub images: Option<Vec<note::Image<'a>>>,
+    pub images: Option<Vec<note::Image<S>>>,
     ///Most used language in the note. In ISO 639-3 code.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub language: Option<NoteLanguage<'a>>,
+    pub language: Option<NoteLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published_at: Option<Datetime>,
     ///Display theme for the note.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub theme: Option<NoteTheme<'a>>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub theme: Option<NoteTheme<S>>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Most used language in the note. In ISO 639-3 code.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum NoteLanguage<'a> {
+pub enum NoteLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {
     Afr,
     Ara,
     Aze,
@@ -133,10 +143,10 @@ pub enum NoteLanguage<'a> {
     Tur,
     Ukr,
     Vie,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> NoteLanguage<'a> {
+impl<S: Bos<str> + AsRef<str>> NoteLanguage<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Afr => "afr",
@@ -192,11 +202,9 @@ impl<'a> NoteLanguage<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for NoteLanguage<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "afr" => Self::Afr,
             "ara" => Self::Ara,
             "aze" => Self::Aze,
@@ -247,111 +255,51 @@ impl<'a> From<&'a str> for NoteLanguage<'a> {
             "tur" => Self::Tur,
             "ukr" => Self::Ukr,
             "vie" => Self::Vie,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for NoteLanguage<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "afr" => Self::Afr,
-            "ara" => Self::Ara,
-            "aze" => Self::Aze,
-            "bel" => Self::Bel,
-            "ben" => Self::Ben,
-            "bul" => Self::Bul,
-            "cat" => Self::Cat,
-            "ces" => Self::Ces,
-            "ckb" => Self::Ckb,
-            "cmn" => Self::Cmn,
-            "dan" => Self::Dan,
-            "deu" => Self::Deu,
-            "ell" => Self::Ell,
-            "eng" => Self::Eng,
-            "est" => Self::Est,
-            "eus" => Self::Eus,
-            "fin" => Self::Fin,
-            "fra" => Self::Fra,
-            "hau" => Self::Hau,
-            "heb" => Self::Heb,
-            "hin" => Self::Hin,
-            "hrv" => Self::Hrv,
-            "hun" => Self::Hun,
-            "hye" => Self::Hye,
-            "ind" => Self::Ind,
-            "isl" => Self::Isl,
-            "ita" => Self::Ita,
-            "jpn" => Self::Jpn,
-            "kat" => Self::Kat,
-            "kaz" => Self::Kaz,
-            "kor" => Self::Kor,
-            "lit" => Self::Lit,
-            "mar" => Self::Mar,
-            "mkd" => Self::Mkd,
-            "nld" => Self::Nld,
-            "nob" => Self::Nob,
-            "pes" => Self::Pes,
-            "pol" => Self::Pol,
-            "por" => Self::Por,
-            "ron" => Self::Ron,
-            "run" => Self::Run,
-            "rus" => Self::Rus,
-            "slk" => Self::Slk,
-            "spa" => Self::Spa,
-            "srp" => Self::Srp,
-            "swe" => Self::Swe,
-            "tgl" => Self::Tgl,
-            "tur" => Self::Tur,
-            "ukr" => Self::Ukr,
-            "vie" => Self::Vie,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for NoteLanguage<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for NoteLanguage<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for NoteLanguage<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for NoteLanguage<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for NoteLanguage<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for NoteLanguage<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for NoteLanguage<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for NoteLanguage<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for NoteLanguage<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for NoteLanguage<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for NoteLanguage<'_> {
-    type Output = NoteLanguage<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for NoteLanguage<S> {
+    type Output = NoteLanguage<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             NoteLanguage::Afr => NoteLanguage::Afr,
@@ -412,13 +360,13 @@ impl jacquard_common::IntoStatic for NoteLanguage<'_> {
 /// Display theme for the note.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum NoteTheme<'a> {
+pub enum NoteTheme<S: Bos<str> + AsRef<str> = DefaultStr> {
     Light,
     Dark,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> NoteTheme<'a> {
+impl<S: Bos<str> + AsRef<str>> NoteTheme<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Light => "light",
@@ -426,70 +374,56 @@ impl<'a> NoteTheme<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for NoteTheme<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "light" => Self::Light,
             "dark" => Self::Dark,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for NoteTheme<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "light" => Self::Light,
-            "dark" => Self::Dark,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for NoteTheme<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for NoteTheme<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for NoteTheme<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for NoteTheme<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for NoteTheme<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for NoteTheme<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for NoteTheme<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for NoteTheme<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for NoteTheme<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for NoteTheme<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for NoteTheme<'_> {
-    type Output = NoteTheme<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for NoteTheme<S> {
+    type Output = NoteTheme<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             NoteTheme::Light => NoteTheme::Light,
@@ -502,26 +436,27 @@ impl jacquard_common::IntoStatic for NoteTheme<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct NoteGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct NoteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Note<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Note<S>,
 }
 
-impl<'a> Note<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, NoteRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Note<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, NoteRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Image<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Image<S> {
     fn nsid() -> &'static str {
         "space.remanso.note"
     }
@@ -593,18 +528,17 @@ pub struct NoteRecord;
 impl XrpcResp for NoteRecord {
     const NSID: &'static str = "space.remanso.note";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = NoteGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = NoteGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<NoteGetRecordOutput<'_>> for Note<'_> {
-    fn from(output: NoteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<NoteGetRecordOutput<S>> for Note<S> {
+    fn from(output: NoteGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Note<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Note<S> {
     const NSID: &'static str = "space.remanso.note";
     type Record = NoteRecord;
 }
@@ -614,7 +548,7 @@ impl Collection for NoteRecord {
     type Record = NoteRecord;
 }
 
-impl<'a> LexiconSchema for Note<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Note<S> {
     fn nsid() -> &'static str {
         "space.remanso.note"
     }
@@ -716,7 +650,7 @@ pub mod image_state {
 /// Builder for constructing an instance of this type
 pub struct ImageBuilder<'a, S: image_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<BlobRef<'a>>),
+    _fields: (Option<S>, Option<BlobRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -740,12 +674,12 @@ impl<'a> ImageBuilder<'a, image_state::Empty> {
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `alt` field (optional)
-    pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
-    pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_alt(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -759,7 +693,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> ImageBuilder<'a, image_state::SetImage<S>> {
         self._fields.1 = Option::Some(value.into());
         ImageBuilder {
@@ -784,13 +718,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Image<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Image<'a> {
         Image {
             alt: self._fields.0,
             image: self._fields.1.unwrap(),
@@ -970,37 +898,37 @@ pub mod note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Content;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Content = S::Content;
+        type Title = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Title = S::Title;
         type Content = Set<members::content>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Content = S::Content;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -1008,16 +936,16 @@ pub mod note_state {
 pub struct NoteBuilder<'a, S: note_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
         Option<bool>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
-        Option<Vec<note::Image<'a>>>,
-        Option<NoteLanguage<'a>>,
+        Option<Vec<note::Image<S>>>,
+        Option<NoteLanguage<S>>,
         Option<Datetime>,
-        Option<NoteTheme<'a>>,
-        Option<CowStr<'a>>,
+        Option<NoteTheme<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1048,7 +976,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> NoteBuilder<'a, note_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         NoteBuilder {
@@ -1087,12 +1015,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `fontFamily` field (optional)
-    pub fn font_family(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn font_family(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `fontFamily` field to an Option value (optional)
-    pub fn maybe_font_family(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_font_family(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1113,12 +1041,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `images` field (optional)
-    pub fn images(mut self, value: impl Into<Option<Vec<note::Image<'a>>>>) -> Self {
+    pub fn images(mut self, value: impl Into<Option<Vec<note::Image<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `images` field to an Option value (optional)
-    pub fn maybe_images(mut self, value: Option<Vec<note::Image<'a>>>) -> Self {
+    pub fn maybe_images(mut self, value: Option<Vec<note::Image<S>>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -1126,12 +1054,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `language` field (optional)
-    pub fn language(mut self, value: impl Into<Option<NoteLanguage<'a>>>) -> Self {
+    pub fn language(mut self, value: impl Into<Option<NoteLanguage<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `language` field to an Option value (optional)
-    pub fn maybe_language(mut self, value: Option<NoteLanguage<'a>>) -> Self {
+    pub fn maybe_language(mut self, value: Option<NoteLanguage<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -1152,12 +1080,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `theme` field (optional)
-    pub fn theme(mut self, value: impl Into<Option<NoteTheme<'a>>>) -> Self {
+    pub fn theme(mut self, value: impl Into<Option<NoteTheme<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
-    pub fn maybe_theme(mut self, value: Option<NoteTheme<'a>>) -> Self {
+    pub fn maybe_theme(mut self, value: Option<NoteTheme<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -1171,7 +1099,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> NoteBuilder<'a, note_state::SetTitle<S>> {
         self._fields.9 = Option::Some(value.into());
         NoteBuilder {
@@ -1185,8 +1113,8 @@ where
 impl<'a, S> NoteBuilder<'a, S>
 where
     S: note_state::State,
-    S::Title: note_state::IsSet,
     S::Content: note_state::IsSet,
+    S::Title: note_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Note<'a> {
@@ -1205,13 +1133,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Note<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Note<'a> {
         Note {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1,

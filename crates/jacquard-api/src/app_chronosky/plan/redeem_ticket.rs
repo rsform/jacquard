@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,29 +26,43 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::app_chronosky::plan::redeem_ticket;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct RedeemTicket<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RedeemTicket<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Ticket redemption code
-    #[serde(borrow)]
-    pub code: CowStr<'a>,
+    pub code: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct RedeemTicketOutput<'a> {
-    #[serde(borrow)]
-    pub assignment: redeem_ticket::RedeemedAssignment<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RedeemTicketOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub assignment: redeem_ticket::RedeemedAssignment<S>,
     ///Success message
-    #[serde(borrow)]
-    pub message: CowStr<'a>,
+    pub message: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -55,25 +71,26 @@ pub struct RedeemTicketOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum RedeemTicketError<'a> {
+pub enum RedeemTicketError {
     /// Ticket code not found
     #[serde(rename = "TicketNotFound")]
-    TicketNotFound(Option<CowStr<'a>>),
+    TicketNotFound(Option<SmolStr>),
     /// Ticket has already been redeemed
     #[serde(rename = "TicketAlreadyRedeemed")]
-    TicketAlreadyRedeemed(Option<CowStr<'a>>),
+    TicketAlreadyRedeemed(Option<SmolStr>),
     /// Ticket has expired
     #[serde(rename = "TicketExpired")]
-    TicketExpired(Option<CowStr<'a>>),
+    TicketExpired(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for RedeemTicketError<'_> {
+impl core::fmt::Display for RedeemTicketError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::TicketNotFound(msg) => {
@@ -97,30 +114,40 @@ impl core::fmt::Display for RedeemTicketError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
 /// Redeemed plan assignment.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RedeemedAssignment<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RedeemedAssignment<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Plan activation timestamp
     pub activated_at: Datetime,
     ///Plan expiration timestamp
     pub expires_at: Datetime,
     ///Plan assignment ID
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
     ///Plan ID
-    #[serde(borrow)]
-    pub plan_id: CowStr<'a>,
+    pub plan_id: S,
     ///Plan assignment status
-    #[serde(borrow)]
-    pub status: CowStr<'a>,
+    pub status: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.chronosky.plan.redeemTicket
@@ -128,11 +155,12 @@ pub struct RedeemTicketResponse;
 impl jacquard_common::xrpc::XrpcResp for RedeemTicketResponse {
     const NSID: &'static str = "app.chronosky.plan.redeemTicket";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RedeemTicketOutput<'de>;
-    type Err<'de> = RedeemTicketError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RedeemTicketOutput<S>;
+    type Err = RedeemTicketError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for RedeemTicket<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for RedeemTicket<S> {
     const NSID: &'static str = "app.chronosky.plan.redeemTicket";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -147,11 +175,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for RedeemTicketRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = RedeemTicket<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = RedeemTicket<S>;
     type Response = RedeemTicketResponse;
 }
 
-impl<'a> LexiconSchema for RedeemedAssignment<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RedeemedAssignment<S> {
     fn nsid() -> &'static str {
         "app.chronosky.plan.redeemTicket"
     }
@@ -209,83 +237,83 @@ pub mod redeemed_assignment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ExpiresAt;
         type PlanId;
-        type Id;
+        type ExpiresAt;
         type ActivatedAt;
+        type Id;
         type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ExpiresAt = Unset;
         type PlanId = Unset;
-        type Id = Unset;
+        type ExpiresAt = Unset;
         type ActivatedAt = Unset;
+        type Id = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `expires_at` field to Set
-    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
-    impl<S: State> State for SetExpiresAt<S> {
-        type ExpiresAt = Set<members::expires_at>;
-        type PlanId = S::PlanId;
-        type Id = S::Id;
-        type ActivatedAt = S::ActivatedAt;
-        type Status = S::Status;
     }
     ///State transition - sets the `plan_id` field to Set
     pub struct SetPlanId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlanId<S> {}
     impl<S: State> State for SetPlanId<S> {
-        type ExpiresAt = S::ExpiresAt;
         type PlanId = Set<members::plan_id>;
-        type Id = S::Id;
+        type ExpiresAt = S::ExpiresAt;
         type ActivatedAt = S::ActivatedAt;
+        type Id = S::Id;
         type Status = S::Status;
     }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type ExpiresAt = S::ExpiresAt;
+    ///State transition - sets the `expires_at` field to Set
+    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
+    impl<S: State> State for SetExpiresAt<S> {
         type PlanId = S::PlanId;
-        type Id = Set<members::id>;
+        type ExpiresAt = Set<members::expires_at>;
         type ActivatedAt = S::ActivatedAt;
+        type Id = S::Id;
         type Status = S::Status;
     }
     ///State transition - sets the `activated_at` field to Set
     pub struct SetActivatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActivatedAt<S> {}
     impl<S: State> State for SetActivatedAt<S> {
-        type ExpiresAt = S::ExpiresAt;
         type PlanId = S::PlanId;
-        type Id = S::Id;
+        type ExpiresAt = S::ExpiresAt;
         type ActivatedAt = Set<members::activated_at>;
+        type Id = S::Id;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type PlanId = S::PlanId;
+        type ExpiresAt = S::ExpiresAt;
+        type ActivatedAt = S::ActivatedAt;
+        type Id = Set<members::id>;
         type Status = S::Status;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type ExpiresAt = S::ExpiresAt;
         type PlanId = S::PlanId;
-        type Id = S::Id;
+        type ExpiresAt = S::ExpiresAt;
         type ActivatedAt = S::ActivatedAt;
+        type Id = S::Id;
         type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `expires_at` field
-        pub struct expires_at(());
         ///Marker type for the `plan_id` field
         pub struct plan_id(());
-        ///Marker type for the `id` field
-        pub struct id(());
+        ///Marker type for the `expires_at` field
+        pub struct expires_at(());
         ///Marker type for the `activated_at` field
         pub struct activated_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `status` field
         pub struct status(());
     }
@@ -294,13 +322,7 @@ pub mod redeemed_assignment_state {
 /// Builder for constructing an instance of this type
 pub struct RedeemedAssignmentBuilder<'a, S: redeemed_assignment_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<Datetime>, Option<S>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -368,7 +390,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RedeemedAssignmentBuilder<'a, redeemed_assignment_state::SetId<S>> {
         self._fields.2 = Option::Some(value.into());
         RedeemedAssignmentBuilder {
@@ -387,7 +409,7 @@ where
     /// Set the `planId` field (required)
     pub fn plan_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RedeemedAssignmentBuilder<'a, redeemed_assignment_state::SetPlanId<S>> {
         self._fields.3 = Option::Some(value.into());
         RedeemedAssignmentBuilder {
@@ -406,7 +428,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RedeemedAssignmentBuilder<'a, redeemed_assignment_state::SetStatus<S>> {
         self._fields.4 = Option::Some(value.into());
         RedeemedAssignmentBuilder {
@@ -420,10 +442,10 @@ where
 impl<'a, S> RedeemedAssignmentBuilder<'a, S>
 where
     S: redeemed_assignment_state::State,
-    S::ExpiresAt: redeemed_assignment_state::IsSet,
     S::PlanId: redeemed_assignment_state::IsSet,
-    S::Id: redeemed_assignment_state::IsSet,
+    S::ExpiresAt: redeemed_assignment_state::IsSet,
     S::ActivatedAt: redeemed_assignment_state::IsSet,
+    S::Id: redeemed_assignment_state::IsSet,
     S::Status: redeemed_assignment_state::IsSet,
 {
     /// Build the final struct
@@ -440,10 +462,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RedeemedAssignment<'a> {
         RedeemedAssignment {
             activated_at: self._fields.0.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,41 +28,45 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "sh.tangled.repo.collaborator",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Collaborator<'a> {
+pub struct Collaborator<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///repo to add this user to
-    #[serde(borrow)]
-    pub repo: AtUri<'a>,
-    #[serde(borrow)]
-    pub subject: Did<'a>,
+    pub repo: AtUri<S>,
+    pub subject: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CollaboratorGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollaboratorGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Collaborator<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Collaborator<S>,
 }
 
-impl<'a> Collaborator<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CollaboratorRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Collaborator<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CollaboratorRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -71,18 +77,17 @@ pub struct CollaboratorRecord;
 impl XrpcResp for CollaboratorRecord {
     const NSID: &'static str = "sh.tangled.repo.collaborator";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollaboratorGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CollaboratorGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CollaboratorGetRecordOutput<'_>> for Collaborator<'_> {
-    fn from(output: CollaboratorGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CollaboratorGetRecordOutput<S>> for Collaborator<S> {
+    fn from(output: CollaboratorGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Collaborator<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Collaborator<S> {
     const NSID: &'static str = "sh.tangled.repo.collaborator";
     type Record = CollaboratorRecord;
 }
@@ -92,7 +97,7 @@ impl Collection for CollaboratorRecord {
     type Record = CollaboratorRecord;
 }
 
-impl<'a> LexiconSchema for Collaborator<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Collaborator<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.collaborator"
     }
@@ -168,7 +173,7 @@ pub mod collaborator_state {
 /// Builder for constructing an instance of this type
 pub struct CollaboratorBuilder<'a, S: collaborator_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<AtUri<'a>>, Option<Did<'a>>),
+    _fields: (Option<Datetime>, Option<AtUri<S>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -217,7 +222,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> CollaboratorBuilder<'a, collaborator_state::SetRepo<S>> {
         self._fields.1 = Option::Some(value.into());
         CollaboratorBuilder {
@@ -236,7 +241,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> CollaboratorBuilder<'a, collaborator_state::SetSubject<S>> {
         self._fields.2 = Option::Some(value.into());
         CollaboratorBuilder {
@@ -266,10 +271,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Collaborator<'a> {
         Collaborator {
             created_at: self._fields.0.unwrap(),

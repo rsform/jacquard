@@ -10,17 +10,25 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::server::InviteCode;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetInviteCodes<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetInviteCodes<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `100`. Min: 1. Max: 500.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -29,19 +37,26 @@ pub struct GetInviteCodes<'a> {
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort: Option<CowStr<'a>>,
+    pub sort: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetInviteCodesOutput<'a> {
-    #[serde(borrow)]
-    pub codes: Vec<InviteCode<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetInviteCodesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub codes: Vec<InviteCode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.atproto.admin.getInviteCodes
@@ -49,11 +64,12 @@ pub struct GetInviteCodesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetInviteCodesResponse {
     const NSID: &'static str = "com.atproto.admin.getInviteCodes";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetInviteCodesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetInviteCodesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetInviteCodes<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetInviteCodes<S> {
     const NSID: &'static str = "com.atproto.admin.getInviteCodes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetInviteCodesResponse;
@@ -64,7 +80,7 @@ pub struct GetInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetInviteCodesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.getInviteCodes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetInviteCodes<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetInviteCodes<S>;
     type Response = GetInviteCodesResponse;
 }
 
@@ -98,7 +114,7 @@ pub mod get_invite_codes_state {
 /// Builder for constructing an instance of this type
 pub struct GetInviteCodesBuilder<'a, S: get_invite_codes_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -122,12 +138,12 @@ impl<'a> GetInviteCodesBuilder<'a, get_invite_codes_state::Empty> {
 
 impl<'a, S: get_invite_codes_state::State> GetInviteCodesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -148,12 +164,12 @@ impl<'a, S: get_invite_codes_state::State> GetInviteCodesBuilder<'a, S> {
 
 impl<'a, S: get_invite_codes_state::State> GetInviteCodesBuilder<'a, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }

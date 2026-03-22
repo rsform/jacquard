@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -45,117 +47,98 @@ use crate::games_gamesgamesgamesgames::Website;
 use crate::games_gamesgamesgamesgames::richtext::facet::Facet;
 /// A video game.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "games.gamesgamesgamesgames.game",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Game<'a> {
+pub struct Game<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub age_ratings: Option<Vec<AgeRating<'a>>>,
+    pub age_ratings: Option<Vec<AgeRating<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternative_names: Option<Vec<AlternativeName<'a>>>,
-    #[serde(borrow)]
-    pub application_type: ApplicationType<'a>,
+    pub alternative_names: Option<Vec<AlternativeName<S>>>,
+    pub application_type: ApplicationType<S>,
     pub created_at: Datetime,
     ///Detailed game description in plain text, with formatting expressed via descriptionFacets.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Rich text facets for the description field.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description_facets: Option<Vec<Facet<'a>>>,
+    pub description_facets: Option<Vec<Facet<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub engines: Option<Vec<AtUri<'a>>>,
+    pub engines: Option<Vec<AtUri<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub external_ids: Option<ExternalIds<'a>>,
+    pub external_ids: Option<ExternalIds<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genres: Option<Vec<Genre<'a>>>,
+    pub genres: Option<Vec<Genre<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<Vec<CowStr<'a>>>,
+    pub keywords: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub language_supports: Option<Vec<LanguageSupport<'a>>>,
+    pub language_supports: Option<Vec<LanguageSupport<S>>>,
     ///Images associated with the game.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub media: Option<Vec<MediaItem<'a>>>,
+    pub media: Option<Vec<MediaItem<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub modes: Option<Vec<Mode<'a>>>,
+    pub modes: Option<Vec<Mode<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub multiplayer_modes: Option<Vec<MultiplayerMode<'a>>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub multiplayer_modes: Option<Vec<MultiplayerMode<S>>>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent: Option<AtUri<'a>>,
+    pub parent: Option<AtUri<S>>,
     ///Platform-specific feature support.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub platform_features: Option<Vec<PlatformFeatures<'a>>>,
+    pub platform_features: Option<Vec<PlatformFeatures<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub player_perspectives: Option<Vec<PlayerPerspective<'a>>>,
+    pub player_perspectives: Option<Vec<PlayerPerspective<S>>>,
     ///When this record was marked ready for public viewing.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub releases: Option<Vec<Release<'a>>>,
+    pub releases: Option<Vec<Release<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub storyline: Option<CowStr<'a>>,
+    pub storyline: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub summary: Option<CowStr<'a>>,
+    pub summary: Option<S>,
     ///System requirements per platform.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub system_requirements: Option<Vec<SystemRequirements<'a>>>,
+    pub system_requirements: Option<Vec<SystemRequirements<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub themes: Option<Vec<Theme<'a>>>,
+    pub themes: Option<Vec<Theme<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub time_to_beat: Option<TimeToBeat<'a>>,
+    pub time_to_beat: Option<TimeToBeat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub videos: Option<Vec<ExternalVideo<'a>>>,
+    pub videos: Option<Vec<ExternalVideo<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub websites: Option<Vec<Website<'a>>>,
+    pub websites: Option<Vec<Website<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GameGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GameGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Game<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Game<S>,
 }
 
-impl<'a> Game<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, GameRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Game<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, GameRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -166,18 +149,17 @@ pub struct GameRecord;
 impl XrpcResp for GameRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.game";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GameGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GameGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<GameGetRecordOutput<'_>> for Game<'_> {
-    fn from(output: GameGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<GameGetRecordOutput<S>> for Game<S> {
+    fn from(output: GameGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Game<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Game<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.game";
     type Record = GameRecord;
 }
@@ -187,7 +169,7 @@ impl Collection for GameRecord {
     type Record = GameRecord;
 }
 
-impl<'a> LexiconSchema for Game<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Game<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.game"
     }
@@ -264,33 +246,33 @@ pub mod game_state {
 pub struct GameBuilder<'a, S: game_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<AgeRating<'a>>>,
-        Option<Vec<AlternativeName<'a>>>,
-        Option<ApplicationType<'a>>,
+        Option<Vec<AgeRating<S>>>,
+        Option<Vec<AlternativeName<S>>>,
+        Option<ApplicationType<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<Vec<AtUri<'a>>>,
-        Option<ExternalIds<'a>>,
-        Option<Vec<Genre<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<LanguageSupport<'a>>>,
-        Option<Vec<MediaItem<'a>>>,
-        Option<Vec<Mode<'a>>>,
-        Option<Vec<MultiplayerMode<'a>>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<Vec<PlatformFeatures<'a>>>,
-        Option<Vec<PlayerPerspective<'a>>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<Vec<AtUri<S>>>,
+        Option<ExternalIds<S>>,
+        Option<Vec<Genre<S>>>,
+        Option<Vec<S>>,
+        Option<Vec<LanguageSupport<S>>>,
+        Option<Vec<MediaItem<S>>>,
+        Option<Vec<Mode<S>>>,
+        Option<Vec<MultiplayerMode<S>>>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<Vec<PlatformFeatures<S>>>,
+        Option<Vec<PlayerPerspective<S>>>,
         Option<Datetime>,
-        Option<Vec<Release<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<SystemRequirements<'a>>>,
-        Option<Vec<Theme<'a>>>,
-        Option<TimeToBeat<'a>>,
-        Option<Vec<ExternalVideo<'a>>>,
-        Option<Vec<Website<'a>>>,
+        Option<Vec<Release<S>>>,
+        Option<S>,
+        Option<S>,
+        Option<Vec<SystemRequirements<S>>>,
+        Option<Vec<Theme<S>>>,
+        Option<TimeToBeat<S>>,
+        Option<Vec<ExternalVideo<S>>>,
+        Option<Vec<Website<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -343,12 +325,12 @@ impl<'a> GameBuilder<'a, game_state::Empty> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `ageRatings` field (optional)
-    pub fn age_ratings(mut self, value: impl Into<Option<Vec<AgeRating<'a>>>>) -> Self {
+    pub fn age_ratings(mut self, value: impl Into<Option<Vec<AgeRating<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `ageRatings` field to an Option value (optional)
-    pub fn maybe_age_ratings(mut self, value: Option<Vec<AgeRating<'a>>>) -> Self {
+    pub fn maybe_age_ratings(mut self, value: Option<Vec<AgeRating<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -358,7 +340,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `alternativeNames` field (optional)
     pub fn alternative_names(
         mut self,
-        value: impl Into<Option<Vec<AlternativeName<'a>>>>,
+        value: impl Into<Option<Vec<AlternativeName<S>>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -366,7 +348,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `alternativeNames` field to an Option value (optional)
     pub fn maybe_alternative_names(
         mut self,
-        value: Option<Vec<AlternativeName<'a>>>,
+        value: Option<Vec<AlternativeName<S>>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -381,7 +363,7 @@ where
     /// Set the `applicationType` field (required)
     pub fn application_type(
         mut self,
-        value: impl Into<ApplicationType<'a>>,
+        value: impl Into<ApplicationType<S>>,
     ) -> GameBuilder<'a, game_state::SetApplicationType<S>> {
         self._fields.2 = Option::Some(value.into());
         GameBuilder {
@@ -413,12 +395,12 @@ where
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -428,13 +410,13 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
-        value: impl Into<Option<Vec<Facet<'a>>>>,
+        value: impl Into<Option<Vec<Facet<S>>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
-    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -442,12 +424,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `engines` field (optional)
-    pub fn engines(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn engines(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `engines` field to an Option value (optional)
-    pub fn maybe_engines(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_engines(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -455,12 +437,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `externalIds` field (optional)
-    pub fn external_ids(mut self, value: impl Into<Option<ExternalIds<'a>>>) -> Self {
+    pub fn external_ids(mut self, value: impl Into<Option<ExternalIds<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `externalIds` field to an Option value (optional)
-    pub fn maybe_external_ids(mut self, value: Option<ExternalIds<'a>>) -> Self {
+    pub fn maybe_external_ids(mut self, value: Option<ExternalIds<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -468,12 +450,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `genres` field (optional)
-    pub fn genres(mut self, value: impl Into<Option<Vec<Genre<'a>>>>) -> Self {
+    pub fn genres(mut self, value: impl Into<Option<Vec<Genre<S>>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `genres` field to an Option value (optional)
-    pub fn maybe_genres(mut self, value: Option<Vec<Genre<'a>>>) -> Self {
+    pub fn maybe_genres(mut self, value: Option<Vec<Genre<S>>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -481,12 +463,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_keywords(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -496,7 +478,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `languageSupports` field (optional)
     pub fn language_supports(
         mut self,
-        value: impl Into<Option<Vec<LanguageSupport<'a>>>>,
+        value: impl Into<Option<Vec<LanguageSupport<S>>>>,
     ) -> Self {
         self._fields.10 = value.into();
         self
@@ -504,7 +486,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `languageSupports` field to an Option value (optional)
     pub fn maybe_language_supports(
         mut self,
-        value: Option<Vec<LanguageSupport<'a>>>,
+        value: Option<Vec<LanguageSupport<S>>>,
     ) -> Self {
         self._fields.10 = value;
         self
@@ -513,12 +495,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `media` field (optional)
-    pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<'a>>>>) -> Self {
+    pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<S>>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `media` field to an Option value (optional)
-    pub fn maybe_media(mut self, value: Option<Vec<MediaItem<'a>>>) -> Self {
+    pub fn maybe_media(mut self, value: Option<Vec<MediaItem<S>>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -526,12 +508,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `modes` field (optional)
-    pub fn modes(mut self, value: impl Into<Option<Vec<Mode<'a>>>>) -> Self {
+    pub fn modes(mut self, value: impl Into<Option<Vec<Mode<S>>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `modes` field to an Option value (optional)
-    pub fn maybe_modes(mut self, value: Option<Vec<Mode<'a>>>) -> Self {
+    pub fn maybe_modes(mut self, value: Option<Vec<Mode<S>>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -541,7 +523,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `multiplayerModes` field (optional)
     pub fn multiplayer_modes(
         mut self,
-        value: impl Into<Option<Vec<MultiplayerMode<'a>>>>,
+        value: impl Into<Option<Vec<MultiplayerMode<S>>>>,
     ) -> Self {
         self._fields.13 = value.into();
         self
@@ -549,7 +531,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `multiplayerModes` field to an Option value (optional)
     pub fn maybe_multiplayer_modes(
         mut self,
-        value: Option<Vec<MultiplayerMode<'a>>>,
+        value: Option<Vec<MultiplayerMode<S>>>,
     ) -> Self {
         self._fields.13 = value;
         self
@@ -564,7 +546,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GameBuilder<'a, game_state::SetName<S>> {
         self._fields.14 = Option::Some(value.into());
         GameBuilder {
@@ -577,12 +559,12 @@ where
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `parent` field (optional)
-    pub fn parent(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn parent(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
-    pub fn maybe_parent(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_parent(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.15 = value;
         self
     }
@@ -592,7 +574,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `platformFeatures` field (optional)
     pub fn platform_features(
         mut self,
-        value: impl Into<Option<Vec<PlatformFeatures<'a>>>>,
+        value: impl Into<Option<Vec<PlatformFeatures<S>>>>,
     ) -> Self {
         self._fields.16 = value.into();
         self
@@ -600,7 +582,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `platformFeatures` field to an Option value (optional)
     pub fn maybe_platform_features(
         mut self,
-        value: Option<Vec<PlatformFeatures<'a>>>,
+        value: Option<Vec<PlatformFeatures<S>>>,
     ) -> Self {
         self._fields.16 = value;
         self
@@ -611,7 +593,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `playerPerspectives` field (optional)
     pub fn player_perspectives(
         mut self,
-        value: impl Into<Option<Vec<PlayerPerspective<'a>>>>,
+        value: impl Into<Option<Vec<PlayerPerspective<S>>>>,
     ) -> Self {
         self._fields.17 = value.into();
         self
@@ -619,7 +601,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `playerPerspectives` field to an Option value (optional)
     pub fn maybe_player_perspectives(
         mut self,
-        value: Option<Vec<PlayerPerspective<'a>>>,
+        value: Option<Vec<PlayerPerspective<S>>>,
     ) -> Self {
         self._fields.17 = value;
         self
@@ -641,12 +623,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `releases` field (optional)
-    pub fn releases(mut self, value: impl Into<Option<Vec<Release<'a>>>>) -> Self {
+    pub fn releases(mut self, value: impl Into<Option<Vec<Release<S>>>>) -> Self {
         self._fields.19 = value.into();
         self
     }
     /// Set the `releases` field to an Option value (optional)
-    pub fn maybe_releases(mut self, value: Option<Vec<Release<'a>>>) -> Self {
+    pub fn maybe_releases(mut self, value: Option<Vec<Release<S>>>) -> Self {
         self._fields.19 = value;
         self
     }
@@ -654,12 +636,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `storyline` field (optional)
-    pub fn storyline(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn storyline(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.20 = value.into();
         self
     }
     /// Set the `storyline` field to an Option value (optional)
-    pub fn maybe_storyline(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_storyline(mut self, value: Option<S>) -> Self {
         self._fields.20 = value;
         self
     }
@@ -667,12 +649,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `summary` field (optional)
-    pub fn summary(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn summary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.21 = value.into();
         self
     }
     /// Set the `summary` field to an Option value (optional)
-    pub fn maybe_summary(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_summary(mut self, value: Option<S>) -> Self {
         self._fields.21 = value;
         self
     }
@@ -682,7 +664,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `systemRequirements` field (optional)
     pub fn system_requirements(
         mut self,
-        value: impl Into<Option<Vec<SystemRequirements<'a>>>>,
+        value: impl Into<Option<Vec<SystemRequirements<S>>>>,
     ) -> Self {
         self._fields.22 = value.into();
         self
@@ -690,7 +672,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `systemRequirements` field to an Option value (optional)
     pub fn maybe_system_requirements(
         mut self,
-        value: Option<Vec<SystemRequirements<'a>>>,
+        value: Option<Vec<SystemRequirements<S>>>,
     ) -> Self {
         self._fields.22 = value;
         self
@@ -699,12 +681,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `themes` field (optional)
-    pub fn themes(mut self, value: impl Into<Option<Vec<Theme<'a>>>>) -> Self {
+    pub fn themes(mut self, value: impl Into<Option<Vec<Theme<S>>>>) -> Self {
         self._fields.23 = value.into();
         self
     }
     /// Set the `themes` field to an Option value (optional)
-    pub fn maybe_themes(mut self, value: Option<Vec<Theme<'a>>>) -> Self {
+    pub fn maybe_themes(mut self, value: Option<Vec<Theme<S>>>) -> Self {
         self._fields.23 = value;
         self
     }
@@ -712,12 +694,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `timeToBeat` field (optional)
-    pub fn time_to_beat(mut self, value: impl Into<Option<TimeToBeat<'a>>>) -> Self {
+    pub fn time_to_beat(mut self, value: impl Into<Option<TimeToBeat<S>>>) -> Self {
         self._fields.24 = value.into();
         self
     }
     /// Set the `timeToBeat` field to an Option value (optional)
-    pub fn maybe_time_to_beat(mut self, value: Option<TimeToBeat<'a>>) -> Self {
+    pub fn maybe_time_to_beat(mut self, value: Option<TimeToBeat<S>>) -> Self {
         self._fields.24 = value;
         self
     }
@@ -725,12 +707,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `videos` field (optional)
-    pub fn videos(mut self, value: impl Into<Option<Vec<ExternalVideo<'a>>>>) -> Self {
+    pub fn videos(mut self, value: impl Into<Option<Vec<ExternalVideo<S>>>>) -> Self {
         self._fields.25 = value.into();
         self
     }
     /// Set the `videos` field to an Option value (optional)
-    pub fn maybe_videos(mut self, value: Option<Vec<ExternalVideo<'a>>>) -> Self {
+    pub fn maybe_videos(mut self, value: Option<Vec<ExternalVideo<S>>>) -> Self {
         self._fields.25 = value;
         self
     }
@@ -738,12 +720,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `websites` field (optional)
-    pub fn websites(mut self, value: impl Into<Option<Vec<Website<'a>>>>) -> Self {
+    pub fn websites(mut self, value: impl Into<Option<Vec<Website<S>>>>) -> Self {
         self._fields.26 = value.into();
         self
     }
     /// Set the `websites` field to an Option value (optional)
-    pub fn maybe_websites(mut self, value: Option<Vec<Website<'a>>>) -> Self {
+    pub fn maybe_websites(mut self, value: Option<Vec<Website<S>>>) -> Self {
         self._fields.26 = value;
         self
     }
@@ -790,13 +772,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Game<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Game<'a> {
         Game {
             age_ratings: self._fields.0,
             alternative_names: self._fields.1,

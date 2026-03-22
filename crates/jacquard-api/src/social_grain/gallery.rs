@@ -13,10 +13,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -34,63 +35,71 @@ use crate::com_atproto::label::SelfLabels;
 use crate::social_grain::actor::ProfileView;
 use crate::social_grain::photo::PhotoView;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.grain.gallery", tag = "$type")]
-pub struct Gallery<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.grain.gallery",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Gallery<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<SelfLabels<'a>>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub labels: Option<SelfLabels<S>>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GalleryGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GalleryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Gallery<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Gallery<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GalleryView<'a> {
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
-    #[serde(borrow)]
-    pub creator: ProfileView<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GalleryView<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub cid: Cid<S>,
+    pub creator: ProfileView<S>,
     pub indexed_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub items: Option<Vec<PhotoView<'a>>>,
+    pub items: Option<Vec<PhotoView<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<Vec<Label<'a>>>,
-    #[serde(borrow)]
-    pub record: Data<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub labels: Option<Vec<Label<S>>>,
+    pub record: Data<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Gallery<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, GalleryRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Gallery<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, GalleryRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -101,18 +110,17 @@ pub struct GalleryRecord;
 impl XrpcResp for GalleryRecord {
     const NSID: &'static str = "social.grain.gallery";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GalleryGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GalleryGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<GalleryGetRecordOutput<'_>> for Gallery<'_> {
-    fn from(output: GalleryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<GalleryGetRecordOutput<S>> for Gallery<S> {
+    fn from(output: GalleryGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Gallery<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Gallery<S> {
     const NSID: &'static str = "social.grain.gallery";
     type Record = GalleryRecord;
 }
@@ -122,7 +130,7 @@ impl Collection for GalleryRecord {
     type Record = GalleryRecord;
 }
 
-impl<'a> LexiconSchema for Gallery<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Gallery<S> {
     fn nsid() -> &'static str {
         "social.grain.gallery"
     }
@@ -158,7 +166,7 @@ impl<'a> LexiconSchema for Gallery<'a> {
     }
 }
 
-impl<'a> LexiconSchema for GalleryView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for GalleryView<S> {
     fn nsid() -> &'static str {
         "social.grain.gallery.defs"
     }
@@ -183,49 +191,44 @@ pub mod gallery_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GalleryBuilder<'a, S: gallery_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<SelfLabels<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<SelfLabels<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -268,12 +271,12 @@ where
 
 impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -281,12 +284,12 @@ impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
 
 impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -300,7 +303,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GalleryBuilder<'a, gallery_state::SetTitle<S>> {
         self._fields.3 = Option::Some(value.into());
         GalleryBuilder {
@@ -314,8 +317,8 @@ where
 impl<'a, S> GalleryBuilder<'a, S>
 where
     S: gallery_state::State,
-    S::CreatedAt: gallery_state::IsSet,
     S::Title: gallery_state::IsSet,
+    S::CreatedAt: gallery_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Gallery<'a> {
@@ -330,7 +333,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Gallery<'a> {
         Gallery {
             created_at: self._fields.0.unwrap(),
@@ -424,85 +427,85 @@ pub mod gallery_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type Creator;
         type IndexedAt;
-        type Uri;
         type Record;
+        type Creator;
+        type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type Creator = Unset;
         type IndexedAt = Unset;
-        type Uri = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Creator = S::Creator;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreator<S> {}
-    impl<S: State> State for SetCreator<S> {
-        type Cid = S::Cid;
-        type Creator = Set<members::creator>;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Record = S::Record;
+        type Creator = Unset;
+        type Cid = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Cid = S::Cid;
-        type Creator = S::Creator;
         type IndexedAt = Set<members::indexed_at>;
-        type Uri = S::Uri;
         type Record = S::Record;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Creator = S::Creator;
-        type IndexedAt = S::IndexedAt;
-        type Uri = Set<members::uri>;
-        type Record = S::Record;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Cid = S::Cid;
-        type Creator = S::Creator;
         type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
         type Record = Set<members::record>;
+        type Creator = S::Creator;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type IndexedAt = S::IndexedAt;
+        type Record = S::Record;
+        type Creator = Set<members::creator>;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type IndexedAt = S::IndexedAt;
+        type Record = S::Record;
+        type Creator = S::Creator;
+        type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type IndexedAt = S::IndexedAt;
+        type Record = S::Record;
+        type Creator = S::Creator;
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `creator` field
-        pub struct creator(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -510,13 +513,13 @@ pub mod gallery_view_state {
 pub struct GalleryViewBuilder<'a, S: gallery_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Cid<'a>>,
-        Option<ProfileView<'a>>,
+        Option<Cid<S>>,
+        Option<ProfileView<S>>,
         Option<Datetime>,
-        Option<Vec<PhotoView<'a>>>,
-        Option<Vec<Label<'a>>>,
-        Option<Data<'a>>,
-        Option<AtUri<'a>>,
+        Option<Vec<PhotoView<S>>>,
+        Option<Vec<Label<S>>>,
+        Option<Data<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -547,7 +550,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> GalleryViewBuilder<'a, gallery_view_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         GalleryViewBuilder {
@@ -566,7 +569,7 @@ where
     /// Set the `creator` field (required)
     pub fn creator(
         mut self,
-        value: impl Into<ProfileView<'a>>,
+        value: impl Into<ProfileView<S>>,
     ) -> GalleryViewBuilder<'a, gallery_view_state::SetCreator<S>> {
         self._fields.1 = Option::Some(value.into());
         GalleryViewBuilder {
@@ -598,12 +601,12 @@ where
 
 impl<'a, S: gallery_view_state::State> GalleryViewBuilder<'a, S> {
     /// Set the `items` field (optional)
-    pub fn items(mut self, value: impl Into<Option<Vec<PhotoView<'a>>>>) -> Self {
+    pub fn items(mut self, value: impl Into<Option<Vec<PhotoView<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `items` field to an Option value (optional)
-    pub fn maybe_items(mut self, value: Option<Vec<PhotoView<'a>>>) -> Self {
+    pub fn maybe_items(mut self, value: Option<Vec<PhotoView<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -611,12 +614,12 @@ impl<'a, S: gallery_view_state::State> GalleryViewBuilder<'a, S> {
 
 impl<'a, S: gallery_view_state::State> GalleryViewBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<Vec<Label<'a>>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<Vec<Label<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<Vec<Label<'a>>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<Vec<Label<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -630,7 +633,7 @@ where
     /// Set the `record` field (required)
     pub fn record(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> GalleryViewBuilder<'a, gallery_view_state::SetRecord<S>> {
         self._fields.5 = Option::Some(value.into());
         GalleryViewBuilder {
@@ -649,7 +652,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GalleryViewBuilder<'a, gallery_view_state::SetUri<S>> {
         self._fields.6 = Option::Some(value.into());
         GalleryViewBuilder {
@@ -663,11 +666,11 @@ where
 impl<'a, S> GalleryViewBuilder<'a, S>
 where
     S: gallery_view_state::State,
-    S::Cid: gallery_view_state::IsSet,
-    S::Creator: gallery_view_state::IsSet,
     S::IndexedAt: gallery_view_state::IsSet,
-    S::Uri: gallery_view_state::IsSet,
     S::Record: gallery_view_state::IsSet,
+    S::Creator: gallery_view_state::IsSet,
+    S::Cid: gallery_view_state::IsSet,
+    S::Uri: gallery_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GalleryView<'a> {
@@ -685,7 +688,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> GalleryView<'a> {
         GalleryView {
             cid: self._fields.0.unwrap(),

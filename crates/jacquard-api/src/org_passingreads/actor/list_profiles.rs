@@ -10,16 +10,27 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::org_passingreads::actor::ProfileView;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListProfilesOutput<'a> {
-    #[serde(borrow)]
-    pub profiles: Vec<ProfileView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListProfilesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub profiles: Vec<ProfileView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// XRPC request marker type.
@@ -31,8 +42,8 @@ pub struct ListProfilesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListProfilesResponse {
     const NSID: &'static str = "org.passingreads.actor.listProfiles";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListProfilesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListProfilesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for ListProfiles {
@@ -46,6 +57,6 @@ pub struct ListProfilesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListProfilesRequest {
     const PATH: &'static str = "/xrpc/org.passingreads.actor.listProfiles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListProfiles;
+    type Request<S: Bos<str> + AsRef<str>> = ListProfiles;
     type Response = ListProfilesResponse;
 }

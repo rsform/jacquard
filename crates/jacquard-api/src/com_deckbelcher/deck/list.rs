@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -31,28 +33,32 @@ use crate::com_deckbelcher::richtext::Document;
 use crate::com_deckbelcher::deck::list;
 /// A card entry in a decklist.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Card<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Card<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Number of copies in the deck.
     pub quantity: i64,
     ///Reference to the card (scryfall printing + oracle card).
-    #[serde(borrow)]
-    pub r#ref: CardRef<'a>,
+    pub r#ref: CardRef<S>,
     ///Which section of the deck this card belongs to. Extensible to support format-specific sections.
-    #[serde(borrow)]
-    pub section: list::Section<'a>,
+    pub section: list::Section<S>,
     ///User annotations for this card in this deck (e.g., "removal", "wincon", "ramp").
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Game format for a deck.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Format<'a> {
+pub enum Format<S: Bos<str> + AsRef<str> = DefaultStr> {
     Standard,
     Pioneer,
     Modern,
@@ -76,10 +82,10 @@ pub enum Format<'a> {
     Penny,
     Cube,
     Kitchentable,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> Format<'a> {
+impl<S: Bos<str> + AsRef<str>> Format<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Standard => "standard",
@@ -108,11 +114,9 @@ impl<'a> Format<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for Format<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "standard" => Self::Standard,
             "pioneer" => Self::Pioneer,
             "modern" => Self::Modern,
@@ -136,78 +140,44 @@ impl<'a> From<&'a str> for Format<'a> {
             "penny" => Self::Penny,
             "cube" => Self::Cube,
             "kitchentable" => Self::Kitchentable,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for Format<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "standard" => Self::Standard,
-            "pioneer" => Self::Pioneer,
-            "modern" => Self::Modern,
-            "legacy" => Self::Legacy,
-            "vintage" => Self::Vintage,
-            "pauper" => Self::Pauper,
-            "commander" => Self::Commander,
-            "duel" => Self::Duel,
-            "paupercommander" => Self::Paupercommander,
-            "predh" => Self::Predh,
-            "oathbreaker" => Self::Oathbreaker,
-            "brawl" => Self::Brawl,
-            "standardbrawl" => Self::Standardbrawl,
-            "historic" => Self::Historic,
-            "timeless" => Self::Timeless,
-            "alchemy" => Self::Alchemy,
-            "gladiator" => Self::Gladiator,
-            "premodern" => Self::Premodern,
-            "oldschool" => Self::Oldschool,
-            "draft" => Self::Draft,
-            "penny" => Self::Penny,
-            "cube" => Self::Cube,
-            "kitchentable" => Self::Kitchentable,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Format<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for Format<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for Format<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Format<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for Format<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for Format<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for Format<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Format<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for Format<'_> {
-    type Output = Format<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for Format<S> {
+    type Output = Format<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             Format::Standard => Format::Standard,
@@ -240,90 +210,116 @@ impl jacquard_common::IntoStatic for Format<'_> {
 
 /// A Magic: The Gathering decklist.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "com.deckbelcher.deck.list", tag = "$type")]
-pub struct List<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "com.deckbelcher.deck.list",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct List<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of cards in the decklist.
-    #[serde(borrow)]
-    pub cards: Vec<list::Card<'a>>,
+    pub cards: Vec<list::Card<S>>,
     ///Timestamp when the decklist was created.
     pub created_at: Datetime,
     ///Format of the deck.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub format: Option<list::Format<'a>>,
+    pub format: Option<list::Format<S>>,
     ///Name of the decklist.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Deck primer with strategy, combos, and card choices.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub primer: Option<ListPrimer<'a>>,
+    pub primer: Option<ListPrimer<S>>,
     ///Timestamp when the decklist was last updated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ListPrimer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ListPrimer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.deckbelcher.richtext#document")]
-    RichtextDocument(Box<Document<'a>>),
+    RichtextDocument(Box<Document<S>>),
     #[serde(rename = "com.deckbelcher.deck.list#primerUri")]
-    PrimerUri(Box<list::PrimerUri<'a>>),
+    PrimerUri(Box<list::PrimerUri<S>>),
     #[serde(rename = "com.deckbelcher.deck.list#primerRef")]
-    PrimerRef(Box<list::PrimerRef<'a>>),
+    PrimerRef(Box<list::PrimerRef<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ListGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: List<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: List<S>,
 }
 
 /// Primer in a separate ATProto record. For use with any longform writing lexicon.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PrimerRef<'a> {
-    #[serde(borrow)]
-    pub r#ref: StrongRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PrimerRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub r#ref: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// External primer content. Typically a URL, but any valid URI scheme.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct PrimerUri<'a> {
-    #[serde(borrow)]
-    pub uri: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PrimerUri<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub uri: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Which section of the deck this card belongs to. Extensible to support format-specific sections.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Section<'a> {
+pub enum Section<S: Bos<str> + AsRef<str> = DefaultStr> {
     Mainboard,
     Sideboard,
     Maybeboard,
     Commander,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> Section<'a> {
+impl<S: Bos<str> + AsRef<str>> Section<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Mainboard => "mainboard",
@@ -333,68 +329,51 @@ impl<'a> Section<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for Section<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "mainboard" => Self::Mainboard,
             "sideboard" => Self::Sideboard,
             "maybeboard" => Self::Maybeboard,
             "commander" => Self::Commander,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for Section<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "mainboard" => Self::Mainboard,
-            "sideboard" => Self::Sideboard,
-            "maybeboard" => Self::Maybeboard,
-            "commander" => Self::Commander,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Section<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for Section<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for Section<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Section<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for Section<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for Section<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for Section<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Section<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for Section<'_> {
-    type Output = Section<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for Section<S> {
+    type Output = Section<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             Section::Mainboard => Section::Mainboard,
@@ -406,15 +385,13 @@ impl jacquard_common::IntoStatic for Section<'_> {
     }
 }
 
-impl<'a> List<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ListRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> List<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ListRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Card<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Card<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.deck.list"
     }
@@ -456,18 +433,17 @@ pub struct ListRecord;
 impl XrpcResp for ListRecord {
     const NSID: &'static str = "com.deckbelcher.deck.list";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ListGetRecordOutput<'_>> for List<'_> {
-    fn from(output: ListGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ListGetRecordOutput<S>> for List<S> {
+    fn from(output: ListGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for List<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for List<S> {
     const NSID: &'static str = "com.deckbelcher.deck.list";
     type Record = ListRecord;
 }
@@ -477,7 +453,7 @@ impl Collection for ListRecord {
     type Record = ListRecord;
 }
 
-impl<'a> LexiconSchema for List<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for List<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.deck.list"
     }
@@ -516,7 +492,7 @@ impl<'a> LexiconSchema for List<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PrimerRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PrimerRef<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.deck.list"
     }
@@ -531,7 +507,7 @@ impl<'a> LexiconSchema for PrimerRef<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PrimerUri<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PrimerUri<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.deck.list"
     }
@@ -631,12 +607,7 @@ pub mod card_state {
 /// Builder for constructing an instance of this type
 pub struct CardBuilder<'a, S: card_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<i64>,
-        Option<CardRef<'a>>,
-        Option<list::Section<'a>>,
-        Option<Vec<CowStr<'a>>>,
-    ),
+    _fields: (Option<i64>, Option<CardRef<S>>, Option<list::Section<S>>, Option<Vec<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -685,7 +656,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<CardRef<'a>>,
+        value: impl Into<CardRef<S>>,
     ) -> CardBuilder<'a, card_state::SetRef<S>> {
         self._fields.1 = Option::Some(value.into());
         CardBuilder {
@@ -704,7 +675,7 @@ where
     /// Set the `section` field (required)
     pub fn section(
         mut self,
-        value: impl Into<list::Section<'a>>,
+        value: impl Into<list::Section<S>>,
     ) -> CardBuilder<'a, card_state::SetSection<S>> {
         self._fields.2 = Option::Some(value.into());
         CardBuilder {
@@ -717,12 +688,12 @@ where
 
 impl<'a, S: card_state::State> CardBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -746,13 +717,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Card<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Card<'a> {
         Card {
             quantity: self._fields.0.unwrap(),
             r#ref: self._fields.1.unwrap(),
@@ -1014,51 +979,51 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type CreatedAt;
         type Cards;
+        type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type CreatedAt = Unset;
         type Cards = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type Cards = S::Cards;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
-        type Cards = S::Cards;
+        type CreatedAt = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `cards` field to Set
     pub struct SetCards<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCards<S> {}
     impl<S: State> State for SetCards<S> {
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type Cards = Set<members::cards>;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Cards = S::Cards;
+        type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Cards = S::Cards;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `cards` field
         pub struct cards(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -1066,11 +1031,11 @@ pub mod list_state {
 pub struct ListBuilder<'a, S: list_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<list::Card<'a>>>,
+        Option<Vec<list::Card<S>>>,
         Option<Datetime>,
-        Option<list::Format<'a>>,
-        Option<CowStr<'a>>,
-        Option<ListPrimer<'a>>,
+        Option<list::Format<S>>,
+        Option<S>,
+        Option<ListPrimer<S>>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -1102,7 +1067,7 @@ where
     /// Set the `cards` field (required)
     pub fn cards(
         mut self,
-        value: impl Into<Vec<list::Card<'a>>>,
+        value: impl Into<Vec<list::Card<S>>>,
     ) -> ListBuilder<'a, list_state::SetCards<S>> {
         self._fields.0 = Option::Some(value.into());
         ListBuilder {
@@ -1134,12 +1099,12 @@ where
 
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `format` field (optional)
-    pub fn format(mut self, value: impl Into<Option<list::Format<'a>>>) -> Self {
+    pub fn format(mut self, value: impl Into<Option<list::Format<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `format` field to an Option value (optional)
-    pub fn maybe_format(mut self, value: Option<list::Format<'a>>) -> Self {
+    pub fn maybe_format(mut self, value: Option<list::Format<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1153,7 +1118,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ListBuilder<'a, list_state::SetName<S>> {
         self._fields.3 = Option::Some(value.into());
         ListBuilder {
@@ -1166,12 +1131,12 @@ where
 
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `primer` field (optional)
-    pub fn primer(mut self, value: impl Into<Option<ListPrimer<'a>>>) -> Self {
+    pub fn primer(mut self, value: impl Into<Option<ListPrimer<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `primer` field to an Option value (optional)
-    pub fn maybe_primer(mut self, value: Option<ListPrimer<'a>>) -> Self {
+    pub fn maybe_primer(mut self, value: Option<ListPrimer<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1193,9 +1158,9 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::Name: list_state::IsSet,
-    S::CreatedAt: list_state::IsSet,
     S::Cards: list_state::IsSet,
+    S::CreatedAt: list_state::IsSet,
+    S::Name: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -1210,13 +1175,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> List<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> List<'a> {
         List {
             cards: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -1264,7 +1223,7 @@ pub mod primer_ref_state {
 /// Builder for constructing an instance of this type
 pub struct PrimerRefBuilder<'a, S: primer_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>,),
+    _fields: (Option<StrongRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1294,7 +1253,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> PrimerRefBuilder<'a, primer_ref_state::SetRef<S>> {
         self._fields.0 = Option::Some(value.into());
         PrimerRefBuilder {
@@ -1320,10 +1279,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PrimerRef<'a> {
         PrimerRef {
             r#ref: self._fields.0.unwrap(),

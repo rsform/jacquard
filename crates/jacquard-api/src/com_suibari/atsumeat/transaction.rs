@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,58 +29,56 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Definition of a transaction
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "com.suibari.atsumeat.transaction",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Transaction<'a> {
+pub struct Transaction<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///Flag to indicate if this is an Easy Exchange (random partner).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_easy_exchange: Option<bool>,
     ///Optional message attached to the exchange offer or completion.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     ///The DID of the exchange partner.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub partner: Option<Did<'a>>,
+    pub partner: Option<Did<S>>,
     ///URI of the partner's profile, used for Constellation backlinking during the offer stage.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ref_partner: Option<UriValue<'a>>,
+    pub ref_partner: Option<UriValue<S>>,
     ///URI of the referencing transaction (e.g., the original Offer) when completing or rejecting.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ref_transaction: Option<UriValue<'a>>,
+    pub ref_transaction: Option<UriValue<S>>,
     ///The current status of the transaction.
-    #[serde(borrow)]
-    pub status: TransactionStatus<'a>,
+    pub status: TransactionStatus<S>,
     ///URIs of the stickers received in this exchange (if completed).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sticker_in: Option<Vec<UriValue<'a>>>,
+    pub sticker_in: Option<Vec<UriValue<S>>>,
     ///URIs of the stickers given in this exchange.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sticker_out: Option<Vec<UriValue<'a>>>,
+    pub sticker_out: Option<Vec<UriValue<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The current status of the transaction.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TransactionStatus<'a> {
+pub enum TransactionStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Offered,
     Completed,
     Rejected,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> TransactionStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> TransactionStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Offered => "offered",
@@ -87,72 +87,57 @@ impl<'a> TransactionStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for TransactionStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "offered" => Self::Offered,
             "completed" => Self::Completed,
             "rejected" => Self::Rejected,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for TransactionStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "offered" => Self::Offered,
-            "completed" => Self::Completed,
-            "rejected" => Self::Rejected,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TransactionStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for TransactionStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for TransactionStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for TransactionStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for TransactionStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for TransactionStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for TransactionStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for TransactionStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for TransactionStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for TransactionStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for TransactionStatus<'_> {
-    type Output = TransactionStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for TransactionStatus<S> {
+    type Output = TransactionStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             TransactionStatus::Offered => TransactionStatus::Offered,
@@ -166,22 +151,23 @@ impl jacquard_common::IntoStatic for TransactionStatus<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TransactionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TransactionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Transaction<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Transaction<S>,
 }
 
-impl<'a> Transaction<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TransactionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Transaction<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TransactionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -192,18 +178,17 @@ pub struct TransactionRecord;
 impl XrpcResp for TransactionRecord {
     const NSID: &'static str = "com.suibari.atsumeat.transaction";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TransactionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TransactionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TransactionGetRecordOutput<'_>> for Transaction<'_> {
-    fn from(output: TransactionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TransactionGetRecordOutput<S>> for Transaction<S> {
+    fn from(output: TransactionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Transaction<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Transaction<S> {
     const NSID: &'static str = "com.suibari.atsumeat.transaction";
     type Record = TransactionRecord;
 }
@@ -213,7 +198,7 @@ impl Collection for TransactionRecord {
     type Record = TransactionRecord;
 }
 
-impl<'a> LexiconSchema for Transaction<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Transaction<S> {
     fn nsid() -> &'static str {
         "com.suibari.atsumeat.transaction"
     }
@@ -271,37 +256,37 @@ pub mod transaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type CreatedAt;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type CreatedAt = S::CreatedAt;
+        type Status = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Status = S::Status;
         type CreatedAt = Set<members::created_at>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type CreatedAt = S::CreatedAt;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -311,13 +296,13 @@ pub struct TransactionBuilder<'a, S: transaction_state::State> {
     _fields: (
         Option<Datetime>,
         Option<bool>,
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<UriValue<'a>>,
-        Option<UriValue<'a>>,
-        Option<TransactionStatus<'a>>,
-        Option<Vec<UriValue<'a>>>,
-        Option<Vec<UriValue<'a>>>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<UriValue<S>>,
+        Option<UriValue<S>>,
+        Option<TransactionStatus<S>>,
+        Option<Vec<UriValue<S>>>,
+        Option<Vec<UriValue<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -374,12 +359,12 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
-    pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_message(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -387,12 +372,12 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `partner` field (optional)
-    pub fn partner(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn partner(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `partner` field to an Option value (optional)
-    pub fn maybe_partner(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_partner(mut self, value: Option<Did<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -400,12 +385,12 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `refPartner` field (optional)
-    pub fn ref_partner(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn ref_partner(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `refPartner` field to an Option value (optional)
-    pub fn maybe_ref_partner(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_ref_partner(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -413,12 +398,12 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `refTransaction` field (optional)
-    pub fn ref_transaction(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn ref_transaction(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `refTransaction` field to an Option value (optional)
-    pub fn maybe_ref_transaction(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_ref_transaction(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -432,7 +417,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<TransactionStatus<'a>>,
+        value: impl Into<TransactionStatus<S>>,
     ) -> TransactionBuilder<'a, transaction_state::SetStatus<S>> {
         self._fields.6 = Option::Some(value.into());
         TransactionBuilder {
@@ -445,12 +430,12 @@ where
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `stickerIn` field (optional)
-    pub fn sticker_in(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
+    pub fn sticker_in(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `stickerIn` field to an Option value (optional)
-    pub fn maybe_sticker_in(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
+    pub fn maybe_sticker_in(mut self, value: Option<Vec<UriValue<S>>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -458,12 +443,12 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `stickerOut` field (optional)
-    pub fn sticker_out(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
+    pub fn sticker_out(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `stickerOut` field to an Option value (optional)
-    pub fn maybe_sticker_out(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
+    pub fn maybe_sticker_out(mut self, value: Option<Vec<UriValue<S>>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -472,8 +457,8 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 impl<'a, S> TransactionBuilder<'a, S>
 where
     S: transaction_state::State,
-    S::Status: transaction_state::IsSet,
     S::CreatedAt: transaction_state::IsSet,
+    S::Status: transaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Transaction<'a> {
@@ -493,10 +478,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Transaction<'a> {
         Transaction {
             created_at: self._fields.0.unwrap(),

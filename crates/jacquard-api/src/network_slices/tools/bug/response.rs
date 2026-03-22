@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,42 +29,43 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "network.slices.tools.bug.response",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Response<'a> {
+pub struct Response<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reference to the bug report
-    #[serde(borrow)]
-    pub bug: AtUri<'a>,
+    pub bug: AtUri<S>,
     pub created_at: Datetime,
     ///Optional explanation or link to fix
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     ///Annotations of message (mentions and links)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message_facets: Option<Vec<Facet<'a>>>,
-    #[serde(borrow)]
-    pub status: ResponseStatus<'a>,
+    pub message_facets: Option<Vec<Facet<S>>>,
+    pub status: ResponseStatus<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ResponseStatus<'a> {
+pub enum ResponseStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Acknowledged,
     Fixed,
     Wontfix,
     Duplicate,
     Invalid,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ResponseStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> ResponseStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Acknowledged => "acknowledged",
@@ -73,76 +76,59 @@ impl<'a> ResponseStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ResponseStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "acknowledged" => Self::Acknowledged,
             "fixed" => Self::Fixed,
             "wontfix" => Self::Wontfix,
             "duplicate" => Self::Duplicate,
             "invalid" => Self::Invalid,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ResponseStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "acknowledged" => Self::Acknowledged,
-            "fixed" => Self::Fixed,
-            "wontfix" => Self::Wontfix,
-            "duplicate" => Self::Duplicate,
-            "invalid" => Self::Invalid,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ResponseStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ResponseStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ResponseStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ResponseStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ResponseStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ResponseStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ResponseStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ResponseStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ResponseStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ResponseStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ResponseStatus<'_> {
-    type Output = ResponseStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ResponseStatus<S> {
+    type Output = ResponseStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ResponseStatus::Acknowledged => ResponseStatus::Acknowledged,
@@ -158,22 +144,23 @@ impl jacquard_common::IntoStatic for ResponseStatus<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ResponseGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResponseGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Response<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Response<S>,
 }
 
-impl<'a> Response<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ResponseRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Response<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ResponseRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -184,18 +171,17 @@ pub struct ResponseRecord;
 impl XrpcResp for ResponseRecord {
     const NSID: &'static str = "network.slices.tools.bug.response";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResponseGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ResponseGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ResponseGetRecordOutput<'_>> for Response<'_> {
-    fn from(output: ResponseGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ResponseGetRecordOutput<S>> for Response<S> {
+    fn from(output: ResponseGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Response<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Response<S> {
     const NSID: &'static str = "network.slices.tools.bug.response";
     type Record = ResponseRecord;
 }
@@ -205,7 +191,7 @@ impl Collection for ResponseRecord {
     type Record = ResponseRecord;
 }
 
-impl<'a> LexiconSchema for Response<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Response<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.bug.response"
     }
@@ -252,51 +238,51 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Bug;
         type Status;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Bug = Unset;
         type Status = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `bug` field to Set
-    pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBug<S> {}
-    impl<S: State> State for SetBug<S> {
-        type Bug = Set<members::bug>;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Bug = S::Bug;
-        type Status = Set<members::status>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Bug = S::Bug;
         type Status = S::Status;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `bug` field to Set
+    pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBug<S> {}
+    impl<S: State> State for SetBug<S> {
+        type CreatedAt = S::CreatedAt;
+        type Bug = Set<members::bug>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type CreatedAt = S::CreatedAt;
+        type Bug = S::Bug;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `bug` field
         pub struct bug(());
         ///Marker type for the `status` field
         pub struct status(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -304,11 +290,11 @@ pub mod response_state {
 pub struct ResponseBuilder<'a, S: response_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtUri<'a>>,
+        Option<AtUri<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<ResponseStatus<'a>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<ResponseStatus<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -339,7 +325,7 @@ where
     /// Set the `bug` field (required)
     pub fn bug(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ResponseBuilder<'a, response_state::SetBug<S>> {
         self._fields.0 = Option::Some(value.into());
         ResponseBuilder {
@@ -371,12 +357,12 @@ where
 
 impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
-    pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_message(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -384,12 +370,12 @@ impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
 
 impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
     /// Set the `messageFacets` field (optional)
-    pub fn message_facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
+    pub fn message_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `messageFacets` field to an Option value (optional)
-    pub fn maybe_message_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_message_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -403,7 +389,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<ResponseStatus<'a>>,
+        value: impl Into<ResponseStatus<S>>,
     ) -> ResponseBuilder<'a, response_state::SetStatus<S>> {
         self._fields.4 = Option::Some(value.into());
         ResponseBuilder {
@@ -417,9 +403,9 @@ where
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
+    S::CreatedAt: response_state::IsSet,
     S::Bug: response_state::IsSet,
     S::Status: response_state::IsSet,
-    S::CreatedAt: response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Response<'a> {
@@ -435,10 +421,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Response<'a> {
         Response {
             bug: self._fields.0.unwrap(),

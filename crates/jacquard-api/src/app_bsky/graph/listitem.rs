@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,38 +29,46 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Record representing an account's inclusion on a specific list. The AppView will ignore duplicate listitem records.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.bsky.graph.listitem", tag = "$type")]
-pub struct Listitem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.bsky.graph.listitem",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Listitem<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///Reference (AT-URI) to the list record (app.bsky.graph.list).
-    #[serde(borrow)]
-    pub list: AtUri<'a>,
+    pub list: AtUri<S>,
     ///The account which is included on the list.
-    #[serde(borrow)]
-    pub subject: Did<'a>,
+    pub subject: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ListitemGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListitemGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Listitem<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Listitem<S>,
 }
 
-impl<'a> Listitem<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ListitemRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Listitem<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ListitemRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -69,18 +79,17 @@ pub struct ListitemRecord;
 impl XrpcResp for ListitemRecord {
     const NSID: &'static str = "app.bsky.graph.listitem";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListitemGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListitemGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ListitemGetRecordOutput<'_>> for Listitem<'_> {
-    fn from(output: ListitemGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ListitemGetRecordOutput<S>> for Listitem<S> {
+    fn from(output: ListitemGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Listitem<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Listitem<S> {
     const NSID: &'static str = "app.bsky.graph.listitem";
     type Record = ListitemRecord;
 }
@@ -90,7 +99,7 @@ impl Collection for ListitemRecord {
     type Record = ListitemRecord;
 }
 
-impl<'a> LexiconSchema for Listitem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Listitem<S> {
     fn nsid() -> &'static str {
         "app.bsky.graph.listitem"
     }
@@ -116,57 +125,57 @@ pub mod listitem_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type List;
-        type Subject;
         type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type List = Unset;
-        type Subject = Unset;
         type CreatedAt = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `list` field to Set
     pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetList<S> {}
     impl<S: State> State for SetList<S> {
         type List = Set<members::list>;
+        type CreatedAt = S::CreatedAt;
         type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type List = S::List;
-        type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type List = S::List;
-        type Subject = S::Subject;
         type CreatedAt = Set<members::created_at>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type List = S::List;
+        type CreatedAt = S::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `list` field
         pub struct list(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ListitemBuilder<'a, S: listitem_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<AtUri<'a>>, Option<Did<'a>>),
+    _fields: (Option<Datetime>, Option<AtUri<S>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -215,7 +224,7 @@ where
     /// Set the `list` field (required)
     pub fn list(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ListitemBuilder<'a, listitem_state::SetList<S>> {
         self._fields.1 = Option::Some(value.into());
         ListitemBuilder {
@@ -234,7 +243,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ListitemBuilder<'a, listitem_state::SetSubject<S>> {
         self._fields.2 = Option::Some(value.into());
         ListitemBuilder {
@@ -249,8 +258,8 @@ impl<'a, S> ListitemBuilder<'a, S>
 where
     S: listitem_state::State,
     S::List: listitem_state::IsSet,
-    S::Subject: listitem_state::IsSet,
     S::CreatedAt: listitem_state::IsSet,
+    S::Subject: listitem_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Listitem<'a> {
@@ -264,10 +273,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Listitem<'a> {
         Listitem {
             created_at: self._fields.0.unwrap(),

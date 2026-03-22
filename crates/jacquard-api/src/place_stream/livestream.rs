@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
@@ -36,39 +37,46 @@ use crate::place_stream::chat::MessageView;
 use crate::place_stream::chat::profile::Profile;
 use crate::place_stream::livestream;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LivestreamView<'a> {
-    #[serde(borrow)]
-    pub author: ProfileViewBasic<'a>,
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LivestreamView<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub author: ProfileViewBasic<S>,
+    pub cid: Cid<S>,
     pub indexed_at: Datetime,
-    #[serde(borrow)]
-    pub record: Data<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub record: Data<S>,
+    pub uri: AtUri<S>,
     ///The number of viewers watching this livestream. Use when you can't reasonably use #viewerCount directly.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub viewer_count: Option<livestream::ViewerCount<'a>>,
+    pub viewer_count: Option<livestream::ViewerCount<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Record announcing a livestream is happening
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "place.stream.livestream", tag = "$type")]
-pub struct Livestream<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "place.stream.livestream",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Livestream<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The source of the livestream, if available, in a User Agent format: `<product> / <product-version> <comment>` e.g. Streamplace/0.7.5 iOS
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub agent: Option<CowStr<'a>>,
+    pub agent: Option<S>,
     ///The primary URL where this livestream can be viewed, if available.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub canonical_url: Option<UriValue<'a>>,
+    pub canonical_url: Option<UriValue<S>>,
     ///Client-declared timestamp when this livestream started.
     pub created_at: Datetime,
     ///Client-declared timestamp when this livestream ended. Ended livestreams are not supposed to start up again.
@@ -81,131 +89,164 @@ pub struct Livestream<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_seen_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notification_settings: Option<livestream::NotificationSettings<'a>>,
+    pub notification_settings: Option<livestream::NotificationSettings<S>>,
     ///The post that announced this livestream.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub post: Option<StrongRef<'a>>,
+    pub post: Option<StrongRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumb: Option<BlobRef<'a>>,
+    pub thumb: Option<BlobRef<S>>,
     ///The title of the livestream, as it will be announced to followers.
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
     ///The URL where this stream can be found. This is primarily a hint for other Streamplace nodes to locate and replicate the stream.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<UriValue<'a>>,
+    pub url: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LivestreamGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LivestreamGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Livestream<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Livestream<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct NotificationSettings<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct NotificationSettings<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether this livestream should trigger a push notification to followers.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub push_notification: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StreamplaceAnything<'a> {
-    #[serde(borrow)]
-    pub livestream: StreamplaceAnythingLivestream<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StreamplaceAnything<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub livestream: StreamplaceAnythingLivestream<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum StreamplaceAnythingLivestream<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum StreamplaceAnythingLivestream<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "place.stream.livestream#livestreamView")]
-    LivestreamView(Box<livestream::LivestreamView<'a>>),
+    LivestreamView(Box<livestream::LivestreamView<S>>),
     #[serde(rename = "place.stream.livestream#viewerCount")]
-    ViewerCount(Box<livestream::ViewerCount<'a>>),
+    ViewerCount(Box<livestream::ViewerCount<S>>),
     #[serde(rename = "place.stream.livestream#teleportArrival")]
-    TeleportArrival(Box<livestream::TeleportArrival<'a>>),
+    TeleportArrival(Box<livestream::TeleportArrival<S>>),
     #[serde(rename = "place.stream.livestream#teleportCanceled")]
-    TeleportCanceled(Box<livestream::TeleportCanceled<'a>>),
+    TeleportCanceled(Box<livestream::TeleportCanceled<S>>),
     #[serde(rename = "place.stream.defs#blockView")]
-    BlockView(Box<BlockView<'a>>),
+    BlockView(Box<BlockView<S>>),
     #[serde(rename = "place.stream.defs#renditions")]
-    Renditions(Box<Renditions<'a>>),
+    Renditions(Box<Renditions<S>>),
     #[serde(rename = "place.stream.defs#rendition")]
-    Rendition(Box<Rendition<'a>>),
+    Rendition(Box<Rendition<S>>),
     #[serde(rename = "place.stream.chat.defs#messageView")]
-    MessageView(Box<MessageView<'a>>),
+    MessageView(Box<MessageView<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TeleportArrival<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TeleportArrival<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The chat profile of the source streamer
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub chat_profile: Option<Profile<'a>>,
+    pub chat_profile: Option<Profile<S>>,
     ///The streamer who is teleporting their viewers here
-    #[serde(borrow)]
-    pub source: ProfileViewBasic<'a>,
+    pub source: ProfileViewBasic<S>,
     ///When this teleport started
     pub starts_at: Datetime,
     ///The URI of the teleport record
-    #[serde(borrow)]
-    pub teleport_uri: AtUri<'a>,
+    pub teleport_uri: AtUri<S>,
     ///How many viewers are arriving from this teleport
     pub viewer_count: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TeleportCanceled<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TeleportCanceled<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Why this teleport was canceled
-    #[serde(borrow)]
-    pub reason: CowStr<'a>,
+    pub reason: S,
     ///The URI of the teleport record that was canceled
-    #[serde(borrow)]
-    pub teleport_uri: AtUri<'a>,
+    pub teleport_uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewerCount<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ViewerCount<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub count: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Livestream<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LivestreamRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Livestream<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LivestreamRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for LivestreamView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LivestreamView<S> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
@@ -227,18 +268,17 @@ pub struct LivestreamRecord;
 impl XrpcResp for LivestreamRecord {
     const NSID: &'static str = "place.stream.livestream";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LivestreamGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LivestreamGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LivestreamGetRecordOutput<'_>> for Livestream<'_> {
-    fn from(output: LivestreamGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LivestreamGetRecordOutput<S>> for Livestream<S> {
+    fn from(output: LivestreamGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Livestream<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Livestream<S> {
     const NSID: &'static str = "place.stream.livestream";
     type Record = LivestreamRecord;
 }
@@ -248,7 +288,7 @@ impl Collection for LivestreamRecord {
     type Record = LivestreamRecord;
 }
 
-impl<'a> LexiconSchema for Livestream<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Livestream<S> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
@@ -325,7 +365,7 @@ impl<'a> LexiconSchema for Livestream<'a> {
     }
 }
 
-impl<'a> LexiconSchema for NotificationSettings<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for NotificationSettings<S> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
@@ -340,7 +380,7 @@ impl<'a> LexiconSchema for NotificationSettings<'a> {
     }
 }
 
-impl<'a> LexiconSchema for StreamplaceAnything<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for StreamplaceAnything<S> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
@@ -355,7 +395,7 @@ impl<'a> LexiconSchema for StreamplaceAnything<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TeleportArrival<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TeleportArrival<S> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
@@ -370,7 +410,7 @@ impl<'a> LexiconSchema for TeleportArrival<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TeleportCanceled<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TeleportCanceled<S> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
@@ -385,7 +425,7 @@ impl<'a> LexiconSchema for TeleportCanceled<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ViewerCount<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViewerCount<S> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
@@ -412,8 +452,8 @@ pub mod livestream_view_state {
     pub trait State: sealed::Sealed {
         type Uri;
         type Record;
-        type Cid;
         type IndexedAt;
+        type Cid;
         type Author;
     }
     /// Empty state - all required fields are unset
@@ -422,8 +462,8 @@ pub mod livestream_view_state {
     impl State for Empty {
         type Uri = Unset;
         type Record = Unset;
-        type Cid = Unset;
         type IndexedAt = Unset;
+        type Cid = Unset;
         type Author = Unset;
     }
     ///State transition - sets the `uri` field to Set
@@ -432,8 +472,8 @@ pub mod livestream_view_state {
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
         type Record = S::Record;
-        type Cid = S::Cid;
         type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
         type Author = S::Author;
     }
     ///State transition - sets the `record` field to Set
@@ -442,18 +482,8 @@ pub mod livestream_view_state {
     impl<S: State> State for SetRecord<S> {
         type Uri = S::Uri;
         type Record = Set<members::record>;
+        type IndexedAt = S::IndexedAt;
         type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
-        type Record = S::Record;
-        type Cid = Set<members::cid>;
-        type IndexedAt = S::IndexedAt;
         type Author = S::Author;
     }
     ///State transition - sets the `indexed_at` field to Set
@@ -462,8 +492,18 @@ pub mod livestream_view_state {
     impl<S: State> State for SetIndexedAt<S> {
         type Uri = S::Uri;
         type Record = S::Record;
-        type Cid = S::Cid;
         type IndexedAt = Set<members::indexed_at>;
+        type Cid = S::Cid;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+        type Cid = Set<members::cid>;
         type Author = S::Author;
     }
     ///State transition - sets the `author` field to Set
@@ -472,8 +512,8 @@ pub mod livestream_view_state {
     impl<S: State> State for SetAuthor<S> {
         type Uri = S::Uri;
         type Record = S::Record;
-        type Cid = S::Cid;
         type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
         type Author = Set<members::author>;
     }
     /// Marker types for field names
@@ -483,10 +523,10 @@ pub mod livestream_view_state {
         pub struct uri(());
         ///Marker type for the `record` field
         pub struct record(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `author` field
         pub struct author(());
     }
@@ -496,12 +536,12 @@ pub mod livestream_view_state {
 pub struct LivestreamViewBuilder<'a, S: livestream_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ProfileViewBasic<'a>>,
-        Option<Cid<'a>>,
+        Option<ProfileViewBasic<S>>,
+        Option<Cid<S>>,
         Option<Datetime>,
-        Option<Data<'a>>,
-        Option<AtUri<'a>>,
-        Option<livestream::ViewerCount<'a>>,
+        Option<Data<S>>,
+        Option<AtUri<S>>,
+        Option<livestream::ViewerCount<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -532,7 +572,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<S>>,
     ) -> LivestreamViewBuilder<'a, livestream_view_state::SetAuthor<S>> {
         self._fields.0 = Option::Some(value.into());
         LivestreamViewBuilder {
@@ -551,7 +591,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> LivestreamViewBuilder<'a, livestream_view_state::SetCid<S>> {
         self._fields.1 = Option::Some(value.into());
         LivestreamViewBuilder {
@@ -589,7 +629,7 @@ where
     /// Set the `record` field (required)
     pub fn record(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> LivestreamViewBuilder<'a, livestream_view_state::SetRecord<S>> {
         self._fields.3 = Option::Some(value.into());
         LivestreamViewBuilder {
@@ -608,7 +648,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> LivestreamViewBuilder<'a, livestream_view_state::SetUri<S>> {
         self._fields.4 = Option::Some(value.into());
         LivestreamViewBuilder {
@@ -623,7 +663,7 @@ impl<'a, S: livestream_view_state::State> LivestreamViewBuilder<'a, S> {
     /// Set the `viewerCount` field (optional)
     pub fn viewer_count(
         mut self,
-        value: impl Into<Option<livestream::ViewerCount<'a>>>,
+        value: impl Into<Option<livestream::ViewerCount<S>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
@@ -631,7 +671,7 @@ impl<'a, S: livestream_view_state::State> LivestreamViewBuilder<'a, S> {
     /// Set the `viewerCount` field to an Option value (optional)
     pub fn maybe_viewer_count(
         mut self,
-        value: Option<livestream::ViewerCount<'a>>,
+        value: Option<livestream::ViewerCount<S>>,
     ) -> Self {
         self._fields.5 = value;
         self
@@ -643,8 +683,8 @@ where
     S: livestream_view_state::State,
     S::Uri: livestream_view_state::IsSet,
     S::Record: livestream_view_state::IsSet,
-    S::Cid: livestream_view_state::IsSet,
     S::IndexedAt: livestream_view_state::IsSet,
+    S::Cid: livestream_view_state::IsSet,
     S::Author: livestream_view_state::IsSet,
 {
     /// Build the final struct
@@ -662,7 +702,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LivestreamView<'a> {
         LivestreamView {
             author: self._fields.0.unwrap(),
@@ -1098,17 +1138,17 @@ pub mod livestream_state {
 pub struct LivestreamBuilder<'a, S: livestream_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
+        Option<S>,
+        Option<UriValue<S>>,
         Option<Datetime>,
         Option<Datetime>,
         Option<i64>,
         Option<Datetime>,
-        Option<livestream::NotificationSettings<'a>>,
-        Option<StrongRef<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
+        Option<livestream::NotificationSettings<S>>,
+        Option<StrongRef<S>>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1133,12 +1173,12 @@ impl<'a> LivestreamBuilder<'a, livestream_state::Empty> {
 
 impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `agent` field (optional)
-    pub fn agent(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn agent(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `agent` field to an Option value (optional)
-    pub fn maybe_agent(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_agent(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1146,12 +1186,12 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
 
 impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `canonicalUrl` field (optional)
-    pub fn canonical_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn canonical_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `canonicalUrl` field to an Option value (optional)
-    pub fn maybe_canonical_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_canonical_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1219,7 +1259,7 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `notificationSettings` field (optional)
     pub fn notification_settings(
         mut self,
-        value: impl Into<Option<livestream::NotificationSettings<'a>>>,
+        value: impl Into<Option<livestream::NotificationSettings<S>>>,
     ) -> Self {
         self._fields.6 = value.into();
         self
@@ -1227,7 +1267,7 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `notificationSettings` field to an Option value (optional)
     pub fn maybe_notification_settings(
         mut self,
-        value: Option<livestream::NotificationSettings<'a>>,
+        value: Option<livestream::NotificationSettings<S>>,
     ) -> Self {
         self._fields.6 = value;
         self
@@ -1236,12 +1276,12 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
 
 impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `post` field (optional)
-    pub fn post(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn post(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `post` field to an Option value (optional)
-    pub fn maybe_post(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_post(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -1249,12 +1289,12 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
 
 impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `thumb` field (optional)
-    pub fn thumb(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn thumb(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `thumb` field to an Option value (optional)
-    pub fn maybe_thumb(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_thumb(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -1268,7 +1308,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LivestreamBuilder<'a, livestream_state::SetTitle<S>> {
         self._fields.9 = Option::Some(value.into());
         LivestreamBuilder {
@@ -1281,12 +1321,12 @@ where
 
 impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -1318,7 +1358,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Livestream<'a> {
         Livestream {
             agent: self._fields.0,
@@ -1372,7 +1412,7 @@ pub mod streamplace_anything_state {
 /// Builder for constructing an instance of this type
 pub struct StreamplaceAnythingBuilder<'a, S: streamplace_anything_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StreamplaceAnythingLivestream<'a>>,),
+    _fields: (Option<StreamplaceAnythingLivestream<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1402,7 +1442,7 @@ where
     /// Set the `livestream` field (required)
     pub fn livestream(
         mut self,
-        value: impl Into<StreamplaceAnythingLivestream<'a>>,
+        value: impl Into<StreamplaceAnythingLivestream<S>>,
     ) -> StreamplaceAnythingBuilder<'a, streamplace_anything_state::SetLivestream<S>> {
         self._fields.0 = Option::Some(value.into());
         StreamplaceAnythingBuilder {
@@ -1428,7 +1468,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> StreamplaceAnything<'a> {
         StreamplaceAnything {
             livestream: self._fields.0.unwrap(),
@@ -1447,67 +1487,67 @@ pub mod teleport_arrival_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Source;
-        type StartsAt;
-        type TeleportUri;
         type ViewerCount;
+        type StartsAt;
+        type Source;
+        type TeleportUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Source = Unset;
-        type StartsAt = Unset;
-        type TeleportUri = Unset;
         type ViewerCount = Unset;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type Source = Set<members::source>;
-        type StartsAt = S::StartsAt;
-        type TeleportUri = S::TeleportUri;
-        type ViewerCount = S::ViewerCount;
-    }
-    ///State transition - sets the `starts_at` field to Set
-    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
-    impl<S: State> State for SetStartsAt<S> {
-        type Source = S::Source;
-        type StartsAt = Set<members::starts_at>;
-        type TeleportUri = S::TeleportUri;
-        type ViewerCount = S::ViewerCount;
-    }
-    ///State transition - sets the `teleport_uri` field to Set
-    pub struct SetTeleportUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeleportUri<S> {}
-    impl<S: State> State for SetTeleportUri<S> {
-        type Source = S::Source;
-        type StartsAt = S::StartsAt;
-        type TeleportUri = Set<members::teleport_uri>;
-        type ViewerCount = S::ViewerCount;
+        type StartsAt = Unset;
+        type Source = Unset;
+        type TeleportUri = Unset;
     }
     ///State transition - sets the `viewer_count` field to Set
     pub struct SetViewerCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetViewerCount<S> {}
     impl<S: State> State for SetViewerCount<S> {
-        type Source = S::Source;
-        type StartsAt = S::StartsAt;
-        type TeleportUri = S::TeleportUri;
         type ViewerCount = Set<members::viewer_count>;
+        type StartsAt = S::StartsAt;
+        type Source = S::Source;
+        type TeleportUri = S::TeleportUri;
+    }
+    ///State transition - sets the `starts_at` field to Set
+    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
+    impl<S: State> State for SetStartsAt<S> {
+        type ViewerCount = S::ViewerCount;
+        type StartsAt = Set<members::starts_at>;
+        type Source = S::Source;
+        type TeleportUri = S::TeleportUri;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSource<S> {}
+    impl<S: State> State for SetSource<S> {
+        type ViewerCount = S::ViewerCount;
+        type StartsAt = S::StartsAt;
+        type Source = Set<members::source>;
+        type TeleportUri = S::TeleportUri;
+    }
+    ///State transition - sets the `teleport_uri` field to Set
+    pub struct SetTeleportUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeleportUri<S> {}
+    impl<S: State> State for SetTeleportUri<S> {
+        type ViewerCount = S::ViewerCount;
+        type StartsAt = S::StartsAt;
+        type Source = S::Source;
+        type TeleportUri = Set<members::teleport_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `source` field
-        pub struct source(());
-        ///Marker type for the `starts_at` field
-        pub struct starts_at(());
-        ///Marker type for the `teleport_uri` field
-        pub struct teleport_uri(());
         ///Marker type for the `viewer_count` field
         pub struct viewer_count(());
+        ///Marker type for the `starts_at` field
+        pub struct starts_at(());
+        ///Marker type for the `source` field
+        pub struct source(());
+        ///Marker type for the `teleport_uri` field
+        pub struct teleport_uri(());
     }
 }
 
@@ -1515,10 +1555,10 @@ pub mod teleport_arrival_state {
 pub struct TeleportArrivalBuilder<'a, S: teleport_arrival_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Profile<'a>>,
-        Option<ProfileViewBasic<'a>>,
+        Option<Profile<S>>,
+        Option<ProfileViewBasic<S>>,
         Option<Datetime>,
-        Option<AtUri<'a>>,
+        Option<AtUri<S>>,
         Option<i64>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -1544,12 +1584,12 @@ impl<'a> TeleportArrivalBuilder<'a, teleport_arrival_state::Empty> {
 
 impl<'a, S: teleport_arrival_state::State> TeleportArrivalBuilder<'a, S> {
     /// Set the `chatProfile` field (optional)
-    pub fn chat_profile(mut self, value: impl Into<Option<Profile<'a>>>) -> Self {
+    pub fn chat_profile(mut self, value: impl Into<Option<Profile<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `chatProfile` field to an Option value (optional)
-    pub fn maybe_chat_profile(mut self, value: Option<Profile<'a>>) -> Self {
+    pub fn maybe_chat_profile(mut self, value: Option<Profile<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1563,7 +1603,7 @@ where
     /// Set the `source` field (required)
     pub fn source(
         mut self,
-        value: impl Into<ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<S>>,
     ) -> TeleportArrivalBuilder<'a, teleport_arrival_state::SetSource<S>> {
         self._fields.1 = Option::Some(value.into());
         TeleportArrivalBuilder {
@@ -1601,7 +1641,7 @@ where
     /// Set the `teleportUri` field (required)
     pub fn teleport_uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> TeleportArrivalBuilder<'a, teleport_arrival_state::SetTeleportUri<S>> {
         self._fields.3 = Option::Some(value.into());
         TeleportArrivalBuilder {
@@ -1634,10 +1674,10 @@ where
 impl<'a, S> TeleportArrivalBuilder<'a, S>
 where
     S: teleport_arrival_state::State,
-    S::Source: teleport_arrival_state::IsSet,
-    S::StartsAt: teleport_arrival_state::IsSet,
-    S::TeleportUri: teleport_arrival_state::IsSet,
     S::ViewerCount: teleport_arrival_state::IsSet,
+    S::StartsAt: teleport_arrival_state::IsSet,
+    S::Source: teleport_arrival_state::IsSet,
+    S::TeleportUri: teleport_arrival_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TeleportArrival<'a> {
@@ -1653,7 +1693,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TeleportArrival<'a> {
         TeleportArrival {
             chat_profile: self._fields.0,
@@ -1713,7 +1753,7 @@ pub mod teleport_canceled_state {
 /// Builder for constructing an instance of this type
 pub struct TeleportCanceledBuilder<'a, S: teleport_canceled_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1743,7 +1783,7 @@ where
     /// Set the `reason` field (required)
     pub fn reason(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TeleportCanceledBuilder<'a, teleport_canceled_state::SetReason<S>> {
         self._fields.0 = Option::Some(value.into());
         TeleportCanceledBuilder {
@@ -1762,7 +1802,7 @@ where
     /// Set the `teleportUri` field (required)
     pub fn teleport_uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> TeleportCanceledBuilder<'a, teleport_canceled_state::SetTeleportUri<S>> {
         self._fields.1 = Option::Some(value.into());
         TeleportCanceledBuilder {
@@ -1790,7 +1830,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TeleportCanceled<'a> {
         TeleportCanceled {
             reason: self._fields.0.unwrap(),
@@ -1891,7 +1931,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ViewerCount<'a> {
         ViewerCount {
             count: self._fields.0.unwrap(),

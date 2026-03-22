@@ -10,45 +10,57 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Datetime};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::sh_tangled::git::temp::Signature;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetBranch<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetBranch<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     #[serde(borrow)]
-    pub repo: AtUri<'a>,
+    pub repo: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetBranchOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetBranchOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<Signature<'a>>,
+    pub author: Option<Signature<S>>,
     ///Latest commit hash on this branch
-    #[serde(borrow)]
-    pub hash: CowStr<'a>,
+    pub hash: S,
     ///Latest commit message
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     ///Branch name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Timestamp of latest commit
     pub when: Datetime,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -57,25 +69,26 @@ pub struct GetBranchOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetBranchError<'a> {
+pub enum GetBranchError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<SmolStr>),
     /// Branch not found
     #[serde(rename = "BranchNotFound")]
-    BranchNotFound(Option<CowStr<'a>>),
+    BranchNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetBranchError<'_> {
+impl core::fmt::Display for GetBranchError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -99,7 +112,13 @@ impl core::fmt::Display for GetBranchError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -109,11 +128,12 @@ pub struct GetBranchResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBranchResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getBranch";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetBranchOutput<'de>;
-    type Err<'de> = GetBranchError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetBranchOutput<S>;
+    type Err = GetBranchError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetBranch<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetBranch<S> {
     const NSID: &'static str = "sh.tangled.git.temp.getBranch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBranchResponse;
@@ -124,7 +144,7 @@ pub struct GetBranchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBranchRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getBranch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBranch<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetBranch<S>;
     type Response = GetBranchResponse;
 }
 
@@ -138,44 +158,44 @@ pub mod get_branch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Name;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Name = S::Name;
+        type Repo = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Repo = S::Repo;
         type Name = Set<members::name>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Name = S::Name;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetBranchBuilder<'a, S: get_branch_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -205,7 +225,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetBranchBuilder<'a, get_branch_state::SetName<S>> {
         self._fields.0 = Option::Some(value.into());
         GetBranchBuilder {
@@ -224,7 +244,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetBranchBuilder<'a, get_branch_state::SetRepo<S>> {
         self._fields.1 = Option::Some(value.into());
         GetBranchBuilder {
@@ -238,8 +258,8 @@ where
 impl<'a, S> GetBranchBuilder<'a, S>
 where
     S: get_branch_state::State,
-    S::Repo: get_branch_state::IsSet,
     S::Name: get_branch_state::IsSet,
+    S::Repo: get_branch_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetBranch<'a> {

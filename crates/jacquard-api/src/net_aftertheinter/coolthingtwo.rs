@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,38 +28,43 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "net.aftertheinter.coolthingtwo",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Coolthingtwo<'a> {
+pub struct Coolthingtwo<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub status: CowStr<'a>,
+    pub status: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CoolthingtwoGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CoolthingtwoGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Coolthingtwo<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Coolthingtwo<S>,
 }
 
-impl<'a> Coolthingtwo<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CoolthingtwoRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Coolthingtwo<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CoolthingtwoRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -68,18 +75,17 @@ pub struct CoolthingtwoRecord;
 impl XrpcResp for CoolthingtwoRecord {
     const NSID: &'static str = "net.aftertheinter.coolthingtwo";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CoolthingtwoGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CoolthingtwoGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CoolthingtwoGetRecordOutput<'_>> for Coolthingtwo<'_> {
-    fn from(output: CoolthingtwoGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CoolthingtwoGetRecordOutput<S>> for Coolthingtwo<S> {
+    fn from(output: CoolthingtwoGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Coolthingtwo<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Coolthingtwo<S> {
     const NSID: &'static str = "net.aftertheinter.coolthingtwo";
     type Record = CoolthingtwoRecord;
 }
@@ -89,7 +95,7 @@ impl Collection for CoolthingtwoRecord {
     type Record = CoolthingtwoRecord;
 }
 
-impl<'a> LexiconSchema for Coolthingtwo<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Coolthingtwo<S> {
     fn nsid() -> &'static str {
         "net.aftertheinter.coolthingtwo"
     }
@@ -186,7 +192,7 @@ pub mod coolthingtwo_state {
 /// Builder for constructing an instance of this type
 pub struct CoolthingtwoBuilder<'a, S: coolthingtwo_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<CowStr<'a>>),
+    _fields: (Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -235,7 +241,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CoolthingtwoBuilder<'a, coolthingtwo_state::SetStatus<S>> {
         self._fields.1 = Option::Some(value.into());
         CoolthingtwoBuilder {
@@ -263,10 +269,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Coolthingtwo<'a> {
         Coolthingtwo {
             created_at: self._fields.0.unwrap(),

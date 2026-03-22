@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,41 +29,45 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A forum-wide announcement
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "dev.fudgeu.experimental.atforumv1.forum.announcement",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Announcement<'a> {
-    #[serde(borrow)]
-    pub body: CowStr<'a>,
+pub struct Announcement<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub body: S,
     pub created_at: Datetime,
     pub expires_at: Datetime,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AnnouncementGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AnnouncementGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Announcement<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Announcement<S>,
 }
 
-impl<'a> Announcement<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AnnouncementRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Announcement<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AnnouncementRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -72,18 +78,17 @@ pub struct AnnouncementRecord;
 impl XrpcResp for AnnouncementRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.announcement";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AnnouncementGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AnnouncementGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AnnouncementGetRecordOutput<'_>> for Announcement<'_> {
-    fn from(output: AnnouncementGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AnnouncementGetRecordOutput<S>> for Announcement<S> {
+    fn from(output: AnnouncementGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Announcement<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Announcement<S> {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.announcement";
     type Record = AnnouncementRecord;
 }
@@ -93,7 +98,7 @@ impl Collection for AnnouncementRecord {
     type Record = AnnouncementRecord;
 }
 
-impl<'a> LexiconSchema for Announcement<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Announcement<S> {
     fn nsid() -> &'static str {
         "dev.fudgeu.experimental.atforumv1.forum.announcement"
     }
@@ -163,8 +168,8 @@ pub mod announcement_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Body;
-        type CreatedAt;
         type Title;
+        type CreatedAt;
         type ExpiresAt;
     }
     /// Empty state - all required fields are unset
@@ -172,8 +177,8 @@ pub mod announcement_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Body = Unset;
-        type CreatedAt = Unset;
         type Title = Unset;
+        type CreatedAt = Unset;
         type ExpiresAt = Unset;
     }
     ///State transition - sets the `body` field to Set
@@ -181,17 +186,8 @@ pub mod announcement_state {
     impl<S: State> sealed::Sealed for SetBody<S> {}
     impl<S: State> State for SetBody<S> {
         type Body = Set<members::body>;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type ExpiresAt = S::ExpiresAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Body = S::Body;
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
         type ExpiresAt = S::ExpiresAt;
     }
     ///State transition - sets the `title` field to Set
@@ -199,8 +195,17 @@ pub mod announcement_state {
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Body = S::Body;
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+        type ExpiresAt = S::ExpiresAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Body = S::Body;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
         type ExpiresAt = S::ExpiresAt;
     }
     ///State transition - sets the `expires_at` field to Set
@@ -208,8 +213,8 @@ pub mod announcement_state {
     impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
     impl<S: State> State for SetExpiresAt<S> {
         type Body = S::Body;
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
         type ExpiresAt = Set<members::expires_at>;
     }
     /// Marker types for field names
@@ -217,10 +222,10 @@ pub mod announcement_state {
     pub mod members {
         ///Marker type for the `body` field
         pub struct body(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `expires_at` field
         pub struct expires_at(());
     }
@@ -229,12 +234,7 @@ pub mod announcement_state {
 /// Builder for constructing an instance of this type
 pub struct AnnouncementBuilder<'a, S: announcement_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<Datetime>, Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -264,7 +264,7 @@ where
     /// Set the `body` field (required)
     pub fn body(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AnnouncementBuilder<'a, announcement_state::SetBody<S>> {
         self._fields.0 = Option::Some(value.into());
         AnnouncementBuilder {
@@ -321,7 +321,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AnnouncementBuilder<'a, announcement_state::SetTitle<S>> {
         self._fields.3 = Option::Some(value.into());
         AnnouncementBuilder {
@@ -336,8 +336,8 @@ impl<'a, S> AnnouncementBuilder<'a, S>
 where
     S: announcement_state::State,
     S::Body: announcement_state::IsSet,
-    S::CreatedAt: announcement_state::IsSet,
     S::Title: announcement_state::IsSet,
+    S::CreatedAt: announcement_state::IsSet,
     S::ExpiresAt: announcement_state::IsSet,
 {
     /// Build the final struct
@@ -353,10 +353,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Announcement<'a> {
         Announcement {
             body: self._fields.0.unwrap(),

@@ -10,29 +10,44 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::place_stream::server::Webhook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetWebhook<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetWebhook<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetWebhookOutput<'a> {
-    #[serde(borrow)]
-    pub webhook: Webhook<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetWebhookOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub webhook: Webhook<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -41,22 +56,23 @@ pub struct GetWebhookOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetWebhookError<'a> {
+pub enum GetWebhookError {
     /// The specified webhook was not found.
     #[serde(rename = "WebhookNotFound")]
-    WebhookNotFound(Option<CowStr<'a>>),
+    WebhookNotFound(Option<SmolStr>),
     /// The authenticated user does not have access to this webhook.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(Option<CowStr<'a>>),
+    Unauthorized(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetWebhookError<'_> {
+impl core::fmt::Display for GetWebhookError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::WebhookNotFound(msg) => {
@@ -73,7 +89,13 @@ impl core::fmt::Display for GetWebhookError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -83,11 +105,12 @@ pub struct GetWebhookResponse;
 impl jacquard_common::xrpc::XrpcResp for GetWebhookResponse {
     const NSID: &'static str = "place.stream.server.getWebhook";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetWebhookOutput<'de>;
-    type Err<'de> = GetWebhookError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetWebhookOutput<S>;
+    type Err = GetWebhookError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetWebhook<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetWebhook<S> {
     const NSID: &'static str = "place.stream.server.getWebhook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetWebhookResponse;
@@ -98,7 +121,7 @@ pub struct GetWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetWebhookRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.getWebhook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetWebhook<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetWebhook<S>;
     type Response = GetWebhookResponse;
 }
 
@@ -137,7 +160,7 @@ pub mod get_webhook_state {
 /// Builder for constructing an instance of this type
 pub struct GetWebhookBuilder<'a, S: get_webhook_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -167,7 +190,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetWebhookBuilder<'a, get_webhook_state::SetId<S>> {
         self._fields.0 = Option::Some(value.into());
         GetWebhookBuilder {

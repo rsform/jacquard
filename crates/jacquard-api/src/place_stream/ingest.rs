@@ -13,12 +13,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -27,19 +29,24 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// An ingest URL for a Streamplace station.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Ingest<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Ingest<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The type of ingest endpoint, currently 'rtmp' and 'whip' are supported.
-    #[serde(borrow)]
-    pub r#type: CowStr<'a>,
+    pub r#type: S,
     ///The URL of the ingest endpoint.
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Ingest<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Ingest<S> {
     fn nsid() -> &'static str {
         "place.stream.ingest.defs"
     }
@@ -101,7 +108,7 @@ pub mod ingest_state {
 /// Builder for constructing an instance of this type
 pub struct IngestBuilder<'a, S: ingest_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _fields: (Option<S>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -131,7 +138,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> IngestBuilder<'a, ingest_state::SetType<S>> {
         self._fields.0 = Option::Some(value.into());
         IngestBuilder {
@@ -150,7 +157,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> IngestBuilder<'a, ingest_state::SetUrl<S>> {
         self._fields.1 = Option::Some(value.into());
         IngestBuilder {
@@ -176,13 +183,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Ingest<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Ingest<'a> {
         Ingest {
             r#type: self._fields.0.unwrap(),
             url: self._fields.1.unwrap(),

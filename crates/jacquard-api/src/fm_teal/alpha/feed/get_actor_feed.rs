@@ -10,31 +10,47 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::fm_teal::alpha::feed::PlayView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetActorFeed<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetActorFeed<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub author_did: AtIdentifier<'a>,
+    pub author_did: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetActorFeedOutput<'a> {
-    #[serde(borrow)]
-    pub plays: Vec<PlayView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetActorFeedOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub plays: Vec<PlayView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for fm.teal.alpha.feed.getActorFeed
@@ -42,11 +58,12 @@ pub struct GetActorFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorFeedResponse {
     const NSID: &'static str = "fm.teal.alpha.feed.getActorFeed";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorFeedOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetActorFeedOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorFeed<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetActorFeed<S> {
     const NSID: &'static str = "fm.teal.alpha.feed.getActorFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetActorFeedResponse;
@@ -57,7 +74,7 @@ pub struct GetActorFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorFeedRequest {
     const PATH: &'static str = "/xrpc/fm.teal.alpha.feed.getActorFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetActorFeed<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetActorFeed<S>;
     type Response = GetActorFeedResponse;
 }
 
@@ -96,7 +113,7 @@ pub mod get_actor_feed_state {
 /// Builder for constructing an instance of this type
 pub struct GetActorFeedBuilder<'a, S: get_actor_feed_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -126,7 +143,7 @@ where
     /// Set the `authorDID` field (required)
     pub fn author_did(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetActorFeedBuilder<'a, get_actor_feed_state::SetAuthorDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetActorFeedBuilder {
@@ -139,12 +156,12 @@ where
 
 impl<'a, S: get_actor_feed_state::State> GetActorFeedBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }

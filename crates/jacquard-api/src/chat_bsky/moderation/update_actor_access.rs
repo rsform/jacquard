@@ -10,21 +10,30 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateActorAccess<'a> {
-    #[serde(borrow)]
-    pub actor: Did<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateActorAccess<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub actor: Did<S>,
     pub allow_access: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#ref: Option<CowStr<'a>>,
+    pub r#ref: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for chat.bsky.moderation.updateActorAccess
@@ -32,11 +41,12 @@ pub struct UpdateActorAccessResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateActorAccessResponse {
     const NSID: &'static str = "chat.bsky.moderation.updateActorAccess";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateActorAccess<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for UpdateActorAccess<S> {
     const NSID: &'static str = "chat.bsky.moderation.updateActorAccess";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -51,7 +61,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateActorAccessRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = UpdateActorAccess<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = UpdateActorAccess<S>;
     type Response = UpdateActorAccessResponse;
 }
 
@@ -102,7 +112,7 @@ pub mod update_actor_access_state {
 /// Builder for constructing an instance of this type
 pub struct UpdateActorAccessBuilder<'a, S: update_actor_access_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<bool>, Option<CowStr<'a>>),
+    _fields: (Option<Did<S>>, Option<bool>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -132,7 +142,7 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> UpdateActorAccessBuilder<'a, update_actor_access_state::SetActor<S>> {
         self._fields.0 = Option::Some(value.into());
         UpdateActorAccessBuilder {
@@ -164,12 +174,12 @@ where
 
 impl<'a, S: update_actor_access_state::State> UpdateActorAccessBuilder<'a, S> {
     /// Set the `ref` field (optional)
-    pub fn r#ref(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn r#ref(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
-    pub fn maybe_ref(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_ref(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -193,10 +203,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> UpdateActorAccess<'a> {
         UpdateActorAccess {
             actor: self._fields.0.unwrap(),

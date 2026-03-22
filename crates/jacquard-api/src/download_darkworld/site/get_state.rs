@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,48 +25,59 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::download_darkworld::site::get_state;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetStateOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetStateOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
+    pub value: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Output<'a> {
-    #[serde(borrow)]
-    pub favorite_albums: Vec<CowStr<'a>>,
-    #[serde(borrow)]
-    pub favorite_artists: Vec<CowStr<'a>>,
-    #[serde(borrow)]
-    pub favorite_deltarune_characters: Vec<CowStr<'a>>,
-    #[serde(borrow)]
-    pub favorite_games: Vec<CowStr<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Output<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub favorite_albums: Vec<S>,
+    pub favorite_artists: Vec<S>,
+    pub favorite_deltarune_characters: Vec<S>,
+    pub favorite_games: Vec<S>,
     ///Named title color mode for the site.
-    #[serde(borrow)]
-    pub title_colors: OutputTitleColors<'a>,
+    pub title_colors: OutputTitleColors<S>,
     ///Whether to show Susie instead of Kris in prophecy content.
     pub use_susie_prophecy: bool,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Named title color mode for the site.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum OutputTitleColors<'a> {
+pub enum OutputTitleColors<S: Bos<str> + AsRef<str> = DefaultStr> {
     None,
     Enby,
     Trans,
     Pan,
     Latvia,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> OutputTitleColors<'a> {
+impl<S: Bos<str> + AsRef<str>> OutputTitleColors<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -75,76 +88,59 @@ impl<'a> OutputTitleColors<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for OutputTitleColors<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "none" => Self::None,
             "enby" => Self::Enby,
             "trans" => Self::Trans,
             "pan" => Self::Pan,
             "latvia" => Self::Latvia,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for OutputTitleColors<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "enby" => Self::Enby,
-            "trans" => Self::Trans,
-            "pan" => Self::Pan,
-            "latvia" => Self::Latvia,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for OutputTitleColors<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for OutputTitleColors<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for OutputTitleColors<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for OutputTitleColors<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for OutputTitleColors<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for OutputTitleColors<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for OutputTitleColors<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for OutputTitleColors<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for OutputTitleColors<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for OutputTitleColors<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for OutputTitleColors<'_> {
-    type Output = OutputTitleColors<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for OutputTitleColors<S> {
+    type Output = OutputTitleColors<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             OutputTitleColors::None => OutputTitleColors::None,
@@ -166,8 +162,8 @@ pub struct GetStateResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStateResponse {
     const NSID: &'static str = "download.darkworld.site.getState";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetStateOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetStateOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetState {
@@ -181,11 +177,11 @@ pub struct GetStateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStateRequest {
     const PATH: &'static str = "/xrpc/download.darkworld.site.getState";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetState;
+    type Request<S: Bos<str> + AsRef<str>> = GetState;
     type Response = GetStateResponse;
 }
 
-impl<'a> LexiconSchema for Output<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Output<S> {
     fn nsid() -> &'static str {
         "download.darkworld.site.getState"
     }
@@ -210,103 +206,103 @@ pub mod output_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UseSusieProphecy;
-        type TitleColors;
-        type FavoriteGames;
-        type FavoriteArtists;
         type FavoriteAlbums;
+        type FavoriteArtists;
+        type UseSusieProphecy;
+        type FavoriteGames;
+        type TitleColors;
         type FavoriteDeltaruneCharacters;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UseSusieProphecy = Unset;
-        type TitleColors = Unset;
-        type FavoriteGames = Unset;
-        type FavoriteArtists = Unset;
         type FavoriteAlbums = Unset;
+        type FavoriteArtists = Unset;
+        type UseSusieProphecy = Unset;
+        type FavoriteGames = Unset;
+        type TitleColors = Unset;
         type FavoriteDeltaruneCharacters = Unset;
     }
-    ///State transition - sets the `use_susie_prophecy` field to Set
-    pub struct SetUseSusieProphecy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUseSusieProphecy<S> {}
-    impl<S: State> State for SetUseSusieProphecy<S> {
-        type UseSusieProphecy = Set<members::use_susie_prophecy>;
-        type TitleColors = S::TitleColors;
-        type FavoriteGames = S::FavoriteGames;
+    ///State transition - sets the `favorite_albums` field to Set
+    pub struct SetFavoriteAlbums<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFavoriteAlbums<S> {}
+    impl<S: State> State for SetFavoriteAlbums<S> {
+        type FavoriteAlbums = Set<members::favorite_albums>;
         type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteAlbums = S::FavoriteAlbums;
-        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
-    }
-    ///State transition - sets the `title_colors` field to Set
-    pub struct SetTitleColors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitleColors<S> {}
-    impl<S: State> State for SetTitleColors<S> {
         type UseSusieProphecy = S::UseSusieProphecy;
-        type TitleColors = Set<members::title_colors>;
         type FavoriteGames = S::FavoriteGames;
-        type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteAlbums = S::FavoriteAlbums;
-        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
-    }
-    ///State transition - sets the `favorite_games` field to Set
-    pub struct SetFavoriteGames<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFavoriteGames<S> {}
-    impl<S: State> State for SetFavoriteGames<S> {
-        type UseSusieProphecy = S::UseSusieProphecy;
         type TitleColors = S::TitleColors;
-        type FavoriteGames = Set<members::favorite_games>;
-        type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteAlbums = S::FavoriteAlbums;
         type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
     }
     ///State transition - sets the `favorite_artists` field to Set
     pub struct SetFavoriteArtists<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFavoriteArtists<S> {}
     impl<S: State> State for SetFavoriteArtists<S> {
-        type UseSusieProphecy = S::UseSusieProphecy;
-        type TitleColors = S::TitleColors;
-        type FavoriteGames = S::FavoriteGames;
-        type FavoriteArtists = Set<members::favorite_artists>;
         type FavoriteAlbums = S::FavoriteAlbums;
+        type FavoriteArtists = Set<members::favorite_artists>;
+        type UseSusieProphecy = S::UseSusieProphecy;
+        type FavoriteGames = S::FavoriteGames;
+        type TitleColors = S::TitleColors;
         type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
     }
-    ///State transition - sets the `favorite_albums` field to Set
-    pub struct SetFavoriteAlbums<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFavoriteAlbums<S> {}
-    impl<S: State> State for SetFavoriteAlbums<S> {
-        type UseSusieProphecy = S::UseSusieProphecy;
-        type TitleColors = S::TitleColors;
-        type FavoriteGames = S::FavoriteGames;
+    ///State transition - sets the `use_susie_prophecy` field to Set
+    pub struct SetUseSusieProphecy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUseSusieProphecy<S> {}
+    impl<S: State> State for SetUseSusieProphecy<S> {
+        type FavoriteAlbums = S::FavoriteAlbums;
         type FavoriteArtists = S::FavoriteArtists;
-        type FavoriteAlbums = Set<members::favorite_albums>;
+        type UseSusieProphecy = Set<members::use_susie_prophecy>;
+        type FavoriteGames = S::FavoriteGames;
+        type TitleColors = S::TitleColors;
+        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
+    }
+    ///State transition - sets the `favorite_games` field to Set
+    pub struct SetFavoriteGames<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFavoriteGames<S> {}
+    impl<S: State> State for SetFavoriteGames<S> {
+        type FavoriteAlbums = S::FavoriteAlbums;
+        type FavoriteArtists = S::FavoriteArtists;
+        type UseSusieProphecy = S::UseSusieProphecy;
+        type FavoriteGames = Set<members::favorite_games>;
+        type TitleColors = S::TitleColors;
+        type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
+    }
+    ///State transition - sets the `title_colors` field to Set
+    pub struct SetTitleColors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitleColors<S> {}
+    impl<S: State> State for SetTitleColors<S> {
+        type FavoriteAlbums = S::FavoriteAlbums;
+        type FavoriteArtists = S::FavoriteArtists;
+        type UseSusieProphecy = S::UseSusieProphecy;
+        type FavoriteGames = S::FavoriteGames;
+        type TitleColors = Set<members::title_colors>;
         type FavoriteDeltaruneCharacters = S::FavoriteDeltaruneCharacters;
     }
     ///State transition - sets the `favorite_deltarune_characters` field to Set
     pub struct SetFavoriteDeltaruneCharacters<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFavoriteDeltaruneCharacters<S> {}
     impl<S: State> State for SetFavoriteDeltaruneCharacters<S> {
-        type UseSusieProphecy = S::UseSusieProphecy;
-        type TitleColors = S::TitleColors;
-        type FavoriteGames = S::FavoriteGames;
-        type FavoriteArtists = S::FavoriteArtists;
         type FavoriteAlbums = S::FavoriteAlbums;
+        type FavoriteArtists = S::FavoriteArtists;
+        type UseSusieProphecy = S::UseSusieProphecy;
+        type FavoriteGames = S::FavoriteGames;
+        type TitleColors = S::TitleColors;
         type FavoriteDeltaruneCharacters = Set<members::favorite_deltarune_characters>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `use_susie_prophecy` field
-        pub struct use_susie_prophecy(());
-        ///Marker type for the `title_colors` field
-        pub struct title_colors(());
-        ///Marker type for the `favorite_games` field
-        pub struct favorite_games(());
-        ///Marker type for the `favorite_artists` field
-        pub struct favorite_artists(());
         ///Marker type for the `favorite_albums` field
         pub struct favorite_albums(());
+        ///Marker type for the `favorite_artists` field
+        pub struct favorite_artists(());
+        ///Marker type for the `use_susie_prophecy` field
+        pub struct use_susie_prophecy(());
+        ///Marker type for the `favorite_games` field
+        pub struct favorite_games(());
+        ///Marker type for the `title_colors` field
+        pub struct title_colors(());
         ///Marker type for the `favorite_deltarune_characters` field
         pub struct favorite_deltarune_characters(());
     }
@@ -316,11 +312,11 @@ pub mod output_state {
 pub struct OutputBuilder<'a, S: output_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<OutputTitleColors<'a>>,
+        Option<Vec<S>>,
+        Option<Vec<S>>,
+        Option<Vec<S>>,
+        Option<Vec<S>>,
+        Option<OutputTitleColors<S>>,
         Option<bool>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -352,7 +348,7 @@ where
     /// Set the `favoriteAlbums` field (required)
     pub fn favorite_albums(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> OutputBuilder<'a, output_state::SetFavoriteAlbums<S>> {
         self._fields.0 = Option::Some(value.into());
         OutputBuilder {
@@ -371,7 +367,7 @@ where
     /// Set the `favoriteArtists` field (required)
     pub fn favorite_artists(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> OutputBuilder<'a, output_state::SetFavoriteArtists<S>> {
         self._fields.1 = Option::Some(value.into());
         OutputBuilder {
@@ -390,7 +386,7 @@ where
     /// Set the `favoriteDeltaruneCharacters` field (required)
     pub fn favorite_deltarune_characters(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> OutputBuilder<'a, output_state::SetFavoriteDeltaruneCharacters<S>> {
         self._fields.2 = Option::Some(value.into());
         OutputBuilder {
@@ -409,7 +405,7 @@ where
     /// Set the `favoriteGames` field (required)
     pub fn favorite_games(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> OutputBuilder<'a, output_state::SetFavoriteGames<S>> {
         self._fields.3 = Option::Some(value.into());
         OutputBuilder {
@@ -428,7 +424,7 @@ where
     /// Set the `titleColors` field (required)
     pub fn title_colors(
         mut self,
-        value: impl Into<OutputTitleColors<'a>>,
+        value: impl Into<OutputTitleColors<S>>,
     ) -> OutputBuilder<'a, output_state::SetTitleColors<S>> {
         self._fields.4 = Option::Some(value.into());
         OutputBuilder {
@@ -461,11 +457,11 @@ where
 impl<'a, S> OutputBuilder<'a, S>
 where
     S: output_state::State,
-    S::UseSusieProphecy: output_state::IsSet,
-    S::TitleColors: output_state::IsSet,
-    S::FavoriteGames: output_state::IsSet,
-    S::FavoriteArtists: output_state::IsSet,
     S::FavoriteAlbums: output_state::IsSet,
+    S::FavoriteArtists: output_state::IsSet,
+    S::UseSusieProphecy: output_state::IsSet,
+    S::FavoriteGames: output_state::IsSet,
+    S::TitleColors: output_state::IsSet,
     S::FavoriteDeltaruneCharacters: output_state::IsSet,
 {
     /// Build the final struct
@@ -481,13 +477,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Output<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Output<'a> {
         Output {
             favorite_albums: self._fields.0.unwrap(),
             favorite_artists: self._fields.1.unwrap(),

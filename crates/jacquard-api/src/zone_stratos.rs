@@ -18,12 +18,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Cid};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -33,31 +35,35 @@ use serde::{Serialize, Deserialize};
 use crate::zone_stratos;
 /// Indicates this record requires hydration from an external service. The stub record on the PDS contains minimal data; full content is fetched from the service endpoint.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Source<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Source<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///DID of the hydration service, optionally with fragment identifying the service entry (e.g., 'did:plc:abc123#atproto_pns').
-    #[serde(borrow)]
-    pub service: Did<'a>,
+    pub service: Did<S>,
     ///Reference to the full record at the hydration service.
-    #[serde(borrow)]
-    pub subject: zone_stratos::SubjectRef<'a>,
+    pub subject: zone_stratos::SubjectRef<S>,
     ///Indicates when hydration is needed. 'authenticated' means full content requires viewer authentication.
-    #[serde(borrow)]
-    pub vary: SourceVary<'a>,
+    pub vary: SourceVary<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Indicates when hydration is needed. 'authenticated' means full content requires viewer authentication.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SourceVary<'a> {
+pub enum SourceVary<S: Bos<str> + AsRef<str> = DefaultStr> {
     Authenticated,
     Unauthenticated,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SourceVary<'a> {
+impl<S: Bos<str> + AsRef<str>> SourceVary<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Authenticated => "authenticated",
@@ -65,70 +71,56 @@ impl<'a> SourceVary<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SourceVary<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "authenticated" => Self::Authenticated,
             "unauthenticated" => Self::Unauthenticated,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SourceVary<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "authenticated" => Self::Authenticated,
-            "unauthenticated" => Self::Unauthenticated,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SourceVary<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SourceVary<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for SourceVary<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SourceVary<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for SourceVary<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SourceVary<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SourceVary<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for SourceVary<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for SourceVary<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for SourceVary<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for SourceVary<'_> {
-    type Output = SourceVary<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SourceVary<S> {
+    type Output = SourceVary<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SourceVary::Authenticated => SourceVary::Authenticated,
@@ -140,19 +132,24 @@ impl jacquard_common::IntoStatic for SourceVary<'_> {
 
 /// A strong reference to a record, including its content hash for verification.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SubjectRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SubjectRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///CID of the full record content for integrity verification.
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///AT-URI of the record at the hydration service.
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Source<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Source<S> {
     fn nsid() -> &'static str {
         "zone.stratos.defs"
     }
@@ -178,7 +175,7 @@ impl<'a> LexiconSchema for Source<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SubjectRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SubjectRef<S> {
     fn nsid() -> &'static str {
         "zone.stratos.defs"
     }
@@ -204,50 +201,50 @@ pub mod source_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Vary;
-        type Subject;
         type Service;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Vary = Unset;
-        type Subject = Unset;
         type Service = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `vary` field to Set
     pub struct SetVary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVary<S> {}
     impl<S: State> State for SetVary<S> {
         type Vary = Set<members::vary>;
+        type Service = S::Service;
         type Subject = S::Subject;
-        type Service = S::Service;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Vary = S::Vary;
-        type Subject = Set<members::subject>;
-        type Service = S::Service;
     }
     ///State transition - sets the `service` field to Set
     pub struct SetService<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetService<S> {}
     impl<S: State> State for SetService<S> {
         type Vary = S::Vary;
-        type Subject = S::Subject;
         type Service = Set<members::service>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Vary = S::Vary;
+        type Service = S::Service;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `vary` field
         pub struct vary(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `service` field
         pub struct service(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -255,9 +252,9 @@ pub mod source_state {
 pub struct SourceBuilder<'a, S: source_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Did<'a>>,
-        Option<zone_stratos::SubjectRef<'a>>,
-        Option<SourceVary<'a>>,
+        Option<Did<S>>,
+        Option<zone_stratos::SubjectRef<S>>,
+        Option<SourceVary<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -288,7 +285,7 @@ where
     /// Set the `service` field (required)
     pub fn service(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> SourceBuilder<'a, source_state::SetService<S>> {
         self._fields.0 = Option::Some(value.into());
         SourceBuilder {
@@ -307,7 +304,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<zone_stratos::SubjectRef<'a>>,
+        value: impl Into<zone_stratos::SubjectRef<S>>,
     ) -> SourceBuilder<'a, source_state::SetSubject<S>> {
         self._fields.1 = Option::Some(value.into());
         SourceBuilder {
@@ -326,7 +323,7 @@ where
     /// Set the `vary` field (required)
     pub fn vary(
         mut self,
-        value: impl Into<SourceVary<'a>>,
+        value: impl Into<SourceVary<S>>,
     ) -> SourceBuilder<'a, source_state::SetVary<S>> {
         self._fields.2 = Option::Some(value.into());
         SourceBuilder {
@@ -341,8 +338,8 @@ impl<'a, S> SourceBuilder<'a, S>
 where
     S: source_state::State,
     S::Vary: source_state::IsSet,
-    S::Subject: source_state::IsSet,
     S::Service: source_state::IsSet,
+    S::Subject: source_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Source<'a> {
@@ -354,13 +351,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Source<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Source<'a> {
         Source {
             service: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
@@ -492,44 +483,44 @@ pub mod subject_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SubjectRefBuilder<'a, S: subject_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -559,7 +550,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> SubjectRefBuilder<'a, subject_ref_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         SubjectRefBuilder {
@@ -578,7 +569,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> SubjectRefBuilder<'a, subject_ref_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         SubjectRefBuilder {
@@ -592,8 +583,8 @@ where
 impl<'a, S> SubjectRefBuilder<'a, S>
 where
     S: subject_ref_state::State,
-    S::Cid: subject_ref_state::IsSet,
     S::Uri: subject_ref_state::IsSet,
+    S::Cid: subject_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubjectRef<'a> {
@@ -606,10 +597,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SubjectRef<'a> {
         SubjectRef {
             cid: self._fields.0.unwrap(),

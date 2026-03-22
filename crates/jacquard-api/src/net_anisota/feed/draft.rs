@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, Language};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -36,88 +38,103 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::net_anisota::feed::draft;
 /// Record containing a draft post that can be edited and later published as app.bsky.feed.post
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "net.anisota.feed.draft", tag = "$type")]
-pub struct Draft<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "net.anisota.feed.draft",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Draft<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Client-declared timestamp when this draft was originally created.
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub embed: Option<DraftEmbed<'a>>,
+    pub embed: Option<DraftEmbed<S>>,
     ///Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Facet<'a>>>,
+    pub facets: Option<Vec<Facet<S>>>,
     ///Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<SelfLabels<'a>>,
+    pub labels: Option<SelfLabels<S>>,
     ///Indicates human language of post primary text content.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub langs: Option<Vec<Language>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reply: Option<draft::ReplyRef<'a>>,
+    pub reply: Option<draft::ReplyRef<S>>,
     ///Additional hashtags, in addition to any included in post text and facets.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///The primary post content. May be an empty string, if there are embeds.
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
     ///Client-declared timestamp when this draft was last updated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum DraftEmbed<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum DraftEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.embed.images")]
-    Images(Box<Images<'a>>),
+    Images(Box<Images<S>>),
     #[serde(rename = "app.bsky.embed.video")]
-    Video(Box<Video<'a>>),
+    Video(Box<Video<S>>),
     #[serde(rename = "app.bsky.embed.external")]
-    External(Box<ExternalRecord<'a>>),
+    External(Box<ExternalRecord<S>>),
     #[serde(rename = "app.bsky.embed.record")]
-    Record(Box<Record<'a>>),
+    Record(Box<Record<S>>),
     #[serde(rename = "app.bsky.embed.recordWithMedia")]
-    RecordWithMedia(Box<RecordWithMedia<'a>>),
+    RecordWithMedia(Box<RecordWithMedia<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DraftGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DraftGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Draft<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Draft<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReplyRef<'a> {
-    #[serde(borrow)]
-    pub parent: StrongRef<'a>,
-    #[serde(borrow)]
-    pub root: StrongRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReplyRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub parent: StrongRef<S>,
+    pub root: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Draft<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DraftRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Draft<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DraftRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -128,18 +145,17 @@ pub struct DraftRecord;
 impl XrpcResp for DraftRecord {
     const NSID: &'static str = "net.anisota.feed.draft";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DraftGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DraftGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DraftGetRecordOutput<'_>> for Draft<'_> {
-    fn from(output: DraftGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DraftGetRecordOutput<S>> for Draft<S> {
+    fn from(output: DraftGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Draft<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Draft<S> {
     const NSID: &'static str = "net.anisota.feed.draft";
     type Record = DraftRecord;
 }
@@ -149,7 +165,7 @@ impl Collection for DraftRecord {
     type Record = DraftRecord;
 }
 
-impl<'a> LexiconSchema for Draft<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Draft<S> {
     fn nsid() -> &'static str {
         "net.anisota.feed.draft"
     }
@@ -208,7 +224,7 @@ impl<'a> LexiconSchema for Draft<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ReplyRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReplyRef<S> {
     fn nsid() -> &'static str {
         "net.anisota.feed.draft"
     }
@@ -272,13 +288,13 @@ pub struct DraftBuilder<'a, S: draft_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<DraftEmbed<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<SelfLabels<'a>>,
+        Option<DraftEmbed<S>>,
+        Option<Vec<Facet<S>>>,
+        Option<SelfLabels<S>>,
         Option<Vec<Language>>,
-        Option<draft::ReplyRef<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<draft::ReplyRef<S>>,
+        Option<Vec<S>>,
+        Option<S>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -323,12 +339,12 @@ where
 
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `embed` field (optional)
-    pub fn embed(mut self, value: impl Into<Option<DraftEmbed<'a>>>) -> Self {
+    pub fn embed(mut self, value: impl Into<Option<DraftEmbed<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `embed` field to an Option value (optional)
-    pub fn maybe_embed(mut self, value: Option<DraftEmbed<'a>>) -> Self {
+    pub fn maybe_embed(mut self, value: Option<DraftEmbed<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -336,12 +352,12 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
 
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `facets` field (optional)
-    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
+    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
-    pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -349,12 +365,12 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
 
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -375,12 +391,12 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
 
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `reply` field (optional)
-    pub fn reply(mut self, value: impl Into<Option<draft::ReplyRef<'a>>>) -> Self {
+    pub fn reply(mut self, value: impl Into<Option<draft::ReplyRef<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `reply` field to an Option value (optional)
-    pub fn maybe_reply(mut self, value: Option<draft::ReplyRef<'a>>) -> Self {
+    pub fn maybe_reply(mut self, value: Option<draft::ReplyRef<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -388,12 +404,12 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
 
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -407,7 +423,7 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DraftBuilder<'a, draft_state::SetText<S>> {
         self._fields.7 = Option::Some(value.into());
         DraftBuilder {
@@ -453,13 +469,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Draft<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Draft<'a> {
         Draft {
             created_at: self._fields.0.unwrap(),
             embed: self._fields.1,
@@ -674,44 +684,44 @@ pub mod reply_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Parent;
         type Root;
+        type Parent;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Parent = Unset;
         type Root = Unset;
-    }
-    ///State transition - sets the `parent` field to Set
-    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParent<S> {}
-    impl<S: State> State for SetParent<S> {
-        type Parent = Set<members::parent>;
-        type Root = S::Root;
+        type Parent = Unset;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoot<S> {}
     impl<S: State> State for SetRoot<S> {
-        type Parent = S::Parent;
         type Root = Set<members::root>;
+        type Parent = S::Parent;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParent<S> {}
+    impl<S: State> State for SetParent<S> {
+        type Root = S::Root;
+        type Parent = Set<members::parent>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `parent` field
-        pub struct parent(());
         ///Marker type for the `root` field
         pub struct root(());
+        ///Marker type for the `parent` field
+        pub struct parent(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReplyRefBuilder<'a, S: reply_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>, Option<StrongRef<'a>>),
+    _fields: (Option<StrongRef<S>>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -741,7 +751,7 @@ where
     /// Set the `parent` field (required)
     pub fn parent(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetParent<S>> {
         self._fields.0 = Option::Some(value.into());
         ReplyRefBuilder {
@@ -760,7 +770,7 @@ where
     /// Set the `root` field (required)
     pub fn root(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetRoot<S>> {
         self._fields.1 = Option::Some(value.into());
         ReplyRefBuilder {
@@ -774,8 +784,8 @@ where
 impl<'a, S> ReplyRefBuilder<'a, S>
 where
     S: reply_ref_state::State,
-    S::Parent: reply_ref_state::IsSet,
     S::Root: reply_ref_state::IsSet,
+    S::Parent: reply_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReplyRef<'a> {
@@ -788,10 +798,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ReplyRef<'a> {
         ReplyRef {
             parent: self._fields.0.unwrap(),

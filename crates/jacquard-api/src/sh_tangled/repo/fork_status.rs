@@ -10,39 +10,54 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ForkStatus<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ForkStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Branch to check status for
-    #[serde(borrow)]
-    pub branch: CowStr<'a>,
+    pub branch: S,
     ///DID of the fork owner
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///Hidden ref to use for comparison
-    #[serde(borrow)]
-    pub hidden_ref: CowStr<'a>,
+    pub hidden_ref: S,
     ///Name of the forked repository
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Source repository URL
-    #[serde(borrow)]
-    pub source: CowStr<'a>,
+    pub source: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ForkStatusOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ForkStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Fork status: 0=UpToDate, 1=FastForwardable, 2=Conflict, 3=MissingBranch
     pub status: i64,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.tangled.repo.forkStatus
@@ -50,11 +65,12 @@ pub struct ForkStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for ForkStatusResponse {
     const NSID: &'static str = "sh.tangled.repo.forkStatus";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ForkStatusOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ForkStatusOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ForkStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ForkStatus<S> {
     const NSID: &'static str = "sh.tangled.repo.forkStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -69,7 +85,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ForkStatusRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = ForkStatus<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ForkStatus<S>;
     type Response = ForkStatusResponse;
 }
 
@@ -83,98 +99,92 @@ pub mod fork_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Branch;
         type Did;
-        type Name;
-        type HiddenRef;
         type Source;
+        type Name;
+        type Branch;
+        type HiddenRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Branch = Unset;
         type Did = Unset;
-        type Name = Unset;
-        type HiddenRef = Unset;
         type Source = Unset;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranch<S> {}
-    impl<S: State> State for SetBranch<S> {
-        type Branch = Set<members::branch>;
-        type Did = S::Did;
-        type Name = S::Name;
-        type HiddenRef = S::HiddenRef;
-        type Source = S::Source;
+        type Name = Unset;
+        type Branch = Unset;
+        type HiddenRef = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Branch = S::Branch;
         type Did = Set<members::did>;
+        type Source = S::Source;
         type Name = S::Name;
-        type HiddenRef = S::HiddenRef;
-        type Source = S::Source;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
         type Branch = S::Branch;
-        type Did = S::Did;
-        type Name = Set<members::name>;
         type HiddenRef = S::HiddenRef;
-        type Source = S::Source;
-    }
-    ///State transition - sets the `hidden_ref` field to Set
-    pub struct SetHiddenRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHiddenRef<S> {}
-    impl<S: State> State for SetHiddenRef<S> {
-        type Branch = S::Branch;
-        type Did = S::Did;
-        type Name = S::Name;
-        type HiddenRef = Set<members::hidden_ref>;
-        type Source = S::Source;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
-        type Branch = S::Branch;
         type Did = S::Did;
-        type Name = S::Name;
-        type HiddenRef = S::HiddenRef;
         type Source = Set<members::source>;
+        type Name = S::Name;
+        type Branch = S::Branch;
+        type HiddenRef = S::HiddenRef;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Did = S::Did;
+        type Source = S::Source;
+        type Name = Set<members::name>;
+        type Branch = S::Branch;
+        type HiddenRef = S::HiddenRef;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranch<S> {}
+    impl<S: State> State for SetBranch<S> {
+        type Did = S::Did;
+        type Source = S::Source;
+        type Name = S::Name;
+        type Branch = Set<members::branch>;
+        type HiddenRef = S::HiddenRef;
+    }
+    ///State transition - sets the `hidden_ref` field to Set
+    pub struct SetHiddenRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiddenRef<S> {}
+    impl<S: State> State for SetHiddenRef<S> {
+        type Did = S::Did;
+        type Source = S::Source;
+        type Name = S::Name;
+        type Branch = S::Branch;
+        type HiddenRef = Set<members::hidden_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `branch` field
-        pub struct branch(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `hidden_ref` field
-        pub struct hidden_ref(());
         ///Marker type for the `source` field
         pub struct source(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
+        ///Marker type for the `hidden_ref` field
+        pub struct hidden_ref(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ForkStatusBuilder<'a, S: fork_status_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<Did<S>>, Option<S>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -204,7 +214,7 @@ where
     /// Set the `branch` field (required)
     pub fn branch(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ForkStatusBuilder<'a, fork_status_state::SetBranch<S>> {
         self._fields.0 = Option::Some(value.into());
         ForkStatusBuilder {
@@ -223,7 +233,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ForkStatusBuilder<'a, fork_status_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         ForkStatusBuilder {
@@ -242,7 +252,7 @@ where
     /// Set the `hiddenRef` field (required)
     pub fn hidden_ref(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ForkStatusBuilder<'a, fork_status_state::SetHiddenRef<S>> {
         self._fields.2 = Option::Some(value.into());
         ForkStatusBuilder {
@@ -261,7 +271,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ForkStatusBuilder<'a, fork_status_state::SetName<S>> {
         self._fields.3 = Option::Some(value.into());
         ForkStatusBuilder {
@@ -280,7 +290,7 @@ where
     /// Set the `source` field (required)
     pub fn source(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ForkStatusBuilder<'a, fork_status_state::SetSource<S>> {
         self._fields.4 = Option::Some(value.into());
         ForkStatusBuilder {
@@ -294,11 +304,11 @@ where
 impl<'a, S> ForkStatusBuilder<'a, S>
 where
     S: fork_status_state::State,
-    S::Branch: fork_status_state::IsSet,
     S::Did: fork_status_state::IsSet,
-    S::Name: fork_status_state::IsSet,
-    S::HiddenRef: fork_status_state::IsSet,
     S::Source: fork_status_state::IsSet,
+    S::Name: fork_status_state::IsSet,
+    S::Branch: fork_status_state::IsSet,
+    S::HiddenRef: fork_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ForkStatus<'a> {
@@ -314,10 +324,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ForkStatus<'a> {
         ForkStatus {
             branch: self._fields.0.unwrap(),

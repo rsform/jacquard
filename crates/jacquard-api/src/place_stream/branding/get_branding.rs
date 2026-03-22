@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,53 +26,69 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::place_stream::branding::get_branding;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct BrandingAsset<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BrandingAsset<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Inline data for text assets
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub data: Option<CowStr<'a>>,
+    pub data: Option<S>,
     ///Image height in pixels (optional, for images only)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
     ///Asset key identifier
-    #[serde(borrow)]
-    pub key: CowStr<'a>,
+    pub key: S,
     ///MIME type of the asset
-    #[serde(borrow)]
-    pub mime_type: CowStr<'a>,
+    pub mime_type: S,
     ///URL to fetch the asset blob (for images)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<CowStr<'a>>,
+    pub url: Option<S>,
     ///Image width in pixels (optional, for images only)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetBranding<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetBranding<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub broadcaster: Option<Did<'a>>,
+    pub broadcaster: Option<Did<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetBrandingOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetBrandingOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of available branding assets
-    #[serde(borrow)]
-    pub assets: Vec<get_branding::BrandingAsset<'a>>,
+    pub assets: Vec<get_branding::BrandingAsset<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[jacquard_derive::open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -79,22 +97,31 @@ pub struct GetBrandingOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetBrandingError<'a> {}
-impl core::fmt::Display for GetBrandingError<'_> {
+pub enum GetBrandingError {
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
+}
+
+impl core::fmt::Display for GetBrandingError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
-impl<'a> LexiconSchema for BrandingAsset<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BrandingAsset<S> {
     fn nsid() -> &'static str {
         "place.stream.branding.getBranding"
     }
@@ -114,11 +141,12 @@ pub struct GetBrandingResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBrandingResponse {
     const NSID: &'static str = "place.stream.branding.getBranding";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetBrandingOutput<'de>;
-    type Err<'de> = GetBrandingError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetBrandingOutput<S>;
+    type Err = GetBrandingError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetBranding<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetBranding<S> {
     const NSID: &'static str = "place.stream.branding.getBranding";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBrandingResponse;
@@ -129,7 +157,7 @@ pub struct GetBrandingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBrandingRequest {
     const PATH: &'static str = "/xrpc/place.stream.branding.getBranding";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBranding<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetBranding<S>;
     type Response = GetBrandingResponse;
 }
 
@@ -264,7 +292,7 @@ pub mod get_branding_state {
 /// Builder for constructing an instance of this type
 pub struct GetBrandingBuilder<'a, S: get_branding_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -288,12 +316,12 @@ impl<'a> GetBrandingBuilder<'a, get_branding_state::Empty> {
 
 impl<'a, S: get_branding_state::State> GetBrandingBuilder<'a, S> {
     /// Set the `broadcaster` field (optional)
-    pub fn broadcaster(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn broadcaster(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `broadcaster` field to an Option value (optional)
-    pub fn maybe_broadcaster(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_broadcaster(mut self, value: Option<Did<S>>) -> Self {
         self._fields.0 = value;
         self
     }

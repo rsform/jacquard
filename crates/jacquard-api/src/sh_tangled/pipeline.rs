@@ -14,13 +14,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -31,148 +33,189 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::sh_tangled::pipeline;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CloneOpts<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CloneOpts<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub depth: i64,
     pub skip: bool,
     pub submodules: bool,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.tangled.pipeline", tag = "$type")]
-pub struct Pipeline<'a> {
-    #[serde(borrow)]
-    pub trigger_metadata: pipeline::TriggerMetadata<'a>,
-    #[serde(borrow)]
-    pub workflows: Vec<pipeline::Workflow<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.tangled.pipeline",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Pipeline<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub trigger_metadata: pipeline::TriggerMetadata<S>,
+    pub workflows: Vec<pipeline::Workflow<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PipelineGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PipelineGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Pipeline<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Pipeline<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ManualTriggerData<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ManualTriggerData<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub inputs: Option<Vec<pipeline::Pair<'a>>>,
+    pub inputs: Option<Vec<pipeline::Pair<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Pair<'a> {
-    #[serde(borrow)]
-    pub key: CowStr<'a>,
-    #[serde(borrow)]
-    pub value: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Pair<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub key: S,
+    pub value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct PullRequestTriggerData<'a> {
-    #[serde(borrow)]
-    pub action: CowStr<'a>,
-    #[serde(borrow)]
-    pub source_branch: CowStr<'a>,
-    #[serde(borrow)]
-    pub source_sha: CowStr<'a>,
-    #[serde(borrow)]
-    pub target_branch: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PullRequestTriggerData<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub action: S,
+    pub source_branch: S,
+    pub source_sha: S,
+    pub target_branch: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct PushTriggerData<'a> {
-    #[serde(borrow)]
-    pub new_sha: CowStr<'a>,
-    #[serde(borrow)]
-    pub old_sha: CowStr<'a>,
-    #[serde(borrow)]
-    pub r#ref: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PushTriggerData<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub new_sha: S,
+    pub old_sha: S,
+    pub r#ref: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TriggerMetadata<'a> {
-    #[serde(borrow)]
-    pub kind: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TriggerMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub kind: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub manual: Option<pipeline::ManualTriggerData<'a>>,
+    pub manual: Option<pipeline::ManualTriggerData<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pull_request: Option<pipeline::PullRequestTriggerData<'a>>,
+    pub pull_request: Option<pipeline::PullRequestTriggerData<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub push: Option<pipeline::PushTriggerData<'a>>,
-    #[serde(borrow)]
-    pub repo: pipeline::TriggerRepo<'a>,
+    pub push: Option<pipeline::PushTriggerData<S>>,
+    pub repo: pipeline::TriggerRepo<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TriggerRepo<'a> {
-    #[serde(borrow)]
-    pub default_branch: CowStr<'a>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
-    #[serde(borrow)]
-    pub knot: CowStr<'a>,
-    #[serde(borrow)]
-    pub repo: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TriggerRepo<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub default_branch: S,
+    pub did: Did<S>,
+    pub knot: S,
+    pub repo: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Workflow<'a> {
-    #[serde(borrow)]
-    pub clone: pipeline::CloneOpts<'a>,
-    #[serde(borrow)]
-    pub engine: CowStr<'a>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
-    #[serde(borrow)]
-    pub raw: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Workflow<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub clone: pipeline::CloneOpts<S>,
+    pub engine: S,
+    pub name: S,
+    pub raw: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Pipeline<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PipelineRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Pipeline<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PipelineRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for CloneOpts<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CloneOpts<S> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
@@ -194,18 +237,17 @@ pub struct PipelineRecord;
 impl XrpcResp for PipelineRecord {
     const NSID: &'static str = "sh.tangled.pipeline";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PipelineGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PipelineGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PipelineGetRecordOutput<'_>> for Pipeline<'_> {
-    fn from(output: PipelineGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PipelineGetRecordOutput<S>> for Pipeline<S> {
+    fn from(output: PipelineGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Pipeline<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Pipeline<S> {
     const NSID: &'static str = "sh.tangled.pipeline";
     type Record = PipelineRecord;
 }
@@ -215,7 +257,7 @@ impl Collection for PipelineRecord {
     type Record = PipelineRecord;
 }
 
-impl<'a> LexiconSchema for Pipeline<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Pipeline<S> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
@@ -230,7 +272,7 @@ impl<'a> LexiconSchema for Pipeline<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ManualTriggerData<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ManualTriggerData<S> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
@@ -245,7 +287,7 @@ impl<'a> LexiconSchema for ManualTriggerData<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Pair<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Pair<S> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
@@ -260,7 +302,7 @@ impl<'a> LexiconSchema for Pair<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PullRequestTriggerData<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PullRequestTriggerData<S> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
@@ -297,7 +339,7 @@ impl<'a> LexiconSchema for PullRequestTriggerData<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PushTriggerData<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PushTriggerData<S> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
@@ -356,7 +398,7 @@ impl<'a> LexiconSchema for PushTriggerData<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TriggerMetadata<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TriggerMetadata<S> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
@@ -371,7 +413,7 @@ impl<'a> LexiconSchema for TriggerMetadata<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TriggerRepo<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TriggerRepo<S> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
@@ -386,7 +428,7 @@ impl<'a> LexiconSchema for TriggerRepo<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Workflow<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Workflow<S> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
@@ -412,50 +454,50 @@ pub mod clone_opts_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Skip;
-        type Depth;
         type Submodules;
+        type Depth;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Skip = Unset;
-        type Depth = Unset;
         type Submodules = Unset;
+        type Depth = Unset;
     }
     ///State transition - sets the `skip` field to Set
     pub struct SetSkip<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSkip<S> {}
     impl<S: State> State for SetSkip<S> {
         type Skip = Set<members::skip>;
+        type Submodules = S::Submodules;
         type Depth = S::Depth;
-        type Submodules = S::Submodules;
-    }
-    ///State transition - sets the `depth` field to Set
-    pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDepth<S> {}
-    impl<S: State> State for SetDepth<S> {
-        type Skip = S::Skip;
-        type Depth = Set<members::depth>;
-        type Submodules = S::Submodules;
     }
     ///State transition - sets the `submodules` field to Set
     pub struct SetSubmodules<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubmodules<S> {}
     impl<S: State> State for SetSubmodules<S> {
         type Skip = S::Skip;
-        type Depth = S::Depth;
         type Submodules = Set<members::submodules>;
+        type Depth = S::Depth;
+    }
+    ///State transition - sets the `depth` field to Set
+    pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDepth<S> {}
+    impl<S: State> State for SetDepth<S> {
+        type Skip = S::Skip;
+        type Submodules = S::Submodules;
+        type Depth = Set<members::depth>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `skip` field
         pub struct skip(());
-        ///Marker type for the `depth` field
-        pub struct depth(());
         ///Marker type for the `submodules` field
         pub struct submodules(());
+        ///Marker type for the `depth` field
+        pub struct depth(());
     }
 }
 
@@ -545,8 +587,8 @@ impl<'a, S> CloneOptsBuilder<'a, S>
 where
     S: clone_opts_state::State,
     S::Skip: clone_opts_state::IsSet,
-    S::Depth: clone_opts_state::IsSet,
     S::Submodules: clone_opts_state::IsSet,
+    S::Depth: clone_opts_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CloneOpts<'a> {
@@ -560,10 +602,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CloneOpts<'a> {
         CloneOpts {
             depth: self._fields.0.unwrap(),
@@ -911,47 +950,44 @@ pub mod pipeline_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TriggerMetadata;
         type Workflows;
+        type TriggerMetadata;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TriggerMetadata = Unset;
         type Workflows = Unset;
-    }
-    ///State transition - sets the `trigger_metadata` field to Set
-    pub struct SetTriggerMetadata<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTriggerMetadata<S> {}
-    impl<S: State> State for SetTriggerMetadata<S> {
-        type TriggerMetadata = Set<members::trigger_metadata>;
-        type Workflows = S::Workflows;
+        type TriggerMetadata = Unset;
     }
     ///State transition - sets the `workflows` field to Set
     pub struct SetWorkflows<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkflows<S> {}
     impl<S: State> State for SetWorkflows<S> {
-        type TriggerMetadata = S::TriggerMetadata;
         type Workflows = Set<members::workflows>;
+        type TriggerMetadata = S::TriggerMetadata;
+    }
+    ///State transition - sets the `trigger_metadata` field to Set
+    pub struct SetTriggerMetadata<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTriggerMetadata<S> {}
+    impl<S: State> State for SetTriggerMetadata<S> {
+        type Workflows = S::Workflows;
+        type TriggerMetadata = Set<members::trigger_metadata>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `trigger_metadata` field
-        pub struct trigger_metadata(());
         ///Marker type for the `workflows` field
         pub struct workflows(());
+        ///Marker type for the `trigger_metadata` field
+        pub struct trigger_metadata(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PipelineBuilder<'a, S: pipeline_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<pipeline::TriggerMetadata<'a>>,
-        Option<Vec<pipeline::Workflow<'a>>>,
-    ),
+    _fields: (Option<pipeline::TriggerMetadata<S>>, Option<Vec<pipeline::Workflow<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -981,7 +1017,7 @@ where
     /// Set the `triggerMetadata` field (required)
     pub fn trigger_metadata(
         mut self,
-        value: impl Into<pipeline::TriggerMetadata<'a>>,
+        value: impl Into<pipeline::TriggerMetadata<S>>,
     ) -> PipelineBuilder<'a, pipeline_state::SetTriggerMetadata<S>> {
         self._fields.0 = Option::Some(value.into());
         PipelineBuilder {
@@ -1000,7 +1036,7 @@ where
     /// Set the `workflows` field (required)
     pub fn workflows(
         mut self,
-        value: impl Into<Vec<pipeline::Workflow<'a>>>,
+        value: impl Into<Vec<pipeline::Workflow<S>>>,
     ) -> PipelineBuilder<'a, pipeline_state::SetWorkflows<S>> {
         self._fields.1 = Option::Some(value.into());
         PipelineBuilder {
@@ -1014,8 +1050,8 @@ where
 impl<'a, S> PipelineBuilder<'a, S>
 where
     S: pipeline_state::State,
-    S::TriggerMetadata: pipeline_state::IsSet,
     S::Workflows: pipeline_state::IsSet,
+    S::TriggerMetadata: pipeline_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pipeline<'a> {
@@ -1028,10 +1064,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Pipeline<'a> {
         Pipeline {
             trigger_metadata: self._fields.0.unwrap(),
@@ -1089,11 +1122,11 @@ pub mod trigger_metadata_state {
 pub struct TriggerMetadataBuilder<'a, S: trigger_metadata_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<pipeline::ManualTriggerData<'a>>,
-        Option<pipeline::PullRequestTriggerData<'a>>,
-        Option<pipeline::PushTriggerData<'a>>,
-        Option<pipeline::TriggerRepo<'a>>,
+        Option<S>,
+        Option<pipeline::ManualTriggerData<S>>,
+        Option<pipeline::PullRequestTriggerData<S>>,
+        Option<pipeline::PushTriggerData<S>>,
+        Option<pipeline::TriggerRepo<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1124,7 +1157,7 @@ where
     /// Set the `kind` field (required)
     pub fn kind(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TriggerMetadataBuilder<'a, trigger_metadata_state::SetKind<S>> {
         self._fields.0 = Option::Some(value.into());
         TriggerMetadataBuilder {
@@ -1139,7 +1172,7 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
     /// Set the `manual` field (optional)
     pub fn manual(
         mut self,
-        value: impl Into<Option<pipeline::ManualTriggerData<'a>>>,
+        value: impl Into<Option<pipeline::ManualTriggerData<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -1147,7 +1180,7 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
     /// Set the `manual` field to an Option value (optional)
     pub fn maybe_manual(
         mut self,
-        value: Option<pipeline::ManualTriggerData<'a>>,
+        value: Option<pipeline::ManualTriggerData<S>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -1158,7 +1191,7 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
     /// Set the `pullRequest` field (optional)
     pub fn pull_request(
         mut self,
-        value: impl Into<Option<pipeline::PullRequestTriggerData<'a>>>,
+        value: impl Into<Option<pipeline::PullRequestTriggerData<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -1166,7 +1199,7 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
     /// Set the `pullRequest` field to an Option value (optional)
     pub fn maybe_pull_request(
         mut self,
-        value: Option<pipeline::PullRequestTriggerData<'a>>,
+        value: Option<pipeline::PullRequestTriggerData<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -1177,13 +1210,13 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
     /// Set the `push` field (optional)
     pub fn push(
         mut self,
-        value: impl Into<Option<pipeline::PushTriggerData<'a>>>,
+        value: impl Into<Option<pipeline::PushTriggerData<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `push` field to an Option value (optional)
-    pub fn maybe_push(mut self, value: Option<pipeline::PushTriggerData<'a>>) -> Self {
+    pub fn maybe_push(mut self, value: Option<pipeline::PushTriggerData<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1197,7 +1230,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<pipeline::TriggerRepo<'a>>,
+        value: impl Into<pipeline::TriggerRepo<S>>,
     ) -> TriggerMetadataBuilder<'a, trigger_metadata_state::SetRepo<S>> {
         self._fields.4 = Option::Some(value.into());
         TriggerMetadataBuilder {
@@ -1228,10 +1261,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TriggerMetadata<'a> {
         TriggerMetadata {
             kind: self._fields.0.unwrap(),
@@ -1254,65 +1284,65 @@ pub mod trigger_repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Did;
         type Knot;
+        type Repo;
         type DefaultBranch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Did = Unset;
         type Knot = Unset;
+        type Repo = Unset;
         type DefaultBranch = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Did = S::Did;
-        type Knot = S::Knot;
-        type DefaultBranch = S::DefaultBranch;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Repo = S::Repo;
         type Did = Set<members::did>;
         type Knot = S::Knot;
+        type Repo = S::Repo;
         type DefaultBranch = S::DefaultBranch;
     }
     ///State transition - sets the `knot` field to Set
     pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKnot<S> {}
     impl<S: State> State for SetKnot<S> {
-        type Repo = S::Repo;
         type Did = S::Did;
         type Knot = Set<members::knot>;
+        type Repo = S::Repo;
+        type DefaultBranch = S::DefaultBranch;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Did = S::Did;
+        type Knot = S::Knot;
+        type Repo = Set<members::repo>;
         type DefaultBranch = S::DefaultBranch;
     }
     ///State transition - sets the `default_branch` field to Set
     pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
     impl<S: State> State for SetDefaultBranch<S> {
-        type Repo = S::Repo;
         type Did = S::Did;
         type Knot = S::Knot;
+        type Repo = S::Repo;
         type DefaultBranch = Set<members::default_branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `knot` field
         pub struct knot(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
         ///Marker type for the `default_branch` field
         pub struct default_branch(());
     }
@@ -1321,12 +1351,7 @@ pub mod trigger_repo_state {
 /// Builder for constructing an instance of this type
 pub struct TriggerRepoBuilder<'a, S: trigger_repo_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<Did<S>>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1356,7 +1381,7 @@ where
     /// Set the `defaultBranch` field (required)
     pub fn default_branch(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetDefaultBranch<S>> {
         self._fields.0 = Option::Some(value.into());
         TriggerRepoBuilder {
@@ -1375,7 +1400,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         TriggerRepoBuilder {
@@ -1394,7 +1419,7 @@ where
     /// Set the `knot` field (required)
     pub fn knot(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetKnot<S>> {
         self._fields.2 = Option::Some(value.into());
         TriggerRepoBuilder {
@@ -1413,7 +1438,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetRepo<S>> {
         self._fields.3 = Option::Some(value.into());
         TriggerRepoBuilder {
@@ -1427,9 +1452,9 @@ where
 impl<'a, S> TriggerRepoBuilder<'a, S>
 where
     S: trigger_repo_state::State,
-    S::Repo: trigger_repo_state::IsSet,
     S::Did: trigger_repo_state::IsSet,
     S::Knot: trigger_repo_state::IsSet,
+    S::Repo: trigger_repo_state::IsSet,
     S::DefaultBranch: trigger_repo_state::IsSet,
 {
     /// Build the final struct
@@ -1445,10 +1470,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TriggerRepo<'a> {
         TriggerRepo {
             default_branch: self._fields.0.unwrap(),
@@ -1472,8 +1494,8 @@ pub mod workflow_state {
     pub trait State: sealed::Sealed {
         type Clone;
         type Name;
-        type Raw;
         type Engine;
+        type Raw;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -1481,8 +1503,8 @@ pub mod workflow_state {
     impl State for Empty {
         type Clone = Unset;
         type Name = Unset;
-        type Raw = Unset;
         type Engine = Unset;
+        type Raw = Unset;
     }
     ///State transition - sets the `clone` field to Set
     pub struct SetClone<S: State = Empty>(PhantomData<fn() -> S>);
@@ -1490,8 +1512,8 @@ pub mod workflow_state {
     impl<S: State> State for SetClone<S> {
         type Clone = Set<members::clone>;
         type Name = S::Name;
-        type Raw = S::Raw;
         type Engine = S::Engine;
+        type Raw = S::Raw;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
@@ -1499,17 +1521,8 @@ pub mod workflow_state {
     impl<S: State> State for SetName<S> {
         type Clone = S::Clone;
         type Name = Set<members::name>;
+        type Engine = S::Engine;
         type Raw = S::Raw;
-        type Engine = S::Engine;
-    }
-    ///State transition - sets the `raw` field to Set
-    pub struct SetRaw<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRaw<S> {}
-    impl<S: State> State for SetRaw<S> {
-        type Clone = S::Clone;
-        type Name = S::Name;
-        type Raw = Set<members::raw>;
-        type Engine = S::Engine;
     }
     ///State transition - sets the `engine` field to Set
     pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
@@ -1517,8 +1530,17 @@ pub mod workflow_state {
     impl<S: State> State for SetEngine<S> {
         type Clone = S::Clone;
         type Name = S::Name;
-        type Raw = S::Raw;
         type Engine = Set<members::engine>;
+        type Raw = S::Raw;
+    }
+    ///State transition - sets the `raw` field to Set
+    pub struct SetRaw<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRaw<S> {}
+    impl<S: State> State for SetRaw<S> {
+        type Clone = S::Clone;
+        type Name = S::Name;
+        type Engine = S::Engine;
+        type Raw = Set<members::raw>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -1527,22 +1549,17 @@ pub mod workflow_state {
         pub struct clone(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `raw` field
-        pub struct raw(());
         ///Marker type for the `engine` field
         pub struct engine(());
+        ///Marker type for the `raw` field
+        pub struct raw(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct WorkflowBuilder<'a, S: workflow_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<pipeline::CloneOpts<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<pipeline::CloneOpts<S>>, Option<S>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1572,7 +1589,7 @@ where
     /// Set the `clone` field (required)
     pub fn clone(
         mut self,
-        value: impl Into<pipeline::CloneOpts<'a>>,
+        value: impl Into<pipeline::CloneOpts<S>>,
     ) -> WorkflowBuilder<'a, workflow_state::SetClone<S>> {
         self._fields.0 = Option::Some(value.into());
         WorkflowBuilder {
@@ -1591,7 +1608,7 @@ where
     /// Set the `engine` field (required)
     pub fn engine(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> WorkflowBuilder<'a, workflow_state::SetEngine<S>> {
         self._fields.1 = Option::Some(value.into());
         WorkflowBuilder {
@@ -1610,7 +1627,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> WorkflowBuilder<'a, workflow_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         WorkflowBuilder {
@@ -1629,7 +1646,7 @@ where
     /// Set the `raw` field (required)
     pub fn raw(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> WorkflowBuilder<'a, workflow_state::SetRaw<S>> {
         self._fields.3 = Option::Some(value.into());
         WorkflowBuilder {
@@ -1645,8 +1662,8 @@ where
     S: workflow_state::State,
     S::Clone: workflow_state::IsSet,
     S::Name: workflow_state::IsSet,
-    S::Raw: workflow_state::IsSet,
     S::Engine: workflow_state::IsSet,
+    S::Raw: workflow_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workflow<'a> {
@@ -1661,10 +1678,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Workflow<'a> {
         Workflow {
             clone: self._fields.0.unwrap(),

@@ -14,13 +14,18 @@ pub mod get_now_playings;
 pub mod get_stories;
 pub mod search;
 
-use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, UriValue};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -35,173 +40,207 @@ use crate::app_rocksky::scrobble::ScrobbleViewBasic;
 use crate::app_rocksky::song::SongViewBasic;
 use crate::app_rocksky::feed;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct FeedGeneratorView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FeedGeneratorView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<UriValue<'a>>,
+    pub avatar: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creator: Option<ProfileViewBasic<'a>>,
+    pub creator: Option<ProfileViewBasic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct FeedGeneratorsView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FeedGeneratorsView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub feeds: Option<Vec<feed::FeedGeneratorView<'a>>>,
+    pub feeds: Option<Vec<feed::FeedGeneratorView<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct FeedItemView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FeedItemView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub scrobble: Option<ScrobbleViewBasic<'a>>,
+    pub scrobble: Option<ScrobbleViewBasic<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct FeedUriView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FeedUriView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The feed URI.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct FeedView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FeedView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The pagination cursor for the next set of results.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub feed: Option<Vec<feed::FeedItemView<'a>>>,
+    pub feed: Option<Vec<feed::FeedItemView<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct NowPlayingView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct NowPlayingView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub album: Option<CowStr<'a>>,
+    pub album: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub album_art: Option<UriValue<'a>>,
+    pub album_art: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub album_artist: Option<CowStr<'a>>,
+    pub album_artist: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub album_uri: Option<AtUri<'a>>,
+    pub album_uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artist: Option<CowStr<'a>>,
+    pub artist: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artist_uri: Option<AtUri<'a>>,
+    pub artist_uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<UriValue<'a>>,
+    pub avatar: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub created_at: Option<CowStr<'a>>,
+    pub created_at: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub did: Option<AtIdentifier<'a>>,
+    pub did: Option<AtIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub handle: Option<CowStr<'a>>,
+    pub handle: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub track_id: Option<CowStr<'a>>,
+    pub track_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub track_uri: Option<AtUri<'a>>,
+    pub track_uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct NowPlayingsView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct NowPlayingsView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub now_playings: Option<Vec<feed::NowPlayingView<'a>>>,
+    pub now_playings: Option<Vec<feed::NowPlayingView<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SearchResultsView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchResultsView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub estimated_total_hits: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub hits: Option<Vec<SearchResultsViewHitsItem<'a>>>,
+    pub hits: Option<Vec<SearchResultsViewHitsItem<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub processing_time_ms: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SearchResultsViewHitsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SearchResultsViewHitsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.rocksky.song.defs#songViewBasic")]
-    SongViewBasic(Box<SongViewBasic<'a>>),
+    SongViewBasic(Box<SongViewBasic<S>>),
     #[serde(rename = "app.rocksky.album.defs#albumViewBasic")]
-    AlbumViewBasic(Box<AlbumViewBasic<'a>>),
+    AlbumViewBasic(Box<AlbumViewBasic<S>>),
     #[serde(rename = "app.rocksky.artist.defs#artistViewBasic")]
-    ArtistViewBasic(Box<ArtistViewBasic<'a>>),
+    ArtistViewBasic(Box<ArtistViewBasic<S>>),
     #[serde(rename = "app.rocksky.playlist.defs#playlistViewBasic")]
-    PlaylistViewBasic(Box<PlaylistViewBasic<'a>>),
+    PlaylistViewBasic(Box<PlaylistViewBasic<S>>),
     #[serde(rename = "app.rocksky.actor.defs#profileViewBasic")]
-    ProfileViewBasic(Box<ProfileViewBasic<'a>>),
+    ProfileViewBasic(Box<ProfileViewBasic<S>>),
 }
 
-impl<'a> LexiconSchema for FeedGeneratorView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedGeneratorView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -216,7 +255,7 @@ impl<'a> LexiconSchema for FeedGeneratorView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for FeedGeneratorsView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedGeneratorsView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -231,7 +270,7 @@ impl<'a> LexiconSchema for FeedGeneratorsView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for FeedItemView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedItemView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -246,7 +285,7 @@ impl<'a> LexiconSchema for FeedItemView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for FeedUriView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedUriView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -261,7 +300,7 @@ impl<'a> LexiconSchema for FeedUriView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for FeedView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -276,7 +315,7 @@ impl<'a> LexiconSchema for FeedView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for NowPlayingView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for NowPlayingView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -291,7 +330,7 @@ impl<'a> LexiconSchema for NowPlayingView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for NowPlayingsView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for NowPlayingsView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -306,7 +345,7 @@ impl<'a> LexiconSchema for NowPlayingsView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SearchResultsView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SearchResultsView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }

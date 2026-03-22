@@ -10,36 +10,49 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetGroup<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetGroup<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetGroupOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetGroupOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cuid: Option<CowStr<'a>>,
+    pub cuid: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display: Option<CowStr<'a>>,
+    pub display: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public: Option<bool>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.blebbit.authr.group.getGroup
@@ -47,11 +60,12 @@ pub struct GetGroupResponse;
 impl jacquard_common::xrpc::XrpcResp for GetGroupResponse {
     const NSID: &'static str = "app.blebbit.authr.group.getGroup";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetGroupOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetGroupOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetGroup<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetGroup<S> {
     const NSID: &'static str = "app.blebbit.authr.group.getGroup";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetGroupResponse;
@@ -62,7 +76,7 @@ pub struct GetGroupRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetGroupRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.group.getGroup";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetGroup<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetGroup<S>;
     type Response = GetGroupResponse;
 }
 
@@ -101,7 +115,7 @@ pub mod get_group_state {
 /// Builder for constructing an instance of this type
 pub struct GetGroupBuilder<'a, S: get_group_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -131,7 +145,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetGroupBuilder<'a, get_group_state::SetId<S>> {
         self._fields.0 = Option::Some(value.into());
         GetGroupBuilder {

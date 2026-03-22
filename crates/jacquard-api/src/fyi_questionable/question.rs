@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, Language};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,44 +31,51 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::fyi_questionable::richtext::content::Content;
 /// A question asked on questionable.fyi
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "fyi.questionable.question", tag = "$type")]
-pub struct Question<'a> {
-    #[serde(borrow)]
-    pub content: Content<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "fyi.questionable.question",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Question<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub content: Content<S>,
     ///Indicates the context in which this question was asked. Currently only fyi.questionable.actor.profile
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub context_ref: Option<StrongRef<'a>>,
+    pub context_ref: Option<StrongRef<S>>,
     pub created_at: Datetime,
     ///Indicates human language of the primary text content.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub languages: Option<Vec<Language>>,
     ///A short summary of the question
-    #[serde(borrow)]
-    pub summary: CowStr<'a>,
+    pub summary: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct QuestionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct QuestionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Question<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Question<S>,
 }
 
-impl<'a> Question<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, QuestionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Question<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, QuestionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -77,18 +86,17 @@ pub struct QuestionRecord;
 impl XrpcResp for QuestionRecord {
     const NSID: &'static str = "fyi.questionable.question";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = QuestionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = QuestionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<QuestionGetRecordOutput<'_>> for Question<'_> {
-    fn from(output: QuestionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<QuestionGetRecordOutput<S>> for Question<S> {
+    fn from(output: QuestionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Question<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Question<S> {
     const NSID: &'static str = "fyi.questionable.question";
     type Record = QuestionRecord;
 }
@@ -98,7 +106,7 @@ impl Collection for QuestionRecord {
     type Record = QuestionRecord;
 }
 
-impl<'a> LexiconSchema for Question<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Question<S> {
     fn nsid() -> &'static str {
         "fyi.questionable.question"
     }
@@ -168,49 +176,49 @@ pub mod question_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Summary;
+        type Content;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Summary = Unset;
+        type Content = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Summary = S::Summary;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSummary<S> {}
     impl<S: State> State for SetSummary<S> {
-        type Content = S::Content;
         type Summary = Set<members::summary>;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Summary = S::Summary;
+        type Content = Set<members::content>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
         type Summary = S::Summary;
+        type Content = S::Content;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `summary` field
         pub struct summary(());
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -220,11 +228,11 @@ pub mod question_state {
 pub struct QuestionBuilder<'a, S: question_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Content<'a>>,
-        Option<StrongRef<'a>>,
+        Option<Content<S>>,
+        Option<StrongRef<S>>,
         Option<Datetime>,
         Option<Vec<Language>>,
-        Option<CowStr<'a>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -255,7 +263,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<Content<'a>>,
+        value: impl Into<Content<S>>,
     ) -> QuestionBuilder<'a, question_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         QuestionBuilder {
@@ -268,12 +276,12 @@ where
 
 impl<'a, S: question_state::State> QuestionBuilder<'a, S> {
     /// Set the `contextRef` field (optional)
-    pub fn context_ref(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn context_ref(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `contextRef` field to an Option value (optional)
-    pub fn maybe_context_ref(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_context_ref(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -319,7 +327,7 @@ where
     /// Set the `summary` field (required)
     pub fn summary(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> QuestionBuilder<'a, question_state::SetSummary<S>> {
         self._fields.4 = Option::Some(value.into());
         QuestionBuilder {
@@ -333,8 +341,8 @@ where
 impl<'a, S> QuestionBuilder<'a, S>
 where
     S: question_state::State,
-    S::Content: question_state::IsSet,
     S::Summary: question_state::IsSet,
+    S::Content: question_state::IsSet,
     S::CreatedAt: question_state::IsSet,
 {
     /// Build the final struct
@@ -351,10 +359,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Question<'a> {
         Question {
             content: self._fields.0.unwrap(),

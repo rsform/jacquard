@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,50 +31,64 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::pub_quizzy::quiz_score;
 /// Final rankings for a completed quiz
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "pub.quizzy.quizScore", tag = "$type")]
-pub struct QuizScore<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "pub.quizzy.quizScore",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct QuizScore<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reference to the quizBegin record
-    #[serde(borrow)]
-    pub quiz_begin: StrongRef<'a>,
+    pub quiz_begin: StrongRef<S>,
     ///Ordered list of team results (by ranking)
-    #[serde(borrow)]
-    pub results: Vec<quiz_score::TeamResult<'a>>,
+    pub results: Vec<quiz_score::TeamResult<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct QuizScoreGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct QuizScoreGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: QuizScore<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: QuizScore<S>,
 }
 
 /// A team's final result
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TeamResult<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TeamResult<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reference to the team's detailed score record
-    #[serde(borrow)]
-    pub team_score: StrongRef<'a>,
+    pub team_score: StrongRef<S>,
     ///Team's total score
     pub total_score: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> QuizScore<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, QuizScoreRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> QuizScore<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, QuizScoreRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -83,18 +99,17 @@ pub struct QuizScoreRecord;
 impl XrpcResp for QuizScoreRecord {
     const NSID: &'static str = "pub.quizzy.quizScore";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = QuizScoreGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = QuizScoreGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<QuizScoreGetRecordOutput<'_>> for QuizScore<'_> {
-    fn from(output: QuizScoreGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<QuizScoreGetRecordOutput<S>> for QuizScore<S> {
+    fn from(output: QuizScoreGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for QuizScore<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for QuizScore<S> {
     const NSID: &'static str = "pub.quizzy.quizScore";
     type Record = QuizScoreRecord;
 }
@@ -104,7 +119,7 @@ impl Collection for QuizScoreRecord {
     type Record = QuizScoreRecord;
 }
 
-impl<'a> LexiconSchema for QuizScore<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for QuizScore<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.quizScore"
     }
@@ -141,7 +156,7 @@ impl<'a> LexiconSchema for QuizScore<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TeamResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TeamResult<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.quizScore"
     }
@@ -213,7 +228,7 @@ pub mod quiz_score_state {
 /// Builder for constructing an instance of this type
 pub struct QuizScoreBuilder<'a, S: quiz_score_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>, Option<Vec<quiz_score::TeamResult<'a>>>),
+    _fields: (Option<StrongRef<S>>, Option<Vec<quiz_score::TeamResult<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -243,7 +258,7 @@ where
     /// Set the `quizBegin` field (required)
     pub fn quiz_begin(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> QuizScoreBuilder<'a, quiz_score_state::SetQuizBegin<S>> {
         self._fields.0 = Option::Some(value.into());
         QuizScoreBuilder {
@@ -262,7 +277,7 @@ where
     /// Set the `results` field (required)
     pub fn results(
         mut self,
-        value: impl Into<Vec<quiz_score::TeamResult<'a>>>,
+        value: impl Into<Vec<quiz_score::TeamResult<S>>>,
     ) -> QuizScoreBuilder<'a, quiz_score_state::SetResults<S>> {
         self._fields.1 = Option::Some(value.into());
         QuizScoreBuilder {
@@ -290,10 +305,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> QuizScore<'a> {
         QuizScore {
             quiz_begin: self._fields.0.unwrap(),
@@ -446,7 +458,7 @@ pub mod team_result_state {
 /// Builder for constructing an instance of this type
 pub struct TeamResultBuilder<'a, S: team_result_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>, Option<i64>),
+    _fields: (Option<StrongRef<S>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -476,7 +488,7 @@ where
     /// Set the `teamScore` field (required)
     pub fn team_score(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> TeamResultBuilder<'a, team_result_state::SetTeamScore<S>> {
         self._fields.0 = Option::Some(value.into());
         TeamResultBuilder {
@@ -523,10 +535,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TeamResult<'a> {
         TeamResult {
             team_score: self._fields.0.unwrap(),

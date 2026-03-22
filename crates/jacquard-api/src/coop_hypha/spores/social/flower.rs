@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,40 +29,45 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A flower planted in another user's garden, representing a 'like' or 'follow'.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "coop.hypha.spores.social.flower",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Flower<'a> {
+pub struct Flower<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Client-declared timestamp when the flower was planted.
     pub created_at: Datetime,
     ///DID of the garden owner receiving the flower.
-    #[serde(borrow)]
-    pub subject: Did<'a>,
+    pub subject: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct FlowerGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FlowerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Flower<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Flower<S>,
 }
 
-impl<'a> Flower<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, FlowerRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Flower<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, FlowerRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -71,18 +78,17 @@ pub struct FlowerRecord;
 impl XrpcResp for FlowerRecord {
     const NSID: &'static str = "coop.hypha.spores.social.flower";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = FlowerGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = FlowerGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<FlowerGetRecordOutput<'_>> for Flower<'_> {
-    fn from(output: FlowerGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<FlowerGetRecordOutput<S>> for Flower<S> {
+    fn from(output: FlowerGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Flower<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Flower<S> {
     const NSID: &'static str = "coop.hypha.spores.social.flower";
     type Record = FlowerRecord;
 }
@@ -92,7 +98,7 @@ impl Collection for FlowerRecord {
     type Record = FlowerRecord;
 }
 
-impl<'a> LexiconSchema for Flower<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Flower<S> {
     fn nsid() -> &'static str {
         "coop.hypha.spores.social.flower"
     }
@@ -154,7 +160,7 @@ pub mod flower_state {
 /// Builder for constructing an instance of this type
 pub struct FlowerBuilder<'a, S: flower_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Did<'a>>),
+    _fields: (Option<Datetime>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -203,7 +209,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> FlowerBuilder<'a, flower_state::SetSubject<S>> {
         self._fields.1 = Option::Some(value.into());
         FlowerBuilder {
@@ -229,13 +235,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Flower<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Flower<'a> {
         Flower {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

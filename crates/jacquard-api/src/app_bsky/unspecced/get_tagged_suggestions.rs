@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -28,36 +30,48 @@ use crate::app_bsky::unspecced::get_tagged_suggestions;
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedSuggestions;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTaggedSuggestionsOutput<'a> {
-    #[serde(borrow)]
-    pub suggestions: Vec<get_tagged_suggestions::Suggestion<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTaggedSuggestionsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub suggestions: Vec<get_tagged_suggestions::Suggestion<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Suggestion<'a> {
-    #[serde(borrow)]
-    pub subject: UriValue<'a>,
-    #[serde(borrow)]
-    pub subject_type: SuggestionSubjectType<'a>,
-    #[serde(borrow)]
-    pub tag: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Suggestion<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub subject: UriValue<S>,
+    pub subject_type: SuggestionSubjectType<S>,
+    pub tag: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SuggestionSubjectType<'a> {
+pub enum SuggestionSubjectType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Actor,
     Feed,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SuggestionSubjectType<'a> {
+impl<S: Bos<str> + AsRef<str>> SuggestionSubjectType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Actor => "actor",
@@ -65,70 +79,56 @@ impl<'a> SuggestionSubjectType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SuggestionSubjectType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "actor" => Self::Actor,
             "feed" => Self::Feed,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SuggestionSubjectType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "actor" => Self::Actor,
-            "feed" => Self::Feed,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SuggestionSubjectType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SuggestionSubjectType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for SuggestionSubjectType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SuggestionSubjectType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for SuggestionSubjectType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SuggestionSubjectType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SuggestionSubjectType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for SuggestionSubjectType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for SuggestionSubjectType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for SuggestionSubjectType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for SuggestionSubjectType<'_> {
-    type Output = SuggestionSubjectType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SuggestionSubjectType<S> {
+    type Output = SuggestionSubjectType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SuggestionSubjectType::Actor => SuggestionSubjectType::Actor,
@@ -145,8 +145,8 @@ pub struct GetTaggedSuggestionsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTaggedSuggestionsResponse {
     const NSID: &'static str = "app.bsky.unspecced.getTaggedSuggestions";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTaggedSuggestionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetTaggedSuggestionsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetTaggedSuggestions {
@@ -160,11 +160,11 @@ pub struct GetTaggedSuggestionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedSuggestionsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getTaggedSuggestions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTaggedSuggestions;
+    type Request<S: Bos<str> + AsRef<str>> = GetTaggedSuggestions;
     type Response = GetTaggedSuggestionsResponse;
 }
 
-impl<'a> LexiconSchema for Suggestion<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Suggestion<S> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.getTaggedSuggestions"
     }
@@ -189,49 +189,49 @@ pub mod suggestion_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tag;
         type SubjectType;
+        type Tag;
         type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tag = Unset;
         type SubjectType = Unset;
+        type Tag = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Tag = Set<members::tag>;
-        type SubjectType = S::SubjectType;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `subject_type` field to Set
     pub struct SetSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubjectType<S> {}
     impl<S: State> State for SetSubjectType<S> {
-        type Tag = S::Tag;
         type SubjectType = Set<members::subject_type>;
+        type Tag = S::Tag;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type SubjectType = S::SubjectType;
+        type Tag = Set<members::tag>;
         type Subject = S::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Tag = S::Tag;
         type SubjectType = S::SubjectType;
+        type Tag = S::Tag;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tag` field
-        pub struct tag(());
         ///Marker type for the `subject_type` field
         pub struct subject_type(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
         ///Marker type for the `subject` field
         pub struct subject(());
     }
@@ -240,11 +240,7 @@ pub mod suggestion_state {
 /// Builder for constructing an instance of this type
 pub struct SuggestionBuilder<'a, S: suggestion_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<UriValue<'a>>,
-        Option<SuggestionSubjectType<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<UriValue<S>>, Option<SuggestionSubjectType<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -274,7 +270,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> SuggestionBuilder<'a, suggestion_state::SetSubject<S>> {
         self._fields.0 = Option::Some(value.into());
         SuggestionBuilder {
@@ -293,7 +289,7 @@ where
     /// Set the `subjectType` field (required)
     pub fn subject_type(
         mut self,
-        value: impl Into<SuggestionSubjectType<'a>>,
+        value: impl Into<SuggestionSubjectType<S>>,
     ) -> SuggestionBuilder<'a, suggestion_state::SetSubjectType<S>> {
         self._fields.1 = Option::Some(value.into());
         SuggestionBuilder {
@@ -312,7 +308,7 @@ where
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SuggestionBuilder<'a, suggestion_state::SetTag<S>> {
         self._fields.2 = Option::Some(value.into());
         SuggestionBuilder {
@@ -326,8 +322,8 @@ where
 impl<'a, S> SuggestionBuilder<'a, S>
 where
     S: suggestion_state::State,
-    S::Tag: suggestion_state::IsSet,
     S::SubjectType: suggestion_state::IsSet,
+    S::Tag: suggestion_state::IsSet,
     S::Subject: suggestion_state::IsSet,
 {
     /// Build the final struct
@@ -342,10 +338,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Suggestion<'a> {
         Suggestion {
             subject: self._fields.0.unwrap(),

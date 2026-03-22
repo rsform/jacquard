@@ -10,26 +10,34 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateEmail<'a> {
-    #[serde(borrow)]
-    pub email: CowStr<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateEmail<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub email: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email_auth_factor: Option<bool>,
     ///Requires a token from com.atproto.sever.requestEmailUpdate if the account's email has been confirmed.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub token: Option<CowStr<'a>>,
+    pub token: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -38,22 +46,23 @@ pub struct UpdateEmail<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UpdateEmailError<'a> {
+pub enum UpdateEmailError {
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(Option<CowStr<'a>>),
+    ExpiredToken(Option<SmolStr>),
     #[serde(rename = "InvalidToken")]
-    InvalidToken(Option<CowStr<'a>>),
+    InvalidToken(Option<SmolStr>),
     #[serde(rename = "TokenRequired")]
-    TokenRequired(Option<CowStr<'a>>),
+    TokenRequired(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for UpdateEmailError<'_> {
+impl core::fmt::Display for UpdateEmailError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::ExpiredToken(msg) => {
@@ -77,7 +86,13 @@ impl core::fmt::Display for UpdateEmailError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -87,11 +102,12 @@ pub struct UpdateEmailResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateEmailResponse {
     const NSID: &'static str = "com.atproto.server.updateEmail";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = UpdateEmailError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = UpdateEmailError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateEmail<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for UpdateEmail<S> {
     const NSID: &'static str = "com.atproto.server.updateEmail";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -106,6 +122,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateEmailRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = UpdateEmail<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = UpdateEmail<S>;
     type Response = UpdateEmailResponse;
 }

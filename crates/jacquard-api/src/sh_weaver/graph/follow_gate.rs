@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,10 +29,17 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Settings controlling follow approval behavior. Absence means auto-accept.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.weaver.graph.followGate", tag = "$type")]
-pub struct FollowGate<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.weaver.graph.followGate",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FollowGate<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///If true, previously auto-accepted follows are invalidated when requireApproval is enabled. Appview should treat followAccept records created before this gate's createdAt as invalid.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -40,27 +49,30 @@ pub struct FollowGate<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_follow_gate_require_approval")]
     pub require_approval: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct FollowGateGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FollowGateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: FollowGate<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: FollowGate<S>,
 }
 
-impl<'a> FollowGate<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, FollowGateRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> FollowGate<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, FollowGateRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -71,18 +83,17 @@ pub struct FollowGateRecord;
 impl XrpcResp for FollowGateRecord {
     const NSID: &'static str = "sh.weaver.graph.followGate";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = FollowGateGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = FollowGateGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<FollowGateGetRecordOutput<'_>> for FollowGate<'_> {
-    fn from(output: FollowGateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<FollowGateGetRecordOutput<S>> for FollowGate<S> {
+    fn from(output: FollowGateGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for FollowGate<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for FollowGate<S> {
     const NSID: &'static str = "sh.weaver.graph.followGate";
     type Record = FollowGateRecord;
 }
@@ -92,7 +103,7 @@ impl Collection for FollowGateRecord {
     type Record = FollowGateRecord;
 }
 
-impl<'a> LexiconSchema for FollowGate<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FollowGate<S> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.followGate"
     }
@@ -234,10 +245,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> FollowGate<'a> {
         FollowGate {
             created_at: self._fields.0.unwrap(),

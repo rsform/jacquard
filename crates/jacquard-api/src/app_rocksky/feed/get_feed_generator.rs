@@ -10,26 +10,43 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::feed::FeedGeneratorView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetFeedGenerator<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetFeedGenerator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub feed: AtUri<'a>,
+    pub feed: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetFeedGeneratorOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetFeedGeneratorOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub view: Option<FeedGeneratorView<'a>>,
+    pub view: Option<FeedGeneratorView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.feed.getFeedGenerator
@@ -37,11 +54,12 @@ pub struct GetFeedGeneratorResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFeedGeneratorResponse {
     const NSID: &'static str = "app.rocksky.feed.getFeedGenerator";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFeedGeneratorOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetFeedGeneratorOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetFeedGenerator<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetFeedGenerator<S> {
     const NSID: &'static str = "app.rocksky.feed.getFeedGenerator";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetFeedGeneratorResponse;
@@ -52,7 +70,7 @@ pub struct GetFeedGeneratorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.feed.getFeedGenerator";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFeedGenerator<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetFeedGenerator<S>;
     type Response = GetFeedGeneratorResponse;
 }
 
@@ -91,7 +109,7 @@ pub mod get_feed_generator_state {
 /// Builder for constructing an instance of this type
 pub struct GetFeedGeneratorBuilder<'a, S: get_feed_generator_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -121,7 +139,7 @@ where
     /// Set the `feed` field (required)
     pub fn feed(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetFeedGeneratorBuilder<'a, get_feed_generator_state::SetFeed<S>> {
         self._fields.0 = Option::Some(value.into());
         GetFeedGeneratorBuilder {

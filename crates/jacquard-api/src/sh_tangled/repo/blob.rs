@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,79 +26,90 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::sh_tangled::repo::blob;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LastCommit<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LastCommit<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<blob::Signature<'a>>,
+    pub author: Option<blob::Signature<S>>,
     ///Commit hash
-    #[serde(borrow)]
-    pub hash: CowStr<'a>,
+    pub hash: S,
     ///Commit message
-    #[serde(borrow)]
-    pub message: CowStr<'a>,
+    pub message: S,
     ///Commit timestamp
     pub when: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Blob<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Blob<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub path: CowStr<'a>,
+    pub path: S,
     /// Defaults to `false`.
     #[serde(default = "_default_raw")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub raw: Option<bool>,
     #[serde(borrow)]
-    pub r#ref: CowStr<'a>,
+    pub r#ref: S,
     #[serde(borrow)]
-    pub repo: CowStr<'a>,
+    pub repo: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct BlobOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BlobOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///File content (base64 encoded for binary files)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content: Option<CowStr<'a>>,
+    pub content: Option<S>,
     ///Content encoding
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding: Option<CowStr<'a>>,
+    pub encoding: Option<S>,
     ///Whether the file is binary
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_binary: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub last_commit: Option<blob::LastCommit<'a>>,
+    pub last_commit: Option<blob::LastCommit<S>>,
     ///MIME type of the file
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mime_type: Option<CowStr<'a>>,
+    pub mime_type: Option<S>,
     ///The file path
-    #[serde(borrow)]
-    pub path: CowStr<'a>,
+    pub path: S,
     ///The git reference used
-    #[serde(borrow)]
-    pub r#ref: CowStr<'a>,
+    pub r#ref: S,
     ///File size in bytes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<i64>,
     ///Submodule information if path is a submodule
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub submodule: Option<blob::Submodule<'a>>,
+    pub submodule: Option<blob::Submodule<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -105,28 +118,29 @@ pub struct BlobOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum BlobError<'a> {
+pub enum BlobError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<SmolStr>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(Option<CowStr<'a>>),
+    RefNotFound(Option<SmolStr>),
     /// File not found at the specified path
     #[serde(rename = "FileNotFound")]
-    FileNotFound(Option<CowStr<'a>>),
+    FileNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for BlobError<'_> {
+impl core::fmt::Display for BlobError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -157,44 +171,59 @@ impl core::fmt::Display for BlobError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Signature<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Signature<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Author email
-    #[serde(borrow)]
-    pub email: CowStr<'a>,
+    pub email: S,
     ///Author name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Author timestamp
     pub when: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Submodule<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Submodule<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Branch to track in the submodule
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub branch: Option<CowStr<'a>>,
+    pub branch: Option<S>,
     ///Submodule name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Submodule repository URL
-    #[serde(borrow)]
-    pub url: CowStr<'a>,
+    pub url: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for LastCommit<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LastCommit<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.blob"
     }
@@ -214,11 +243,12 @@ pub struct BlobResponse;
 impl jacquard_common::xrpc::XrpcResp for BlobResponse {
     const NSID: &'static str = "sh.tangled.repo.blob";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BlobOutput<'de>;
-    type Err<'de> = BlobError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BlobOutput<S>;
+    type Err = BlobError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Blob<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Blob<S> {
     const NSID: &'static str = "sh.tangled.repo.blob";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = BlobResponse;
@@ -229,11 +259,11 @@ pub struct BlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BlobRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.blob";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Blob<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Blob<S>;
     type Response = BlobResponse;
 }
 
-impl<'a> LexiconSchema for Signature<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Signature<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.blob"
     }
@@ -248,7 +278,7 @@ impl<'a> LexiconSchema for Signature<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Submodule<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Submodule<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.blob"
     }
@@ -273,63 +303,58 @@ pub mod last_commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type When;
         type Hash;
         type Message;
-        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type When = Unset;
         type Hash = Unset;
         type Message = Unset;
-        type When = Unset;
-    }
-    ///State transition - sets the `hash` field to Set
-    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHash<S> {}
-    impl<S: State> State for SetHash<S> {
-        type Hash = Set<members::hash>;
-        type Message = S::Message;
-        type When = S::When;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Hash = S::Hash;
-        type Message = Set<members::message>;
-        type When = S::When;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
+        type When = Set<members::when>;
         type Hash = S::Hash;
         type Message = S::Message;
-        type When = Set<members::when>;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHash<S> {}
+    impl<S: State> State for SetHash<S> {
+        type When = S::When;
+        type Hash = Set<members::hash>;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type When = S::When;
+        type Hash = S::Hash;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `when` field
+        pub struct when(());
         ///Marker type for the `hash` field
         pub struct hash(());
         ///Marker type for the `message` field
         pub struct message(());
-        ///Marker type for the `when` field
-        pub struct when(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LastCommitBuilder<'a, S: last_commit_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<blob::Signature<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<blob::Signature<S>>, Option<S>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -353,12 +378,12 @@ impl<'a> LastCommitBuilder<'a, last_commit_state::Empty> {
 
 impl<'a, S: last_commit_state::State> LastCommitBuilder<'a, S> {
     /// Set the `author` field (optional)
-    pub fn author(mut self, value: impl Into<Option<blob::Signature<'a>>>) -> Self {
+    pub fn author(mut self, value: impl Into<Option<blob::Signature<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
-    pub fn maybe_author(mut self, value: Option<blob::Signature<'a>>) -> Self {
+    pub fn maybe_author(mut self, value: Option<blob::Signature<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -372,7 +397,7 @@ where
     /// Set the `hash` field (required)
     pub fn hash(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LastCommitBuilder<'a, last_commit_state::SetHash<S>> {
         self._fields.1 = Option::Some(value.into());
         LastCommitBuilder {
@@ -391,7 +416,7 @@ where
     /// Set the `message` field (required)
     pub fn message(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LastCommitBuilder<'a, last_commit_state::SetMessage<S>> {
         self._fields.2 = Option::Some(value.into());
         LastCommitBuilder {
@@ -424,9 +449,9 @@ where
 impl<'a, S> LastCommitBuilder<'a, S>
 where
     S: last_commit_state::State,
+    S::When: last_commit_state::IsSet,
     S::Hash: last_commit_state::IsSet,
     S::Message: last_commit_state::IsSet,
-    S::When: last_commit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LastCommit<'a> {
@@ -441,10 +466,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LastCommit<'a> {
         LastCommit {
             author: self._fields.0,
@@ -669,58 +691,58 @@ pub mod blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
-        type Path;
         type Repo;
+        type Path;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
-        type Path = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type Path = S::Path;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
-        type Ref = S::Ref;
-        type Path = Set<members::path>;
-        type Repo = S::Repo;
+        type Path = Unset;
+        type Ref = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Ref = S::Ref;
-        type Path = S::Path;
         type Repo = Set<members::repo>;
+        type Path = S::Path;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type Repo = S::Repo;
+        type Path = Set<members::path>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Repo = S::Repo;
+        type Path = S::Path;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
-        ///Marker type for the `path` field
-        pub struct path(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `path` field
+        pub struct path(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BlobBuilder<'a, S: blob_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<bool>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<bool>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -750,7 +772,7 @@ where
     /// Set the `path` field (required)
     pub fn path(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BlobBuilder<'a, blob_state::SetPath<S>> {
         self._fields.0 = Option::Some(value.into());
         BlobBuilder {
@@ -782,7 +804,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BlobBuilder<'a, blob_state::SetRef<S>> {
         self._fields.2 = Option::Some(value.into());
         BlobBuilder {
@@ -801,7 +823,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BlobBuilder<'a, blob_state::SetRepo<S>> {
         self._fields.3 = Option::Some(value.into());
         BlobBuilder {
@@ -815,9 +837,9 @@ where
 impl<'a, S> BlobBuilder<'a, S>
 where
     S: blob_state::State,
-    S::Ref: blob_state::IsSet,
-    S::Path: blob_state::IsSet,
     S::Repo: blob_state::IsSet,
+    S::Path: blob_state::IsSet,
+    S::Ref: blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Blob<'a> {
@@ -891,7 +913,7 @@ pub mod signature_state {
 /// Builder for constructing an instance of this type
 pub struct SignatureBuilder<'a, S: signature_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _fields: (Option<S>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -921,7 +943,7 @@ where
     /// Set the `email` field (required)
     pub fn email(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SignatureBuilder<'a, signature_state::SetEmail<S>> {
         self._fields.0 = Option::Some(value.into());
         SignatureBuilder {
@@ -940,7 +962,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SignatureBuilder<'a, signature_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         SignatureBuilder {
@@ -989,10 +1011,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Signature<'a> {
         Signature {
             email: self._fields.0.unwrap(),

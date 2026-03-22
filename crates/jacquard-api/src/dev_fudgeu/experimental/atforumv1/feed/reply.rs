@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,42 +29,46 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// An initial post that starts a discussion
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "dev.fudgeu.experimental.atforumv1.feed.reply",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Reply<'a> {
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
+pub struct Reply<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub content: S,
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub root: AtUri<'a>,
+    pub root: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReplyGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReplyGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Reply<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Reply<S>,
 }
 
-impl<'a> Reply<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ReplyRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Reply<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ReplyRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -73,18 +79,17 @@ pub struct ReplyRecord;
 impl XrpcResp for ReplyRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.feed.reply";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReplyGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ReplyGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ReplyGetRecordOutput<'_>> for Reply<'_> {
-    fn from(output: ReplyGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ReplyGetRecordOutput<S>> for Reply<S> {
+    fn from(output: ReplyGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Reply<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Reply<S> {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.feed.reply";
     type Record = ReplyRecord;
 }
@@ -94,7 +99,7 @@ impl Collection for ReplyRecord {
     type Record = ReplyRecord;
 }
 
-impl<'a> LexiconSchema for Reply<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Reply<S> {
     fn nsid() -> &'static str {
         "dev.fudgeu.experimental.atforumv1.feed.reply"
     }
@@ -130,49 +135,49 @@ pub mod reply_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Content;
+        type CreatedAt;
         type Root;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Content = Unset;
+        type CreatedAt = Unset;
         type Root = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
-        type Root = S::Root;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
         type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+        type Root = S::Root;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
         type Root = S::Root;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoot<S> {}
     impl<S: State> State for SetRoot<S> {
-        type CreatedAt = S::CreatedAt;
         type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
         type Root = Set<members::root>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `root` field
         pub struct root(());
     }
@@ -181,7 +186,7 @@ pub mod reply_state {
 /// Builder for constructing an instance of this type
 pub struct ReplyBuilder<'a, S: reply_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Datetime>, Option<AtUri<'a>>, Option<Datetime>),
+    _fields: (Option<S>, Option<Datetime>, Option<AtUri<S>>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -211,7 +216,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReplyBuilder<'a, reply_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         ReplyBuilder {
@@ -249,7 +254,7 @@ where
     /// Set the `root` field (required)
     pub fn root(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ReplyBuilder<'a, reply_state::SetRoot<S>> {
         self._fields.2 = Option::Some(value.into());
         ReplyBuilder {
@@ -276,8 +281,8 @@ impl<'a, S: reply_state::State> ReplyBuilder<'a, S> {
 impl<'a, S> ReplyBuilder<'a, S>
 where
     S: reply_state::State,
-    S::CreatedAt: reply_state::IsSet,
     S::Content: reply_state::IsSet,
+    S::CreatedAt: reply_state::IsSet,
     S::Root: reply_state::IsSet,
 {
     /// Build the final struct
@@ -291,13 +296,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Reply<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Reply<'a> {
         Reply {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

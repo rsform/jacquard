@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -34,2630 +35,4103 @@ use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
 /// A recipe. For dietary restrictions covered by the recipe, a few common restrictions are enumerated via [[suitableForDiet]]. The [[keywords]] property can also be used to add more detail.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Embedded<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub about: Option<EmbeddedAbout<'a>>,
+    pub about: Option<EmbeddedAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#abstract: Option<EmbeddedAbstract<'a>>,
+    pub r#abstract: Option<EmbeddedAbstract<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode: Option<EmbeddedAccessMode<'a>>,
+    pub access_mode: Option<EmbeddedAccessMode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode_sufficient: Option<EmbeddedAccessModeSufficient<'a>>,
+    pub access_mode_sufficient: Option<EmbeddedAccessModeSufficient<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_api: Option<EmbeddedAccessibilityApi<'a>>,
+    pub accessibility_api: Option<EmbeddedAccessibilityApi<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_control: Option<EmbeddedAccessibilityControl<'a>>,
+    pub accessibility_control: Option<EmbeddedAccessibilityControl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_feature: Option<EmbeddedAccessibilityFeature<'a>>,
+    pub accessibility_feature: Option<EmbeddedAccessibilityFeature<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_hazard: Option<EmbeddedAccessibilityHazard<'a>>,
+    pub accessibility_hazard: Option<EmbeddedAccessibilityHazard<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_summary: Option<EmbeddedAccessibilitySummary<'a>>,
+    pub accessibility_summary: Option<EmbeddedAccessibilitySummary<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accountable_person: Option<EmbeddedAccountablePerson<'a>>,
+    pub accountable_person: Option<EmbeddedAccountablePerson<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub acquire_license_page: Option<EmbeddedAcquireLicensePage<'a>>,
+    pub acquire_license_page: Option<EmbeddedAcquireLicensePage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<EmbeddedAdditionalType<'a>>,
+    pub additional_type: Option<EmbeddedAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<EmbeddedAggregateRating<'a>>,
+    pub aggregate_rating: Option<EmbeddedAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<EmbeddedAlternateName<'a>>,
+    pub alternate_name: Option<EmbeddedAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternative_headline: Option<EmbeddedAlternativeHeadline<'a>>,
+    pub alternative_headline: Option<EmbeddedAlternativeHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub archived_at: Option<EmbeddedArchivedAt<'a>>,
+    pub archived_at: Option<EmbeddedArchivedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub assesses: Option<EmbeddedAssesses<'a>>,
+    pub assesses: Option<EmbeddedAssesses<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_media: Option<EmbeddedAssociatedMedia<'a>>,
+    pub associated_media: Option<EmbeddedAssociatedMedia<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audience: Option<EmbeddedAudience<'a>>,
+    pub audience: Option<EmbeddedAudience<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audio: Option<EmbeddedAudio<'a>>,
+    pub audio: Option<EmbeddedAudio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<EmbeddedAuthor<'a>>,
+    pub author: Option<EmbeddedAuthor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<EmbeddedAward<'a>>,
+    pub award: Option<EmbeddedAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<EmbeddedAwards<'a>>,
+    pub awards: Option<EmbeddedAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub character: Option<EmbeddedCharacter<'a>>,
+    pub character: Option<EmbeddedCharacter<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub citation: Option<EmbeddedCitation<'a>>,
+    pub citation: Option<EmbeddedCitation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<EmbeddedComment<'a>>,
+    pub comment: Option<EmbeddedComment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment_count: Option<EmbeddedCommentCount<'a>>,
+    pub comment_count: Option<EmbeddedCommentCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub conditions_of_access: Option<EmbeddedConditionsOfAccess<'a>>,
+    pub conditions_of_access: Option<EmbeddedConditionsOfAccess<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_location: Option<EmbeddedContentLocation<'a>>,
+    pub content_location: Option<EmbeddedContentLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_rating: Option<EmbeddedContentRating<'a>>,
+    pub content_rating: Option<EmbeddedContentRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_reference_time: Option<EmbeddedContentReferenceTime<'a>>,
+    pub content_reference_time: Option<EmbeddedContentReferenceTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contributor: Option<EmbeddedContributor<'a>>,
+    pub contributor: Option<EmbeddedContributor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cook_time: Option<EmbeddedCookTime<'a>>,
+    pub cook_time: Option<EmbeddedCookTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cooking_method: Option<EmbeddedCookingMethod<'a>>,
+    pub cooking_method: Option<EmbeddedCookingMethod<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_holder: Option<EmbeddedCopyrightHolder<'a>>,
+    pub copyright_holder: Option<EmbeddedCopyrightHolder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_notice: Option<EmbeddedCopyrightNotice<'a>>,
+    pub copyright_notice: Option<EmbeddedCopyrightNotice<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_year: Option<EmbeddedCopyrightYear<'a>>,
+    pub copyright_year: Option<EmbeddedCopyrightYear<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub correction: Option<EmbeddedCorrection<'a>>,
+    pub correction: Option<EmbeddedCorrection<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_origin: Option<EmbeddedCountryOfOrigin<'a>>,
+    pub country_of_origin: Option<EmbeddedCountryOfOrigin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creative_work_status: Option<EmbeddedCreativeWorkStatus<'a>>,
+    pub creative_work_status: Option<EmbeddedCreativeWorkStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creator: Option<EmbeddedCreator<'a>>,
+    pub creator: Option<EmbeddedCreator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub credit_text: Option<EmbeddedCreditText<'a>>,
+    pub credit_text: Option<EmbeddedCreditText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_created: Option<EmbeddedDateCreated<'a>>,
+    pub date_created: Option<EmbeddedDateCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_modified: Option<EmbeddedDateModified<'a>>,
+    pub date_modified: Option<EmbeddedDateModified<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_published: Option<EmbeddedDatePublished<'a>>,
+    pub date_published: Option<EmbeddedDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<EmbeddedDescription<'a>>,
+    pub description: Option<EmbeddedDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub digital_source_type: Option<EmbeddedDigitalSourceType<'a>>,
+    pub digital_source_type: Option<EmbeddedDigitalSourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub discussion_url: Option<EmbeddedDiscussionUrl<'a>>,
+    pub discussion_url: Option<EmbeddedDiscussionUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub edit_eidr: Option<EmbeddedEditEidr<'a>>,
+    pub edit_eidr: Option<EmbeddedEditEidr<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub editor: Option<EmbeddedEditor<'a>>,
+    pub editor: Option<EmbeddedEditor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_alignment: Option<EmbeddedEducationalAlignment<'a>>,
+    pub educational_alignment: Option<EmbeddedEducationalAlignment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_level: Option<EmbeddedEducationalLevel<'a>>,
+    pub educational_level: Option<EmbeddedEducationalLevel<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_use: Option<EmbeddedEducationalUse<'a>>,
+    pub educational_use: Option<EmbeddedEducationalUse<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding: Option<EmbeddedEncoding<'a>>,
+    pub encoding: Option<EmbeddedEncoding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding_format: Option<EmbeddedEncodingFormat<'a>>,
+    pub encoding_format: Option<EmbeddedEncodingFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encodings: Option<EmbeddedEncodings<'a>>,
+    pub encodings: Option<EmbeddedEncodings<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub estimated_cost: Option<EmbeddedEstimatedCost<'a>>,
+    pub estimated_cost: Option<EmbeddedEstimatedCost<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub example_of_work: Option<EmbeddedExampleOfWork<'a>>,
+    pub example_of_work: Option<EmbeddedExampleOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub expires: Option<EmbeddedExpires<'a>>,
+    pub expires: Option<EmbeddedExpires<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub file_format: Option<EmbeddedFileFormat<'a>>,
+    pub file_format: Option<EmbeddedFileFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funder: Option<EmbeddedFunder<'a>>,
+    pub funder: Option<EmbeddedFunder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<EmbeddedFunding<'a>>,
+    pub funding: Option<EmbeddedFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genre: Option<EmbeddedGenre<'a>>,
+    pub genre: Option<EmbeddedGenre<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_part: Option<EmbeddedHasPart<'a>>,
+    pub has_part: Option<EmbeddedHasPart<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub headline: Option<EmbeddedHeadline<'a>>,
+    pub headline: Option<EmbeddedHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<EmbeddedIdentifier<'a>>,
+    pub identifier: Option<EmbeddedIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<EmbeddedImage<'a>>,
+    pub image: Option<EmbeddedImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub in_language: Option<EmbeddedInLanguage<'a>>,
+    pub in_language: Option<EmbeddedInLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ingredients: Option<EmbeddedIngredients<'a>>,
+    pub ingredients: Option<EmbeddedIngredients<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interaction_statistic: Option<EmbeddedInteractionStatistic<'a>>,
+    pub interaction_statistic: Option<EmbeddedInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interactivity_type: Option<EmbeddedInteractivityType<'a>>,
+    pub interactivity_type: Option<EmbeddedInteractivityType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interpreted_as_claim: Option<EmbeddedInterpretedAsClaim<'a>>,
+    pub interpreted_as_claim: Option<EmbeddedInterpretedAsClaim<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_accessible_for_free: Option<EmbeddedIsAccessibleForFree<'a>>,
+    pub is_accessible_for_free: Option<EmbeddedIsAccessibleForFree<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on: Option<EmbeddedIsBasedOn<'a>>,
+    pub is_based_on: Option<EmbeddedIsBasedOn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on_url: Option<EmbeddedIsBasedOnUrl<'a>>,
+    pub is_based_on_url: Option<EmbeddedIsBasedOnUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_family_friendly: Option<EmbeddedIsFamilyFriendly<'a>>,
+    pub is_family_friendly: Option<EmbeddedIsFamilyFriendly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_part_of: Option<EmbeddedIsPartOf<'a>>,
+    pub is_part_of: Option<EmbeddedIsPartOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<EmbeddedKeywords<'a>>,
+    pub keywords: Option<EmbeddedKeywords<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub learning_resource_type: Option<EmbeddedLearningResourceType<'a>>,
+    pub learning_resource_type: Option<EmbeddedLearningResourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub license: Option<EmbeddedLicense<'a>>,
+    pub license: Option<EmbeddedLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location_created: Option<EmbeddedLocationCreated<'a>>,
+    pub location_created: Option<EmbeddedLocationCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity: Option<EmbeddedMainEntity<'a>>,
+    pub main_entity: Option<EmbeddedMainEntity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub maintainer: Option<EmbeddedMaintainer<'a>>,
+    pub maintainer: Option<EmbeddedMaintainer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material: Option<EmbeddedMaterial<'a>>,
+    pub material: Option<EmbeddedMaterial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material_extent: Option<EmbeddedMaterialExtent<'a>>,
+    pub material_extent: Option<EmbeddedMaterialExtent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mentions: Option<EmbeddedMentions<'a>>,
+    pub mentions: Option<EmbeddedMentions<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<EmbeddedName<'a>>,
+    pub name: Option<EmbeddedName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub nutrition: Option<EmbeddedNutrition<'a>>,
+    pub nutrition: Option<EmbeddedNutrition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub offers: Option<EmbeddedOffers<'a>>,
+    pub offers: Option<EmbeddedOffers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pattern: Option<EmbeddedPattern<'a>>,
+    pub pattern: Option<EmbeddedPattern<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub perform_time: Option<EmbeddedPerformTime<'a>>,
+    pub perform_time: Option<EmbeddedPerformTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub position: Option<EmbeddedPosition<'a>>,
+    pub position: Option<EmbeddedPosition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<EmbeddedPotentialAction<'a>>,
+    pub potential_action: Option<EmbeddedPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub prep_time: Option<EmbeddedPrepTime<'a>>,
+    pub prep_time: Option<EmbeddedPrepTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub producer: Option<EmbeddedProducer<'a>>,
+    pub producer: Option<EmbeddedProducer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub provider: Option<EmbeddedProvider<'a>>,
+    pub provider: Option<EmbeddedProvider<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publication: Option<EmbeddedPublication<'a>>,
+    pub publication: Option<EmbeddedPublication<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher: Option<EmbeddedPublisher<'a>>,
+    pub publisher: Option<EmbeddedPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher_imprint: Option<EmbeddedPublisherImprint<'a>>,
+    pub publisher_imprint: Option<EmbeddedPublisherImprint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publishing_principles: Option<EmbeddedPublishingPrinciples<'a>>,
+    pub publishing_principles: Option<EmbeddedPublishingPrinciples<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recipe_category: Option<EmbeddedRecipeCategory<'a>>,
+    pub recipe_category: Option<EmbeddedRecipeCategory<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recipe_cuisine: Option<EmbeddedRecipeCuisine<'a>>,
+    pub recipe_cuisine: Option<EmbeddedRecipeCuisine<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recipe_ingredient: Option<EmbeddedRecipeIngredient<'a>>,
+    pub recipe_ingredient: Option<EmbeddedRecipeIngredient<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recipe_instructions: Option<EmbeddedRecipeInstructions<'a>>,
+    pub recipe_instructions: Option<EmbeddedRecipeInstructions<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recipe_yield: Option<EmbeddedRecipeYield<'a>>,
+    pub recipe_yield: Option<EmbeddedRecipeYield<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recorded_at: Option<EmbeddedRecordedAt<'a>>,
+    pub recorded_at: Option<EmbeddedRecordedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub released_event: Option<EmbeddedReleasedEvent<'a>>,
+    pub released_event: Option<EmbeddedReleasedEvent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<EmbeddedReview<'a>>,
+    pub review: Option<EmbeddedReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<EmbeddedReviews<'a>>,
+    pub reviews: Option<EmbeddedReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<EmbeddedSameAs<'a>>,
+    pub same_as: Option<EmbeddedSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub schema_version: Option<EmbeddedSchemaVersion<'a>>,
+    pub schema_version: Option<EmbeddedSchemaVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_date_published: Option<EmbeddedSdDatePublished<'a>>,
+    pub sd_date_published: Option<EmbeddedSdDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_license: Option<EmbeddedSdLicense<'a>>,
+    pub sd_license: Option<EmbeddedSdLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_publisher: Option<EmbeddedSdPublisher<'a>>,
+    pub sd_publisher: Option<EmbeddedSdPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub size: Option<EmbeddedSize<'a>>,
+    pub size: Option<EmbeddedSize<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_organization: Option<EmbeddedSourceOrganization<'a>>,
+    pub source_organization: Option<EmbeddedSourceOrganization<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial: Option<EmbeddedSpatial<'a>>,
+    pub spatial: Option<EmbeddedSpatial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial_coverage: Option<EmbeddedSpatialCoverage<'a>>,
+    pub spatial_coverage: Option<EmbeddedSpatialCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sponsor: Option<EmbeddedSponsor<'a>>,
+    pub sponsor: Option<EmbeddedSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub step: Option<EmbeddedStep<'a>>,
+    pub step: Option<EmbeddedStep<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub steps: Option<EmbeddedSteps<'a>>,
+    pub steps: Option<EmbeddedSteps<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<EmbeddedSubjectOf<'a>>,
+    pub subject_of: Option<EmbeddedSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub suitable_for_diet: Option<EmbeddedSuitableForDiet<'a>>,
+    pub suitable_for_diet: Option<EmbeddedSuitableForDiet<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub supply: Option<EmbeddedSupply<'a>>,
+    pub supply: Option<EmbeddedSupply<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub teaches: Option<EmbeddedTeaches<'a>>,
+    pub teaches: Option<EmbeddedTeaches<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal: Option<EmbeddedTemporal<'a>>,
+    pub temporal: Option<EmbeddedTemporal<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal_coverage: Option<EmbeddedTemporalCoverage<'a>>,
+    pub temporal_coverage: Option<EmbeddedTemporalCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<EmbeddedText<'a>>,
+    pub text: Option<EmbeddedText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail: Option<EmbeddedThumbnail<'a>>,
+    pub thumbnail: Option<EmbeddedThumbnail<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail_url: Option<EmbeddedThumbnailUrl<'a>>,
+    pub thumbnail_url: Option<EmbeddedThumbnailUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub time_required: Option<EmbeddedTimeRequired<'a>>,
+    pub time_required: Option<EmbeddedTimeRequired<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tool: Option<EmbeddedTool<'a>>,
+    pub tool: Option<EmbeddedTool<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub total_time: Option<EmbeddedTotalTime<'a>>,
+    pub total_time: Option<EmbeddedTotalTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translation_of_work: Option<EmbeddedTranslationOfWork<'a>>,
+    pub translation_of_work: Option<EmbeddedTranslationOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translator: Option<EmbeddedTranslator<'a>>,
+    pub translator: Option<EmbeddedTranslator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub typical_age_range: Option<EmbeddedTypicalAgeRange<'a>>,
+    pub typical_age_range: Option<EmbeddedTypicalAgeRange<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<EmbeddedUrl<'a>>,
+    pub url: Option<EmbeddedUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub usage_info: Option<EmbeddedUsageInfo<'a>>,
+    pub usage_info: Option<EmbeddedUsageInfo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub version: Option<EmbeddedVersion<'a>>,
+    pub version: Option<EmbeddedVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub video: Option<EmbeddedVideo<'a>>,
+    pub video: Option<EmbeddedVideo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub word_count: Option<EmbeddedWordCount<'a>>,
+    pub word_count: Option<EmbeddedWordCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_example: Option<EmbeddedWorkExample<'a>>,
+    pub work_example: Option<EmbeddedWorkExample<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_translation: Option<EmbeddedWorkTranslation<'a>>,
+    pub work_translation: Option<EmbeddedWorkTranslation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#yield: Option<EmbeddedYield<'a>>,
+    pub r#yield: Option<EmbeddedYield<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAbout<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAbstract<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAbstract<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessMode<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessMode<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessModeSufficient<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessModeSufficient<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityApi<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityApi<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityControl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityControl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityFeature<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityFeature<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityHazard<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityHazard<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilitySummary<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilitySummary<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccountablePerson<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccountablePerson<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAcquireLicensePage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAcquireLicensePage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlternativeHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlternativeHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedArchivedAt<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedArchivedAt<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAssesses<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAssesses<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAssociatedMedia<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAssociatedMedia<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAudience<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAudio<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAudio<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAuthor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAuthor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCharacter<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCharacter<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCitation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCitation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedComment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedComment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCommentCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCommentCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedConditionsOfAccess<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedConditionsOfAccess<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentReferenceTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentReferenceTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContributor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContributor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCookTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCookTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCookingMethod<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCookingMethod<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCopyrightHolder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCopyrightHolder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCopyrightNotice<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCopyrightNotice<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCopyrightYear<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCopyrightYear<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCorrection<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCorrection<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCountryOfOrigin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCreativeWorkStatus<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCreativeWorkStatus<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCreator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCreator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCreditText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCreditText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDateCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDateCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDateModified<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDateModified<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDigitalSourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDigitalSourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDiscussionUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDiscussionUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEditEidr<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEditEidr<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEditor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEditor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEducationalAlignment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEducationalAlignment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEducationalLevel<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEducationalLevel<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEducationalUse<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEducationalUse<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEncoding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEncoding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEncodingFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEncodingFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEncodings<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEncodings<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEstimatedCost<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEstimatedCost<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedExampleOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedExampleOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedExpires<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedExpires<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFileFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFileFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFunder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGenre<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGenre<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasPart<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasPart<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIngredients<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIngredients<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInteractivityType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInteractivityType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInterpretedAsClaim<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInterpretedAsClaim<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsAccessibleForFree<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsAccessibleForFree<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsBasedOn<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsBasedOn<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsBasedOnUrl<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsBasedOnUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsFamilyFriendly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsPartOf<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsPartOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedKeywords<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLearningResourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLearningResourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLocationCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLocationCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMainEntity<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMainEntity<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaintainer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaintainer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaterial<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaterialExtent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaterialExtent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMentions<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMentions<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedNutrition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedNutrition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedOffers<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPattern<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPerformTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPerformTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPosition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPosition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPrepTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPrepTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedProducer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedProducer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedProvider<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedProvider<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublication<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublication<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublisherImprint<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublisherImprint<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublishingPrinciples<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedRecipeCategory<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedRecipeCategory<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedRecipeCuisine<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedRecipeCuisine<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedRecipeIngredient<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedRecipeIngredient<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedRecipeInstructions<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedRecipeInstructions<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedRecipeYield<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedRecipeYield<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedRecordedAt<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedRecordedAt<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReleasedEvent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReleasedEvent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSchemaVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSchemaVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSdDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSdDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSdLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSdLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSdPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSdPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSize<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSourceOrganization<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSourceOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSpatial<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSpatial<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSpatialCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSpatialCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSponsor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedStep<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedStep<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSteps<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSteps<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSuitableForDiet<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSuitableForDiet<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSupply<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSupply<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTeaches<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTeaches<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTemporal<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTemporal<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTemporalCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTemporalCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedThumbnail<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedThumbnail<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedThumbnailUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedThumbnailUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTimeRequired<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTimeRequired<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTool<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTool<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTotalTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTotalTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTranslationOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTranslationOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTranslator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTranslator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTypicalAgeRange<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTypicalAgeRange<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUsageInfo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUsageInfo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedVideo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedVideo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWordCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWordCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWorkExample<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWorkExample<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWorkTranslation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWorkTranslation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedYield<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedYield<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "social.flockfeeds.lexical.type.Recipe",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Recipe<'a> {
+pub struct Recipe<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub about: Option<RecipeAbout<'a>>,
+    pub about: Option<RecipeAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#abstract: Option<RecipeAbstract<'a>>,
+    pub r#abstract: Option<RecipeAbstract<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode: Option<RecipeAccessMode<'a>>,
+    pub access_mode: Option<RecipeAccessMode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode_sufficient: Option<RecipeAccessModeSufficient<'a>>,
+    pub access_mode_sufficient: Option<RecipeAccessModeSufficient<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_api: Option<RecipeAccessibilityApi<'a>>,
+    pub accessibility_api: Option<RecipeAccessibilityApi<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_control: Option<RecipeAccessibilityControl<'a>>,
+    pub accessibility_control: Option<RecipeAccessibilityControl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_feature: Option<RecipeAccessibilityFeature<'a>>,
+    pub accessibility_feature: Option<RecipeAccessibilityFeature<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_hazard: Option<RecipeAccessibilityHazard<'a>>,
+    pub accessibility_hazard: Option<RecipeAccessibilityHazard<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_summary: Option<RecipeAccessibilitySummary<'a>>,
+    pub accessibility_summary: Option<RecipeAccessibilitySummary<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accountable_person: Option<RecipeAccountablePerson<'a>>,
+    pub accountable_person: Option<RecipeAccountablePerson<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub acquire_license_page: Option<RecipeAcquireLicensePage<'a>>,
+    pub acquire_license_page: Option<RecipeAcquireLicensePage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<RecipeAdditionalType<'a>>,
+    pub additional_type: Option<RecipeAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<RecipeAggregateRating<'a>>,
+    pub aggregate_rating: Option<RecipeAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<RecipeAlternateName<'a>>,
+    pub alternate_name: Option<RecipeAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternative_headline: Option<RecipeAlternativeHeadline<'a>>,
+    pub alternative_headline: Option<RecipeAlternativeHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub archived_at: Option<RecipeArchivedAt<'a>>,
+    pub archived_at: Option<RecipeArchivedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub assesses: Option<RecipeAssesses<'a>>,
+    pub assesses: Option<RecipeAssesses<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_media: Option<RecipeAssociatedMedia<'a>>,
+    pub associated_media: Option<RecipeAssociatedMedia<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audience: Option<RecipeAudience<'a>>,
+    pub audience: Option<RecipeAudience<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audio: Option<RecipeAudio<'a>>,
+    pub audio: Option<RecipeAudio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<RecipeAuthor<'a>>,
+    pub author: Option<RecipeAuthor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<RecipeAward<'a>>,
+    pub award: Option<RecipeAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<RecipeAwards<'a>>,
+    pub awards: Option<RecipeAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub character: Option<RecipeCharacter<'a>>,
+    pub character: Option<RecipeCharacter<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub citation: Option<RecipeCitation<'a>>,
+    pub citation: Option<RecipeCitation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<RecipeComment<'a>>,
+    pub comment: Option<RecipeComment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment_count: Option<RecipeCommentCount<'a>>,
+    pub comment_count: Option<RecipeCommentCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub conditions_of_access: Option<RecipeConditionsOfAccess<'a>>,
+    pub conditions_of_access: Option<RecipeConditionsOfAccess<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_location: Option<RecipeContentLocation<'a>>,
+    pub content_location: Option<RecipeContentLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_rating: Option<RecipeContentRating<'a>>,
+    pub content_rating: Option<RecipeContentRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_reference_time: Option<RecipeContentReferenceTime<'a>>,
+    pub content_reference_time: Option<RecipeContentReferenceTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contributor: Option<RecipeContributor<'a>>,
+    pub contributor: Option<RecipeContributor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cook_time: Option<RecipeCookTime<'a>>,
+    pub cook_time: Option<RecipeCookTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cooking_method: Option<RecipeCookingMethod<'a>>,
+    pub cooking_method: Option<RecipeCookingMethod<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_holder: Option<RecipeCopyrightHolder<'a>>,
+    pub copyright_holder: Option<RecipeCopyrightHolder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_notice: Option<RecipeCopyrightNotice<'a>>,
+    pub copyright_notice: Option<RecipeCopyrightNotice<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_year: Option<RecipeCopyrightYear<'a>>,
+    pub copyright_year: Option<RecipeCopyrightYear<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub correction: Option<RecipeCorrection<'a>>,
+    pub correction: Option<RecipeCorrection<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_origin: Option<RecipeCountryOfOrigin<'a>>,
+    pub country_of_origin: Option<RecipeCountryOfOrigin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creative_work_status: Option<RecipeCreativeWorkStatus<'a>>,
+    pub creative_work_status: Option<RecipeCreativeWorkStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creator: Option<RecipeCreator<'a>>,
+    pub creator: Option<RecipeCreator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub credit_text: Option<RecipeCreditText<'a>>,
+    pub credit_text: Option<RecipeCreditText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_created: Option<RecipeDateCreated<'a>>,
+    pub date_created: Option<RecipeDateCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_modified: Option<RecipeDateModified<'a>>,
+    pub date_modified: Option<RecipeDateModified<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_published: Option<RecipeDatePublished<'a>>,
+    pub date_published: Option<RecipeDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<RecipeDescription<'a>>,
+    pub description: Option<RecipeDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub digital_source_type: Option<RecipeDigitalSourceType<'a>>,
+    pub digital_source_type: Option<RecipeDigitalSourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<RecipeDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<RecipeDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub discussion_url: Option<RecipeDiscussionUrl<'a>>,
+    pub discussion_url: Option<RecipeDiscussionUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub edit_eidr: Option<RecipeEditEidr<'a>>,
+    pub edit_eidr: Option<RecipeEditEidr<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub editor: Option<RecipeEditor<'a>>,
+    pub editor: Option<RecipeEditor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_alignment: Option<RecipeEducationalAlignment<'a>>,
+    pub educational_alignment: Option<RecipeEducationalAlignment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_level: Option<RecipeEducationalLevel<'a>>,
+    pub educational_level: Option<RecipeEducationalLevel<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_use: Option<RecipeEducationalUse<'a>>,
+    pub educational_use: Option<RecipeEducationalUse<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding: Option<RecipeEncoding<'a>>,
+    pub encoding: Option<RecipeEncoding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding_format: Option<RecipeEncodingFormat<'a>>,
+    pub encoding_format: Option<RecipeEncodingFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encodings: Option<RecipeEncodings<'a>>,
+    pub encodings: Option<RecipeEncodings<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub estimated_cost: Option<RecipeEstimatedCost<'a>>,
+    pub estimated_cost: Option<RecipeEstimatedCost<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub example_of_work: Option<RecipeExampleOfWork<'a>>,
+    pub example_of_work: Option<RecipeExampleOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub expires: Option<RecipeExpires<'a>>,
+    pub expires: Option<RecipeExpires<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub file_format: Option<RecipeFileFormat<'a>>,
+    pub file_format: Option<RecipeFileFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funder: Option<RecipeFunder<'a>>,
+    pub funder: Option<RecipeFunder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<RecipeFunding<'a>>,
+    pub funding: Option<RecipeFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genre: Option<RecipeGenre<'a>>,
+    pub genre: Option<RecipeGenre<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_part: Option<RecipeHasPart<'a>>,
+    pub has_part: Option<RecipeHasPart<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub headline: Option<RecipeHeadline<'a>>,
+    pub headline: Option<RecipeHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<RecipeIdentifier<'a>>,
+    pub identifier: Option<RecipeIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<RecipeImage<'a>>,
+    pub image: Option<RecipeImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub in_language: Option<RecipeInLanguage<'a>>,
+    pub in_language: Option<RecipeInLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ingredients: Option<RecipeIngredients<'a>>,
+    pub ingredients: Option<RecipeIngredients<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interaction_statistic: Option<RecipeInteractionStatistic<'a>>,
+    pub interaction_statistic: Option<RecipeInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interactivity_type: Option<RecipeInteractivityType<'a>>,
+    pub interactivity_type: Option<RecipeInteractivityType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interpreted_as_claim: Option<RecipeInterpretedAsClaim<'a>>,
+    pub interpreted_as_claim: Option<RecipeInterpretedAsClaim<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_accessible_for_free: Option<RecipeIsAccessibleForFree<'a>>,
+    pub is_accessible_for_free: Option<RecipeIsAccessibleForFree<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on: Option<RecipeIsBasedOn<'a>>,
+    pub is_based_on: Option<RecipeIsBasedOn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on_url: Option<RecipeIsBasedOnUrl<'a>>,
+    pub is_based_on_url: Option<RecipeIsBasedOnUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_family_friendly: Option<RecipeIsFamilyFriendly<'a>>,
+    pub is_family_friendly: Option<RecipeIsFamilyFriendly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_part_of: Option<RecipeIsPartOf<'a>>,
+    pub is_part_of: Option<RecipeIsPartOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<RecipeKeywords<'a>>,
+    pub keywords: Option<RecipeKeywords<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub learning_resource_type: Option<RecipeLearningResourceType<'a>>,
+    pub learning_resource_type: Option<RecipeLearningResourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub license: Option<RecipeLicense<'a>>,
+    pub license: Option<RecipeLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location_created: Option<RecipeLocationCreated<'a>>,
+    pub location_created: Option<RecipeLocationCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity: Option<RecipeMainEntity<'a>>,
+    pub main_entity: Option<RecipeMainEntity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<RecipeMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<RecipeMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub maintainer: Option<RecipeMaintainer<'a>>,
+    pub maintainer: Option<RecipeMaintainer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material: Option<RecipeMaterial<'a>>,
+    pub material: Option<RecipeMaterial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material_extent: Option<RecipeMaterialExtent<'a>>,
+    pub material_extent: Option<RecipeMaterialExtent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mentions: Option<RecipeMentions<'a>>,
+    pub mentions: Option<RecipeMentions<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<RecipeName<'a>>,
+    pub name: Option<RecipeName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub nutrition: Option<RecipeNutrition<'a>>,
+    pub nutrition: Option<RecipeNutrition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub offers: Option<RecipeOffers<'a>>,
+    pub offers: Option<RecipeOffers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pattern: Option<RecipePattern<'a>>,
+    pub pattern: Option<RecipePattern<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub perform_time: Option<RecipePerformTime<'a>>,
+    pub perform_time: Option<RecipePerformTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub position: Option<RecipePosition<'a>>,
+    pub position: Option<RecipePosition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<RecipePotentialAction<'a>>,
+    pub potential_action: Option<RecipePotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub prep_time: Option<RecipePrepTime<'a>>,
+    pub prep_time: Option<RecipePrepTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub producer: Option<RecipeProducer<'a>>,
+    pub producer: Option<RecipeProducer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub provider: Option<RecipeProvider<'a>>,
+    pub provider: Option<RecipeProvider<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publication: Option<RecipePublication<'a>>,
+    pub publication: Option<RecipePublication<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher: Option<RecipePublisher<'a>>,
+    pub publisher: Option<RecipePublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher_imprint: Option<RecipePublisherImprint<'a>>,
+    pub publisher_imprint: Option<RecipePublisherImprint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publishing_principles: Option<RecipePublishingPrinciples<'a>>,
+    pub publishing_principles: Option<RecipePublishingPrinciples<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recipe_category: Option<RecipeRecipeCategory<'a>>,
+    pub recipe_category: Option<RecipeRecipeCategory<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recipe_cuisine: Option<RecipeRecipeCuisine<'a>>,
+    pub recipe_cuisine: Option<RecipeRecipeCuisine<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recipe_ingredient: Option<RecipeRecipeIngredient<'a>>,
+    pub recipe_ingredient: Option<RecipeRecipeIngredient<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recipe_instructions: Option<RecipeRecipeInstructions<'a>>,
+    pub recipe_instructions: Option<RecipeRecipeInstructions<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recipe_yield: Option<RecipeRecipeYield<'a>>,
+    pub recipe_yield: Option<RecipeRecipeYield<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recorded_at: Option<RecipeRecordedAt<'a>>,
+    pub recorded_at: Option<RecipeRecordedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub released_event: Option<RecipeReleasedEvent<'a>>,
+    pub released_event: Option<RecipeReleasedEvent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<RecipeReview<'a>>,
+    pub review: Option<RecipeReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<RecipeReviews<'a>>,
+    pub reviews: Option<RecipeReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<RecipeSameAs<'a>>,
+    pub same_as: Option<RecipeSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub schema_version: Option<RecipeSchemaVersion<'a>>,
+    pub schema_version: Option<RecipeSchemaVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_date_published: Option<RecipeSdDatePublished<'a>>,
+    pub sd_date_published: Option<RecipeSdDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_license: Option<RecipeSdLicense<'a>>,
+    pub sd_license: Option<RecipeSdLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_publisher: Option<RecipeSdPublisher<'a>>,
+    pub sd_publisher: Option<RecipeSdPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub size: Option<RecipeSize<'a>>,
+    pub size: Option<RecipeSize<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_organization: Option<RecipeSourceOrganization<'a>>,
+    pub source_organization: Option<RecipeSourceOrganization<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial: Option<RecipeSpatial<'a>>,
+    pub spatial: Option<RecipeSpatial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial_coverage: Option<RecipeSpatialCoverage<'a>>,
+    pub spatial_coverage: Option<RecipeSpatialCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sponsor: Option<RecipeSponsor<'a>>,
+    pub sponsor: Option<RecipeSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub step: Option<RecipeStep<'a>>,
+    pub step: Option<RecipeStep<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub steps: Option<RecipeSteps<'a>>,
+    pub steps: Option<RecipeSteps<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<RecipeSubjectOf<'a>>,
+    pub subject_of: Option<RecipeSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub suitable_for_diet: Option<RecipeSuitableForDiet<'a>>,
+    pub suitable_for_diet: Option<RecipeSuitableForDiet<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub supply: Option<RecipeSupply<'a>>,
+    pub supply: Option<RecipeSupply<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub teaches: Option<RecipeTeaches<'a>>,
+    pub teaches: Option<RecipeTeaches<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal: Option<RecipeTemporal<'a>>,
+    pub temporal: Option<RecipeTemporal<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal_coverage: Option<RecipeTemporalCoverage<'a>>,
+    pub temporal_coverage: Option<RecipeTemporalCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<RecipeText<'a>>,
+    pub text: Option<RecipeText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail: Option<RecipeThumbnail<'a>>,
+    pub thumbnail: Option<RecipeThumbnail<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail_url: Option<RecipeThumbnailUrl<'a>>,
+    pub thumbnail_url: Option<RecipeThumbnailUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub time_required: Option<RecipeTimeRequired<'a>>,
+    pub time_required: Option<RecipeTimeRequired<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tool: Option<RecipeTool<'a>>,
+    pub tool: Option<RecipeTool<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub total_time: Option<RecipeTotalTime<'a>>,
+    pub total_time: Option<RecipeTotalTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translation_of_work: Option<RecipeTranslationOfWork<'a>>,
+    pub translation_of_work: Option<RecipeTranslationOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translator: Option<RecipeTranslator<'a>>,
+    pub translator: Option<RecipeTranslator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub typical_age_range: Option<RecipeTypicalAgeRange<'a>>,
+    pub typical_age_range: Option<RecipeTypicalAgeRange<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<RecipeUrl<'a>>,
+    pub url: Option<RecipeUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub usage_info: Option<RecipeUsageInfo<'a>>,
+    pub usage_info: Option<RecipeUsageInfo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub version: Option<RecipeVersion<'a>>,
+    pub version: Option<RecipeVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub video: Option<RecipeVideo<'a>>,
+    pub video: Option<RecipeVideo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub word_count: Option<RecipeWordCount<'a>>,
+    pub word_count: Option<RecipeWordCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_example: Option<RecipeWorkExample<'a>>,
+    pub work_example: Option<RecipeWorkExample<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_translation: Option<RecipeWorkTranslation<'a>>,
+    pub work_translation: Option<RecipeWorkTranslation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#yield: Option<RecipeYield<'a>>,
+    pub r#yield: Option<RecipeYield<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAbout<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAbstract<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAbstract<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAccessMode<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAccessMode<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAccessModeSufficient<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAccessModeSufficient<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAccessibilityApi<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAccessibilityApi<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAccessibilityControl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAccessibilityControl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAccessibilityFeature<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAccessibilityFeature<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAccessibilityHazard<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAccessibilityHazard<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAccessibilitySummary<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAccessibilitySummary<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAccountablePerson<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAccountablePerson<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAcquireLicensePage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAcquireLicensePage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAlternativeHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAlternativeHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeArchivedAt<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeArchivedAt<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAssesses<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAssesses<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAssociatedMedia<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAssociatedMedia<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAudience<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAudio<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAudio<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAuthor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAuthor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeCharacter<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeCharacter<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeCitation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeCitation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeComment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeComment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeCommentCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeCommentCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeConditionsOfAccess<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeConditionsOfAccess<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeContentLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeContentLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeContentRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeContentRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeContentReferenceTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeContentReferenceTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeContributor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeContributor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeCookTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeCookTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeCookingMethod<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeCookingMethod<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeCopyrightHolder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeCopyrightHolder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeCopyrightNotice<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeCopyrightNotice<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeCopyrightYear<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeCopyrightYear<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeCorrection<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeCorrection<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeCountryOfOrigin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeCreativeWorkStatus<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeCreativeWorkStatus<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeCreator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeCreator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeCreditText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeCreditText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeDateCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeDateCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeDateModified<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeDateModified<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeDigitalSourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeDigitalSourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeDiscussionUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeDiscussionUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeEditEidr<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeEditEidr<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeEditor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeEditor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeEducationalAlignment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeEducationalAlignment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeEducationalLevel<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeEducationalLevel<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeEducationalUse<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeEducationalUse<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeEncoding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeEncoding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeEncodingFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeEncodingFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeEncodings<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeEncodings<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeEstimatedCost<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeEstimatedCost<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeExampleOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeExampleOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeExpires<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeExpires<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeFileFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeFileFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeFunder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeGenre<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeGenre<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeHasPart<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeHasPart<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeInLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeInLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeIngredients<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeIngredients<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeInteractivityType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeInteractivityType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeInterpretedAsClaim<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeInterpretedAsClaim<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeIsAccessibleForFree<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeIsAccessibleForFree<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeIsBasedOn<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeIsBasedOn<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeIsBasedOnUrl<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeIsBasedOnUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeIsFamilyFriendly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeIsPartOf<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeIsPartOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeKeywords<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeLearningResourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeLearningResourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeLocationCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeLocationCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeMainEntity<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeMainEntity<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeMaintainer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeMaintainer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeMaterial<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeMaterialExtent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeMaterialExtent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeMentions<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeMentions<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeNutrition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeNutrition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeOffers<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipePattern<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipePattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipePerformTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipePerformTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipePosition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipePosition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipePotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipePotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipePrepTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipePrepTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeProducer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeProducer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeProvider<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeProvider<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipePublication<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipePublication<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipePublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipePublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipePublisherImprint<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipePublisherImprint<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipePublishingPrinciples<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipePublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeRecipeCategory<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeRecipeCategory<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeRecipeCuisine<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeRecipeCuisine<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeRecipeIngredient<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeRecipeIngredient<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeRecipeInstructions<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeRecipeInstructions<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeRecipeYield<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeRecipeYield<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeRecordedAt<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeRecordedAt<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeReleasedEvent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeReleasedEvent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSchemaVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSchemaVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSdDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSdDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSdLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSdLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSdPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSdPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSize<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSourceOrganization<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSourceOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSpatial<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSpatial<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSpatialCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSpatialCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSponsor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeStep<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeStep<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSteps<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSteps<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSuitableForDiet<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSuitableForDiet<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeSupply<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeSupply<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeTeaches<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeTeaches<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeTemporal<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeTemporal<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeTemporalCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeTemporalCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeThumbnail<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeThumbnail<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeThumbnailUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeThumbnailUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeTimeRequired<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeTimeRequired<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeTool<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeTool<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeTotalTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeTotalTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeTranslationOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeTranslationOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeTranslator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeTranslator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeTypicalAgeRange<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeTypicalAgeRange<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeUsageInfo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeUsageInfo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeVideo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeVideo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeWordCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeWordCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeWorkExample<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeWorkExample<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeWorkTranslation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeWorkTranslation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecipeYield<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecipeYield<S: Bos<str> + AsRef<str> = DefaultStr> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RecipeGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RecipeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Recipe<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Recipe<S>,
 }
 
-impl<'a> Recipe<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, RecipeRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Recipe<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, RecipeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Embedded<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Embedded<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Recipe"
     }
@@ -2679,18 +4153,17 @@ pub struct RecipeRecord;
 impl XrpcResp for RecipeRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Recipe";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RecipeGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RecipeGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<RecipeGetRecordOutput<'_>> for Recipe<'_> {
-    fn from(output: RecipeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<RecipeGetRecordOutput<S>> for Recipe<S> {
+    fn from(output: RecipeGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Recipe<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Recipe<S> {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Recipe";
     type Record = RecipeRecord;
 }
@@ -2700,7 +4173,7 @@ impl Collection for RecipeRecord {
     type Record = RecipeRecord;
 }
 
-impl<'a> LexiconSchema for Recipe<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Recipe<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Recipe"
     }
@@ -5840,152 +7313,152 @@ pub mod recipe_state {
 pub struct RecipeBuilder<'a, S: recipe_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<RecipeAbout<'a>>,
-        Option<RecipeAbstract<'a>>,
-        Option<RecipeAccessMode<'a>>,
-        Option<RecipeAccessModeSufficient<'a>>,
-        Option<RecipeAccessibilityApi<'a>>,
-        Option<RecipeAccessibilityControl<'a>>,
-        Option<RecipeAccessibilityFeature<'a>>,
-        Option<RecipeAccessibilityHazard<'a>>,
-        Option<RecipeAccessibilitySummary<'a>>,
-        Option<RecipeAccountablePerson<'a>>,
-        Option<RecipeAcquireLicensePage<'a>>,
-        Option<RecipeAdditionalType<'a>>,
-        Option<RecipeAggregateRating<'a>>,
-        Option<RecipeAlternateName<'a>>,
-        Option<RecipeAlternativeHeadline<'a>>,
-        Option<RecipeArchivedAt<'a>>,
-        Option<RecipeAssesses<'a>>,
-        Option<RecipeAssociatedMedia<'a>>,
-        Option<RecipeAudience<'a>>,
-        Option<RecipeAudio<'a>>,
-        Option<RecipeAuthor<'a>>,
-        Option<RecipeAward<'a>>,
-        Option<RecipeAwards<'a>>,
-        Option<RecipeCharacter<'a>>,
-        Option<RecipeCitation<'a>>,
-        Option<RecipeComment<'a>>,
-        Option<RecipeCommentCount<'a>>,
-        Option<RecipeConditionsOfAccess<'a>>,
-        Option<RecipeContentLocation<'a>>,
-        Option<RecipeContentRating<'a>>,
-        Option<RecipeContentReferenceTime<'a>>,
-        Option<RecipeContributor<'a>>,
-        Option<RecipeCookTime<'a>>,
-        Option<RecipeCookingMethod<'a>>,
-        Option<RecipeCopyrightHolder<'a>>,
-        Option<RecipeCopyrightNotice<'a>>,
-        Option<RecipeCopyrightYear<'a>>,
-        Option<RecipeCorrection<'a>>,
-        Option<RecipeCountryOfOrigin<'a>>,
-        Option<RecipeCreativeWorkStatus<'a>>,
-        Option<RecipeCreator<'a>>,
-        Option<RecipeCreditText<'a>>,
-        Option<RecipeDateCreated<'a>>,
-        Option<RecipeDateModified<'a>>,
-        Option<RecipeDatePublished<'a>>,
-        Option<RecipeDescription<'a>>,
-        Option<RecipeDigitalSourceType<'a>>,
-        Option<RecipeDisambiguatingDescription<'a>>,
-        Option<RecipeDiscussionUrl<'a>>,
-        Option<RecipeEditEidr<'a>>,
-        Option<RecipeEditor<'a>>,
-        Option<RecipeEducationalAlignment<'a>>,
-        Option<RecipeEducationalLevel<'a>>,
-        Option<RecipeEducationalUse<'a>>,
-        Option<RecipeEncoding<'a>>,
-        Option<RecipeEncodingFormat<'a>>,
-        Option<RecipeEncodings<'a>>,
-        Option<RecipeEstimatedCost<'a>>,
-        Option<RecipeExampleOfWork<'a>>,
-        Option<RecipeExpires<'a>>,
-        Option<RecipeFileFormat<'a>>,
-        Option<RecipeFunder<'a>>,
-        Option<RecipeFunding<'a>>,
-        Option<RecipeGenre<'a>>,
-        Option<RecipeHasPart<'a>>,
-        Option<RecipeHeadline<'a>>,
-        Option<RecipeIdentifier<'a>>,
-        Option<RecipeImage<'a>>,
-        Option<RecipeInLanguage<'a>>,
-        Option<RecipeIngredients<'a>>,
-        Option<RecipeInteractionStatistic<'a>>,
-        Option<RecipeInteractivityType<'a>>,
-        Option<RecipeInterpretedAsClaim<'a>>,
-        Option<RecipeIsAccessibleForFree<'a>>,
-        Option<RecipeIsBasedOn<'a>>,
-        Option<RecipeIsBasedOnUrl<'a>>,
-        Option<RecipeIsFamilyFriendly<'a>>,
-        Option<RecipeIsPartOf<'a>>,
-        Option<RecipeKeywords<'a>>,
-        Option<RecipeLearningResourceType<'a>>,
-        Option<RecipeLicense<'a>>,
-        Option<RecipeLocationCreated<'a>>,
-        Option<RecipeMainEntity<'a>>,
-        Option<RecipeMainEntityOfPage<'a>>,
-        Option<RecipeMaintainer<'a>>,
-        Option<RecipeMaterial<'a>>,
-        Option<RecipeMaterialExtent<'a>>,
-        Option<RecipeMentions<'a>>,
-        Option<RecipeName<'a>>,
-        Option<RecipeNutrition<'a>>,
-        Option<RecipeOffers<'a>>,
-        Option<RecipePattern<'a>>,
-        Option<RecipePerformTime<'a>>,
-        Option<RecipePosition<'a>>,
-        Option<RecipePotentialAction<'a>>,
-        Option<RecipePrepTime<'a>>,
-        Option<RecipeProducer<'a>>,
-        Option<RecipeProvider<'a>>,
-        Option<RecipePublication<'a>>,
-        Option<RecipePublisher<'a>>,
-        Option<RecipePublisherImprint<'a>>,
-        Option<RecipePublishingPrinciples<'a>>,
-        Option<RecipeRecipeCategory<'a>>,
-        Option<RecipeRecipeCuisine<'a>>,
-        Option<RecipeRecipeIngredient<'a>>,
-        Option<RecipeRecipeInstructions<'a>>,
-        Option<RecipeRecipeYield<'a>>,
-        Option<RecipeRecordedAt<'a>>,
-        Option<RecipeReleasedEvent<'a>>,
-        Option<RecipeReview<'a>>,
-        Option<RecipeReviews<'a>>,
-        Option<RecipeSameAs<'a>>,
-        Option<RecipeSchemaVersion<'a>>,
-        Option<RecipeSdDatePublished<'a>>,
-        Option<RecipeSdLicense<'a>>,
-        Option<RecipeSdPublisher<'a>>,
-        Option<RecipeSize<'a>>,
-        Option<RecipeSourceOrganization<'a>>,
-        Option<RecipeSpatial<'a>>,
-        Option<RecipeSpatialCoverage<'a>>,
-        Option<RecipeSponsor<'a>>,
-        Option<RecipeStep<'a>>,
-        Option<RecipeSteps<'a>>,
-        Option<RecipeSubjectOf<'a>>,
-        Option<RecipeSuitableForDiet<'a>>,
-        Option<RecipeSupply<'a>>,
-        Option<RecipeTeaches<'a>>,
-        Option<RecipeTemporal<'a>>,
-        Option<RecipeTemporalCoverage<'a>>,
-        Option<RecipeText<'a>>,
-        Option<RecipeThumbnail<'a>>,
-        Option<RecipeThumbnailUrl<'a>>,
-        Option<RecipeTimeRequired<'a>>,
-        Option<RecipeTool<'a>>,
-        Option<RecipeTotalTime<'a>>,
-        Option<RecipeTranslationOfWork<'a>>,
-        Option<RecipeTranslator<'a>>,
-        Option<RecipeTypicalAgeRange<'a>>,
-        Option<RecipeUrl<'a>>,
-        Option<RecipeUsageInfo<'a>>,
-        Option<RecipeVersion<'a>>,
-        Option<RecipeVideo<'a>>,
-        Option<RecipeWordCount<'a>>,
-        Option<RecipeWorkExample<'a>>,
-        Option<RecipeWorkTranslation<'a>>,
-        Option<RecipeYield<'a>>,
+        Option<RecipeAbout<S>>,
+        Option<RecipeAbstract<S>>,
+        Option<RecipeAccessMode<S>>,
+        Option<RecipeAccessModeSufficient<S>>,
+        Option<RecipeAccessibilityApi<S>>,
+        Option<RecipeAccessibilityControl<S>>,
+        Option<RecipeAccessibilityFeature<S>>,
+        Option<RecipeAccessibilityHazard<S>>,
+        Option<RecipeAccessibilitySummary<S>>,
+        Option<RecipeAccountablePerson<S>>,
+        Option<RecipeAcquireLicensePage<S>>,
+        Option<RecipeAdditionalType<S>>,
+        Option<RecipeAggregateRating<S>>,
+        Option<RecipeAlternateName<S>>,
+        Option<RecipeAlternativeHeadline<S>>,
+        Option<RecipeArchivedAt<S>>,
+        Option<RecipeAssesses<S>>,
+        Option<RecipeAssociatedMedia<S>>,
+        Option<RecipeAudience<S>>,
+        Option<RecipeAudio<S>>,
+        Option<RecipeAuthor<S>>,
+        Option<RecipeAward<S>>,
+        Option<RecipeAwards<S>>,
+        Option<RecipeCharacter<S>>,
+        Option<RecipeCitation<S>>,
+        Option<RecipeComment<S>>,
+        Option<RecipeCommentCount<S>>,
+        Option<RecipeConditionsOfAccess<S>>,
+        Option<RecipeContentLocation<S>>,
+        Option<RecipeContentRating<S>>,
+        Option<RecipeContentReferenceTime<S>>,
+        Option<RecipeContributor<S>>,
+        Option<RecipeCookTime<S>>,
+        Option<RecipeCookingMethod<S>>,
+        Option<RecipeCopyrightHolder<S>>,
+        Option<RecipeCopyrightNotice<S>>,
+        Option<RecipeCopyrightYear<S>>,
+        Option<RecipeCorrection<S>>,
+        Option<RecipeCountryOfOrigin<S>>,
+        Option<RecipeCreativeWorkStatus<S>>,
+        Option<RecipeCreator<S>>,
+        Option<RecipeCreditText<S>>,
+        Option<RecipeDateCreated<S>>,
+        Option<RecipeDateModified<S>>,
+        Option<RecipeDatePublished<S>>,
+        Option<RecipeDescription<S>>,
+        Option<RecipeDigitalSourceType<S>>,
+        Option<RecipeDisambiguatingDescription<S>>,
+        Option<RecipeDiscussionUrl<S>>,
+        Option<RecipeEditEidr<S>>,
+        Option<RecipeEditor<S>>,
+        Option<RecipeEducationalAlignment<S>>,
+        Option<RecipeEducationalLevel<S>>,
+        Option<RecipeEducationalUse<S>>,
+        Option<RecipeEncoding<S>>,
+        Option<RecipeEncodingFormat<S>>,
+        Option<RecipeEncodings<S>>,
+        Option<RecipeEstimatedCost<S>>,
+        Option<RecipeExampleOfWork<S>>,
+        Option<RecipeExpires<S>>,
+        Option<RecipeFileFormat<S>>,
+        Option<RecipeFunder<S>>,
+        Option<RecipeFunding<S>>,
+        Option<RecipeGenre<S>>,
+        Option<RecipeHasPart<S>>,
+        Option<RecipeHeadline<S>>,
+        Option<RecipeIdentifier<S>>,
+        Option<RecipeImage<S>>,
+        Option<RecipeInLanguage<S>>,
+        Option<RecipeIngredients<S>>,
+        Option<RecipeInteractionStatistic<S>>,
+        Option<RecipeInteractivityType<S>>,
+        Option<RecipeInterpretedAsClaim<S>>,
+        Option<RecipeIsAccessibleForFree<S>>,
+        Option<RecipeIsBasedOn<S>>,
+        Option<RecipeIsBasedOnUrl<S>>,
+        Option<RecipeIsFamilyFriendly<S>>,
+        Option<RecipeIsPartOf<S>>,
+        Option<RecipeKeywords<S>>,
+        Option<RecipeLearningResourceType<S>>,
+        Option<RecipeLicense<S>>,
+        Option<RecipeLocationCreated<S>>,
+        Option<RecipeMainEntity<S>>,
+        Option<RecipeMainEntityOfPage<S>>,
+        Option<RecipeMaintainer<S>>,
+        Option<RecipeMaterial<S>>,
+        Option<RecipeMaterialExtent<S>>,
+        Option<RecipeMentions<S>>,
+        Option<RecipeName<S>>,
+        Option<RecipeNutrition<S>>,
+        Option<RecipeOffers<S>>,
+        Option<RecipePattern<S>>,
+        Option<RecipePerformTime<S>>,
+        Option<RecipePosition<S>>,
+        Option<RecipePotentialAction<S>>,
+        Option<RecipePrepTime<S>>,
+        Option<RecipeProducer<S>>,
+        Option<RecipeProvider<S>>,
+        Option<RecipePublication<S>>,
+        Option<RecipePublisher<S>>,
+        Option<RecipePublisherImprint<S>>,
+        Option<RecipePublishingPrinciples<S>>,
+        Option<RecipeRecipeCategory<S>>,
+        Option<RecipeRecipeCuisine<S>>,
+        Option<RecipeRecipeIngredient<S>>,
+        Option<RecipeRecipeInstructions<S>>,
+        Option<RecipeRecipeYield<S>>,
+        Option<RecipeRecordedAt<S>>,
+        Option<RecipeReleasedEvent<S>>,
+        Option<RecipeReview<S>>,
+        Option<RecipeReviews<S>>,
+        Option<RecipeSameAs<S>>,
+        Option<RecipeSchemaVersion<S>>,
+        Option<RecipeSdDatePublished<S>>,
+        Option<RecipeSdLicense<S>>,
+        Option<RecipeSdPublisher<S>>,
+        Option<RecipeSize<S>>,
+        Option<RecipeSourceOrganization<S>>,
+        Option<RecipeSpatial<S>>,
+        Option<RecipeSpatialCoverage<S>>,
+        Option<RecipeSponsor<S>>,
+        Option<RecipeStep<S>>,
+        Option<RecipeSteps<S>>,
+        Option<RecipeSubjectOf<S>>,
+        Option<RecipeSuitableForDiet<S>>,
+        Option<RecipeSupply<S>>,
+        Option<RecipeTeaches<S>>,
+        Option<RecipeTemporal<S>>,
+        Option<RecipeTemporalCoverage<S>>,
+        Option<RecipeText<S>>,
+        Option<RecipeThumbnail<S>>,
+        Option<RecipeThumbnailUrl<S>>,
+        Option<RecipeTimeRequired<S>>,
+        Option<RecipeTool<S>>,
+        Option<RecipeTotalTime<S>>,
+        Option<RecipeTranslationOfWork<S>>,
+        Option<RecipeTranslator<S>>,
+        Option<RecipeTypicalAgeRange<S>>,
+        Option<RecipeUrl<S>>,
+        Option<RecipeUsageInfo<S>>,
+        Option<RecipeVersion<S>>,
+        Option<RecipeVideo<S>>,
+        Option<RecipeWordCount<S>>,
+        Option<RecipeWorkExample<S>>,
+        Option<RecipeWorkTranslation<S>>,
+        Option<RecipeYield<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -6157,12 +7630,12 @@ impl<'a> RecipeBuilder<'a, recipe_state::Empty> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `about` field (optional)
-    pub fn about(mut self, value: impl Into<Option<RecipeAbout<'a>>>) -> Self {
+    pub fn about(mut self, value: impl Into<Option<RecipeAbout<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `about` field to an Option value (optional)
-    pub fn maybe_about(mut self, value: Option<RecipeAbout<'a>>) -> Self {
+    pub fn maybe_about(mut self, value: Option<RecipeAbout<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -6170,12 +7643,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `abstract` field (optional)
-    pub fn r#abstract(mut self, value: impl Into<Option<RecipeAbstract<'a>>>) -> Self {
+    pub fn r#abstract(mut self, value: impl Into<Option<RecipeAbstract<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `abstract` field to an Option value (optional)
-    pub fn maybe_abstract(mut self, value: Option<RecipeAbstract<'a>>) -> Self {
+    pub fn maybe_abstract(mut self, value: Option<RecipeAbstract<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -6183,15 +7656,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accessMode` field (optional)
-    pub fn access_mode(
-        mut self,
-        value: impl Into<Option<RecipeAccessMode<'a>>>,
-    ) -> Self {
+    pub fn access_mode(mut self, value: impl Into<Option<RecipeAccessMode<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `accessMode` field to an Option value (optional)
-    pub fn maybe_access_mode(mut self, value: Option<RecipeAccessMode<'a>>) -> Self {
+    pub fn maybe_access_mode(mut self, value: Option<RecipeAccessMode<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -6201,7 +7671,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accessModeSufficient` field (optional)
     pub fn access_mode_sufficient(
         mut self,
-        value: impl Into<Option<RecipeAccessModeSufficient<'a>>>,
+        value: impl Into<Option<RecipeAccessModeSufficient<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -6209,7 +7679,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accessModeSufficient` field to an Option value (optional)
     pub fn maybe_access_mode_sufficient(
         mut self,
-        value: Option<RecipeAccessModeSufficient<'a>>,
+        value: Option<RecipeAccessModeSufficient<S>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -6220,7 +7690,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accessibilityAPI` field (optional)
     pub fn accessibility_api(
         mut self,
-        value: impl Into<Option<RecipeAccessibilityApi<'a>>>,
+        value: impl Into<Option<RecipeAccessibilityApi<S>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
@@ -6228,7 +7698,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accessibilityAPI` field to an Option value (optional)
     pub fn maybe_accessibility_api(
         mut self,
-        value: Option<RecipeAccessibilityApi<'a>>,
+        value: Option<RecipeAccessibilityApi<S>>,
     ) -> Self {
         self._fields.4 = value;
         self
@@ -6239,7 +7709,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accessibilityControl` field (optional)
     pub fn accessibility_control(
         mut self,
-        value: impl Into<Option<RecipeAccessibilityControl<'a>>>,
+        value: impl Into<Option<RecipeAccessibilityControl<S>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
@@ -6247,7 +7717,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accessibilityControl` field to an Option value (optional)
     pub fn maybe_accessibility_control(
         mut self,
-        value: Option<RecipeAccessibilityControl<'a>>,
+        value: Option<RecipeAccessibilityControl<S>>,
     ) -> Self {
         self._fields.5 = value;
         self
@@ -6258,7 +7728,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accessibilityFeature` field (optional)
     pub fn accessibility_feature(
         mut self,
-        value: impl Into<Option<RecipeAccessibilityFeature<'a>>>,
+        value: impl Into<Option<RecipeAccessibilityFeature<S>>>,
     ) -> Self {
         self._fields.6 = value.into();
         self
@@ -6266,7 +7736,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accessibilityFeature` field to an Option value (optional)
     pub fn maybe_accessibility_feature(
         mut self,
-        value: Option<RecipeAccessibilityFeature<'a>>,
+        value: Option<RecipeAccessibilityFeature<S>>,
     ) -> Self {
         self._fields.6 = value;
         self
@@ -6277,7 +7747,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accessibilityHazard` field (optional)
     pub fn accessibility_hazard(
         mut self,
-        value: impl Into<Option<RecipeAccessibilityHazard<'a>>>,
+        value: impl Into<Option<RecipeAccessibilityHazard<S>>>,
     ) -> Self {
         self._fields.7 = value.into();
         self
@@ -6285,7 +7755,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accessibilityHazard` field to an Option value (optional)
     pub fn maybe_accessibility_hazard(
         mut self,
-        value: Option<RecipeAccessibilityHazard<'a>>,
+        value: Option<RecipeAccessibilityHazard<S>>,
     ) -> Self {
         self._fields.7 = value;
         self
@@ -6296,7 +7766,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accessibilitySummary` field (optional)
     pub fn accessibility_summary(
         mut self,
-        value: impl Into<Option<RecipeAccessibilitySummary<'a>>>,
+        value: impl Into<Option<RecipeAccessibilitySummary<S>>>,
     ) -> Self {
         self._fields.8 = value.into();
         self
@@ -6304,7 +7774,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accessibilitySummary` field to an Option value (optional)
     pub fn maybe_accessibility_summary(
         mut self,
-        value: Option<RecipeAccessibilitySummary<'a>>,
+        value: Option<RecipeAccessibilitySummary<S>>,
     ) -> Self {
         self._fields.8 = value;
         self
@@ -6315,7 +7785,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accountablePerson` field (optional)
     pub fn accountable_person(
         mut self,
-        value: impl Into<Option<RecipeAccountablePerson<'a>>>,
+        value: impl Into<Option<RecipeAccountablePerson<S>>>,
     ) -> Self {
         self._fields.9 = value.into();
         self
@@ -6323,7 +7793,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `accountablePerson` field to an Option value (optional)
     pub fn maybe_accountable_person(
         mut self,
-        value: Option<RecipeAccountablePerson<'a>>,
+        value: Option<RecipeAccountablePerson<S>>,
     ) -> Self {
         self._fields.9 = value;
         self
@@ -6334,7 +7804,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `acquireLicensePage` field (optional)
     pub fn acquire_license_page(
         mut self,
-        value: impl Into<Option<RecipeAcquireLicensePage<'a>>>,
+        value: impl Into<Option<RecipeAcquireLicensePage<S>>>,
     ) -> Self {
         self._fields.10 = value.into();
         self
@@ -6342,7 +7812,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `acquireLicensePage` field to an Option value (optional)
     pub fn maybe_acquire_license_page(
         mut self,
-        value: Option<RecipeAcquireLicensePage<'a>>,
+        value: Option<RecipeAcquireLicensePage<S>>,
     ) -> Self {
         self._fields.10 = value;
         self
@@ -6353,7 +7823,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `additionalType` field (optional)
     pub fn additional_type(
         mut self,
-        value: impl Into<Option<RecipeAdditionalType<'a>>>,
+        value: impl Into<Option<RecipeAdditionalType<S>>>,
     ) -> Self {
         self._fields.11 = value.into();
         self
@@ -6361,7 +7831,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `additionalType` field to an Option value (optional)
     pub fn maybe_additional_type(
         mut self,
-        value: Option<RecipeAdditionalType<'a>>,
+        value: Option<RecipeAdditionalType<S>>,
     ) -> Self {
         self._fields.11 = value;
         self
@@ -6372,7 +7842,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `aggregateRating` field (optional)
     pub fn aggregate_rating(
         mut self,
-        value: impl Into<Option<RecipeAggregateRating<'a>>>,
+        value: impl Into<Option<RecipeAggregateRating<S>>>,
     ) -> Self {
         self._fields.12 = value.into();
         self
@@ -6380,7 +7850,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `aggregateRating` field to an Option value (optional)
     pub fn maybe_aggregate_rating(
         mut self,
-        value: Option<RecipeAggregateRating<'a>>,
+        value: Option<RecipeAggregateRating<S>>,
     ) -> Self {
         self._fields.12 = value;
         self
@@ -6391,7 +7861,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `alternateName` field (optional)
     pub fn alternate_name(
         mut self,
-        value: impl Into<Option<RecipeAlternateName<'a>>>,
+        value: impl Into<Option<RecipeAlternateName<S>>>,
     ) -> Self {
         self._fields.13 = value.into();
         self
@@ -6399,7 +7869,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `alternateName` field to an Option value (optional)
     pub fn maybe_alternate_name(
         mut self,
-        value: Option<RecipeAlternateName<'a>>,
+        value: Option<RecipeAlternateName<S>>,
     ) -> Self {
         self._fields.13 = value;
         self
@@ -6410,7 +7880,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `alternativeHeadline` field (optional)
     pub fn alternative_headline(
         mut self,
-        value: impl Into<Option<RecipeAlternativeHeadline<'a>>>,
+        value: impl Into<Option<RecipeAlternativeHeadline<S>>>,
     ) -> Self {
         self._fields.14 = value.into();
         self
@@ -6418,7 +7888,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `alternativeHeadline` field to an Option value (optional)
     pub fn maybe_alternative_headline(
         mut self,
-        value: Option<RecipeAlternativeHeadline<'a>>,
+        value: Option<RecipeAlternativeHeadline<S>>,
     ) -> Self {
         self._fields.14 = value;
         self
@@ -6427,15 +7897,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `archivedAt` field (optional)
-    pub fn archived_at(
-        mut self,
-        value: impl Into<Option<RecipeArchivedAt<'a>>>,
-    ) -> Self {
+    pub fn archived_at(mut self, value: impl Into<Option<RecipeArchivedAt<S>>>) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `archivedAt` field to an Option value (optional)
-    pub fn maybe_archived_at(mut self, value: Option<RecipeArchivedAt<'a>>) -> Self {
+    pub fn maybe_archived_at(mut self, value: Option<RecipeArchivedAt<S>>) -> Self {
         self._fields.15 = value;
         self
     }
@@ -6443,12 +7910,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `assesses` field (optional)
-    pub fn assesses(mut self, value: impl Into<Option<RecipeAssesses<'a>>>) -> Self {
+    pub fn assesses(mut self, value: impl Into<Option<RecipeAssesses<S>>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `assesses` field to an Option value (optional)
-    pub fn maybe_assesses(mut self, value: Option<RecipeAssesses<'a>>) -> Self {
+    pub fn maybe_assesses(mut self, value: Option<RecipeAssesses<S>>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -6458,7 +7925,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `associatedMedia` field (optional)
     pub fn associated_media(
         mut self,
-        value: impl Into<Option<RecipeAssociatedMedia<'a>>>,
+        value: impl Into<Option<RecipeAssociatedMedia<S>>>,
     ) -> Self {
         self._fields.17 = value.into();
         self
@@ -6466,7 +7933,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `associatedMedia` field to an Option value (optional)
     pub fn maybe_associated_media(
         mut self,
-        value: Option<RecipeAssociatedMedia<'a>>,
+        value: Option<RecipeAssociatedMedia<S>>,
     ) -> Self {
         self._fields.17 = value;
         self
@@ -6475,12 +7942,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `audience` field (optional)
-    pub fn audience(mut self, value: impl Into<Option<RecipeAudience<'a>>>) -> Self {
+    pub fn audience(mut self, value: impl Into<Option<RecipeAudience<S>>>) -> Self {
         self._fields.18 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
-    pub fn maybe_audience(mut self, value: Option<RecipeAudience<'a>>) -> Self {
+    pub fn maybe_audience(mut self, value: Option<RecipeAudience<S>>) -> Self {
         self._fields.18 = value;
         self
     }
@@ -6488,12 +7955,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `audio` field (optional)
-    pub fn audio(mut self, value: impl Into<Option<RecipeAudio<'a>>>) -> Self {
+    pub fn audio(mut self, value: impl Into<Option<RecipeAudio<S>>>) -> Self {
         self._fields.19 = value.into();
         self
     }
     /// Set the `audio` field to an Option value (optional)
-    pub fn maybe_audio(mut self, value: Option<RecipeAudio<'a>>) -> Self {
+    pub fn maybe_audio(mut self, value: Option<RecipeAudio<S>>) -> Self {
         self._fields.19 = value;
         self
     }
@@ -6501,12 +7968,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `author` field (optional)
-    pub fn author(mut self, value: impl Into<Option<RecipeAuthor<'a>>>) -> Self {
+    pub fn author(mut self, value: impl Into<Option<RecipeAuthor<S>>>) -> Self {
         self._fields.20 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
-    pub fn maybe_author(mut self, value: Option<RecipeAuthor<'a>>) -> Self {
+    pub fn maybe_author(mut self, value: Option<RecipeAuthor<S>>) -> Self {
         self._fields.20 = value;
         self
     }
@@ -6514,12 +7981,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `award` field (optional)
-    pub fn award(mut self, value: impl Into<Option<RecipeAward<'a>>>) -> Self {
+    pub fn award(mut self, value: impl Into<Option<RecipeAward<S>>>) -> Self {
         self._fields.21 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
-    pub fn maybe_award(mut self, value: Option<RecipeAward<'a>>) -> Self {
+    pub fn maybe_award(mut self, value: Option<RecipeAward<S>>) -> Self {
         self._fields.21 = value;
         self
     }
@@ -6527,12 +7994,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `awards` field (optional)
-    pub fn awards(mut self, value: impl Into<Option<RecipeAwards<'a>>>) -> Self {
+    pub fn awards(mut self, value: impl Into<Option<RecipeAwards<S>>>) -> Self {
         self._fields.22 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
-    pub fn maybe_awards(mut self, value: Option<RecipeAwards<'a>>) -> Self {
+    pub fn maybe_awards(mut self, value: Option<RecipeAwards<S>>) -> Self {
         self._fields.22 = value;
         self
     }
@@ -6540,12 +8007,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `character` field (optional)
-    pub fn character(mut self, value: impl Into<Option<RecipeCharacter<'a>>>) -> Self {
+    pub fn character(mut self, value: impl Into<Option<RecipeCharacter<S>>>) -> Self {
         self._fields.23 = value.into();
         self
     }
     /// Set the `character` field to an Option value (optional)
-    pub fn maybe_character(mut self, value: Option<RecipeCharacter<'a>>) -> Self {
+    pub fn maybe_character(mut self, value: Option<RecipeCharacter<S>>) -> Self {
         self._fields.23 = value;
         self
     }
@@ -6553,12 +8020,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `citation` field (optional)
-    pub fn citation(mut self, value: impl Into<Option<RecipeCitation<'a>>>) -> Self {
+    pub fn citation(mut self, value: impl Into<Option<RecipeCitation<S>>>) -> Self {
         self._fields.24 = value.into();
         self
     }
     /// Set the `citation` field to an Option value (optional)
-    pub fn maybe_citation(mut self, value: Option<RecipeCitation<'a>>) -> Self {
+    pub fn maybe_citation(mut self, value: Option<RecipeCitation<S>>) -> Self {
         self._fields.24 = value;
         self
     }
@@ -6566,12 +8033,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(mut self, value: impl Into<Option<RecipeComment<'a>>>) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<RecipeComment<S>>>) -> Self {
         self._fields.25 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(mut self, value: Option<RecipeComment<'a>>) -> Self {
+    pub fn maybe_comment(mut self, value: Option<RecipeComment<S>>) -> Self {
         self._fields.25 = value;
         self
     }
@@ -6581,13 +8048,13 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `commentCount` field (optional)
     pub fn comment_count(
         mut self,
-        value: impl Into<Option<RecipeCommentCount<'a>>>,
+        value: impl Into<Option<RecipeCommentCount<S>>>,
     ) -> Self {
         self._fields.26 = value.into();
         self
     }
     /// Set the `commentCount` field to an Option value (optional)
-    pub fn maybe_comment_count(mut self, value: Option<RecipeCommentCount<'a>>) -> Self {
+    pub fn maybe_comment_count(mut self, value: Option<RecipeCommentCount<S>>) -> Self {
         self._fields.26 = value;
         self
     }
@@ -6597,7 +8064,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `conditionsOfAccess` field (optional)
     pub fn conditions_of_access(
         mut self,
-        value: impl Into<Option<RecipeConditionsOfAccess<'a>>>,
+        value: impl Into<Option<RecipeConditionsOfAccess<S>>>,
     ) -> Self {
         self._fields.27 = value.into();
         self
@@ -6605,7 +8072,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `conditionsOfAccess` field to an Option value (optional)
     pub fn maybe_conditions_of_access(
         mut self,
-        value: Option<RecipeConditionsOfAccess<'a>>,
+        value: Option<RecipeConditionsOfAccess<S>>,
     ) -> Self {
         self._fields.27 = value;
         self
@@ -6616,7 +8083,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `contentLocation` field (optional)
     pub fn content_location(
         mut self,
-        value: impl Into<Option<RecipeContentLocation<'a>>>,
+        value: impl Into<Option<RecipeContentLocation<S>>>,
     ) -> Self {
         self._fields.28 = value.into();
         self
@@ -6624,7 +8091,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `contentLocation` field to an Option value (optional)
     pub fn maybe_content_location(
         mut self,
-        value: Option<RecipeContentLocation<'a>>,
+        value: Option<RecipeContentLocation<S>>,
     ) -> Self {
         self._fields.28 = value;
         self
@@ -6635,7 +8102,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `contentRating` field (optional)
     pub fn content_rating(
         mut self,
-        value: impl Into<Option<RecipeContentRating<'a>>>,
+        value: impl Into<Option<RecipeContentRating<S>>>,
     ) -> Self {
         self._fields.29 = value.into();
         self
@@ -6643,7 +8110,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `contentRating` field to an Option value (optional)
     pub fn maybe_content_rating(
         mut self,
-        value: Option<RecipeContentRating<'a>>,
+        value: Option<RecipeContentRating<S>>,
     ) -> Self {
         self._fields.29 = value;
         self
@@ -6654,7 +8121,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `contentReferenceTime` field (optional)
     pub fn content_reference_time(
         mut self,
-        value: impl Into<Option<RecipeContentReferenceTime<'a>>>,
+        value: impl Into<Option<RecipeContentReferenceTime<S>>>,
     ) -> Self {
         self._fields.30 = value.into();
         self
@@ -6662,7 +8129,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `contentReferenceTime` field to an Option value (optional)
     pub fn maybe_content_reference_time(
         mut self,
-        value: Option<RecipeContentReferenceTime<'a>>,
+        value: Option<RecipeContentReferenceTime<S>>,
     ) -> Self {
         self._fields.30 = value;
         self
@@ -6673,13 +8140,13 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `contributor` field (optional)
     pub fn contributor(
         mut self,
-        value: impl Into<Option<RecipeContributor<'a>>>,
+        value: impl Into<Option<RecipeContributor<S>>>,
     ) -> Self {
         self._fields.31 = value.into();
         self
     }
     /// Set the `contributor` field to an Option value (optional)
-    pub fn maybe_contributor(mut self, value: Option<RecipeContributor<'a>>) -> Self {
+    pub fn maybe_contributor(mut self, value: Option<RecipeContributor<S>>) -> Self {
         self._fields.31 = value;
         self
     }
@@ -6687,12 +8154,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `cookTime` field (optional)
-    pub fn cook_time(mut self, value: impl Into<Option<RecipeCookTime<'a>>>) -> Self {
+    pub fn cook_time(mut self, value: impl Into<Option<RecipeCookTime<S>>>) -> Self {
         self._fields.32 = value.into();
         self
     }
     /// Set the `cookTime` field to an Option value (optional)
-    pub fn maybe_cook_time(mut self, value: Option<RecipeCookTime<'a>>) -> Self {
+    pub fn maybe_cook_time(mut self, value: Option<RecipeCookTime<S>>) -> Self {
         self._fields.32 = value;
         self
     }
@@ -6702,7 +8169,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `cookingMethod` field (optional)
     pub fn cooking_method(
         mut self,
-        value: impl Into<Option<RecipeCookingMethod<'a>>>,
+        value: impl Into<Option<RecipeCookingMethod<S>>>,
     ) -> Self {
         self._fields.33 = value.into();
         self
@@ -6710,7 +8177,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `cookingMethod` field to an Option value (optional)
     pub fn maybe_cooking_method(
         mut self,
-        value: Option<RecipeCookingMethod<'a>>,
+        value: Option<RecipeCookingMethod<S>>,
     ) -> Self {
         self._fields.33 = value;
         self
@@ -6721,7 +8188,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `copyrightHolder` field (optional)
     pub fn copyright_holder(
         mut self,
-        value: impl Into<Option<RecipeCopyrightHolder<'a>>>,
+        value: impl Into<Option<RecipeCopyrightHolder<S>>>,
     ) -> Self {
         self._fields.34 = value.into();
         self
@@ -6729,7 +8196,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `copyrightHolder` field to an Option value (optional)
     pub fn maybe_copyright_holder(
         mut self,
-        value: Option<RecipeCopyrightHolder<'a>>,
+        value: Option<RecipeCopyrightHolder<S>>,
     ) -> Self {
         self._fields.34 = value;
         self
@@ -6740,7 +8207,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `copyrightNotice` field (optional)
     pub fn copyright_notice(
         mut self,
-        value: impl Into<Option<RecipeCopyrightNotice<'a>>>,
+        value: impl Into<Option<RecipeCopyrightNotice<S>>>,
     ) -> Self {
         self._fields.35 = value.into();
         self
@@ -6748,7 +8215,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `copyrightNotice` field to an Option value (optional)
     pub fn maybe_copyright_notice(
         mut self,
-        value: Option<RecipeCopyrightNotice<'a>>,
+        value: Option<RecipeCopyrightNotice<S>>,
     ) -> Self {
         self._fields.35 = value;
         self
@@ -6759,7 +8226,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `copyrightYear` field (optional)
     pub fn copyright_year(
         mut self,
-        value: impl Into<Option<RecipeCopyrightYear<'a>>>,
+        value: impl Into<Option<RecipeCopyrightYear<S>>>,
     ) -> Self {
         self._fields.36 = value.into();
         self
@@ -6767,7 +8234,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `copyrightYear` field to an Option value (optional)
     pub fn maybe_copyright_year(
         mut self,
-        value: Option<RecipeCopyrightYear<'a>>,
+        value: Option<RecipeCopyrightYear<S>>,
     ) -> Self {
         self._fields.36 = value;
         self
@@ -6776,12 +8243,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `correction` field (optional)
-    pub fn correction(mut self, value: impl Into<Option<RecipeCorrection<'a>>>) -> Self {
+    pub fn correction(mut self, value: impl Into<Option<RecipeCorrection<S>>>) -> Self {
         self._fields.37 = value.into();
         self
     }
     /// Set the `correction` field to an Option value (optional)
-    pub fn maybe_correction(mut self, value: Option<RecipeCorrection<'a>>) -> Self {
+    pub fn maybe_correction(mut self, value: Option<RecipeCorrection<S>>) -> Self {
         self._fields.37 = value;
         self
     }
@@ -6791,7 +8258,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `countryOfOrigin` field (optional)
     pub fn country_of_origin(
         mut self,
-        value: impl Into<Option<RecipeCountryOfOrigin<'a>>>,
+        value: impl Into<Option<RecipeCountryOfOrigin<S>>>,
     ) -> Self {
         self._fields.38 = value.into();
         self
@@ -6799,7 +8266,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `countryOfOrigin` field to an Option value (optional)
     pub fn maybe_country_of_origin(
         mut self,
-        value: Option<RecipeCountryOfOrigin<'a>>,
+        value: Option<RecipeCountryOfOrigin<S>>,
     ) -> Self {
         self._fields.38 = value;
         self
@@ -6810,7 +8277,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `creativeWorkStatus` field (optional)
     pub fn creative_work_status(
         mut self,
-        value: impl Into<Option<RecipeCreativeWorkStatus<'a>>>,
+        value: impl Into<Option<RecipeCreativeWorkStatus<S>>>,
     ) -> Self {
         self._fields.39 = value.into();
         self
@@ -6818,7 +8285,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `creativeWorkStatus` field to an Option value (optional)
     pub fn maybe_creative_work_status(
         mut self,
-        value: Option<RecipeCreativeWorkStatus<'a>>,
+        value: Option<RecipeCreativeWorkStatus<S>>,
     ) -> Self {
         self._fields.39 = value;
         self
@@ -6827,12 +8294,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `creator` field (optional)
-    pub fn creator(mut self, value: impl Into<Option<RecipeCreator<'a>>>) -> Self {
+    pub fn creator(mut self, value: impl Into<Option<RecipeCreator<S>>>) -> Self {
         self._fields.40 = value.into();
         self
     }
     /// Set the `creator` field to an Option value (optional)
-    pub fn maybe_creator(mut self, value: Option<RecipeCreator<'a>>) -> Self {
+    pub fn maybe_creator(mut self, value: Option<RecipeCreator<S>>) -> Self {
         self._fields.40 = value;
         self
     }
@@ -6840,15 +8307,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `creditText` field (optional)
-    pub fn credit_text(
-        mut self,
-        value: impl Into<Option<RecipeCreditText<'a>>>,
-    ) -> Self {
+    pub fn credit_text(mut self, value: impl Into<Option<RecipeCreditText<S>>>) -> Self {
         self._fields.41 = value.into();
         self
     }
     /// Set the `creditText` field to an Option value (optional)
-    pub fn maybe_credit_text(mut self, value: Option<RecipeCreditText<'a>>) -> Self {
+    pub fn maybe_credit_text(mut self, value: Option<RecipeCreditText<S>>) -> Self {
         self._fields.41 = value;
         self
     }
@@ -6858,13 +8322,13 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `dateCreated` field (optional)
     pub fn date_created(
         mut self,
-        value: impl Into<Option<RecipeDateCreated<'a>>>,
+        value: impl Into<Option<RecipeDateCreated<S>>>,
     ) -> Self {
         self._fields.42 = value.into();
         self
     }
     /// Set the `dateCreated` field to an Option value (optional)
-    pub fn maybe_date_created(mut self, value: Option<RecipeDateCreated<'a>>) -> Self {
+    pub fn maybe_date_created(mut self, value: Option<RecipeDateCreated<S>>) -> Self {
         self._fields.42 = value;
         self
     }
@@ -6874,13 +8338,13 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `dateModified` field (optional)
     pub fn date_modified(
         mut self,
-        value: impl Into<Option<RecipeDateModified<'a>>>,
+        value: impl Into<Option<RecipeDateModified<S>>>,
     ) -> Self {
         self._fields.43 = value.into();
         self
     }
     /// Set the `dateModified` field to an Option value (optional)
-    pub fn maybe_date_modified(mut self, value: Option<RecipeDateModified<'a>>) -> Self {
+    pub fn maybe_date_modified(mut self, value: Option<RecipeDateModified<S>>) -> Self {
         self._fields.43 = value;
         self
     }
@@ -6890,7 +8354,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `datePublished` field (optional)
     pub fn date_published(
         mut self,
-        value: impl Into<Option<RecipeDatePublished<'a>>>,
+        value: impl Into<Option<RecipeDatePublished<S>>>,
     ) -> Self {
         self._fields.44 = value.into();
         self
@@ -6898,7 +8362,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `datePublished` field to an Option value (optional)
     pub fn maybe_date_published(
         mut self,
-        value: Option<RecipeDatePublished<'a>>,
+        value: Option<RecipeDatePublished<S>>,
     ) -> Self {
         self._fields.44 = value;
         self
@@ -6909,13 +8373,13 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
-        value: impl Into<Option<RecipeDescription<'a>>>,
+        value: impl Into<Option<RecipeDescription<S>>>,
     ) -> Self {
         self._fields.45 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<RecipeDescription<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<RecipeDescription<S>>) -> Self {
         self._fields.45 = value;
         self
     }
@@ -6925,7 +8389,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `digitalSourceType` field (optional)
     pub fn digital_source_type(
         mut self,
-        value: impl Into<Option<RecipeDigitalSourceType<'a>>>,
+        value: impl Into<Option<RecipeDigitalSourceType<S>>>,
     ) -> Self {
         self._fields.46 = value.into();
         self
@@ -6933,7 +8397,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `digitalSourceType` field to an Option value (optional)
     pub fn maybe_digital_source_type(
         mut self,
-        value: Option<RecipeDigitalSourceType<'a>>,
+        value: Option<RecipeDigitalSourceType<S>>,
     ) -> Self {
         self._fields.46 = value;
         self
@@ -6944,7 +8408,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
-        value: impl Into<Option<RecipeDisambiguatingDescription<'a>>>,
+        value: impl Into<Option<RecipeDisambiguatingDescription<S>>>,
     ) -> Self {
         self._fields.47 = value.into();
         self
@@ -6952,7 +8416,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field to an Option value (optional)
     pub fn maybe_disambiguating_description(
         mut self,
-        value: Option<RecipeDisambiguatingDescription<'a>>,
+        value: Option<RecipeDisambiguatingDescription<S>>,
     ) -> Self {
         self._fields.47 = value;
         self
@@ -6963,7 +8427,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `discussionUrl` field (optional)
     pub fn discussion_url(
         mut self,
-        value: impl Into<Option<RecipeDiscussionUrl<'a>>>,
+        value: impl Into<Option<RecipeDiscussionUrl<S>>>,
     ) -> Self {
         self._fields.48 = value.into();
         self
@@ -6971,7 +8435,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `discussionUrl` field to an Option value (optional)
     pub fn maybe_discussion_url(
         mut self,
-        value: Option<RecipeDiscussionUrl<'a>>,
+        value: Option<RecipeDiscussionUrl<S>>,
     ) -> Self {
         self._fields.48 = value;
         self
@@ -6980,12 +8444,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `editEIDR` field (optional)
-    pub fn edit_eidr(mut self, value: impl Into<Option<RecipeEditEidr<'a>>>) -> Self {
+    pub fn edit_eidr(mut self, value: impl Into<Option<RecipeEditEidr<S>>>) -> Self {
         self._fields.49 = value.into();
         self
     }
     /// Set the `editEIDR` field to an Option value (optional)
-    pub fn maybe_edit_eidr(mut self, value: Option<RecipeEditEidr<'a>>) -> Self {
+    pub fn maybe_edit_eidr(mut self, value: Option<RecipeEditEidr<S>>) -> Self {
         self._fields.49 = value;
         self
     }
@@ -6993,12 +8457,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `editor` field (optional)
-    pub fn editor(mut self, value: impl Into<Option<RecipeEditor<'a>>>) -> Self {
+    pub fn editor(mut self, value: impl Into<Option<RecipeEditor<S>>>) -> Self {
         self._fields.50 = value.into();
         self
     }
     /// Set the `editor` field to an Option value (optional)
-    pub fn maybe_editor(mut self, value: Option<RecipeEditor<'a>>) -> Self {
+    pub fn maybe_editor(mut self, value: Option<RecipeEditor<S>>) -> Self {
         self._fields.50 = value;
         self
     }
@@ -7008,7 +8472,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `educationalAlignment` field (optional)
     pub fn educational_alignment(
         mut self,
-        value: impl Into<Option<RecipeEducationalAlignment<'a>>>,
+        value: impl Into<Option<RecipeEducationalAlignment<S>>>,
     ) -> Self {
         self._fields.51 = value.into();
         self
@@ -7016,7 +8480,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `educationalAlignment` field to an Option value (optional)
     pub fn maybe_educational_alignment(
         mut self,
-        value: Option<RecipeEducationalAlignment<'a>>,
+        value: Option<RecipeEducationalAlignment<S>>,
     ) -> Self {
         self._fields.51 = value;
         self
@@ -7027,7 +8491,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `educationalLevel` field (optional)
     pub fn educational_level(
         mut self,
-        value: impl Into<Option<RecipeEducationalLevel<'a>>>,
+        value: impl Into<Option<RecipeEducationalLevel<S>>>,
     ) -> Self {
         self._fields.52 = value.into();
         self
@@ -7035,7 +8499,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `educationalLevel` field to an Option value (optional)
     pub fn maybe_educational_level(
         mut self,
-        value: Option<RecipeEducationalLevel<'a>>,
+        value: Option<RecipeEducationalLevel<S>>,
     ) -> Self {
         self._fields.52 = value;
         self
@@ -7046,7 +8510,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `educationalUse` field (optional)
     pub fn educational_use(
         mut self,
-        value: impl Into<Option<RecipeEducationalUse<'a>>>,
+        value: impl Into<Option<RecipeEducationalUse<S>>>,
     ) -> Self {
         self._fields.53 = value.into();
         self
@@ -7054,7 +8518,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `educationalUse` field to an Option value (optional)
     pub fn maybe_educational_use(
         mut self,
-        value: Option<RecipeEducationalUse<'a>>,
+        value: Option<RecipeEducationalUse<S>>,
     ) -> Self {
         self._fields.53 = value;
         self
@@ -7063,12 +8527,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `encoding` field (optional)
-    pub fn encoding(mut self, value: impl Into<Option<RecipeEncoding<'a>>>) -> Self {
+    pub fn encoding(mut self, value: impl Into<Option<RecipeEncoding<S>>>) -> Self {
         self._fields.54 = value.into();
         self
     }
     /// Set the `encoding` field to an Option value (optional)
-    pub fn maybe_encoding(mut self, value: Option<RecipeEncoding<'a>>) -> Self {
+    pub fn maybe_encoding(mut self, value: Option<RecipeEncoding<S>>) -> Self {
         self._fields.54 = value;
         self
     }
@@ -7078,7 +8542,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `encodingFormat` field (optional)
     pub fn encoding_format(
         mut self,
-        value: impl Into<Option<RecipeEncodingFormat<'a>>>,
+        value: impl Into<Option<RecipeEncodingFormat<S>>>,
     ) -> Self {
         self._fields.55 = value.into();
         self
@@ -7086,7 +8550,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `encodingFormat` field to an Option value (optional)
     pub fn maybe_encoding_format(
         mut self,
-        value: Option<RecipeEncodingFormat<'a>>,
+        value: Option<RecipeEncodingFormat<S>>,
     ) -> Self {
         self._fields.55 = value;
         self
@@ -7095,12 +8559,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `encodings` field (optional)
-    pub fn encodings(mut self, value: impl Into<Option<RecipeEncodings<'a>>>) -> Self {
+    pub fn encodings(mut self, value: impl Into<Option<RecipeEncodings<S>>>) -> Self {
         self._fields.56 = value.into();
         self
     }
     /// Set the `encodings` field to an Option value (optional)
-    pub fn maybe_encodings(mut self, value: Option<RecipeEncodings<'a>>) -> Self {
+    pub fn maybe_encodings(mut self, value: Option<RecipeEncodings<S>>) -> Self {
         self._fields.56 = value;
         self
     }
@@ -7110,7 +8574,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `estimatedCost` field (optional)
     pub fn estimated_cost(
         mut self,
-        value: impl Into<Option<RecipeEstimatedCost<'a>>>,
+        value: impl Into<Option<RecipeEstimatedCost<S>>>,
     ) -> Self {
         self._fields.57 = value.into();
         self
@@ -7118,7 +8582,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `estimatedCost` field to an Option value (optional)
     pub fn maybe_estimated_cost(
         mut self,
-        value: Option<RecipeEstimatedCost<'a>>,
+        value: Option<RecipeEstimatedCost<S>>,
     ) -> Self {
         self._fields.57 = value;
         self
@@ -7129,7 +8593,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `exampleOfWork` field (optional)
     pub fn example_of_work(
         mut self,
-        value: impl Into<Option<RecipeExampleOfWork<'a>>>,
+        value: impl Into<Option<RecipeExampleOfWork<S>>>,
     ) -> Self {
         self._fields.58 = value.into();
         self
@@ -7137,7 +8601,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `exampleOfWork` field to an Option value (optional)
     pub fn maybe_example_of_work(
         mut self,
-        value: Option<RecipeExampleOfWork<'a>>,
+        value: Option<RecipeExampleOfWork<S>>,
     ) -> Self {
         self._fields.58 = value;
         self
@@ -7146,12 +8610,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `expires` field (optional)
-    pub fn expires(mut self, value: impl Into<Option<RecipeExpires<'a>>>) -> Self {
+    pub fn expires(mut self, value: impl Into<Option<RecipeExpires<S>>>) -> Self {
         self._fields.59 = value.into();
         self
     }
     /// Set the `expires` field to an Option value (optional)
-    pub fn maybe_expires(mut self, value: Option<RecipeExpires<'a>>) -> Self {
+    pub fn maybe_expires(mut self, value: Option<RecipeExpires<S>>) -> Self {
         self._fields.59 = value;
         self
     }
@@ -7159,15 +8623,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `fileFormat` field (optional)
-    pub fn file_format(
-        mut self,
-        value: impl Into<Option<RecipeFileFormat<'a>>>,
-    ) -> Self {
+    pub fn file_format(mut self, value: impl Into<Option<RecipeFileFormat<S>>>) -> Self {
         self._fields.60 = value.into();
         self
     }
     /// Set the `fileFormat` field to an Option value (optional)
-    pub fn maybe_file_format(mut self, value: Option<RecipeFileFormat<'a>>) -> Self {
+    pub fn maybe_file_format(mut self, value: Option<RecipeFileFormat<S>>) -> Self {
         self._fields.60 = value;
         self
     }
@@ -7175,12 +8636,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `funder` field (optional)
-    pub fn funder(mut self, value: impl Into<Option<RecipeFunder<'a>>>) -> Self {
+    pub fn funder(mut self, value: impl Into<Option<RecipeFunder<S>>>) -> Self {
         self._fields.61 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
-    pub fn maybe_funder(mut self, value: Option<RecipeFunder<'a>>) -> Self {
+    pub fn maybe_funder(mut self, value: Option<RecipeFunder<S>>) -> Self {
         self._fields.61 = value;
         self
     }
@@ -7188,12 +8649,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `funding` field (optional)
-    pub fn funding(mut self, value: impl Into<Option<RecipeFunding<'a>>>) -> Self {
+    pub fn funding(mut self, value: impl Into<Option<RecipeFunding<S>>>) -> Self {
         self._fields.62 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
-    pub fn maybe_funding(mut self, value: Option<RecipeFunding<'a>>) -> Self {
+    pub fn maybe_funding(mut self, value: Option<RecipeFunding<S>>) -> Self {
         self._fields.62 = value;
         self
     }
@@ -7201,12 +8662,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<RecipeGenre<'a>>>) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<RecipeGenre<S>>>) -> Self {
         self._fields.63 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<RecipeGenre<'a>>) -> Self {
+    pub fn maybe_genre(mut self, value: Option<RecipeGenre<S>>) -> Self {
         self._fields.63 = value;
         self
     }
@@ -7214,12 +8675,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `hasPart` field (optional)
-    pub fn has_part(mut self, value: impl Into<Option<RecipeHasPart<'a>>>) -> Self {
+    pub fn has_part(mut self, value: impl Into<Option<RecipeHasPart<S>>>) -> Self {
         self._fields.64 = value.into();
         self
     }
     /// Set the `hasPart` field to an Option value (optional)
-    pub fn maybe_has_part(mut self, value: Option<RecipeHasPart<'a>>) -> Self {
+    pub fn maybe_has_part(mut self, value: Option<RecipeHasPart<S>>) -> Self {
         self._fields.64 = value;
         self
     }
@@ -7227,12 +8688,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `headline` field (optional)
-    pub fn headline(mut self, value: impl Into<Option<RecipeHeadline<'a>>>) -> Self {
+    pub fn headline(mut self, value: impl Into<Option<RecipeHeadline<S>>>) -> Self {
         self._fields.65 = value.into();
         self
     }
     /// Set the `headline` field to an Option value (optional)
-    pub fn maybe_headline(mut self, value: Option<RecipeHeadline<'a>>) -> Self {
+    pub fn maybe_headline(mut self, value: Option<RecipeHeadline<S>>) -> Self {
         self._fields.65 = value;
         self
     }
@@ -7240,12 +8701,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(mut self, value: impl Into<Option<RecipeIdentifier<'a>>>) -> Self {
+    pub fn identifier(mut self, value: impl Into<Option<RecipeIdentifier<S>>>) -> Self {
         self._fields.66 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
-    pub fn maybe_identifier(mut self, value: Option<RecipeIdentifier<'a>>) -> Self {
+    pub fn maybe_identifier(mut self, value: Option<RecipeIdentifier<S>>) -> Self {
         self._fields.66 = value;
         self
     }
@@ -7253,12 +8714,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<RecipeImage<'a>>>) -> Self {
+    pub fn image(mut self, value: impl Into<Option<RecipeImage<S>>>) -> Self {
         self._fields.67 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<RecipeImage<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<RecipeImage<S>>) -> Self {
         self._fields.67 = value;
         self
     }
@@ -7266,15 +8727,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `inLanguage` field (optional)
-    pub fn in_language(
-        mut self,
-        value: impl Into<Option<RecipeInLanguage<'a>>>,
-    ) -> Self {
+    pub fn in_language(mut self, value: impl Into<Option<RecipeInLanguage<S>>>) -> Self {
         self._fields.68 = value.into();
         self
     }
     /// Set the `inLanguage` field to an Option value (optional)
-    pub fn maybe_in_language(mut self, value: Option<RecipeInLanguage<'a>>) -> Self {
+    pub fn maybe_in_language(mut self, value: Option<RecipeInLanguage<S>>) -> Self {
         self._fields.68 = value;
         self
     }
@@ -7284,13 +8742,13 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `ingredients` field (optional)
     pub fn ingredients(
         mut self,
-        value: impl Into<Option<RecipeIngredients<'a>>>,
+        value: impl Into<Option<RecipeIngredients<S>>>,
     ) -> Self {
         self._fields.69 = value.into();
         self
     }
     /// Set the `ingredients` field to an Option value (optional)
-    pub fn maybe_ingredients(mut self, value: Option<RecipeIngredients<'a>>) -> Self {
+    pub fn maybe_ingredients(mut self, value: Option<RecipeIngredients<S>>) -> Self {
         self._fields.69 = value;
         self
     }
@@ -7300,7 +8758,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `interactionStatistic` field (optional)
     pub fn interaction_statistic(
         mut self,
-        value: impl Into<Option<RecipeInteractionStatistic<'a>>>,
+        value: impl Into<Option<RecipeInteractionStatistic<S>>>,
     ) -> Self {
         self._fields.70 = value.into();
         self
@@ -7308,7 +8766,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `interactionStatistic` field to an Option value (optional)
     pub fn maybe_interaction_statistic(
         mut self,
-        value: Option<RecipeInteractionStatistic<'a>>,
+        value: Option<RecipeInteractionStatistic<S>>,
     ) -> Self {
         self._fields.70 = value;
         self
@@ -7319,7 +8777,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `interactivityType` field (optional)
     pub fn interactivity_type(
         mut self,
-        value: impl Into<Option<RecipeInteractivityType<'a>>>,
+        value: impl Into<Option<RecipeInteractivityType<S>>>,
     ) -> Self {
         self._fields.71 = value.into();
         self
@@ -7327,7 +8785,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `interactivityType` field to an Option value (optional)
     pub fn maybe_interactivity_type(
         mut self,
-        value: Option<RecipeInteractivityType<'a>>,
+        value: Option<RecipeInteractivityType<S>>,
     ) -> Self {
         self._fields.71 = value;
         self
@@ -7338,7 +8796,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `interpretedAsClaim` field (optional)
     pub fn interpreted_as_claim(
         mut self,
-        value: impl Into<Option<RecipeInterpretedAsClaim<'a>>>,
+        value: impl Into<Option<RecipeInterpretedAsClaim<S>>>,
     ) -> Self {
         self._fields.72 = value.into();
         self
@@ -7346,7 +8804,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `interpretedAsClaim` field to an Option value (optional)
     pub fn maybe_interpreted_as_claim(
         mut self,
-        value: Option<RecipeInterpretedAsClaim<'a>>,
+        value: Option<RecipeInterpretedAsClaim<S>>,
     ) -> Self {
         self._fields.72 = value;
         self
@@ -7357,7 +8815,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `isAccessibleForFree` field (optional)
     pub fn is_accessible_for_free(
         mut self,
-        value: impl Into<Option<RecipeIsAccessibleForFree<'a>>>,
+        value: impl Into<Option<RecipeIsAccessibleForFree<S>>>,
     ) -> Self {
         self._fields.73 = value.into();
         self
@@ -7365,7 +8823,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `isAccessibleForFree` field to an Option value (optional)
     pub fn maybe_is_accessible_for_free(
         mut self,
-        value: Option<RecipeIsAccessibleForFree<'a>>,
+        value: Option<RecipeIsAccessibleForFree<S>>,
     ) -> Self {
         self._fields.73 = value;
         self
@@ -7374,12 +8832,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `isBasedOn` field (optional)
-    pub fn is_based_on(mut self, value: impl Into<Option<RecipeIsBasedOn<'a>>>) -> Self {
+    pub fn is_based_on(mut self, value: impl Into<Option<RecipeIsBasedOn<S>>>) -> Self {
         self._fields.74 = value.into();
         self
     }
     /// Set the `isBasedOn` field to an Option value (optional)
-    pub fn maybe_is_based_on(mut self, value: Option<RecipeIsBasedOn<'a>>) -> Self {
+    pub fn maybe_is_based_on(mut self, value: Option<RecipeIsBasedOn<S>>) -> Self {
         self._fields.74 = value;
         self
     }
@@ -7389,7 +8847,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `isBasedOnUrl` field (optional)
     pub fn is_based_on_url(
         mut self,
-        value: impl Into<Option<RecipeIsBasedOnUrl<'a>>>,
+        value: impl Into<Option<RecipeIsBasedOnUrl<S>>>,
     ) -> Self {
         self._fields.75 = value.into();
         self
@@ -7397,7 +8855,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `isBasedOnUrl` field to an Option value (optional)
     pub fn maybe_is_based_on_url(
         mut self,
-        value: Option<RecipeIsBasedOnUrl<'a>>,
+        value: Option<RecipeIsBasedOnUrl<S>>,
     ) -> Self {
         self._fields.75 = value;
         self
@@ -7408,7 +8866,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `isFamilyFriendly` field (optional)
     pub fn is_family_friendly(
         mut self,
-        value: impl Into<Option<RecipeIsFamilyFriendly<'a>>>,
+        value: impl Into<Option<RecipeIsFamilyFriendly<S>>>,
     ) -> Self {
         self._fields.76 = value.into();
         self
@@ -7416,7 +8874,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `isFamilyFriendly` field to an Option value (optional)
     pub fn maybe_is_family_friendly(
         mut self,
-        value: Option<RecipeIsFamilyFriendly<'a>>,
+        value: Option<RecipeIsFamilyFriendly<S>>,
     ) -> Self {
         self._fields.76 = value;
         self
@@ -7425,12 +8883,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `isPartOf` field (optional)
-    pub fn is_part_of(mut self, value: impl Into<Option<RecipeIsPartOf<'a>>>) -> Self {
+    pub fn is_part_of(mut self, value: impl Into<Option<RecipeIsPartOf<S>>>) -> Self {
         self._fields.77 = value.into();
         self
     }
     /// Set the `isPartOf` field to an Option value (optional)
-    pub fn maybe_is_part_of(mut self, value: Option<RecipeIsPartOf<'a>>) -> Self {
+    pub fn maybe_is_part_of(mut self, value: Option<RecipeIsPartOf<S>>) -> Self {
         self._fields.77 = value;
         self
     }
@@ -7438,12 +8896,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(mut self, value: impl Into<Option<RecipeKeywords<'a>>>) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<RecipeKeywords<S>>>) -> Self {
         self._fields.78 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(mut self, value: Option<RecipeKeywords<'a>>) -> Self {
+    pub fn maybe_keywords(mut self, value: Option<RecipeKeywords<S>>) -> Self {
         self._fields.78 = value;
         self
     }
@@ -7453,7 +8911,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `learningResourceType` field (optional)
     pub fn learning_resource_type(
         mut self,
-        value: impl Into<Option<RecipeLearningResourceType<'a>>>,
+        value: impl Into<Option<RecipeLearningResourceType<S>>>,
     ) -> Self {
         self._fields.79 = value.into();
         self
@@ -7461,7 +8919,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `learningResourceType` field to an Option value (optional)
     pub fn maybe_learning_resource_type(
         mut self,
-        value: Option<RecipeLearningResourceType<'a>>,
+        value: Option<RecipeLearningResourceType<S>>,
     ) -> Self {
         self._fields.79 = value;
         self
@@ -7470,12 +8928,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `license` field (optional)
-    pub fn license(mut self, value: impl Into<Option<RecipeLicense<'a>>>) -> Self {
+    pub fn license(mut self, value: impl Into<Option<RecipeLicense<S>>>) -> Self {
         self._fields.80 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
-    pub fn maybe_license(mut self, value: Option<RecipeLicense<'a>>) -> Self {
+    pub fn maybe_license(mut self, value: Option<RecipeLicense<S>>) -> Self {
         self._fields.80 = value;
         self
     }
@@ -7485,7 +8943,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `locationCreated` field (optional)
     pub fn location_created(
         mut self,
-        value: impl Into<Option<RecipeLocationCreated<'a>>>,
+        value: impl Into<Option<RecipeLocationCreated<S>>>,
     ) -> Self {
         self._fields.81 = value.into();
         self
@@ -7493,7 +8951,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `locationCreated` field to an Option value (optional)
     pub fn maybe_location_created(
         mut self,
-        value: Option<RecipeLocationCreated<'a>>,
+        value: Option<RecipeLocationCreated<S>>,
     ) -> Self {
         self._fields.81 = value;
         self
@@ -7502,15 +8960,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `mainEntity` field (optional)
-    pub fn main_entity(
-        mut self,
-        value: impl Into<Option<RecipeMainEntity<'a>>>,
-    ) -> Self {
+    pub fn main_entity(mut self, value: impl Into<Option<RecipeMainEntity<S>>>) -> Self {
         self._fields.82 = value.into();
         self
     }
     /// Set the `mainEntity` field to an Option value (optional)
-    pub fn maybe_main_entity(mut self, value: Option<RecipeMainEntity<'a>>) -> Self {
+    pub fn maybe_main_entity(mut self, value: Option<RecipeMainEntity<S>>) -> Self {
         self._fields.82 = value;
         self
     }
@@ -7520,7 +8975,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
-        value: impl Into<Option<RecipeMainEntityOfPage<'a>>>,
+        value: impl Into<Option<RecipeMainEntityOfPage<S>>>,
     ) -> Self {
         self._fields.83 = value.into();
         self
@@ -7528,7 +8983,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field to an Option value (optional)
     pub fn maybe_main_entity_of_page(
         mut self,
-        value: Option<RecipeMainEntityOfPage<'a>>,
+        value: Option<RecipeMainEntityOfPage<S>>,
     ) -> Self {
         self._fields.83 = value;
         self
@@ -7537,12 +8992,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `maintainer` field (optional)
-    pub fn maintainer(mut self, value: impl Into<Option<RecipeMaintainer<'a>>>) -> Self {
+    pub fn maintainer(mut self, value: impl Into<Option<RecipeMaintainer<S>>>) -> Self {
         self._fields.84 = value.into();
         self
     }
     /// Set the `maintainer` field to an Option value (optional)
-    pub fn maybe_maintainer(mut self, value: Option<RecipeMaintainer<'a>>) -> Self {
+    pub fn maybe_maintainer(mut self, value: Option<RecipeMaintainer<S>>) -> Self {
         self._fields.84 = value;
         self
     }
@@ -7550,12 +9005,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `material` field (optional)
-    pub fn material(mut self, value: impl Into<Option<RecipeMaterial<'a>>>) -> Self {
+    pub fn material(mut self, value: impl Into<Option<RecipeMaterial<S>>>) -> Self {
         self._fields.85 = value.into();
         self
     }
     /// Set the `material` field to an Option value (optional)
-    pub fn maybe_material(mut self, value: Option<RecipeMaterial<'a>>) -> Self {
+    pub fn maybe_material(mut self, value: Option<RecipeMaterial<S>>) -> Self {
         self._fields.85 = value;
         self
     }
@@ -7565,7 +9020,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `materialExtent` field (optional)
     pub fn material_extent(
         mut self,
-        value: impl Into<Option<RecipeMaterialExtent<'a>>>,
+        value: impl Into<Option<RecipeMaterialExtent<S>>>,
     ) -> Self {
         self._fields.86 = value.into();
         self
@@ -7573,7 +9028,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `materialExtent` field to an Option value (optional)
     pub fn maybe_material_extent(
         mut self,
-        value: Option<RecipeMaterialExtent<'a>>,
+        value: Option<RecipeMaterialExtent<S>>,
     ) -> Self {
         self._fields.86 = value;
         self
@@ -7582,12 +9037,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `mentions` field (optional)
-    pub fn mentions(mut self, value: impl Into<Option<RecipeMentions<'a>>>) -> Self {
+    pub fn mentions(mut self, value: impl Into<Option<RecipeMentions<S>>>) -> Self {
         self._fields.87 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
-    pub fn maybe_mentions(mut self, value: Option<RecipeMentions<'a>>) -> Self {
+    pub fn maybe_mentions(mut self, value: Option<RecipeMentions<S>>) -> Self {
         self._fields.87 = value;
         self
     }
@@ -7595,12 +9050,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<RecipeName<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<RecipeName<S>>>) -> Self {
         self._fields.88 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<RecipeName<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<RecipeName<S>>) -> Self {
         self._fields.88 = value;
         self
     }
@@ -7608,12 +9063,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `nutrition` field (optional)
-    pub fn nutrition(mut self, value: impl Into<Option<RecipeNutrition<'a>>>) -> Self {
+    pub fn nutrition(mut self, value: impl Into<Option<RecipeNutrition<S>>>) -> Self {
         self._fields.89 = value.into();
         self
     }
     /// Set the `nutrition` field to an Option value (optional)
-    pub fn maybe_nutrition(mut self, value: Option<RecipeNutrition<'a>>) -> Self {
+    pub fn maybe_nutrition(mut self, value: Option<RecipeNutrition<S>>) -> Self {
         self._fields.89 = value;
         self
     }
@@ -7621,12 +9076,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `offers` field (optional)
-    pub fn offers(mut self, value: impl Into<Option<RecipeOffers<'a>>>) -> Self {
+    pub fn offers(mut self, value: impl Into<Option<RecipeOffers<S>>>) -> Self {
         self._fields.90 = value.into();
         self
     }
     /// Set the `offers` field to an Option value (optional)
-    pub fn maybe_offers(mut self, value: Option<RecipeOffers<'a>>) -> Self {
+    pub fn maybe_offers(mut self, value: Option<RecipeOffers<S>>) -> Self {
         self._fields.90 = value;
         self
     }
@@ -7634,12 +9089,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `pattern` field (optional)
-    pub fn pattern(mut self, value: impl Into<Option<RecipePattern<'a>>>) -> Self {
+    pub fn pattern(mut self, value: impl Into<Option<RecipePattern<S>>>) -> Self {
         self._fields.91 = value.into();
         self
     }
     /// Set the `pattern` field to an Option value (optional)
-    pub fn maybe_pattern(mut self, value: Option<RecipePattern<'a>>) -> Self {
+    pub fn maybe_pattern(mut self, value: Option<RecipePattern<S>>) -> Self {
         self._fields.91 = value;
         self
     }
@@ -7649,13 +9104,13 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `performTime` field (optional)
     pub fn perform_time(
         mut self,
-        value: impl Into<Option<RecipePerformTime<'a>>>,
+        value: impl Into<Option<RecipePerformTime<S>>>,
     ) -> Self {
         self._fields.92 = value.into();
         self
     }
     /// Set the `performTime` field to an Option value (optional)
-    pub fn maybe_perform_time(mut self, value: Option<RecipePerformTime<'a>>) -> Self {
+    pub fn maybe_perform_time(mut self, value: Option<RecipePerformTime<S>>) -> Self {
         self._fields.92 = value;
         self
     }
@@ -7663,12 +9118,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `position` field (optional)
-    pub fn position(mut self, value: impl Into<Option<RecipePosition<'a>>>) -> Self {
+    pub fn position(mut self, value: impl Into<Option<RecipePosition<S>>>) -> Self {
         self._fields.93 = value.into();
         self
     }
     /// Set the `position` field to an Option value (optional)
-    pub fn maybe_position(mut self, value: Option<RecipePosition<'a>>) -> Self {
+    pub fn maybe_position(mut self, value: Option<RecipePosition<S>>) -> Self {
         self._fields.93 = value;
         self
     }
@@ -7678,7 +9133,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `potentialAction` field (optional)
     pub fn potential_action(
         mut self,
-        value: impl Into<Option<RecipePotentialAction<'a>>>,
+        value: impl Into<Option<RecipePotentialAction<S>>>,
     ) -> Self {
         self._fields.94 = value.into();
         self
@@ -7686,7 +9141,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `potentialAction` field to an Option value (optional)
     pub fn maybe_potential_action(
         mut self,
-        value: Option<RecipePotentialAction<'a>>,
+        value: Option<RecipePotentialAction<S>>,
     ) -> Self {
         self._fields.94 = value;
         self
@@ -7695,12 +9150,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `prepTime` field (optional)
-    pub fn prep_time(mut self, value: impl Into<Option<RecipePrepTime<'a>>>) -> Self {
+    pub fn prep_time(mut self, value: impl Into<Option<RecipePrepTime<S>>>) -> Self {
         self._fields.95 = value.into();
         self
     }
     /// Set the `prepTime` field to an Option value (optional)
-    pub fn maybe_prep_time(mut self, value: Option<RecipePrepTime<'a>>) -> Self {
+    pub fn maybe_prep_time(mut self, value: Option<RecipePrepTime<S>>) -> Self {
         self._fields.95 = value;
         self
     }
@@ -7708,12 +9163,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `producer` field (optional)
-    pub fn producer(mut self, value: impl Into<Option<RecipeProducer<'a>>>) -> Self {
+    pub fn producer(mut self, value: impl Into<Option<RecipeProducer<S>>>) -> Self {
         self._fields.96 = value.into();
         self
     }
     /// Set the `producer` field to an Option value (optional)
-    pub fn maybe_producer(mut self, value: Option<RecipeProducer<'a>>) -> Self {
+    pub fn maybe_producer(mut self, value: Option<RecipeProducer<S>>) -> Self {
         self._fields.96 = value;
         self
     }
@@ -7721,12 +9176,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `provider` field (optional)
-    pub fn provider(mut self, value: impl Into<Option<RecipeProvider<'a>>>) -> Self {
+    pub fn provider(mut self, value: impl Into<Option<RecipeProvider<S>>>) -> Self {
         self._fields.97 = value.into();
         self
     }
     /// Set the `provider` field to an Option value (optional)
-    pub fn maybe_provider(mut self, value: Option<RecipeProvider<'a>>) -> Self {
+    pub fn maybe_provider(mut self, value: Option<RecipeProvider<S>>) -> Self {
         self._fields.97 = value;
         self
     }
@@ -7736,13 +9191,13 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `publication` field (optional)
     pub fn publication(
         mut self,
-        value: impl Into<Option<RecipePublication<'a>>>,
+        value: impl Into<Option<RecipePublication<S>>>,
     ) -> Self {
         self._fields.98 = value.into();
         self
     }
     /// Set the `publication` field to an Option value (optional)
-    pub fn maybe_publication(mut self, value: Option<RecipePublication<'a>>) -> Self {
+    pub fn maybe_publication(mut self, value: Option<RecipePublication<S>>) -> Self {
         self._fields.98 = value;
         self
     }
@@ -7750,12 +9205,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `publisher` field (optional)
-    pub fn publisher(mut self, value: impl Into<Option<RecipePublisher<'a>>>) -> Self {
+    pub fn publisher(mut self, value: impl Into<Option<RecipePublisher<S>>>) -> Self {
         self._fields.99 = value.into();
         self
     }
     /// Set the `publisher` field to an Option value (optional)
-    pub fn maybe_publisher(mut self, value: Option<RecipePublisher<'a>>) -> Self {
+    pub fn maybe_publisher(mut self, value: Option<RecipePublisher<S>>) -> Self {
         self._fields.99 = value;
         self
     }
@@ -7765,7 +9220,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `publisherImprint` field (optional)
     pub fn publisher_imprint(
         mut self,
-        value: impl Into<Option<RecipePublisherImprint<'a>>>,
+        value: impl Into<Option<RecipePublisherImprint<S>>>,
     ) -> Self {
         self._fields.100 = value.into();
         self
@@ -7773,7 +9228,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `publisherImprint` field to an Option value (optional)
     pub fn maybe_publisher_imprint(
         mut self,
-        value: Option<RecipePublisherImprint<'a>>,
+        value: Option<RecipePublisherImprint<S>>,
     ) -> Self {
         self._fields.100 = value;
         self
@@ -7784,7 +9239,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `publishingPrinciples` field (optional)
     pub fn publishing_principles(
         mut self,
-        value: impl Into<Option<RecipePublishingPrinciples<'a>>>,
+        value: impl Into<Option<RecipePublishingPrinciples<S>>>,
     ) -> Self {
         self._fields.101 = value.into();
         self
@@ -7792,7 +9247,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `publishingPrinciples` field to an Option value (optional)
     pub fn maybe_publishing_principles(
         mut self,
-        value: Option<RecipePublishingPrinciples<'a>>,
+        value: Option<RecipePublishingPrinciples<S>>,
     ) -> Self {
         self._fields.101 = value;
         self
@@ -7803,7 +9258,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `recipeCategory` field (optional)
     pub fn recipe_category(
         mut self,
-        value: impl Into<Option<RecipeRecipeCategory<'a>>>,
+        value: impl Into<Option<RecipeRecipeCategory<S>>>,
     ) -> Self {
         self._fields.102 = value.into();
         self
@@ -7811,7 +9266,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `recipeCategory` field to an Option value (optional)
     pub fn maybe_recipe_category(
         mut self,
-        value: Option<RecipeRecipeCategory<'a>>,
+        value: Option<RecipeRecipeCategory<S>>,
     ) -> Self {
         self._fields.102 = value;
         self
@@ -7822,7 +9277,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `recipeCuisine` field (optional)
     pub fn recipe_cuisine(
         mut self,
-        value: impl Into<Option<RecipeRecipeCuisine<'a>>>,
+        value: impl Into<Option<RecipeRecipeCuisine<S>>>,
     ) -> Self {
         self._fields.103 = value.into();
         self
@@ -7830,7 +9285,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `recipeCuisine` field to an Option value (optional)
     pub fn maybe_recipe_cuisine(
         mut self,
-        value: Option<RecipeRecipeCuisine<'a>>,
+        value: Option<RecipeRecipeCuisine<S>>,
     ) -> Self {
         self._fields.103 = value;
         self
@@ -7841,7 +9296,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `recipeIngredient` field (optional)
     pub fn recipe_ingredient(
         mut self,
-        value: impl Into<Option<RecipeRecipeIngredient<'a>>>,
+        value: impl Into<Option<RecipeRecipeIngredient<S>>>,
     ) -> Self {
         self._fields.104 = value.into();
         self
@@ -7849,7 +9304,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `recipeIngredient` field to an Option value (optional)
     pub fn maybe_recipe_ingredient(
         mut self,
-        value: Option<RecipeRecipeIngredient<'a>>,
+        value: Option<RecipeRecipeIngredient<S>>,
     ) -> Self {
         self._fields.104 = value;
         self
@@ -7860,7 +9315,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `recipeInstructions` field (optional)
     pub fn recipe_instructions(
         mut self,
-        value: impl Into<Option<RecipeRecipeInstructions<'a>>>,
+        value: impl Into<Option<RecipeRecipeInstructions<S>>>,
     ) -> Self {
         self._fields.105 = value.into();
         self
@@ -7868,7 +9323,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `recipeInstructions` field to an Option value (optional)
     pub fn maybe_recipe_instructions(
         mut self,
-        value: Option<RecipeRecipeInstructions<'a>>,
+        value: Option<RecipeRecipeInstructions<S>>,
     ) -> Self {
         self._fields.105 = value;
         self
@@ -7879,13 +9334,13 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `recipeYield` field (optional)
     pub fn recipe_yield(
         mut self,
-        value: impl Into<Option<RecipeRecipeYield<'a>>>,
+        value: impl Into<Option<RecipeRecipeYield<S>>>,
     ) -> Self {
         self._fields.106 = value.into();
         self
     }
     /// Set the `recipeYield` field to an Option value (optional)
-    pub fn maybe_recipe_yield(mut self, value: Option<RecipeRecipeYield<'a>>) -> Self {
+    pub fn maybe_recipe_yield(mut self, value: Option<RecipeRecipeYield<S>>) -> Self {
         self._fields.106 = value;
         self
     }
@@ -7893,15 +9348,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `recordedAt` field (optional)
-    pub fn recorded_at(
-        mut self,
-        value: impl Into<Option<RecipeRecordedAt<'a>>>,
-    ) -> Self {
+    pub fn recorded_at(mut self, value: impl Into<Option<RecipeRecordedAt<S>>>) -> Self {
         self._fields.107 = value.into();
         self
     }
     /// Set the `recordedAt` field to an Option value (optional)
-    pub fn maybe_recorded_at(mut self, value: Option<RecipeRecordedAt<'a>>) -> Self {
+    pub fn maybe_recorded_at(mut self, value: Option<RecipeRecordedAt<S>>) -> Self {
         self._fields.107 = value;
         self
     }
@@ -7911,7 +9363,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `releasedEvent` field (optional)
     pub fn released_event(
         mut self,
-        value: impl Into<Option<RecipeReleasedEvent<'a>>>,
+        value: impl Into<Option<RecipeReleasedEvent<S>>>,
     ) -> Self {
         self._fields.108 = value.into();
         self
@@ -7919,7 +9371,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `releasedEvent` field to an Option value (optional)
     pub fn maybe_released_event(
         mut self,
-        value: Option<RecipeReleasedEvent<'a>>,
+        value: Option<RecipeReleasedEvent<S>>,
     ) -> Self {
         self._fields.108 = value;
         self
@@ -7928,12 +9380,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `review` field (optional)
-    pub fn review(mut self, value: impl Into<Option<RecipeReview<'a>>>) -> Self {
+    pub fn review(mut self, value: impl Into<Option<RecipeReview<S>>>) -> Self {
         self._fields.109 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
-    pub fn maybe_review(mut self, value: Option<RecipeReview<'a>>) -> Self {
+    pub fn maybe_review(mut self, value: Option<RecipeReview<S>>) -> Self {
         self._fields.109 = value;
         self
     }
@@ -7941,12 +9393,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `reviews` field (optional)
-    pub fn reviews(mut self, value: impl Into<Option<RecipeReviews<'a>>>) -> Self {
+    pub fn reviews(mut self, value: impl Into<Option<RecipeReviews<S>>>) -> Self {
         self._fields.110 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
-    pub fn maybe_reviews(mut self, value: Option<RecipeReviews<'a>>) -> Self {
+    pub fn maybe_reviews(mut self, value: Option<RecipeReviews<S>>) -> Self {
         self._fields.110 = value;
         self
     }
@@ -7954,12 +9406,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
-    pub fn same_as(mut self, value: impl Into<Option<RecipeSameAs<'a>>>) -> Self {
+    pub fn same_as(mut self, value: impl Into<Option<RecipeSameAs<S>>>) -> Self {
         self._fields.111 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
-    pub fn maybe_same_as(mut self, value: Option<RecipeSameAs<'a>>) -> Self {
+    pub fn maybe_same_as(mut self, value: Option<RecipeSameAs<S>>) -> Self {
         self._fields.111 = value;
         self
     }
@@ -7969,7 +9421,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `schemaVersion` field (optional)
     pub fn schema_version(
         mut self,
-        value: impl Into<Option<RecipeSchemaVersion<'a>>>,
+        value: impl Into<Option<RecipeSchemaVersion<S>>>,
     ) -> Self {
         self._fields.112 = value.into();
         self
@@ -7977,7 +9429,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `schemaVersion` field to an Option value (optional)
     pub fn maybe_schema_version(
         mut self,
-        value: Option<RecipeSchemaVersion<'a>>,
+        value: Option<RecipeSchemaVersion<S>>,
     ) -> Self {
         self._fields.112 = value;
         self
@@ -7988,7 +9440,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `sdDatePublished` field (optional)
     pub fn sd_date_published(
         mut self,
-        value: impl Into<Option<RecipeSdDatePublished<'a>>>,
+        value: impl Into<Option<RecipeSdDatePublished<S>>>,
     ) -> Self {
         self._fields.113 = value.into();
         self
@@ -7996,7 +9448,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `sdDatePublished` field to an Option value (optional)
     pub fn maybe_sd_date_published(
         mut self,
-        value: Option<RecipeSdDatePublished<'a>>,
+        value: Option<RecipeSdDatePublished<S>>,
     ) -> Self {
         self._fields.113 = value;
         self
@@ -8005,12 +9457,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `sdLicense` field (optional)
-    pub fn sd_license(mut self, value: impl Into<Option<RecipeSdLicense<'a>>>) -> Self {
+    pub fn sd_license(mut self, value: impl Into<Option<RecipeSdLicense<S>>>) -> Self {
         self._fields.114 = value.into();
         self
     }
     /// Set the `sdLicense` field to an Option value (optional)
-    pub fn maybe_sd_license(mut self, value: Option<RecipeSdLicense<'a>>) -> Self {
+    pub fn maybe_sd_license(mut self, value: Option<RecipeSdLicense<S>>) -> Self {
         self._fields.114 = value;
         self
     }
@@ -8020,13 +9472,13 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `sdPublisher` field (optional)
     pub fn sd_publisher(
         mut self,
-        value: impl Into<Option<RecipeSdPublisher<'a>>>,
+        value: impl Into<Option<RecipeSdPublisher<S>>>,
     ) -> Self {
         self._fields.115 = value.into();
         self
     }
     /// Set the `sdPublisher` field to an Option value (optional)
-    pub fn maybe_sd_publisher(mut self, value: Option<RecipeSdPublisher<'a>>) -> Self {
+    pub fn maybe_sd_publisher(mut self, value: Option<RecipeSdPublisher<S>>) -> Self {
         self._fields.115 = value;
         self
     }
@@ -8034,12 +9486,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `size` field (optional)
-    pub fn size(mut self, value: impl Into<Option<RecipeSize<'a>>>) -> Self {
+    pub fn size(mut self, value: impl Into<Option<RecipeSize<S>>>) -> Self {
         self._fields.116 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
-    pub fn maybe_size(mut self, value: Option<RecipeSize<'a>>) -> Self {
+    pub fn maybe_size(mut self, value: Option<RecipeSize<S>>) -> Self {
         self._fields.116 = value;
         self
     }
@@ -8049,7 +9501,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `sourceOrganization` field (optional)
     pub fn source_organization(
         mut self,
-        value: impl Into<Option<RecipeSourceOrganization<'a>>>,
+        value: impl Into<Option<RecipeSourceOrganization<S>>>,
     ) -> Self {
         self._fields.117 = value.into();
         self
@@ -8057,7 +9509,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `sourceOrganization` field to an Option value (optional)
     pub fn maybe_source_organization(
         mut self,
-        value: Option<RecipeSourceOrganization<'a>>,
+        value: Option<RecipeSourceOrganization<S>>,
     ) -> Self {
         self._fields.117 = value;
         self
@@ -8066,12 +9518,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `spatial` field (optional)
-    pub fn spatial(mut self, value: impl Into<Option<RecipeSpatial<'a>>>) -> Self {
+    pub fn spatial(mut self, value: impl Into<Option<RecipeSpatial<S>>>) -> Self {
         self._fields.118 = value.into();
         self
     }
     /// Set the `spatial` field to an Option value (optional)
-    pub fn maybe_spatial(mut self, value: Option<RecipeSpatial<'a>>) -> Self {
+    pub fn maybe_spatial(mut self, value: Option<RecipeSpatial<S>>) -> Self {
         self._fields.118 = value;
         self
     }
@@ -8081,7 +9533,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `spatialCoverage` field (optional)
     pub fn spatial_coverage(
         mut self,
-        value: impl Into<Option<RecipeSpatialCoverage<'a>>>,
+        value: impl Into<Option<RecipeSpatialCoverage<S>>>,
     ) -> Self {
         self._fields.119 = value.into();
         self
@@ -8089,7 +9541,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `spatialCoverage` field to an Option value (optional)
     pub fn maybe_spatial_coverage(
         mut self,
-        value: Option<RecipeSpatialCoverage<'a>>,
+        value: Option<RecipeSpatialCoverage<S>>,
     ) -> Self {
         self._fields.119 = value;
         self
@@ -8098,12 +9550,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
-    pub fn sponsor(mut self, value: impl Into<Option<RecipeSponsor<'a>>>) -> Self {
+    pub fn sponsor(mut self, value: impl Into<Option<RecipeSponsor<S>>>) -> Self {
         self._fields.120 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
-    pub fn maybe_sponsor(mut self, value: Option<RecipeSponsor<'a>>) -> Self {
+    pub fn maybe_sponsor(mut self, value: Option<RecipeSponsor<S>>) -> Self {
         self._fields.120 = value;
         self
     }
@@ -8111,12 +9563,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `step` field (optional)
-    pub fn step(mut self, value: impl Into<Option<RecipeStep<'a>>>) -> Self {
+    pub fn step(mut self, value: impl Into<Option<RecipeStep<S>>>) -> Self {
         self._fields.121 = value.into();
         self
     }
     /// Set the `step` field to an Option value (optional)
-    pub fn maybe_step(mut self, value: Option<RecipeStep<'a>>) -> Self {
+    pub fn maybe_step(mut self, value: Option<RecipeStep<S>>) -> Self {
         self._fields.121 = value;
         self
     }
@@ -8124,12 +9576,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `steps` field (optional)
-    pub fn steps(mut self, value: impl Into<Option<RecipeSteps<'a>>>) -> Self {
+    pub fn steps(mut self, value: impl Into<Option<RecipeSteps<S>>>) -> Self {
         self._fields.122 = value.into();
         self
     }
     /// Set the `steps` field to an Option value (optional)
-    pub fn maybe_steps(mut self, value: Option<RecipeSteps<'a>>) -> Self {
+    pub fn maybe_steps(mut self, value: Option<RecipeSteps<S>>) -> Self {
         self._fields.122 = value;
         self
     }
@@ -8137,12 +9589,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(mut self, value: impl Into<Option<RecipeSubjectOf<'a>>>) -> Self {
+    pub fn subject_of(mut self, value: impl Into<Option<RecipeSubjectOf<S>>>) -> Self {
         self._fields.123 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
-    pub fn maybe_subject_of(mut self, value: Option<RecipeSubjectOf<'a>>) -> Self {
+    pub fn maybe_subject_of(mut self, value: Option<RecipeSubjectOf<S>>) -> Self {
         self._fields.123 = value;
         self
     }
@@ -8152,7 +9604,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `suitableForDiet` field (optional)
     pub fn suitable_for_diet(
         mut self,
-        value: impl Into<Option<RecipeSuitableForDiet<'a>>>,
+        value: impl Into<Option<RecipeSuitableForDiet<S>>>,
     ) -> Self {
         self._fields.124 = value.into();
         self
@@ -8160,7 +9612,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `suitableForDiet` field to an Option value (optional)
     pub fn maybe_suitable_for_diet(
         mut self,
-        value: Option<RecipeSuitableForDiet<'a>>,
+        value: Option<RecipeSuitableForDiet<S>>,
     ) -> Self {
         self._fields.124 = value;
         self
@@ -8169,12 +9621,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `supply` field (optional)
-    pub fn supply(mut self, value: impl Into<Option<RecipeSupply<'a>>>) -> Self {
+    pub fn supply(mut self, value: impl Into<Option<RecipeSupply<S>>>) -> Self {
         self._fields.125 = value.into();
         self
     }
     /// Set the `supply` field to an Option value (optional)
-    pub fn maybe_supply(mut self, value: Option<RecipeSupply<'a>>) -> Self {
+    pub fn maybe_supply(mut self, value: Option<RecipeSupply<S>>) -> Self {
         self._fields.125 = value;
         self
     }
@@ -8182,12 +9634,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `teaches` field (optional)
-    pub fn teaches(mut self, value: impl Into<Option<RecipeTeaches<'a>>>) -> Self {
+    pub fn teaches(mut self, value: impl Into<Option<RecipeTeaches<S>>>) -> Self {
         self._fields.126 = value.into();
         self
     }
     /// Set the `teaches` field to an Option value (optional)
-    pub fn maybe_teaches(mut self, value: Option<RecipeTeaches<'a>>) -> Self {
+    pub fn maybe_teaches(mut self, value: Option<RecipeTeaches<S>>) -> Self {
         self._fields.126 = value;
         self
     }
@@ -8195,12 +9647,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `temporal` field (optional)
-    pub fn temporal(mut self, value: impl Into<Option<RecipeTemporal<'a>>>) -> Self {
+    pub fn temporal(mut self, value: impl Into<Option<RecipeTemporal<S>>>) -> Self {
         self._fields.127 = value.into();
         self
     }
     /// Set the `temporal` field to an Option value (optional)
-    pub fn maybe_temporal(mut self, value: Option<RecipeTemporal<'a>>) -> Self {
+    pub fn maybe_temporal(mut self, value: Option<RecipeTemporal<S>>) -> Self {
         self._fields.127 = value;
         self
     }
@@ -8210,7 +9662,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `temporalCoverage` field (optional)
     pub fn temporal_coverage(
         mut self,
-        value: impl Into<Option<RecipeTemporalCoverage<'a>>>,
+        value: impl Into<Option<RecipeTemporalCoverage<S>>>,
     ) -> Self {
         self._fields.128 = value.into();
         self
@@ -8218,7 +9670,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `temporalCoverage` field to an Option value (optional)
     pub fn maybe_temporal_coverage(
         mut self,
-        value: Option<RecipeTemporalCoverage<'a>>,
+        value: Option<RecipeTemporalCoverage<S>>,
     ) -> Self {
         self._fields.128 = value;
         self
@@ -8227,12 +9679,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `text` field (optional)
-    pub fn text(mut self, value: impl Into<Option<RecipeText<'a>>>) -> Self {
+    pub fn text(mut self, value: impl Into<Option<RecipeText<S>>>) -> Self {
         self._fields.129 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
-    pub fn maybe_text(mut self, value: Option<RecipeText<'a>>) -> Self {
+    pub fn maybe_text(mut self, value: Option<RecipeText<S>>) -> Self {
         self._fields.129 = value;
         self
     }
@@ -8240,12 +9692,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
-    pub fn thumbnail(mut self, value: impl Into<Option<RecipeThumbnail<'a>>>) -> Self {
+    pub fn thumbnail(mut self, value: impl Into<Option<RecipeThumbnail<S>>>) -> Self {
         self._fields.130 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
-    pub fn maybe_thumbnail(mut self, value: Option<RecipeThumbnail<'a>>) -> Self {
+    pub fn maybe_thumbnail(mut self, value: Option<RecipeThumbnail<S>>) -> Self {
         self._fields.130 = value;
         self
     }
@@ -8255,13 +9707,13 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `thumbnailUrl` field (optional)
     pub fn thumbnail_url(
         mut self,
-        value: impl Into<Option<RecipeThumbnailUrl<'a>>>,
+        value: impl Into<Option<RecipeThumbnailUrl<S>>>,
     ) -> Self {
         self._fields.131 = value.into();
         self
     }
     /// Set the `thumbnailUrl` field to an Option value (optional)
-    pub fn maybe_thumbnail_url(mut self, value: Option<RecipeThumbnailUrl<'a>>) -> Self {
+    pub fn maybe_thumbnail_url(mut self, value: Option<RecipeThumbnailUrl<S>>) -> Self {
         self._fields.131 = value;
         self
     }
@@ -8271,13 +9723,13 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `timeRequired` field (optional)
     pub fn time_required(
         mut self,
-        value: impl Into<Option<RecipeTimeRequired<'a>>>,
+        value: impl Into<Option<RecipeTimeRequired<S>>>,
     ) -> Self {
         self._fields.132 = value.into();
         self
     }
     /// Set the `timeRequired` field to an Option value (optional)
-    pub fn maybe_time_required(mut self, value: Option<RecipeTimeRequired<'a>>) -> Self {
+    pub fn maybe_time_required(mut self, value: Option<RecipeTimeRequired<S>>) -> Self {
         self._fields.132 = value;
         self
     }
@@ -8285,12 +9737,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `tool` field (optional)
-    pub fn tool(mut self, value: impl Into<Option<RecipeTool<'a>>>) -> Self {
+    pub fn tool(mut self, value: impl Into<Option<RecipeTool<S>>>) -> Self {
         self._fields.133 = value.into();
         self
     }
     /// Set the `tool` field to an Option value (optional)
-    pub fn maybe_tool(mut self, value: Option<RecipeTool<'a>>) -> Self {
+    pub fn maybe_tool(mut self, value: Option<RecipeTool<S>>) -> Self {
         self._fields.133 = value;
         self
     }
@@ -8298,12 +9750,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `totalTime` field (optional)
-    pub fn total_time(mut self, value: impl Into<Option<RecipeTotalTime<'a>>>) -> Self {
+    pub fn total_time(mut self, value: impl Into<Option<RecipeTotalTime<S>>>) -> Self {
         self._fields.134 = value.into();
         self
     }
     /// Set the `totalTime` field to an Option value (optional)
-    pub fn maybe_total_time(mut self, value: Option<RecipeTotalTime<'a>>) -> Self {
+    pub fn maybe_total_time(mut self, value: Option<RecipeTotalTime<S>>) -> Self {
         self._fields.134 = value;
         self
     }
@@ -8313,7 +9765,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `translationOfWork` field (optional)
     pub fn translation_of_work(
         mut self,
-        value: impl Into<Option<RecipeTranslationOfWork<'a>>>,
+        value: impl Into<Option<RecipeTranslationOfWork<S>>>,
     ) -> Self {
         self._fields.135 = value.into();
         self
@@ -8321,7 +9773,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `translationOfWork` field to an Option value (optional)
     pub fn maybe_translation_of_work(
         mut self,
-        value: Option<RecipeTranslationOfWork<'a>>,
+        value: Option<RecipeTranslationOfWork<S>>,
     ) -> Self {
         self._fields.135 = value;
         self
@@ -8330,12 +9782,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `translator` field (optional)
-    pub fn translator(mut self, value: impl Into<Option<RecipeTranslator<'a>>>) -> Self {
+    pub fn translator(mut self, value: impl Into<Option<RecipeTranslator<S>>>) -> Self {
         self._fields.136 = value.into();
         self
     }
     /// Set the `translator` field to an Option value (optional)
-    pub fn maybe_translator(mut self, value: Option<RecipeTranslator<'a>>) -> Self {
+    pub fn maybe_translator(mut self, value: Option<RecipeTranslator<S>>) -> Self {
         self._fields.136 = value;
         self
     }
@@ -8345,7 +9797,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `typicalAgeRange` field (optional)
     pub fn typical_age_range(
         mut self,
-        value: impl Into<Option<RecipeTypicalAgeRange<'a>>>,
+        value: impl Into<Option<RecipeTypicalAgeRange<S>>>,
     ) -> Self {
         self._fields.137 = value.into();
         self
@@ -8353,7 +9805,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `typicalAgeRange` field to an Option value (optional)
     pub fn maybe_typical_age_range(
         mut self,
-        value: Option<RecipeTypicalAgeRange<'a>>,
+        value: Option<RecipeTypicalAgeRange<S>>,
     ) -> Self {
         self._fields.137 = value;
         self
@@ -8362,12 +9814,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<RecipeUrl<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<RecipeUrl<S>>>) -> Self {
         self._fields.138 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<RecipeUrl<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<RecipeUrl<S>>) -> Self {
         self._fields.138 = value;
         self
     }
@@ -8375,12 +9827,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `usageInfo` field (optional)
-    pub fn usage_info(mut self, value: impl Into<Option<RecipeUsageInfo<'a>>>) -> Self {
+    pub fn usage_info(mut self, value: impl Into<Option<RecipeUsageInfo<S>>>) -> Self {
         self._fields.139 = value.into();
         self
     }
     /// Set the `usageInfo` field to an Option value (optional)
-    pub fn maybe_usage_info(mut self, value: Option<RecipeUsageInfo<'a>>) -> Self {
+    pub fn maybe_usage_info(mut self, value: Option<RecipeUsageInfo<S>>) -> Self {
         self._fields.139 = value;
         self
     }
@@ -8388,12 +9840,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `version` field (optional)
-    pub fn version(mut self, value: impl Into<Option<RecipeVersion<'a>>>) -> Self {
+    pub fn version(mut self, value: impl Into<Option<RecipeVersion<S>>>) -> Self {
         self._fields.140 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
-    pub fn maybe_version(mut self, value: Option<RecipeVersion<'a>>) -> Self {
+    pub fn maybe_version(mut self, value: Option<RecipeVersion<S>>) -> Self {
         self._fields.140 = value;
         self
     }
@@ -8401,12 +9853,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `video` field (optional)
-    pub fn video(mut self, value: impl Into<Option<RecipeVideo<'a>>>) -> Self {
+    pub fn video(mut self, value: impl Into<Option<RecipeVideo<S>>>) -> Self {
         self._fields.141 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
-    pub fn maybe_video(mut self, value: Option<RecipeVideo<'a>>) -> Self {
+    pub fn maybe_video(mut self, value: Option<RecipeVideo<S>>) -> Self {
         self._fields.141 = value;
         self
     }
@@ -8414,12 +9866,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `wordCount` field (optional)
-    pub fn word_count(mut self, value: impl Into<Option<RecipeWordCount<'a>>>) -> Self {
+    pub fn word_count(mut self, value: impl Into<Option<RecipeWordCount<S>>>) -> Self {
         self._fields.142 = value.into();
         self
     }
     /// Set the `wordCount` field to an Option value (optional)
-    pub fn maybe_word_count(mut self, value: Option<RecipeWordCount<'a>>) -> Self {
+    pub fn maybe_word_count(mut self, value: Option<RecipeWordCount<S>>) -> Self {
         self._fields.142 = value;
         self
     }
@@ -8429,13 +9881,13 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `workExample` field (optional)
     pub fn work_example(
         mut self,
-        value: impl Into<Option<RecipeWorkExample<'a>>>,
+        value: impl Into<Option<RecipeWorkExample<S>>>,
     ) -> Self {
         self._fields.143 = value.into();
         self
     }
     /// Set the `workExample` field to an Option value (optional)
-    pub fn maybe_work_example(mut self, value: Option<RecipeWorkExample<'a>>) -> Self {
+    pub fn maybe_work_example(mut self, value: Option<RecipeWorkExample<S>>) -> Self {
         self._fields.143 = value;
         self
     }
@@ -8445,7 +9897,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `workTranslation` field (optional)
     pub fn work_translation(
         mut self,
-        value: impl Into<Option<RecipeWorkTranslation<'a>>>,
+        value: impl Into<Option<RecipeWorkTranslation<S>>>,
     ) -> Self {
         self._fields.144 = value.into();
         self
@@ -8453,7 +9905,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `workTranslation` field to an Option value (optional)
     pub fn maybe_work_translation(
         mut self,
-        value: Option<RecipeWorkTranslation<'a>>,
+        value: Option<RecipeWorkTranslation<S>>,
     ) -> Self {
         self._fields.144 = value;
         self
@@ -8462,12 +9914,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `yield` field (optional)
-    pub fn r#yield(mut self, value: impl Into<Option<RecipeYield<'a>>>) -> Self {
+    pub fn r#yield(mut self, value: impl Into<Option<RecipeYield<S>>>) -> Self {
         self._fields.145 = value.into();
         self
     }
     /// Set the `yield` field to an Option value (optional)
-    pub fn maybe_yield(mut self, value: Option<RecipeYield<'a>>) -> Self {
+    pub fn maybe_yield(mut self, value: Option<RecipeYield<S>>) -> Self {
         self._fields.145 = value;
         self
     }
@@ -8630,10 +10082,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Recipe<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Recipe<'a> {
         Recipe {
             about: self._fields.0,
             r#abstract: self._fields.1,

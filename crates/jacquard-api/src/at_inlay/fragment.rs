@@ -10,27 +10,46 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Fragment<'a> {
-    #[serde(borrow)]
-    pub children: Data<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Fragment<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub children: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct FragmentOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FragmentOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Response<'a>,
+    pub value: Response<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for at.inlay.Fragment
@@ -38,11 +57,12 @@ pub struct FragmentResponse;
 impl jacquard_common::xrpc::XrpcResp for FragmentResponse {
     const NSID: &'static str = "at.inlay.Fragment";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = FragmentOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = FragmentOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Fragment<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Fragment<S> {
     const NSID: &'static str = "at.inlay.Fragment";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -57,7 +77,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for FragmentRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Fragment<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Fragment<S>;
     type Response = FragmentResponse;
 }
 
@@ -96,7 +116,7 @@ pub mod fragment_state {
 /// Builder for constructing an instance of this type
 pub struct FragmentBuilder<'a, S: fragment_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Data<'a>>,),
+    _fields: (Option<Data<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -126,7 +146,7 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> FragmentBuilder<'a, fragment_state::SetChildren<S>> {
         self._fields.0 = Option::Some(value.into());
         FragmentBuilder {
@@ -152,7 +172,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Fragment<'a> {
         Fragment {
             children: self._fields.0.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,53 +30,64 @@ use serde::{Serialize, Deserialize};
 use crate::net_mimonelu::klearsky::repost_mutes;
 /// Klearsky client-specific record that stores a list of DIDs whose reposts should be muted.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "net.mimonelu.klearsky.repostMutes",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct RepostMutes<'a> {
+pub struct RepostMutes<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when this record was created (or last rewritten).
     pub created_at: Datetime,
     ///List of subjects (DIDs) whose reposts are muted in this client. Each entry includes when it was added.
-    #[serde(borrow)]
-    pub subjects: Vec<repost_mutes::Subject<'a>>,
+    pub subjects: Vec<repost_mutes::Subject<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RepostMutesGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RepostMutesGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: RepostMutes<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: RepostMutes<S>,
 }
 
 /// A DID added to repost-mute list and the timestamp when it was added.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Subject<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Subject<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when this DID was added to the mute list.
     pub created_at: Datetime,
     ///DID of the user whose reposts are muted.
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> RepostMutes<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, RepostMutesRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> RepostMutes<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, RepostMutesRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -85,18 +98,17 @@ pub struct RepostMutesRecord;
 impl XrpcResp for RepostMutesRecord {
     const NSID: &'static str = "net.mimonelu.klearsky.repostMutes";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RepostMutesGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RepostMutesGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<RepostMutesGetRecordOutput<'_>> for RepostMutes<'_> {
-    fn from(output: RepostMutesGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<RepostMutesGetRecordOutput<S>> for RepostMutes<S> {
+    fn from(output: RepostMutesGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for RepostMutes<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for RepostMutes<S> {
     const NSID: &'static str = "net.mimonelu.klearsky.repostMutes";
     type Record = RepostMutesRecord;
 }
@@ -106,7 +118,7 @@ impl Collection for RepostMutesRecord {
     type Record = RepostMutesRecord;
 }
 
-impl<'a> LexiconSchema for RepostMutes<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RepostMutes<S> {
     fn nsid() -> &'static str {
         "net.mimonelu.klearsky.repostMutes"
     }
@@ -121,7 +133,7 @@ impl<'a> LexiconSchema for RepostMutes<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Subject<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Subject<S> {
     fn nsid() -> &'static str {
         "net.mimonelu.klearsky.repostMutes"
     }
@@ -146,44 +158,44 @@ pub mod repost_mutes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subjects;
         type CreatedAt;
+        type Subjects;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subjects = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subjects` field to Set
-    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubjects<S> {}
-    impl<S: State> State for SetSubjects<S> {
-        type Subjects = Set<members::subjects>;
-        type CreatedAt = S::CreatedAt;
+        type Subjects = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subjects = S::Subjects;
         type CreatedAt = Set<members::created_at>;
+        type Subjects = S::Subjects;
+    }
+    ///State transition - sets the `subjects` field to Set
+    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubjects<S> {}
+    impl<S: State> State for SetSubjects<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subjects = Set<members::subjects>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subjects` field
-        pub struct subjects(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subjects` field
+        pub struct subjects(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RepostMutesBuilder<'a, S: repost_mutes_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Vec<repost_mutes::Subject<'a>>>),
+    _fields: (Option<Datetime>, Option<Vec<repost_mutes::Subject<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -232,7 +244,7 @@ where
     /// Set the `subjects` field (required)
     pub fn subjects(
         mut self,
-        value: impl Into<Vec<repost_mutes::Subject<'a>>>,
+        value: impl Into<Vec<repost_mutes::Subject<S>>>,
     ) -> RepostMutesBuilder<'a, repost_mutes_state::SetSubjects<S>> {
         self._fields.1 = Option::Some(value.into());
         RepostMutesBuilder {
@@ -246,8 +258,8 @@ where
 impl<'a, S> RepostMutesBuilder<'a, S>
 where
     S: repost_mutes_state::State,
-    S::Subjects: repost_mutes_state::IsSet,
     S::CreatedAt: repost_mutes_state::IsSet,
+    S::Subjects: repost_mutes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RepostMutes<'a> {
@@ -260,10 +272,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RepostMutes<'a> {
         RepostMutes {
             created_at: self._fields.0.unwrap(),
@@ -397,44 +406,44 @@ pub mod subject_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type CreatedAt;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type CreatedAt = S::CreatedAt;
+        type Did = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Did = S::Did;
         type CreatedAt = Set<members::created_at>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type CreatedAt = S::CreatedAt;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SubjectBuilder<'a, S: subject_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Did<'a>>),
+    _fields: (Option<Datetime>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -483,7 +492,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> SubjectBuilder<'a, subject_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         SubjectBuilder {
@@ -497,8 +506,8 @@ where
 impl<'a, S> SubjectBuilder<'a, S>
 where
     S: subject_state::State,
-    S::Did: subject_state::IsSet,
     S::CreatedAt: subject_state::IsSet,
+    S::Did: subject_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Subject<'a> {
@@ -511,10 +520,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Subject<'a> {
         Subject {
             created_at: self._fields.0.unwrap(),

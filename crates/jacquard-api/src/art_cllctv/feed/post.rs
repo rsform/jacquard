@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, Language};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -35,103 +37,122 @@ use crate::art_cllctv::embed::images::Images;
 use crate::com_atproto::label::SelfLabels;
 use crate::art_cllctv::feed::post;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Category<'a> {
-    #[serde(borrow)]
-    pub group: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Category<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub group: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<Vec<CowStr<'a>>>,
+    pub labels: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Record containing a cllctv.ART post.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "art.cllctv.feed.post", tag = "$type")]
-pub struct Post<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "art.cllctv.feed.post",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Post<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category: Option<post::Category<'a>>,
+    pub category: Option<post::Category<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content: Option<PostContent<'a>>,
+    pub content: Option<PostContent<S>>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub embed: Option<PostEmbed<'a>>,
+    pub embed: Option<PostEmbed<S>>,
     ///Self-label values for this post. Effectively content warnings.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<SelfLabels<'a>>,
+    pub labels: Option<SelfLabels<S>>,
     ///Indicates human language of post primary text content.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub langs: Option<Vec<Language>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub og_image: Option<BlobRef<'a>>,
+    pub og_image: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tombstone: Option<Tombstone<'a>>,
+    pub tombstone: Option<Tombstone<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PostContent<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PostContent<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "art.cllctv.content.plaintext")]
-    Plaintext(Box<Plaintext<'a>>),
+    Plaintext(Box<Plaintext<S>>),
     #[serde(rename = "art.cllctv.content.markdoc")]
-    Markdoc(Box<Markdoc<'a>>),
+    Markdoc(Box<Markdoc<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PostEmbed<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PostEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "art.cllctv.embed.images")]
-    Images(Box<Images<'a>>),
+    Images(Box<Images<S>>),
     #[serde(rename = "art.cllctv.embed.external")]
-    External(Box<External<'a>>),
+    External(Box<External<S>>),
     #[serde(rename = "art.cllctv.embed.externalVideo")]
-    ExternalVideo(Box<ExternalVideo<'a>>),
+    ExternalVideo(Box<ExternalVideo<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PostGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PostGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Post<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Post<S>,
 }
 
-impl<'a> Post<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PostRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Post<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PostRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Category<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Category<S> {
     fn nsid() -> &'static str {
         "art.cllctv.feed.post"
     }
@@ -153,18 +174,17 @@ pub struct PostRecord;
 impl XrpcResp for PostRecord {
     const NSID: &'static str = "art.cllctv.feed.post";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PostGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PostGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PostGetRecordOutput<'_>> for Post<'_> {
-    fn from(output: PostGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PostGetRecordOutput<S>> for Post<S> {
+    fn from(output: PostGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Post<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Post<S> {
     const NSID: &'static str = "art.cllctv.feed.post";
     type Record = PostRecord;
 }
@@ -174,7 +194,7 @@ impl Collection for PostRecord {
     type Record = PostRecord;
 }
 
-impl<'a> LexiconSchema for Post<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Post<S> {
     fn nsid() -> &'static str {
         "art.cllctv.feed.post"
     }
@@ -478,17 +498,17 @@ pub mod post_state {
 pub struct PostBuilder<'a, S: post_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<post::Category<'a>>,
-        Option<PostContent<'a>>,
+        Option<post::Category<S>>,
+        Option<PostContent<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<PostEmbed<'a>>,
-        Option<SelfLabels<'a>>,
+        Option<S>,
+        Option<PostEmbed<S>>,
+        Option<SelfLabels<S>>,
         Option<Vec<Language>>,
-        Option<BlobRef<'a>>,
+        Option<BlobRef<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Tombstone<'a>>,
+        Option<S>,
+        Option<Tombstone<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -513,12 +533,12 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(mut self, value: impl Into<Option<post::Category<'a>>>) -> Self {
+    pub fn category(mut self, value: impl Into<Option<post::Category<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<post::Category<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<post::Category<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -526,12 +546,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `content` field (optional)
-    pub fn content(mut self, value: impl Into<Option<PostContent<'a>>>) -> Self {
+    pub fn content(mut self, value: impl Into<Option<PostContent<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
-    pub fn maybe_content(mut self, value: Option<PostContent<'a>>) -> Self {
+    pub fn maybe_content(mut self, value: Option<PostContent<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -558,12 +578,12 @@ where
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -571,12 +591,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `embed` field (optional)
-    pub fn embed(mut self, value: impl Into<Option<PostEmbed<'a>>>) -> Self {
+    pub fn embed(mut self, value: impl Into<Option<PostEmbed<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `embed` field to an Option value (optional)
-    pub fn maybe_embed(mut self, value: Option<PostEmbed<'a>>) -> Self {
+    pub fn maybe_embed(mut self, value: Option<PostEmbed<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -584,12 +604,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -610,12 +630,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `ogImage` field (optional)
-    pub fn og_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn og_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `ogImage` field to an Option value (optional)
-    pub fn maybe_og_image(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_og_image(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -636,12 +656,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -649,12 +669,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `tombstone` field (optional)
-    pub fn tombstone(mut self, value: impl Into<Option<Tombstone<'a>>>) -> Self {
+    pub fn tombstone(mut self, value: impl Into<Option<Tombstone<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `tombstone` field to an Option value (optional)
-    pub fn maybe_tombstone(mut self, value: Option<Tombstone<'a>>) -> Self {
+    pub fn maybe_tombstone(mut self, value: Option<Tombstone<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -683,13 +703,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Post<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Post<'a> {
         Post {
             category: self._fields.0,
             content: self._fields.1,

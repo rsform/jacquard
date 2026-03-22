@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,39 +28,47 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.tangled.publicKey", tag = "$type")]
-pub struct PublicKey<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.tangled.publicKey",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PublicKey<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///key upload timestamp
     pub created_at: Datetime,
     ///public key contents
-    #[serde(borrow)]
-    pub key: CowStr<'a>,
+    pub key: S,
     ///human-readable name for this key
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PublicKeyGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PublicKeyGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: PublicKey<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: PublicKey<S>,
 }
 
-impl<'a> PublicKey<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PublicKeyRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> PublicKey<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PublicKeyRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -69,18 +79,17 @@ pub struct PublicKeyRecord;
 impl XrpcResp for PublicKeyRecord {
     const NSID: &'static str = "sh.tangled.publicKey";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PublicKeyGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PublicKeyGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PublicKeyGetRecordOutput<'_>> for PublicKey<'_> {
-    fn from(output: PublicKeyGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PublicKeyGetRecordOutput<S>> for PublicKey<S> {
+    fn from(output: PublicKeyGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for PublicKey<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for PublicKey<S> {
     const NSID: &'static str = "sh.tangled.publicKey";
     type Record = PublicKeyRecord;
 }
@@ -90,7 +99,7 @@ impl Collection for PublicKeyRecord {
     type Record = PublicKeyRecord;
 }
 
-impl<'a> LexiconSchema for PublicKey<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PublicKey<S> {
     fn nsid() -> &'static str {
         "sh.tangled.publicKey"
     }
@@ -177,7 +186,7 @@ pub mod public_key_state {
 /// Builder for constructing an instance of this type
 pub struct PublicKeyBuilder<'a, S: public_key_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Datetime>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -226,7 +235,7 @@ where
     /// Set the `key` field (required)
     pub fn key(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PublicKeyBuilder<'a, public_key_state::SetKey<S>> {
         self._fields.1 = Option::Some(value.into());
         PublicKeyBuilder {
@@ -245,7 +254,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PublicKeyBuilder<'a, public_key_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         PublicKeyBuilder {
@@ -275,10 +284,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PublicKey<'a> {
         PublicKey {
             created_at: self._fields.0.unwrap(),

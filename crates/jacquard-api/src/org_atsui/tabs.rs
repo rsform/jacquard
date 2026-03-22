@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,39 +27,60 @@ use crate::at_inlay::Element;
 use crate::at_inlay::Response;
 use crate::org_atsui::tabs;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Tabs<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Tabs<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Tabs to display.
-    #[serde(borrow)]
-    pub items: Vec<tabs::Tab<'a>>,
+    pub items: Vec<tabs::Tab<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct TabsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TabsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Response<'a>,
+    pub value: Response<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Tab<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Tab<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Element to render as tab content.
-    #[serde(borrow)]
-    pub content: Element<'a>,
+    pub content: Element<S>,
     ///Stable key that identifies the tab among its siblings.
-    #[serde(borrow)]
-    pub key: CowStr<'a>,
+    pub key: S,
     ///Display label for the tab.
-    #[serde(borrow)]
-    pub label: CowStr<'a>,
+    pub label: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for org.atsui.Tabs
@@ -65,11 +88,12 @@ pub struct TabsResponse;
 impl jacquard_common::xrpc::XrpcResp for TabsResponse {
     const NSID: &'static str = "org.atsui.Tabs";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TabsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TabsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Tabs<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Tabs<S> {
     const NSID: &'static str = "org.atsui.Tabs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -84,11 +108,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for TabsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Tabs<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Tabs<S>;
     type Response = TabsResponse;
 }
 
-impl<'a> LexiconSchema for Tab<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tab<S> {
     fn nsid() -> &'static str {
         "org.atsui.Tabs"
     }
@@ -160,7 +184,7 @@ pub mod tabs_state {
 /// Builder for constructing an instance of this type
 pub struct TabsBuilder<'a, S: tabs_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<tabs::Tab<'a>>>,),
+    _fields: (Option<Vec<tabs::Tab<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -190,7 +214,7 @@ where
     /// Set the `items` field (required)
     pub fn items(
         mut self,
-        value: impl Into<Vec<tabs::Tab<'a>>>,
+        value: impl Into<Vec<tabs::Tab<S>>>,
     ) -> TabsBuilder<'a, tabs_state::SetItems<S>> {
         self._fields.0 = Option::Some(value.into());
         TabsBuilder {
@@ -214,13 +238,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Tabs<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Tabs<'a> {
         Tabs {
             items: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -238,58 +256,58 @@ pub mod tab_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Label;
         type Content;
         type Key;
-        type Label;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Label = Unset;
         type Content = Unset;
         type Key = Unset;
-        type Label = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Key = S::Key;
-        type Label = S::Label;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Content = S::Content;
-        type Key = Set<members::key>;
-        type Label = S::Label;
     }
     ///State transition - sets the `label` field to Set
     pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLabel<S> {}
     impl<S: State> State for SetLabel<S> {
+        type Label = Set<members::label>;
         type Content = S::Content;
         type Key = S::Key;
-        type Label = Set<members::label>;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Label = S::Label;
+        type Content = Set<members::content>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Label = S::Label;
+        type Content = S::Content;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `label` field
+        pub struct label(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `key` field
         pub struct key(());
-        ///Marker type for the `label` field
-        pub struct label(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TabBuilder<'a, S: tab_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Element<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Element<S>>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -319,7 +337,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<Element<'a>>,
+        value: impl Into<Element<S>>,
     ) -> TabBuilder<'a, tab_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         TabBuilder {
@@ -336,10 +354,7 @@ where
     S::Key: tab_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(
-        mut self,
-        value: impl Into<CowStr<'a>>,
-    ) -> TabBuilder<'a, tab_state::SetKey<S>> {
+    pub fn key(mut self, value: impl Into<S>) -> TabBuilder<'a, tab_state::SetKey<S>> {
         self._fields.1 = Option::Some(value.into());
         TabBuilder {
             _state: PhantomData,
@@ -357,7 +372,7 @@ where
     /// Set the `label` field (required)
     pub fn label(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TabBuilder<'a, tab_state::SetLabel<S>> {
         self._fields.2 = Option::Some(value.into());
         TabBuilder {
@@ -371,9 +386,9 @@ where
 impl<'a, S> TabBuilder<'a, S>
 where
     S: tab_state::State,
+    S::Label: tab_state::IsSet,
     S::Content: tab_state::IsSet,
     S::Key: tab_state::IsSet,
-    S::Label: tab_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tab<'a> {
@@ -385,13 +400,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Tab<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Tab<'a> {
         Tab {
             content: self._fields.0.unwrap(),
             key: self._fields.1.unwrap(),

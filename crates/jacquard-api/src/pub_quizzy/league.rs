@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,40 +30,47 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A quiz league with quiz masters and teams
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "pub.quizzy.league", tag = "$type")]
-pub struct League<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "pub.quizzy.league",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct League<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Name of the league
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///DIDs of quiz masters who can run quizzes for this league
-    #[serde(borrow)]
-    pub quiz_masters: Vec<Did<'a>>,
+    pub quiz_masters: Vec<Did<S>>,
     ///Teams participating in this league
-    #[serde(borrow)]
-    pub teams: Vec<StrongRef<'a>>,
+    pub teams: Vec<StrongRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LeagueGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LeagueGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: League<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: League<S>,
 }
 
-impl<'a> League<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LeagueRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> League<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LeagueRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -72,18 +81,17 @@ pub struct LeagueRecord;
 impl XrpcResp for LeagueRecord {
     const NSID: &'static str = "pub.quizzy.league";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LeagueGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LeagueGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LeagueGetRecordOutput<'_>> for League<'_> {
-    fn from(output: LeagueGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LeagueGetRecordOutput<S>> for League<S> {
+    fn from(output: LeagueGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for League<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for League<S> {
     const NSID: &'static str = "pub.quizzy.league";
     type Record = LeagueRecord;
 }
@@ -93,7 +101,7 @@ impl Collection for LeagueRecord {
     type Record = LeagueRecord;
 }
 
-impl<'a> LexiconSchema for League<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for League<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.league"
     }
@@ -175,58 +183,58 @@ pub mod league_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type QuizMasters;
-        type Teams;
         type Name;
+        type Teams;
+        type QuizMasters;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type QuizMasters = Unset;
-        type Teams = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `quiz_masters` field to Set
-    pub struct SetQuizMasters<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuizMasters<S> {}
-    impl<S: State> State for SetQuizMasters<S> {
-        type QuizMasters = Set<members::quiz_masters>;
-        type Teams = S::Teams;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `teams` field to Set
-    pub struct SetTeams<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeams<S> {}
-    impl<S: State> State for SetTeams<S> {
-        type QuizMasters = S::QuizMasters;
-        type Teams = Set<members::teams>;
-        type Name = S::Name;
+        type Teams = Unset;
+        type QuizMasters = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type QuizMasters = S::QuizMasters;
-        type Teams = S::Teams;
         type Name = Set<members::name>;
+        type Teams = S::Teams;
+        type QuizMasters = S::QuizMasters;
+    }
+    ///State transition - sets the `teams` field to Set
+    pub struct SetTeams<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeams<S> {}
+    impl<S: State> State for SetTeams<S> {
+        type Name = S::Name;
+        type Teams = Set<members::teams>;
+        type QuizMasters = S::QuizMasters;
+    }
+    ///State transition - sets the `quiz_masters` field to Set
+    pub struct SetQuizMasters<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuizMasters<S> {}
+    impl<S: State> State for SetQuizMasters<S> {
+        type Name = S::Name;
+        type Teams = S::Teams;
+        type QuizMasters = Set<members::quiz_masters>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quiz_masters` field
-        pub struct quiz_masters(());
-        ///Marker type for the `teams` field
-        pub struct teams(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `teams` field
+        pub struct teams(());
+        ///Marker type for the `quiz_masters` field
+        pub struct quiz_masters(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LeagueBuilder<'a, S: league_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Vec<Did<'a>>>, Option<Vec<StrongRef<'a>>>),
+    _fields: (Option<S>, Option<Vec<Did<S>>>, Option<Vec<StrongRef<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -256,7 +264,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LeagueBuilder<'a, league_state::SetName<S>> {
         self._fields.0 = Option::Some(value.into());
         LeagueBuilder {
@@ -275,7 +283,7 @@ where
     /// Set the `quizMasters` field (required)
     pub fn quiz_masters(
         mut self,
-        value: impl Into<Vec<Did<'a>>>,
+        value: impl Into<Vec<Did<S>>>,
     ) -> LeagueBuilder<'a, league_state::SetQuizMasters<S>> {
         self._fields.1 = Option::Some(value.into());
         LeagueBuilder {
@@ -294,7 +302,7 @@ where
     /// Set the `teams` field (required)
     pub fn teams(
         mut self,
-        value: impl Into<Vec<StrongRef<'a>>>,
+        value: impl Into<Vec<StrongRef<S>>>,
     ) -> LeagueBuilder<'a, league_state::SetTeams<S>> {
         self._fields.2 = Option::Some(value.into());
         LeagueBuilder {
@@ -308,9 +316,9 @@ where
 impl<'a, S> LeagueBuilder<'a, S>
 where
     S: league_state::State,
-    S::QuizMasters: league_state::IsSet,
-    S::Teams: league_state::IsSet,
     S::Name: league_state::IsSet,
+    S::Teams: league_state::IsSet,
+    S::QuizMasters: league_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> League<'a> {
@@ -322,13 +330,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> League<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> League<'a> {
         League {
             name: self._fields.0.unwrap(),
             quiz_masters: self._fields.1.unwrap(),

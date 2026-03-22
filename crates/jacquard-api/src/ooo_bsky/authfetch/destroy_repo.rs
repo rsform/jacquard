@@ -18,8 +18,8 @@ pub struct DestroyRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for DestroyRepoResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.destroyRepo";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for DestroyRepo {
@@ -37,6 +37,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for DestroyRepoRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DestroyRepo;
+    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = DestroyRepo;
     type Response = DestroyRepoResponse;
 }

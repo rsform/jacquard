@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,40 +26,61 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::server::create_invite_codes;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AccountCodes<'a> {
-    #[serde(borrow)]
-    pub account: CowStr<'a>,
-    #[serde(borrow)]
-    pub codes: Vec<CowStr<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AccountCodes<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub account: S,
+    pub codes: Vec<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateInviteCodes<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateInviteCodes<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// Defaults to `1`.
     #[serde(default = "_default_create_invite_codes_code_count")]
     pub code_count: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub for_accounts: Option<Vec<Did<'a>>>,
+    pub for_accounts: Option<Vec<Did<S>>>,
     pub use_count: i64,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateInviteCodesOutput<'a> {
-    #[serde(borrow)]
-    pub codes: Vec<create_invite_codes::AccountCodes<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateInviteCodesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub codes: Vec<create_invite_codes::AccountCodes<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for AccountCodes<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AccountCodes<S> {
     fn nsid() -> &'static str {
         "com.atproto.server.createInviteCodes"
     }
@@ -77,11 +100,12 @@ pub struct CreateInviteCodesResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateInviteCodesResponse {
     const NSID: &'static str = "com.atproto.server.createInviteCodes";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateInviteCodesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CreateInviteCodesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateInviteCodes<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CreateInviteCodes<S> {
     const NSID: &'static str = "com.atproto.server.createInviteCodes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -96,7 +120,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateInviteCodesRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CreateInviteCodes<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CreateInviteCodes<S>;
     type Response = CreateInviteCodesResponse;
 }
 
@@ -110,44 +134,44 @@ pub mod account_codes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Account;
         type Codes;
+        type Account;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Account = Unset;
         type Codes = Unset;
-    }
-    ///State transition - sets the `account` field to Set
-    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccount<S> {}
-    impl<S: State> State for SetAccount<S> {
-        type Account = Set<members::account>;
-        type Codes = S::Codes;
+        type Account = Unset;
     }
     ///State transition - sets the `codes` field to Set
     pub struct SetCodes<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCodes<S> {}
     impl<S: State> State for SetCodes<S> {
-        type Account = S::Account;
         type Codes = Set<members::codes>;
+        type Account = S::Account;
+    }
+    ///State transition - sets the `account` field to Set
+    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccount<S> {}
+    impl<S: State> State for SetAccount<S> {
+        type Codes = S::Codes;
+        type Account = Set<members::account>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `account` field
-        pub struct account(());
         ///Marker type for the `codes` field
         pub struct codes(());
+        ///Marker type for the `account` field
+        pub struct account(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AccountCodesBuilder<'a, S: account_codes_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Vec<CowStr<'a>>>),
+    _fields: (Option<S>, Option<Vec<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -177,7 +201,7 @@ where
     /// Set the `account` field (required)
     pub fn account(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AccountCodesBuilder<'a, account_codes_state::SetAccount<S>> {
         self._fields.0 = Option::Some(value.into());
         AccountCodesBuilder {
@@ -196,7 +220,7 @@ where
     /// Set the `codes` field (required)
     pub fn codes(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> AccountCodesBuilder<'a, account_codes_state::SetCodes<S>> {
         self._fields.1 = Option::Some(value.into());
         AccountCodesBuilder {
@@ -210,8 +234,8 @@ where
 impl<'a, S> AccountCodesBuilder<'a, S>
 where
     S: account_codes_state::State,
-    S::Account: account_codes_state::IsSet,
     S::Codes: account_codes_state::IsSet,
+    S::Account: account_codes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AccountCodes<'a> {
@@ -224,10 +248,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> AccountCodes<'a> {
         AccountCodes {
             account: self._fields.0.unwrap(),
@@ -344,44 +365,44 @@ pub mod create_invite_codes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UseCount;
         type CodeCount;
+        type UseCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UseCount = Unset;
         type CodeCount = Unset;
-    }
-    ///State transition - sets the `use_count` field to Set
-    pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUseCount<S> {}
-    impl<S: State> State for SetUseCount<S> {
-        type UseCount = Set<members::use_count>;
-        type CodeCount = S::CodeCount;
+        type UseCount = Unset;
     }
     ///State transition - sets the `code_count` field to Set
     pub struct SetCodeCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCodeCount<S> {}
     impl<S: State> State for SetCodeCount<S> {
-        type UseCount = S::UseCount;
         type CodeCount = Set<members::code_count>;
+        type UseCount = S::UseCount;
+    }
+    ///State transition - sets the `use_count` field to Set
+    pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUseCount<S> {}
+    impl<S: State> State for SetUseCount<S> {
+        type CodeCount = S::CodeCount;
+        type UseCount = Set<members::use_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `use_count` field
-        pub struct use_count(());
         ///Marker type for the `code_count` field
         pub struct code_count(());
+        ///Marker type for the `use_count` field
+        pub struct use_count(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CreateInviteCodesBuilder<'a, S: create_invite_codes_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<Vec<Did<'a>>>, Option<i64>),
+    _fields: (Option<i64>, Option<Vec<Did<S>>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -424,12 +445,12 @@ where
 
 impl<'a, S: create_invite_codes_state::State> CreateInviteCodesBuilder<'a, S> {
     /// Set the `forAccounts` field (optional)
-    pub fn for_accounts(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
+    pub fn for_accounts(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `forAccounts` field to an Option value (optional)
-    pub fn maybe_for_accounts(mut self, value: Option<Vec<Did<'a>>>) -> Self {
+    pub fn maybe_for_accounts(mut self, value: Option<Vec<Did<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -457,8 +478,8 @@ where
 impl<'a, S> CreateInviteCodesBuilder<'a, S>
 where
     S: create_invite_codes_state::State,
-    S::UseCount: create_invite_codes_state::IsSet,
     S::CodeCount: create_invite_codes_state::IsSet,
+    S::UseCount: create_invite_codes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateInviteCodes<'a> {
@@ -472,10 +493,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CreateInviteCodes<'a> {
         CreateInviteCodes {
             code_count: self._fields.0.unwrap(),

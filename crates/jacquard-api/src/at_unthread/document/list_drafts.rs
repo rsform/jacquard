@@ -10,17 +10,25 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::at_unthread::document::put_draft::DraftView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListDrafts<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListDrafts<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -28,16 +36,23 @@ pub struct ListDrafts<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListDraftsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListDraftsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Pagination cursor for the next page.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub drafts: Vec<DraftView<'a>>,
+    pub cursor: Option<S>,
+    pub drafts: Vec<DraftView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for at.unthread.document.listDrafts
@@ -45,11 +60,12 @@ pub struct ListDraftsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListDraftsResponse {
     const NSID: &'static str = "at.unthread.document.listDrafts";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListDraftsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListDraftsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListDrafts<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListDrafts<S> {
     const NSID: &'static str = "at.unthread.document.listDrafts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListDraftsResponse;
@@ -60,7 +76,7 @@ pub struct ListDraftsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListDraftsRequest {
     const PATH: &'static str = "/xrpc/at.unthread.document.listDrafts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListDrafts<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListDrafts<S>;
     type Response = ListDraftsResponse;
 }
 
@@ -90,7 +106,7 @@ pub mod list_drafts_state {
 /// Builder for constructing an instance of this type
 pub struct ListDraftsBuilder<'a, S: list_drafts_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -114,12 +130,12 @@ impl<'a> ListDraftsBuilder<'a, list_drafts_state::Empty> {
 
 impl<'a, S: list_drafts_state::State> ListDraftsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }

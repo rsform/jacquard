@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,38 +28,37 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "diy.razorgirl.winter.wikiLink",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct WikiLink<'a> {
+pub struct WikiLink<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Why this link exists
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub context: Option<CowStr<'a>>,
+    pub context: Option<S>,
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub link_type: WikiLinkLinkType<'a>,
-    #[serde(borrow)]
-    pub source: AtUri<'a>,
+    pub link_type: WikiLinkLinkType<S>,
+    pub source: AtUri<S>,
     ///Section heading slug in source
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_anchor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub target: AtUri<'a>,
+    pub source_anchor: Option<S>,
+    pub target: AtUri<S>,
     ///Section heading slug in target
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub target_anchor: Option<CowStr<'a>>,
+    pub target_anchor: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WikiLinkLinkType<'a> {
+pub enum WikiLinkLinkType<S: Bos<str> + AsRef<str> = DefaultStr> {
     RelatedTo,
     DependsOn,
     Extends,
@@ -67,10 +68,10 @@ pub enum WikiLinkLinkType<'a> {
     References,
     Defines,
     IsPartOf,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> WikiLinkLinkType<'a> {
+impl<S: Bos<str> + AsRef<str>> WikiLinkLinkType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::RelatedTo => "related-to",
@@ -85,11 +86,9 @@ impl<'a> WikiLinkLinkType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for WikiLinkLinkType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "related-to" => Self::RelatedTo,
             "depends-on" => Self::DependsOn,
             "extends" => Self::Extends,
@@ -99,70 +98,51 @@ impl<'a> From<&'a str> for WikiLinkLinkType<'a> {
             "references" => Self::References,
             "defines" => Self::Defines,
             "is-part-of" => Self::IsPartOf,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for WikiLinkLinkType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "related-to" => Self::RelatedTo,
-            "depends-on" => Self::DependsOn,
-            "extends" => Self::Extends,
-            "contradicts" => Self::Contradicts,
-            "is-example-of" => Self::IsExampleOf,
-            "supersedes" => Self::Supersedes,
-            "references" => Self::References,
-            "defines" => Self::Defines,
-            "is-part-of" => Self::IsPartOf,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WikiLinkLinkType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WikiLinkLinkType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for WikiLinkLinkType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for WikiLinkLinkType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for WikiLinkLinkType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for WikiLinkLinkType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for WikiLinkLinkType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for WikiLinkLinkType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for WikiLinkLinkType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for WikiLinkLinkType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for WikiLinkLinkType<'_> {
-    type Output = WikiLinkLinkType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for WikiLinkLinkType<S> {
+    type Output = WikiLinkLinkType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             WikiLinkLinkType::RelatedTo => WikiLinkLinkType::RelatedTo,
@@ -182,22 +162,23 @@ impl jacquard_common::IntoStatic for WikiLinkLinkType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct WikiLinkGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct WikiLinkGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: WikiLink<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: WikiLink<S>,
 }
 
-impl<'a> WikiLink<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, WikiLinkRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> WikiLink<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, WikiLinkRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -208,18 +189,17 @@ pub struct WikiLinkRecord;
 impl XrpcResp for WikiLinkRecord {
     const NSID: &'static str = "diy.razorgirl.winter.wikiLink";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = WikiLinkGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = WikiLinkGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<WikiLinkGetRecordOutput<'_>> for WikiLink<'_> {
-    fn from(output: WikiLinkGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<WikiLinkGetRecordOutput<S>> for WikiLink<S> {
+    fn from(output: WikiLinkGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for WikiLink<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for WikiLink<S> {
     const NSID: &'static str = "diy.razorgirl.winter.wikiLink";
     type Record = WikiLinkRecord;
 }
@@ -229,7 +209,7 @@ impl Collection for WikiLinkRecord {
     type Record = WikiLinkRecord;
 }
 
-impl<'a> LexiconSchema for WikiLink<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for WikiLink<S> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.wikiLink"
     }
@@ -264,67 +244,67 @@ pub mod wiki_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type LinkType;
-        type Target;
         type Source;
+        type Target;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type LinkType = Unset;
-        type Target = Unset;
         type Source = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type LinkType = S::LinkType;
-        type Target = S::Target;
-        type Source = S::Source;
+        type Target = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `link_type` field to Set
     pub struct SetLinkType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLinkType<S> {}
     impl<S: State> State for SetLinkType<S> {
-        type CreatedAt = S::CreatedAt;
         type LinkType = Set<members::link_type>;
+        type Source = S::Source;
         type Target = S::Target;
-        type Source = S::Source;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
         type CreatedAt = S::CreatedAt;
-        type LinkType = S::LinkType;
-        type Target = Set<members::target>;
-        type Source = S::Source;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
-        type CreatedAt = S::CreatedAt;
         type LinkType = S::LinkType;
-        type Target = S::Target;
         type Source = Set<members::source>;
+        type Target = S::Target;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTarget<S> {}
+    impl<S: State> State for SetTarget<S> {
+        type LinkType = S::LinkType;
+        type Source = S::Source;
+        type Target = Set<members::target>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type LinkType = S::LinkType;
+        type Source = S::Source;
+        type Target = S::Target;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `link_type` field
         pub struct link_type(());
-        ///Marker type for the `target` field
-        pub struct target(());
         ///Marker type for the `source` field
         pub struct source(());
+        ///Marker type for the `target` field
+        pub struct target(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -332,13 +312,13 @@ pub mod wiki_link_state {
 pub struct WikiLinkBuilder<'a, S: wiki_link_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<WikiLinkLinkType<'a>>,
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
+        Option<WikiLinkLinkType<S>>,
+        Option<AtUri<S>>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -363,12 +343,12 @@ impl<'a> WikiLinkBuilder<'a, wiki_link_state::Empty> {
 
 impl<'a, S: wiki_link_state::State> WikiLinkBuilder<'a, S> {
     /// Set the `context` field (optional)
-    pub fn context(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn context(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `context` field to an Option value (optional)
-    pub fn maybe_context(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_context(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -401,7 +381,7 @@ where
     /// Set the `linkType` field (required)
     pub fn link_type(
         mut self,
-        value: impl Into<WikiLinkLinkType<'a>>,
+        value: impl Into<WikiLinkLinkType<S>>,
     ) -> WikiLinkBuilder<'a, wiki_link_state::SetLinkType<S>> {
         self._fields.2 = Option::Some(value.into());
         WikiLinkBuilder {
@@ -420,7 +400,7 @@ where
     /// Set the `source` field (required)
     pub fn source(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> WikiLinkBuilder<'a, wiki_link_state::SetSource<S>> {
         self._fields.3 = Option::Some(value.into());
         WikiLinkBuilder {
@@ -433,12 +413,12 @@ where
 
 impl<'a, S: wiki_link_state::State> WikiLinkBuilder<'a, S> {
     /// Set the `sourceAnchor` field (optional)
-    pub fn source_anchor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn source_anchor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `sourceAnchor` field to an Option value (optional)
-    pub fn maybe_source_anchor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_source_anchor(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -452,7 +432,7 @@ where
     /// Set the `target` field (required)
     pub fn target(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> WikiLinkBuilder<'a, wiki_link_state::SetTarget<S>> {
         self._fields.5 = Option::Some(value.into());
         WikiLinkBuilder {
@@ -465,12 +445,12 @@ where
 
 impl<'a, S: wiki_link_state::State> WikiLinkBuilder<'a, S> {
     /// Set the `targetAnchor` field (optional)
-    pub fn target_anchor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn target_anchor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `targetAnchor` field to an Option value (optional)
-    pub fn maybe_target_anchor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_target_anchor(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -479,10 +459,10 @@ impl<'a, S: wiki_link_state::State> WikiLinkBuilder<'a, S> {
 impl<'a, S> WikiLinkBuilder<'a, S>
 where
     S: wiki_link_state::State,
-    S::CreatedAt: wiki_link_state::IsSet,
     S::LinkType: wiki_link_state::IsSet,
-    S::Target: wiki_link_state::IsSet,
     S::Source: wiki_link_state::IsSet,
+    S::Target: wiki_link_state::IsSet,
+    S::CreatedAt: wiki_link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WikiLink<'a> {
@@ -500,10 +480,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> WikiLink<'a> {
         WikiLink {
             context: self._fields.0,

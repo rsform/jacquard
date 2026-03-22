@@ -7,16 +7,22 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DownloadFile<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DownloadFile<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub file_id: CowStr<'a>,
+    pub file_id: S,
 }
 
 
@@ -31,18 +37,22 @@ pub struct DownloadFileResponse;
 impl jacquard_common::xrpc::XrpcResp for DownloadFileResponse {
     const NSID: &'static str = "app.rocksky.dropbox.downloadFile";
     const ENCODING: &'static str = "application/octet-stream";
-    type Output<'de> = DownloadFileOutput;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = DownloadFileOutput;
+    type Err = jacquard_common::xrpc::GenericError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(DownloadFileOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -50,7 +60,8 @@ impl jacquard_common::xrpc::XrpcResp for DownloadFileResponse {
     }
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DownloadFile<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DownloadFile<S> {
     const NSID: &'static str = "app.rocksky.dropbox.downloadFile";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = DownloadFileResponse;
@@ -61,7 +72,7 @@ pub struct DownloadFileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DownloadFileRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.dropbox.downloadFile";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = DownloadFile<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DownloadFile<S>;
     type Response = DownloadFileResponse;
 }
 
@@ -100,7 +111,7 @@ pub mod download_file_state {
 /// Builder for constructing an instance of this type
 pub struct DownloadFileBuilder<'a, S: download_file_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -130,7 +141,7 @@ where
     /// Set the `fileId` field (required)
     pub fn file_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DownloadFileBuilder<'a, download_file_state::SetFileId<S>> {
         self._fields.0 = Option::Some(value.into());
         DownloadFileBuilder {

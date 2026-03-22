@@ -10,53 +10,59 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Row<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Row<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Cross-axis (vertical) alignment of children.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub align: Option<RowAlign<'a>>,
-    #[serde(borrow)]
-    pub children: Data<'a>,
+    pub align: Option<RowAlign<S>>,
+    pub children: Data<S>,
     ///Space between children.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gap: Option<RowGap<'a>>,
+    pub gap: Option<RowGap<S>>,
     ///Whether this container has inset padding. The theme controls the amount.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inset: Option<bool>,
     ///Main-axis distribution of children.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub justify: Option<RowJustify<'a>>,
+    pub justify: Option<RowJustify<S>>,
     ///Whether the container has an opaque background.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opaque: Option<bool>,
     ///Whether the container sticks to the top of the scroll area.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sticky: Option<bool>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Cross-axis (vertical) alignment of children.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RowAlign<'a> {
+pub enum RowAlign<S: Bos<str> + AsRef<str> = DefaultStr> {
     Start,
     Center,
     End,
     Stretch,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> RowAlign<'a> {
+impl<S: Bos<str> + AsRef<str>> RowAlign<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Start => "start",
@@ -66,74 +72,57 @@ impl<'a> RowAlign<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for RowAlign<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "start" => Self::Start,
             "center" => Self::Center,
             "end" => Self::End,
             "stretch" => Self::Stretch,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for RowAlign<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "start" => Self::Start,
-            "center" => Self::Center,
-            "end" => Self::End,
-            "stretch" => Self::Stretch,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for RowAlign<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for RowAlign<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for RowAlign<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for RowAlign<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for RowAlign<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for RowAlign<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for RowAlign<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for RowAlign<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for RowAlign<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for RowAlign<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for RowAlign<'_> {
-    type Output = RowAlign<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for RowAlign<S> {
+    type Output = RowAlign<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             RowAlign::Start => RowAlign::Start,
@@ -148,15 +137,15 @@ impl jacquard_common::IntoStatic for RowAlign<'_> {
 /// Space between children.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RowGap<'a> {
+pub enum RowGap<S: Bos<str> + AsRef<str> = DefaultStr> {
     None,
     Small,
     Medium,
     Large,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> RowGap<'a> {
+impl<S: Bos<str> + AsRef<str>> RowGap<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -166,74 +155,57 @@ impl<'a> RowGap<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for RowGap<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "none" => Self::None,
             "small" => Self::Small,
             "medium" => Self::Medium,
             "large" => Self::Large,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for RowGap<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "small" => Self::Small,
-            "medium" => Self::Medium,
-            "large" => Self::Large,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for RowGap<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for RowGap<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for RowGap<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for RowGap<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for RowGap<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for RowGap<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for RowGap<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for RowGap<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for RowGap<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for RowGap<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for RowGap<'_> {
-    type Output = RowGap<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for RowGap<S> {
+    type Output = RowGap<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             RowGap::None => RowGap::None,
@@ -248,15 +220,15 @@ impl jacquard_common::IntoStatic for RowGap<'_> {
 /// Main-axis distribution of children.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RowJustify<'a> {
+pub enum RowJustify<S: Bos<str> + AsRef<str> = DefaultStr> {
     Start,
     Center,
     End,
     Between,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> RowJustify<'a> {
+impl<S: Bos<str> + AsRef<str>> RowJustify<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Start => "start",
@@ -266,74 +238,58 @@ impl<'a> RowJustify<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for RowJustify<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "start" => Self::Start,
             "center" => Self::Center,
             "end" => Self::End,
             "between" => Self::Between,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for RowJustify<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "start" => Self::Start,
-            "center" => Self::Center,
-            "end" => Self::End,
-            "between" => Self::Between,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for RowJustify<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for RowJustify<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for RowJustify<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for RowJustify<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for RowJustify<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for RowJustify<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for RowJustify<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for RowJustify<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for RowJustify<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for RowJustify<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for RowJustify<'_> {
-    type Output = RowJustify<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for RowJustify<S> {
+    type Output = RowJustify<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             RowJustify::Start => RowJustify::Start,
@@ -346,13 +302,22 @@ impl jacquard_common::IntoStatic for RowJustify<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct RowOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RowOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Response<'a>,
+    pub value: Response<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for org.atsui.Row
@@ -360,11 +325,12 @@ pub struct RowResponse;
 impl jacquard_common::xrpc::XrpcResp for RowResponse {
     const NSID: &'static str = "org.atsui.Row";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RowOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RowOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Row<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Row<S> {
     const NSID: &'static str = "org.atsui.Row";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -379,7 +345,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for RowRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Row<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Row<S>;
     type Response = RowResponse;
 }
 
@@ -419,11 +385,11 @@ pub mod row_state {
 pub struct RowBuilder<'a, S: row_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<RowAlign<'a>>,
-        Option<Data<'a>>,
-        Option<RowGap<'a>>,
+        Option<RowAlign<S>>,
+        Option<Data<S>>,
+        Option<RowGap<S>>,
         Option<bool>,
-        Option<RowJustify<'a>>,
+        Option<RowJustify<S>>,
         Option<bool>,
         Option<bool>,
     ),
@@ -450,12 +416,12 @@ impl<'a> RowBuilder<'a, row_state::Empty> {
 
 impl<'a, S: row_state::State> RowBuilder<'a, S> {
     /// Set the `align` field (optional)
-    pub fn align(mut self, value: impl Into<Option<RowAlign<'a>>>) -> Self {
+    pub fn align(mut self, value: impl Into<Option<RowAlign<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `align` field to an Option value (optional)
-    pub fn maybe_align(mut self, value: Option<RowAlign<'a>>) -> Self {
+    pub fn maybe_align(mut self, value: Option<RowAlign<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -469,7 +435,7 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> RowBuilder<'a, row_state::SetChildren<S>> {
         self._fields.1 = Option::Some(value.into());
         RowBuilder {
@@ -482,12 +448,12 @@ where
 
 impl<'a, S: row_state::State> RowBuilder<'a, S> {
     /// Set the `gap` field (optional)
-    pub fn gap(mut self, value: impl Into<Option<RowGap<'a>>>) -> Self {
+    pub fn gap(mut self, value: impl Into<Option<RowGap<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `gap` field to an Option value (optional)
-    pub fn maybe_gap(mut self, value: Option<RowGap<'a>>) -> Self {
+    pub fn maybe_gap(mut self, value: Option<RowGap<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -508,12 +474,12 @@ impl<'a, S: row_state::State> RowBuilder<'a, S> {
 
 impl<'a, S: row_state::State> RowBuilder<'a, S> {
     /// Set the `justify` field (optional)
-    pub fn justify(mut self, value: impl Into<Option<RowJustify<'a>>>) -> Self {
+    pub fn justify(mut self, value: impl Into<Option<RowJustify<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `justify` field to an Option value (optional)
-    pub fn maybe_justify(mut self, value: Option<RowJustify<'a>>) -> Self {
+    pub fn maybe_justify(mut self, value: Option<RowJustify<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -564,10 +530,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Row<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Row<'a> {
         Row {
             align: self._fields.0,
             children: self._fields.1.unwrap(),

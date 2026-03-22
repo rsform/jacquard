@@ -10,10 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,26 +27,38 @@ use crate::pub_leaflet::pages::canvas::Canvas;
 use crate::pub_leaflet::pages::linear_document::LinearDocument;
 /// Content format for leaflet documents
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Content<'a> {
-    #[serde(borrow)]
-    pub pages: Vec<ContentPagesItem<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Content<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub pages: Vec<ContentPagesItem<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ContentPagesItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ContentPagesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "pub.leaflet.pages.linearDocument")]
-    LinearDocument(Box<LinearDocument<'a>>),
+    LinearDocument(Box<LinearDocument<S>>),
     #[serde(rename = "pub.leaflet.pages.canvas")]
-    Canvas(Box<Canvas<'a>>),
+    Canvas(Box<Canvas<S>>),
 }
 
-impl<'a> LexiconSchema for Content<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Content<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.content"
     }
@@ -93,7 +108,7 @@ pub mod content_state {
 /// Builder for constructing an instance of this type
 pub struct ContentBuilder<'a, S: content_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<ContentPagesItem<'a>>>,),
+    _fields: (Option<Vec<ContentPagesItem<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -123,7 +138,7 @@ where
     /// Set the `pages` field (required)
     pub fn pages(
         mut self,
-        value: impl Into<Vec<ContentPagesItem<'a>>>,
+        value: impl Into<Vec<ContentPagesItem<S>>>,
     ) -> ContentBuilder<'a, content_state::SetPages<S>> {
         self._fields.0 = Option::Some(value.into());
         ContentBuilder {
@@ -149,10 +164,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Content<'a> {
         Content {
             pages: self._fields.0.unwrap(),

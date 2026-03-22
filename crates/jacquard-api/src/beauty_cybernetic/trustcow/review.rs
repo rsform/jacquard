@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,45 +29,46 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A review connected to a verified transaction, can only be created by one of the transaction parties
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "beauty.cybernetic.trustcow.review",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Review<'a> {
+pub struct Review<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When the review was created
     pub created_at: Datetime,
     ///The detailed review text
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Rating score from 1 to 5
     pub rating: i64,
     ///Whether this review is from the service provider or consumer
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviewer_role: Option<ReviewReviewerRole<'a>>,
+    pub reviewer_role: Option<ReviewReviewerRole<S>>,
     ///The title of the review
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     ///AT URI reference to the transaction record (at://did/beauty.cybernetic.trustcow.transaction/rkey)
-    #[serde(borrow)]
-    pub transaction: CowStr<'a>,
+    pub transaction: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Whether this review is from the service provider or consumer
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReviewReviewerRole<'a> {
+pub enum ReviewReviewerRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     ServiceProvider,
     ServiceConsumer,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ReviewReviewerRole<'a> {
+impl<S: Bos<str> + AsRef<str>> ReviewReviewerRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ServiceProvider => "serviceProvider",
@@ -73,70 +76,56 @@ impl<'a> ReviewReviewerRole<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ReviewReviewerRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "serviceProvider" => Self::ServiceProvider,
             "serviceConsumer" => Self::ServiceConsumer,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ReviewReviewerRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "serviceProvider" => Self::ServiceProvider,
-            "serviceConsumer" => Self::ServiceConsumer,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ReviewReviewerRole<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ReviewReviewerRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ReviewReviewerRole<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ReviewReviewerRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ReviewReviewerRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ReviewReviewerRole<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ReviewReviewerRole<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ReviewReviewerRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ReviewReviewerRole<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ReviewReviewerRole<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ReviewReviewerRole<'_> {
-    type Output = ReviewReviewerRole<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ReviewReviewerRole<S> {
+    type Output = ReviewReviewerRole<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ReviewReviewerRole::ServiceProvider => ReviewReviewerRole::ServiceProvider,
@@ -149,22 +138,23 @@ impl jacquard_common::IntoStatic for ReviewReviewerRole<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReviewGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReviewGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Review<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Review<S>,
 }
 
-impl<'a> Review<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ReviewRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Review<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ReviewRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -175,18 +165,17 @@ pub struct ReviewRecord;
 impl XrpcResp for ReviewRecord {
     const NSID: &'static str = "beauty.cybernetic.trustcow.review";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReviewGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ReviewGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ReviewGetRecordOutput<'_>> for Review<'_> {
-    fn from(output: ReviewGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ReviewGetRecordOutput<S>> for Review<S> {
+    fn from(output: ReviewGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Review<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Review<S> {
     const NSID: &'static str = "beauty.cybernetic.trustcow.review";
     type Record = ReviewRecord;
 }
@@ -196,7 +185,7 @@ impl Collection for ReviewRecord {
     type Record = ReviewRecord;
 }
 
-impl<'a> LexiconSchema for Review<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Review<S> {
     fn nsid() -> &'static str {
         "beauty.cybernetic.trustcow.review"
     }
@@ -261,51 +250,51 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Transaction;
         type Rating;
         type CreatedAt;
+        type Transaction;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Transaction = Unset;
         type Rating = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `transaction` field to Set
-    pub struct SetTransaction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTransaction<S> {}
-    impl<S: State> State for SetTransaction<S> {
-        type Transaction = Set<members::transaction>;
-        type Rating = S::Rating;
-        type CreatedAt = S::CreatedAt;
+        type Transaction = Unset;
     }
     ///State transition - sets the `rating` field to Set
     pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRating<S> {}
     impl<S: State> State for SetRating<S> {
-        type Transaction = S::Transaction;
         type Rating = Set<members::rating>;
         type CreatedAt = S::CreatedAt;
+        type Transaction = S::Transaction;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Transaction = S::Transaction;
         type Rating = S::Rating;
         type CreatedAt = Set<members::created_at>;
+        type Transaction = S::Transaction;
+    }
+    ///State transition - sets the `transaction` field to Set
+    pub struct SetTransaction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTransaction<S> {}
+    impl<S: State> State for SetTransaction<S> {
+        type Rating = S::Rating;
+        type CreatedAt = S::CreatedAt;
+        type Transaction = Set<members::transaction>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `transaction` field
-        pub struct transaction(());
         ///Marker type for the `rating` field
         pub struct rating(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `transaction` field
+        pub struct transaction(());
     }
 }
 
@@ -314,11 +303,11 @@ pub struct ReviewBuilder<'a, S: review_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
-        Option<ReviewReviewerRole<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<ReviewReviewerRole<S>>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -362,12 +351,12 @@ where
 
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -396,13 +385,13 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `reviewerRole` field (optional)
     pub fn reviewer_role(
         mut self,
-        value: impl Into<Option<ReviewReviewerRole<'a>>>,
+        value: impl Into<Option<ReviewReviewerRole<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `reviewerRole` field to an Option value (optional)
-    pub fn maybe_reviewer_role(mut self, value: Option<ReviewReviewerRole<'a>>) -> Self {
+    pub fn maybe_reviewer_role(mut self, value: Option<ReviewReviewerRole<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -410,12 +399,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -429,7 +418,7 @@ where
     /// Set the `transaction` field (required)
     pub fn transaction(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReviewBuilder<'a, review_state::SetTransaction<S>> {
         self._fields.5 = Option::Some(value.into());
         ReviewBuilder {
@@ -443,9 +432,9 @@ where
 impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
-    S::Transaction: review_state::IsSet,
     S::Rating: review_state::IsSet,
     S::CreatedAt: review_state::IsSet,
+    S::Transaction: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {
@@ -460,13 +449,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Review<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Review<'a> {
         Review {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

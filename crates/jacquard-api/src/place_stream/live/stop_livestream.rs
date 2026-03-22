@@ -10,25 +10,46 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Cid, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct StopLivestream<'a> {}
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StopLivestream<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
 
-#[lexicon]
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct StopLivestreamOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StopLivestreamOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The new CID of the stopped livestream record.
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///The URI of the stopped livestream record.
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+    pub uri: UriValue<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for place.stream.live.stopLivestream
@@ -36,11 +57,12 @@ pub struct StopLivestreamResponse;
 impl jacquard_common::xrpc::XrpcResp for StopLivestreamResponse {
     const NSID: &'static str = "place.stream.live.stopLivestream";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StopLivestreamOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StopLivestreamOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for StopLivestream<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for StopLivestream<S> {
     const NSID: &'static str = "place.stream.live.stopLivestream";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -55,6 +77,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for StopLivestreamRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = StopLivestream<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = StopLivestream<S>;
     type Response = StopLivestreamResponse;
 }

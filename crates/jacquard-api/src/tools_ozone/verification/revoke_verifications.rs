@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,44 +26,63 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::verification::revoke_verifications;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct RevokeVerifications<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RevokeVerifications<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reason for revoking the verification. This is optional and can be omitted if not needed.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub revoke_reason: Option<CowStr<'a>>,
+    pub revoke_reason: Option<S>,
     ///Array of verification record uris to revoke
-    #[serde(borrow)]
-    pub uris: Vec<AtUri<'a>>,
+    pub uris: Vec<AtUri<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct RevokeVerificationsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RevokeVerificationsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of verification uris that couldn't be revoked, including failure reasons
-    #[serde(borrow)]
-    pub failed_revocations: Vec<revoke_verifications::RevokeError<'a>>,
+    pub failed_revocations: Vec<revoke_verifications::RevokeError<S>>,
     ///List of verification uris successfully revoked
-    #[serde(borrow)]
-    pub revoked_verifications: Vec<AtUri<'a>>,
+    pub revoked_verifications: Vec<AtUri<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Error object for failed revocations
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RevokeError<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RevokeError<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Description of the error that occurred during revocation.
-    #[serde(borrow)]
-    pub error: CowStr<'a>,
+    pub error: S,
     ///The AT-URI of the verification record that failed to revoke.
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for tools.ozone.verification.revokeVerifications
@@ -69,11 +90,12 @@ pub struct RevokeVerificationsResponse;
 impl jacquard_common::xrpc::XrpcResp for RevokeVerificationsResponse {
     const NSID: &'static str = "tools.ozone.verification.revokeVerifications";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RevokeVerificationsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RevokeVerificationsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for RevokeVerifications<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for RevokeVerifications<S> {
     const NSID: &'static str = "tools.ozone.verification.revokeVerifications";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -88,11 +110,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for RevokeVerificationsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = RevokeVerifications<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = RevokeVerifications<S>;
     type Response = RevokeVerificationsResponse;
 }
 
-impl<'a> LexiconSchema for RevokeError<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RevokeError<S> {
     fn nsid() -> &'static str {
         "tools.ozone.verification.revokeVerifications"
     }
@@ -142,7 +164,7 @@ pub mod revoke_verifications_state {
 /// Builder for constructing an instance of this type
 pub struct RevokeVerificationsBuilder<'a, S: revoke_verifications_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Vec<AtUri<'a>>>),
+    _fields: (Option<S>, Option<Vec<AtUri<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -166,12 +188,12 @@ impl<'a> RevokeVerificationsBuilder<'a, revoke_verifications_state::Empty> {
 
 impl<'a, S: revoke_verifications_state::State> RevokeVerificationsBuilder<'a, S> {
     /// Set the `revokeReason` field (optional)
-    pub fn revoke_reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn revoke_reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `revokeReason` field to an Option value (optional)
-    pub fn maybe_revoke_reason(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_revoke_reason(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -185,7 +207,7 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<S>>>,
     ) -> RevokeVerificationsBuilder<'a, revoke_verifications_state::SetUris<S>> {
         self._fields.1 = Option::Some(value.into());
         RevokeVerificationsBuilder {
@@ -212,10 +234,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RevokeVerifications<'a> {
         RevokeVerifications {
             revoke_reason: self._fields.0,
@@ -235,44 +254,44 @@ pub mod revoke_error_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Error;
         type Uri;
+        type Error;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Error = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `error` field to Set
-    pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetError<S> {}
-    impl<S: State> State for SetError<S> {
-        type Error = Set<members::error>;
-        type Uri = S::Uri;
+        type Error = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Error = S::Error;
         type Uri = Set<members::uri>;
+        type Error = S::Error;
+    }
+    ///State transition - sets the `error` field to Set
+    pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetError<S> {}
+    impl<S: State> State for SetError<S> {
+        type Uri = S::Uri;
+        type Error = Set<members::error>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `error` field
-        pub struct error(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `error` field
+        pub struct error(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RevokeErrorBuilder<'a, S: revoke_error_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -302,7 +321,7 @@ where
     /// Set the `error` field (required)
     pub fn error(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RevokeErrorBuilder<'a, revoke_error_state::SetError<S>> {
         self._fields.0 = Option::Some(value.into());
         RevokeErrorBuilder {
@@ -321,7 +340,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> RevokeErrorBuilder<'a, revoke_error_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         RevokeErrorBuilder {
@@ -335,8 +354,8 @@ where
 impl<'a, S> RevokeErrorBuilder<'a, S>
 where
     S: revoke_error_state::State,
-    S::Error: revoke_error_state::IsSet,
     S::Uri: revoke_error_state::IsSet,
+    S::Error: revoke_error_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RevokeError<'a> {
@@ -349,10 +368,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RevokeError<'a> {
         RevokeError {
             error: self._fields.0.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,33 +29,39 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Assign a moderator role to a user for a specific room.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.protoimsg.chat.role", tag = "$type")]
-pub struct Role<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.protoimsg.chat.role",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Role<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp of role assignment.
     pub created_at: Datetime,
     ///The role being assigned.
-    #[serde(borrow)]
-    pub role: RoleRole<'a>,
+    pub role: RoleRole<S>,
     ///AT-URI of the room.
-    #[serde(borrow)]
-    pub room: AtUri<'a>,
+    pub room: AtUri<S>,
     ///DID of the user being assigned the role.
-    #[serde(borrow)]
-    pub subject: Did<'a>,
+    pub subject: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The role being assigned.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RoleRole<'a> {
+pub enum RoleRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     Moderator,
     Owner,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> RoleRole<'a> {
+impl<S: Bos<str> + AsRef<str>> RoleRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Moderator => "moderator",
@@ -61,70 +69,55 @@ impl<'a> RoleRole<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for RoleRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "moderator" => Self::Moderator,
             "owner" => Self::Owner,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for RoleRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "moderator" => Self::Moderator,
-            "owner" => Self::Owner,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for RoleRole<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for RoleRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for RoleRole<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for RoleRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for RoleRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for RoleRole<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for RoleRole<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for RoleRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for RoleRole<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for RoleRole<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for RoleRole<'_> {
-    type Output = RoleRole<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for RoleRole<S> {
+    type Output = RoleRole<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             RoleRole::Moderator => RoleRole::Moderator,
@@ -137,22 +130,23 @@ impl jacquard_common::IntoStatic for RoleRole<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RoleGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RoleGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Role<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Role<S>,
 }
 
-impl<'a> Role<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, RoleRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Role<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, RoleRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -163,18 +157,17 @@ pub struct RoleRecord;
 impl XrpcResp for RoleRecord {
     const NSID: &'static str = "app.protoimsg.chat.role";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RoleGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RoleGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<RoleGetRecordOutput<'_>> for Role<'_> {
-    fn from(output: RoleGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<RoleGetRecordOutput<S>> for Role<S> {
+    fn from(output: RoleGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Role<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Role<S> {
     const NSID: &'static str = "app.protoimsg.chat.role";
     type Record = RoleRecord;
 }
@@ -184,7 +177,7 @@ impl Collection for RoleRecord {
     type Record = RoleRecord;
 }
 
-impl<'a> LexiconSchema for Role<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Role<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.role"
     }
@@ -209,8 +202,8 @@ pub mod role_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Room;
         type Subject;
+        type Room;
         type Role;
         type CreatedAt;
     }
@@ -218,26 +211,26 @@ pub mod role_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Room = Unset;
         type Subject = Unset;
+        type Room = Unset;
         type Role = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type Room = Set<members::room>;
-        type Subject = S::Subject;
-        type Role = S::Role;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Room = S::Room;
         type Subject = Set<members::subject>;
+        type Room = S::Room;
+        type Role = S::Role;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoom<S> {}
+    impl<S: State> State for SetRoom<S> {
+        type Subject = S::Subject;
+        type Room = Set<members::room>;
         type Role = S::Role;
         type CreatedAt = S::CreatedAt;
     }
@@ -245,8 +238,8 @@ pub mod role_state {
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRole<S> {}
     impl<S: State> State for SetRole<S> {
-        type Room = S::Room;
         type Subject = S::Subject;
+        type Room = S::Room;
         type Role = Set<members::role>;
         type CreatedAt = S::CreatedAt;
     }
@@ -254,18 +247,18 @@ pub mod role_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Room = S::Room;
         type Subject = S::Subject;
+        type Room = S::Room;
         type Role = S::Role;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `room` field
-        pub struct room(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `room` field
+        pub struct room(());
         ///Marker type for the `role` field
         pub struct role(());
         ///Marker type for the `created_at` field
@@ -276,12 +269,7 @@ pub mod role_state {
 /// Builder for constructing an instance of this type
 pub struct RoleBuilder<'a, S: role_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<RoleRole<'a>>,
-        Option<AtUri<'a>>,
-        Option<Did<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<RoleRole<S>>, Option<AtUri<S>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -330,7 +318,7 @@ where
     /// Set the `role` field (required)
     pub fn role(
         mut self,
-        value: impl Into<RoleRole<'a>>,
+        value: impl Into<RoleRole<S>>,
     ) -> RoleBuilder<'a, role_state::SetRole<S>> {
         self._fields.1 = Option::Some(value.into());
         RoleBuilder {
@@ -349,7 +337,7 @@ where
     /// Set the `room` field (required)
     pub fn room(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> RoleBuilder<'a, role_state::SetRoom<S>> {
         self._fields.2 = Option::Some(value.into());
         RoleBuilder {
@@ -368,7 +356,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> RoleBuilder<'a, role_state::SetSubject<S>> {
         self._fields.3 = Option::Some(value.into());
         RoleBuilder {
@@ -382,8 +370,8 @@ where
 impl<'a, S> RoleBuilder<'a, S>
 where
     S: role_state::State,
-    S::Room: role_state::IsSet,
     S::Subject: role_state::IsSet,
+    S::Room: role_state::IsSet,
     S::Role: role_state::IsSet,
     S::CreatedAt: role_state::IsSet,
 {
@@ -398,13 +386,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Role<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Role<'a> {
         Role {
             created_at: self._fields.0.unwrap(),
             role: self._fields.1.unwrap(),

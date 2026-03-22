@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,30 +26,41 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::sync::HostStatus;
 use crate::com_atproto::sync::list_hosts;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Host<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Host<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub account_count: Option<i64>,
     ///hostname of server; not a URL (no scheme)
-    #[serde(borrow)]
-    pub hostname: CowStr<'a>,
+    pub hostname: S,
     ///Recent repo stream event sequence number. May be delayed from actual stream processing (eg, persisted cursor not in-memory cursor).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub seq: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<HostStatus<'a>>,
+    pub status: Option<HostStatus<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListHosts<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListHosts<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `200`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,19 +68,26 @@ pub struct ListHosts<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListHostsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListHostsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Sort order is not formally specified. Recommended order is by time host was first seen by the server, with oldest first.
-    #[serde(borrow)]
-    pub hosts: Vec<list_hosts::Host<'a>>,
+    pub hosts: Vec<list_hosts::Host<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Host<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Host<S> {
     fn nsid() -> &'static str {
         "com.atproto.sync.listHosts"
     }
@@ -87,11 +107,12 @@ pub struct ListHostsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListHostsResponse {
     const NSID: &'static str = "com.atproto.sync.listHosts";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListHostsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListHostsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListHosts<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListHosts<S> {
     const NSID: &'static str = "com.atproto.sync.listHosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListHostsResponse;
@@ -102,7 +123,7 @@ pub struct ListHostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListHostsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.listHosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListHosts<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListHosts<S>;
     type Response = ListHostsResponse;
 }
 
@@ -220,7 +241,7 @@ pub mod list_hosts_state {
 /// Builder for constructing an instance of this type
 pub struct ListHostsBuilder<'a, S: list_hosts_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -244,12 +265,12 @@ impl<'a> ListHostsBuilder<'a, list_hosts_state::Empty> {
 
 impl<'a, S: list_hosts_state::State> ListHostsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }

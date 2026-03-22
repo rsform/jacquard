@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,66 +29,68 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A Last.fm scrobble play record written by Linkname.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "me.linkna.lastfm", tag = "$type")]
-pub struct Lastfm<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "me.linkna.lastfm",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Lastfm<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///MusicBrainz ID for the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artist_mb_id: Option<CowStr<'a>>,
+    pub artist_mb_id: Option<S>,
     ///Artist name(s).
-    #[serde(borrow)]
-    pub artist_names: Vec<CowStr<'a>>,
+    pub artist_names: Vec<S>,
     ///URL to the album cover art.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cover_art_url: Option<CowStr<'a>>,
+    pub cover_art_url: Option<S>,
     ///When this record was created.
     pub created_at: Datetime,
     ///URL to the track on Last.fm.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub origin_url: Option<UriValue<'a>>,
+    pub origin_url: Option<UriValue<S>>,
     ///When the track was played on Last.fm.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub played_time: Option<Datetime>,
     ///MusicBrainz ID for the release/album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub release_mb_id: Option<CowStr<'a>>,
+    pub release_mb_id: Option<S>,
     ///Album/release name.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub release_name: Option<CowStr<'a>>,
+    pub release_name: Option<S>,
     ///MusicBrainz ID for the track.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub track_mb_id: Option<CowStr<'a>>,
+    pub track_mb_id: Option<S>,
     ///Track/song name.
-    #[serde(borrow)]
-    pub track_name: CowStr<'a>,
+    pub track_name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LastfmGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LastfmGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Lastfm<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Lastfm<S>,
 }
 
-impl<'a> Lastfm<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LastfmRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Lastfm<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LastfmRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -97,18 +101,17 @@ pub struct LastfmRecord;
 impl XrpcResp for LastfmRecord {
     const NSID: &'static str = "me.linkna.lastfm";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LastfmGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LastfmGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LastfmGetRecordOutput<'_>> for Lastfm<'_> {
-    fn from(output: LastfmGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LastfmGetRecordOutput<S>> for Lastfm<S> {
+    fn from(output: LastfmGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Lastfm<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Lastfm<S> {
     const NSID: &'static str = "me.linkna.lastfm";
     type Record = LastfmRecord;
 }
@@ -118,7 +121,7 @@ impl Collection for LastfmRecord {
     type Record = LastfmRecord;
 }
 
-impl<'a> LexiconSchema for Lastfm<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Lastfm<S> {
     fn nsid() -> &'static str {
         "me.linkna.lastfm"
     }
@@ -143,51 +146,51 @@ pub mod lastfm_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type TrackName;
         type ArtistNames;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type TrackName = Unset;
         type ArtistNames = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type TrackName = S::TrackName;
-        type ArtistNames = S::ArtistNames;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `track_name` field to Set
     pub struct SetTrackName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTrackName<S> {}
     impl<S: State> State for SetTrackName<S> {
-        type CreatedAt = S::CreatedAt;
         type TrackName = Set<members::track_name>;
         type ArtistNames = S::ArtistNames;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `artist_names` field to Set
     pub struct SetArtistNames<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtistNames<S> {}
     impl<S: State> State for SetArtistNames<S> {
-        type CreatedAt = S::CreatedAt;
         type TrackName = S::TrackName;
         type ArtistNames = Set<members::artist_names>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type TrackName = S::TrackName;
+        type ArtistNames = S::ArtistNames;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `track_name` field
         pub struct track_name(());
         ///Marker type for the `artist_names` field
         pub struct artist_names(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -195,16 +198,16 @@ pub mod lastfm_state {
 pub struct LastfmBuilder<'a, S: lastfm_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<Vec<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<UriValue<'a>>,
+        Option<UriValue<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -229,12 +232,12 @@ impl<'a> LastfmBuilder<'a, lastfm_state::Empty> {
 
 impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
     /// Set the `artistMbId` field (optional)
-    pub fn artist_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn artist_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `artistMbId` field to an Option value (optional)
-    pub fn maybe_artist_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_artist_mb_id(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -248,7 +251,7 @@ where
     /// Set the `artistNames` field (required)
     pub fn artist_names(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> LastfmBuilder<'a, lastfm_state::SetArtistNames<S>> {
         self._fields.1 = Option::Some(value.into());
         LastfmBuilder {
@@ -261,12 +264,12 @@ where
 
 impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
     /// Set the `coverArtUrl` field (optional)
-    pub fn cover_art_url(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cover_art_url(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `coverArtUrl` field to an Option value (optional)
-    pub fn maybe_cover_art_url(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cover_art_url(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -293,12 +296,12 @@ where
 
 impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
     /// Set the `originUrl` field (optional)
-    pub fn origin_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn origin_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `originUrl` field to an Option value (optional)
-    pub fn maybe_origin_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_origin_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -319,12 +322,12 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
 
 impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
     /// Set the `releaseMbId` field (optional)
-    pub fn release_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn release_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `releaseMbId` field to an Option value (optional)
-    pub fn maybe_release_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_release_mb_id(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -332,12 +335,12 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
 
 impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
     /// Set the `releaseName` field (optional)
-    pub fn release_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn release_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `releaseName` field to an Option value (optional)
-    pub fn maybe_release_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_release_name(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -345,12 +348,12 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
 
 impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
     /// Set the `trackMbId` field (optional)
-    pub fn track_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn track_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `trackMbId` field to an Option value (optional)
-    pub fn maybe_track_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_track_mb_id(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -364,7 +367,7 @@ where
     /// Set the `trackName` field (required)
     pub fn track_name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LastfmBuilder<'a, lastfm_state::SetTrackName<S>> {
         self._fields.9 = Option::Some(value.into());
         LastfmBuilder {
@@ -378,9 +381,9 @@ where
 impl<'a, S> LastfmBuilder<'a, S>
 where
     S: lastfm_state::State,
-    S::CreatedAt: lastfm_state::IsSet,
     S::TrackName: lastfm_state::IsSet,
     S::ArtistNames: lastfm_state::IsSet,
+    S::CreatedAt: lastfm_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lastfm<'a> {
@@ -399,13 +402,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Lastfm<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Lastfm<'a> {
         Lastfm {
             artist_mb_id: self._fields.0,
             artist_names: self._fields.1.unwrap(),

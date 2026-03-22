@@ -10,10 +10,12 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 /// Binary image data. Supported formats: JPEG, PNG, WebP, GIF. Maximum size: 1MB (1,000,000 bytes).
 
@@ -24,17 +26,24 @@ pub struct UploadBlob {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct UploadBlobOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UploadBlobOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Blob reference object that can be used in post embeds (app.bsky.embed.images).
-    #[serde(borrow)]
-    pub blob: BlobRef<'a>,
+    pub blob: BlobRef<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -43,24 +52,25 @@ pub struct UploadBlobOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UploadBlobError<'a> {
+pub enum UploadBlobError {
     #[serde(rename = "InvalidContentType")]
-    InvalidContentType(Option<CowStr<'a>>),
+    InvalidContentType(Option<SmolStr>),
     #[serde(rename = "BlobTooLarge")]
-    BlobTooLarge(Option<CowStr<'a>>),
+    BlobTooLarge(Option<SmolStr>),
     #[serde(rename = "UploadFailed")]
-    UploadFailed(Option<CowStr<'a>>),
+    UploadFailed(Option<SmolStr>),
     #[serde(rename = "NoActiveSession")]
-    NoActiveSession(Option<CowStr<'a>>),
+    NoActiveSession(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for UploadBlobError<'_> {
+impl core::fmt::Display for UploadBlobError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidContentType(msg) => {
@@ -91,7 +101,13 @@ impl core::fmt::Display for UploadBlobError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -101,8 +117,8 @@ pub struct UploadBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for UploadBlobResponse {
     const NSID: &'static str = "app.chronosky.media.uploadBlob";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = UploadBlobOutput<'de>;
-    type Err<'de> = UploadBlobError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = UploadBlobOutput<S>;
+    type Err = UploadBlobError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for UploadBlob {
@@ -118,7 +134,7 @@ impl jacquard_common::xrpc::XrpcRequest for UploadBlob {
         body: &'de [u8],
     ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
     where
-        Self: serde::Deserialize<'de>,
+        Self: Deserialize<'de>,
     {
         Ok(
             Box::new(Self {
@@ -135,6 +151,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for UploadBlobRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "image/jpeg,image/png,image/webp,image/gif",
     );
-    type Request<'de> = UploadBlob;
+    type Request<S: Bos<str> + AsRef<str>> = UploadBlob;
     type Response = UploadBlobResponse;
 }

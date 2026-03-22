@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,27 +26,39 @@ use serde::{Serialize, Deserialize};
 use crate::zone_stratos::boundary;
 /// A specific domain to define exposure boundary.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Domain<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Domain<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Domain identifier for boundary. Must be a valid domain name.
-    #[serde(borrow)]
-    pub value: CowStr<'a>,
+    pub value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A collection of domains that define the exposure boundary for a record.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Domains<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Domains<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of domains that can access this record.
-    #[serde(borrow)]
-    pub values: Vec<boundary::Domain<'a>>,
+    pub values: Vec<boundary::Domain<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Domain<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Domain<S> {
     fn nsid() -> &'static str {
         "zone.stratos.boundary.defs"
     }
@@ -70,7 +84,7 @@ impl<'a> LexiconSchema for Domain<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Domains<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Domains<S> {
     fn nsid() -> &'static str {
         "zone.stratos.boundary.defs"
     }
@@ -209,7 +223,7 @@ pub mod domains_state {
 /// Builder for constructing an instance of this type
 pub struct DomainsBuilder<'a, S: domains_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<boundary::Domain<'a>>>,),
+    _fields: (Option<Vec<boundary::Domain<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -239,7 +253,7 @@ where
     /// Set the `values` field (required)
     pub fn values(
         mut self,
-        value: impl Into<Vec<boundary::Domain<'a>>>,
+        value: impl Into<Vec<boundary::Domain<S>>>,
     ) -> DomainsBuilder<'a, domains_state::SetValues<S>> {
         self._fields.0 = Option::Some(value.into());
         DomainsBuilder {
@@ -265,10 +279,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Domains<'a> {
         Domains {
             values: self._fields.0.unwrap(),

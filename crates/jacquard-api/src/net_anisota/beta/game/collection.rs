@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::RecordError;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,30 +30,30 @@ use serde::{Serialize, Deserialize};
 use crate::net_anisota::beta::game::collection;
 /// Beta version: Record representing a collected specimen in a player's collection
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "net.anisota.beta.game.collection",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Collection<'a> {
+pub struct Collection<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When the specimen was first acquired
     pub acquired_at: Datetime,
     ///Common name of the specimen
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub common_name: Option<CowStr<'a>>,
+    pub common_name: Option<S>,
     ///When the record was created
     pub created_at: Datetime,
     ///Taxonomic family
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub family: Option<CowStr<'a>>,
+    pub family: Option<S>,
     ///Taxonomic genus
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genus: Option<CowStr<'a>>,
+    pub genus: Option<S>,
     ///When the record was last modified
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_modified: Option<Datetime>,
@@ -60,99 +62,102 @@ pub struct Collection<'a> {
     pub last_seen: Option<Datetime>,
     ///URI of the game.log record that documents the acquisition of this specimen
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub log_record_uri: Option<CowStr<'a>>,
+    pub log_record_uri: Option<S>,
     ///Number of specimens collected
     pub quantity: i64,
     ///Rarity level of the specimen
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rarity: Option<CowStr<'a>>,
+    pub rarity: Option<S>,
     ///Scientific name of the specimen
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub scientific_name: Option<CowStr<'a>>,
+    pub scientific_name: Option<S>,
     ///How the specimen was acquired
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source: Option<CowStr<'a>>,
+    pub source: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_details: Option<collection::SourceDetails<'a>>,
+    pub source_details: Option<collection::SourceDetails<S>>,
     ///Taxonomic species
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub species: Option<CowStr<'a>>,
+    pub species: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub specimen_data: Option<collection::SpecimenData<'a>>,
+    pub specimen_data: Option<collection::SpecimenData<S>>,
     ///Unique identifier for the specimen
-    #[serde(borrow)]
-    pub specimen_id: CowStr<'a>,
+    pub specimen_id: S,
     ///Collection status of this specimen
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<CowStr<'a>>,
+    pub status: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollectionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Collection<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Collection<S>,
 }
 
 /// Additional details about how the specimen was acquired
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SourceDetails<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SourceDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Number of attempts before successful capture
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attempts: Option<i64>,
     ///Probability used when catching this specimen (decimal string, e.g. '0.75')
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub catch_probability: Option<CowStr<'a>>,
+    pub catch_probability: Option<S>,
     ///URI of the game card that provided this specimen
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub game_card_uri: Option<CowStr<'a>>,
+    pub game_card_uri: Option<S>,
     ///Location where specimen was found or observed
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location: Option<CowStr<'a>>,
+    pub location: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Complete specimen information
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SpecimenData<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SpecimenData<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Scientific authorship of the species
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub authorship: Option<CowStr<'a>>,
+    pub authorship: Option<S>,
     ///Detailed description of the specimen
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Collection<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CollectionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Collection<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CollectionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -163,18 +168,18 @@ pub struct CollectionRecord;
 impl XrpcResp for CollectionRecord {
     const NSID: &'static str = "net.anisota.beta.game.collection";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollectionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CollectionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CollectionGetRecordOutput<'_>> for Collection<'_> {
-    fn from(output: CollectionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CollectionGetRecordOutput<S>> for Collection<S> {
+    fn from(output: CollectionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl jacquard_common::types::collection::Collection for Collection<'_> {
+impl<S: Bos<str> + AsRef<str>> jacquard_common::types::collection::Collection
+for Collection<S> {
     const NSID: &'static str = "net.anisota.beta.game.collection";
     type Record = CollectionRecord;
 }
@@ -184,7 +189,7 @@ impl jacquard_common::types::collection::Collection for CollectionRecord {
     type Record = CollectionRecord;
 }
 
-impl<'a> LexiconSchema for Collection<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Collection<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.collection"
     }
@@ -270,7 +275,7 @@ impl<'a> LexiconSchema for Collection<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SourceDetails<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SourceDetails<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.collection"
     }
@@ -285,7 +290,7 @@ impl<'a> LexiconSchema for SourceDetails<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SpecimenData<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SpecimenData<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.collection"
     }
@@ -379,22 +384,22 @@ pub struct CollectionBuilder<'a, S: collection_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<collection::SourceDetails<'a>>,
-        Option<CowStr<'a>>,
-        Option<collection::SpecimenData<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<collection::SourceDetails<S>>,
+        Option<S>,
+        Option<collection::SpecimenData<S>>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -456,12 +461,12 @@ where
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `commonName` field (optional)
-    pub fn common_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn common_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `commonName` field to an Option value (optional)
-    pub fn maybe_common_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_common_name(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -488,12 +493,12 @@ where
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `family` field (optional)
-    pub fn family(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn family(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `family` field to an Option value (optional)
-    pub fn maybe_family(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_family(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -501,12 +506,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `genus` field (optional)
-    pub fn genus(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn genus(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `genus` field to an Option value (optional)
-    pub fn maybe_genus(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_genus(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -540,12 +545,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `logRecordUri` field (optional)
-    pub fn log_record_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn log_record_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `logRecordUri` field to an Option value (optional)
-    pub fn maybe_log_record_uri(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_log_record_uri(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -572,12 +577,12 @@ where
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `rarity` field (optional)
-    pub fn rarity(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn rarity(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `rarity` field to an Option value (optional)
-    pub fn maybe_rarity(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_rarity(mut self, value: Option<S>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -585,12 +590,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `scientificName` field (optional)
-    pub fn scientific_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn scientific_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `scientificName` field to an Option value (optional)
-    pub fn maybe_scientific_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_scientific_name(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -598,12 +603,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
-    pub fn maybe_source(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_source(mut self, value: Option<S>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -613,7 +618,7 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `sourceDetails` field (optional)
     pub fn source_details(
         mut self,
-        value: impl Into<Option<collection::SourceDetails<'a>>>,
+        value: impl Into<Option<collection::SourceDetails<S>>>,
     ) -> Self {
         self._fields.12 = value.into();
         self
@@ -621,7 +626,7 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `sourceDetails` field to an Option value (optional)
     pub fn maybe_source_details(
         mut self,
-        value: Option<collection::SourceDetails<'a>>,
+        value: Option<collection::SourceDetails<S>>,
     ) -> Self {
         self._fields.12 = value;
         self
@@ -630,12 +635,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `species` field (optional)
-    pub fn species(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn species(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `species` field to an Option value (optional)
-    pub fn maybe_species(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_species(mut self, value: Option<S>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -645,7 +650,7 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `specimenData` field (optional)
     pub fn specimen_data(
         mut self,
-        value: impl Into<Option<collection::SpecimenData<'a>>>,
+        value: impl Into<Option<collection::SpecimenData<S>>>,
     ) -> Self {
         self._fields.14 = value.into();
         self
@@ -653,7 +658,7 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `specimenData` field to an Option value (optional)
     pub fn maybe_specimen_data(
         mut self,
-        value: Option<collection::SpecimenData<'a>>,
+        value: Option<collection::SpecimenData<S>>,
     ) -> Self {
         self._fields.14 = value;
         self
@@ -668,7 +673,7 @@ where
     /// Set the `specimenId` field (required)
     pub fn specimen_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CollectionBuilder<'a, collection_state::SetSpecimenId<S>> {
         self._fields.15 = Option::Some(value.into());
         CollectionBuilder {
@@ -681,12 +686,12 @@ where
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<S>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -726,10 +731,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Collection<'a> {
         Collection {
             acquired_at: self._fields.0.unwrap(),

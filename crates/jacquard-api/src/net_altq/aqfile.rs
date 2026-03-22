@@ -10,15 +10,17 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,29 +32,34 @@ use serde::{Serialize, Deserialize};
 use crate::net_altq::aqfile;
 /// Cryptographic checksum for integrity verification.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Checksum<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Checksum<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Hash algorithm name.
-    #[serde(borrow)]
-    pub algo: ChecksumAlgo<'a>,
+    pub algo: ChecksumAlgo<S>,
     ///Hex or base64 encoded digest produced by the algorithm.
-    #[serde(borrow)]
-    pub hash: CowStr<'a>,
+    pub hash: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Hash algorithm name.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ChecksumAlgo<'a> {
+pub enum ChecksumAlgo<S: Bos<str> + AsRef<str> = DefaultStr> {
     Sha256,
     Sha512,
     Blake3,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ChecksumAlgo<'a> {
+impl<S: Bos<str> + AsRef<str>> ChecksumAlgo<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Sha256 => "sha256",
@@ -61,72 +68,57 @@ impl<'a> ChecksumAlgo<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ChecksumAlgo<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "sha256" => Self::Sha256,
             "sha512" => Self::Sha512,
             "blake3" => Self::Blake3,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ChecksumAlgo<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "sha256" => Self::Sha256,
-            "sha512" => Self::Sha512,
-            "blake3" => Self::Blake3,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ChecksumAlgo<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ChecksumAlgo<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ChecksumAlgo<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ChecksumAlgo<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ChecksumAlgo<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ChecksumAlgo<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ChecksumAlgo<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ChecksumAlgo<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ChecksumAlgo<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ChecksumAlgo<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ChecksumAlgo<'_> {
-    type Output = ChecksumAlgo<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ChecksumAlgo<S> {
+    type Output = ChecksumAlgo<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ChecksumAlgo::Sha256 => ChecksumAlgo::Sha256,
@@ -139,71 +131,82 @@ impl jacquard_common::IntoStatic for ChecksumAlgo<'_> {
 
 /// File metadata describing the uploaded blob.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct File<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct File<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///MIME type, e.g. 'video/mp4'.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mime_type: Option<CowStr<'a>>,
+    pub mime_type: Option<S>,
     ///Client-side last-modified timestamp.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub modified_at: Option<Datetime>,
     ///User-visible filename.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///File size in bytes.
     pub size: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A record representing an uploaded file blob with metadata.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "net.altq.aqfile", tag = "$type")]
-pub struct Aqfile<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "net.altq.aqfile",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Aqfile<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Handle or DID of the account to attribute this upload to.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub attribution: Option<AtIdentifier<'a>>,
+    pub attribution: Option<AtIdentifier<S>>,
     ///The uploaded blob reference. Note: Individual PDS instances may enforce lower size limits.
-    #[serde(borrow)]
-    pub blob: BlobRef<'a>,
+    pub blob: BlobRef<S>,
     ///Optional cryptographic checksum for integrity verification.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub checksum: Option<aqfile::Checksum<'a>>,
+    pub checksum: Option<aqfile::Checksum<S>>,
     ///Timestamp when this record was created.
     pub created_at: Datetime,
     ///Metadata about the file.
-    #[serde(borrow)]
-    pub file: aqfile::File<'a>,
+    pub file: aqfile::File<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AqfileGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AqfileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Aqfile<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Aqfile<S>,
 }
 
-impl<'a> Aqfile<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AqfileRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Aqfile<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AqfileRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Checksum<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Checksum<S> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
@@ -240,7 +243,7 @@ impl<'a> LexiconSchema for Checksum<'a> {
     }
 }
 
-impl<'a> LexiconSchema for File<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for File<S> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
@@ -303,18 +306,17 @@ pub struct AqfileRecord;
 impl XrpcResp for AqfileRecord {
     const NSID: &'static str = "net.altq.aqfile";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AqfileGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AqfileGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AqfileGetRecordOutput<'_>> for Aqfile<'_> {
-    fn from(output: AqfileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AqfileGetRecordOutput<S>> for Aqfile<S> {
+    fn from(output: AqfileGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Aqfile<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Aqfile<S> {
     const NSID: &'static str = "net.altq.aqfile";
     type Record = AqfileRecord;
 }
@@ -324,7 +326,7 @@ impl Collection for AqfileRecord {
     type Record = AqfileRecord;
 }
 
-impl<'a> LexiconSchema for Aqfile<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Aqfile<S> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
@@ -570,44 +572,44 @@ pub mod file_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Size;
         type Name;
+        type Size;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Size = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Size = Set<members::size>;
-        type Name = S::Name;
+        type Size = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Size = S::Size;
         type Name = Set<members::name>;
+        type Size = S::Size;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Name = S::Name;
+        type Size = Set<members::size>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `size` field
+        pub struct size(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FileBuilder<'a, S: file_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Datetime>, Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<Datetime>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -631,12 +633,12 @@ impl<'a> FileBuilder<'a, file_state::Empty> {
 
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `mimeType` field (optional)
-    pub fn mime_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn mime_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `mimeType` field to an Option value (optional)
-    pub fn maybe_mime_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_mime_type(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -663,7 +665,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> FileBuilder<'a, file_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         FileBuilder {
@@ -696,8 +698,8 @@ where
 impl<'a, S> FileBuilder<'a, S>
 where
     S: file_state::State,
-    S::Size: file_state::IsSet,
     S::Name: file_state::IsSet,
+    S::Size: file_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> File<'a> {
@@ -710,13 +712,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> File<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> File<'a> {
         File {
             mime_type: self._fields.0,
             modified_at: self._fields.1,
@@ -737,51 +733,51 @@ pub mod aqfile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blob;
-        type CreatedAt;
         type File;
+        type CreatedAt;
+        type Blob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blob = Unset;
-        type CreatedAt = Unset;
         type File = Unset;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
-        type Blob = Set<members::blob>;
-        type CreatedAt = S::CreatedAt;
-        type File = S::File;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Blob = S::Blob;
-        type CreatedAt = Set<members::created_at>;
-        type File = S::File;
+        type CreatedAt = Unset;
+        type Blob = Unset;
     }
     ///State transition - sets the `file` field to Set
     pub struct SetFile<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFile<S> {}
     impl<S: State> State for SetFile<S> {
-        type Blob = S::Blob;
-        type CreatedAt = S::CreatedAt;
         type File = Set<members::file>;
+        type CreatedAt = S::CreatedAt;
+        type Blob = S::Blob;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type File = S::File;
+        type CreatedAt = Set<members::created_at>;
+        type Blob = S::Blob;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type File = S::File;
+        type CreatedAt = S::CreatedAt;
+        type Blob = Set<members::blob>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blob` field
-        pub struct blob(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `file` field
         pub struct file(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
     }
 }
 
@@ -789,11 +785,11 @@ pub mod aqfile_state {
 pub struct AqfileBuilder<'a, S: aqfile_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtIdentifier<'a>>,
-        Option<BlobRef<'a>>,
-        Option<aqfile::Checksum<'a>>,
+        Option<AtIdentifier<S>>,
+        Option<BlobRef<S>>,
+        Option<aqfile::Checksum<S>>,
         Option<Datetime>,
-        Option<aqfile::File<'a>>,
+        Option<aqfile::File<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -818,12 +814,12 @@ impl<'a> AqfileBuilder<'a, aqfile_state::Empty> {
 
 impl<'a, S: aqfile_state::State> AqfileBuilder<'a, S> {
     /// Set the `attribution` field (optional)
-    pub fn attribution(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
+    pub fn attribution(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `attribution` field to an Option value (optional)
-    pub fn maybe_attribution(mut self, value: Option<AtIdentifier<'a>>) -> Self {
+    pub fn maybe_attribution(mut self, value: Option<AtIdentifier<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -837,7 +833,7 @@ where
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> AqfileBuilder<'a, aqfile_state::SetBlob<S>> {
         self._fields.1 = Option::Some(value.into());
         AqfileBuilder {
@@ -850,12 +846,12 @@ where
 
 impl<'a, S: aqfile_state::State> AqfileBuilder<'a, S> {
     /// Set the `checksum` field (optional)
-    pub fn checksum(mut self, value: impl Into<Option<aqfile::Checksum<'a>>>) -> Self {
+    pub fn checksum(mut self, value: impl Into<Option<aqfile::Checksum<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `checksum` field to an Option value (optional)
-    pub fn maybe_checksum(mut self, value: Option<aqfile::Checksum<'a>>) -> Self {
+    pub fn maybe_checksum(mut self, value: Option<aqfile::Checksum<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -888,7 +884,7 @@ where
     /// Set the `file` field (required)
     pub fn file(
         mut self,
-        value: impl Into<aqfile::File<'a>>,
+        value: impl Into<aqfile::File<S>>,
     ) -> AqfileBuilder<'a, aqfile_state::SetFile<S>> {
         self._fields.4 = Option::Some(value.into());
         AqfileBuilder {
@@ -902,9 +898,9 @@ where
 impl<'a, S> AqfileBuilder<'a, S>
 where
     S: aqfile_state::State,
-    S::Blob: aqfile_state::IsSet,
-    S::CreatedAt: aqfile_state::IsSet,
     S::File: aqfile_state::IsSet,
+    S::CreatedAt: aqfile_state::IsSet,
+    S::Blob: aqfile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Aqfile<'a> {
@@ -918,13 +914,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Aqfile<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Aqfile<'a> {
         Aqfile {
             attribution: self._fields.0,
             blob: self._fields.1.unwrap(),

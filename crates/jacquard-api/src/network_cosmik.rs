@@ -14,8 +14,14 @@ pub mod follow;
 
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{Bos, DefaultStr};
+
+#[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,17 +31,23 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Represents the provenance or source of a record.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Provenance<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Provenance<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Strong reference to the card that led to this record.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub via: Option<StrongRef<'a>>,
+    pub via: Option<StrongRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Provenance<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Provenance<S> {
     fn nsid() -> &'static str {
         "network.cosmik.defs"
     }

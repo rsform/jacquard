@@ -15,10 +15,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
@@ -34,25 +35,28 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A declaration of an album.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.rocksky.album", tag = "$type")]
-pub struct Album<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.rocksky.album",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Album<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The album art of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub album_art: Option<BlobRef<'a>>,
+    pub album_art: Option<BlobRef<S>>,
     ///The URL of the album art of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub album_art_url: Option<UriValue<'a>>,
+    pub album_art_url: Option<UriValue<S>>,
     ///The Apple Music link of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub apple_music_link: Option<UriValue<'a>>,
+    pub apple_music_link: Option<UriValue<S>>,
     ///The artist of the album.
-    #[serde(borrow)]
-    pub artist: CowStr<'a>,
+    pub artist: S,
     ///The date and time when the album was created.
     pub created_at: Datetime,
     ///The duration of the album in seconds.
@@ -60,156 +64,149 @@ pub struct Album<'a> {
     pub duration: Option<i64>,
     ///The genre of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genre: Option<CowStr<'a>>,
+    pub genre: Option<S>,
     ///The release date of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub release_date: Option<Datetime>,
     ///The Spotify link of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spotify_link: Option<UriValue<'a>>,
+    pub spotify_link: Option<UriValue<S>>,
     ///The tags of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///The tidal link of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tidal_link: Option<UriValue<'a>>,
+    pub tidal_link: Option<UriValue<S>>,
     ///The title of the album.
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
     ///The year the album was released.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub year: Option<i64>,
     ///The YouTube link of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub youtube_link: Option<UriValue<'a>>,
+    pub youtube_link: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AlbumGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AlbumGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Album<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Album<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct AlbumViewBasic<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AlbumViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The URL of the album art image.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub album_art: Option<UriValue<'a>>,
+    pub album_art: Option<UriValue<S>>,
     ///The artist of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artist: Option<CowStr<'a>>,
+    pub artist: Option<S>,
     ///The URI of the album's artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artist_uri: Option<AtUri<'a>>,
+    pub artist_uri: Option<AtUri<S>>,
     ///The unique identifier of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///The number of times the album has been played.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub play_count: Option<i64>,
     ///The release date of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub release_date: Option<CowStr<'a>>,
+    pub release_date: Option<S>,
     ///The SHA256 hash of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sha256: Option<CowStr<'a>>,
+    pub sha256: Option<S>,
     ///The title of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     ///The number of unique listeners who have played the album.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub unique_listeners: Option<i64>,
     ///The URI of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
     ///The year the album was released.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub year: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct AlbumViewDetailed<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AlbumViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The URL of the album art image.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub album_art: Option<UriValue<'a>>,
+    pub album_art: Option<UriValue<S>>,
     ///The artist of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artist: Option<CowStr<'a>>,
+    pub artist: Option<S>,
     ///The URI of the album's artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artist_uri: Option<AtUri<'a>>,
+    pub artist_uri: Option<AtUri<S>>,
     ///The unique identifier of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///The number of times the album has been played.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub play_count: Option<i64>,
     ///The release date of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub release_date: Option<CowStr<'a>>,
+    pub release_date: Option<S>,
     ///The SHA256 hash of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sha256: Option<CowStr<'a>>,
+    pub sha256: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///The title of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tracks: Option<Vec<Data<'a>>>,
+    pub tracks: Option<Vec<Data<S>>>,
     ///The number of unique listeners who have played the album.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub unique_listeners: Option<i64>,
     ///The URI of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
     ///The year the album was released.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub year: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Album<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AlbumRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Album<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AlbumRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -220,18 +217,17 @@ pub struct AlbumRecord;
 impl XrpcResp for AlbumRecord {
     const NSID: &'static str = "app.rocksky.album";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AlbumGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AlbumGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AlbumGetRecordOutput<'_>> for Album<'_> {
-    fn from(output: AlbumGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AlbumGetRecordOutput<S>> for Album<S> {
+    fn from(output: AlbumGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Album<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Album<S> {
     const NSID: &'static str = "app.rocksky.album";
     type Record = AlbumRecord;
 }
@@ -241,7 +237,7 @@ impl Collection for AlbumRecord {
     type Record = AlbumRecord;
 }
 
-impl<'a> LexiconSchema for Album<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Album<S> {
     fn nsid() -> &'static str {
         "app.rocksky.album"
     }
@@ -350,7 +346,7 @@ impl<'a> LexiconSchema for Album<'a> {
     }
 }
 
-impl<'a> LexiconSchema for AlbumViewBasic<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AlbumViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.album.defs"
     }
@@ -383,7 +379,7 @@ impl<'a> LexiconSchema for AlbumViewBasic<'a> {
     }
 }
 
-impl<'a> LexiconSchema for AlbumViewDetailed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AlbumViewDetailed<S> {
     fn nsid() -> &'static str {
         "app.rocksky.album.defs"
     }
@@ -426,51 +422,51 @@ pub mod album_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Artist;
         type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Artist = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Artist = S::Artist;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtist<S> {}
     impl<S: State> State for SetArtist<S> {
-        type Title = S::Title;
         type Artist = Set<members::artist>;
         type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
         type Artist = S::Artist;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Artist = S::Artist;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `artist` field
         pub struct artist(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -478,20 +474,20 @@ pub mod album_state {
 pub struct AlbumBuilder<'a, S: album_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<BlobRef<'a>>,
-        Option<UriValue<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
+        Option<BlobRef<S>>,
+        Option<UriValue<S>>,
+        Option<UriValue<S>>,
+        Option<S>,
         Option<Datetime>,
         Option<i64>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<UriValue<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
+        Option<UriValue<S>>,
+        Option<Vec<S>>,
+        Option<UriValue<S>>,
+        Option<S>,
         Option<i64>,
-        Option<UriValue<'a>>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -531,12 +527,12 @@ impl<'a> AlbumBuilder<'a, album_state::Empty> {
 
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `albumArt` field (optional)
-    pub fn album_art(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn album_art(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `albumArt` field to an Option value (optional)
-    pub fn maybe_album_art(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_album_art(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -544,12 +540,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `albumArtUrl` field (optional)
-    pub fn album_art_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn album_art_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `albumArtUrl` field to an Option value (optional)
-    pub fn maybe_album_art_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_album_art_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -557,12 +553,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `appleMusicLink` field (optional)
-    pub fn apple_music_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn apple_music_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `appleMusicLink` field to an Option value (optional)
-    pub fn maybe_apple_music_link(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_apple_music_link(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -576,7 +572,7 @@ where
     /// Set the `artist` field (required)
     pub fn artist(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AlbumBuilder<'a, album_state::SetArtist<S>> {
         self._fields.3 = Option::Some(value.into());
         AlbumBuilder {
@@ -621,12 +617,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_genre(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -647,12 +643,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `spotifyLink` field (optional)
-    pub fn spotify_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn spotify_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `spotifyLink` field to an Option value (optional)
-    pub fn maybe_spotify_link(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_spotify_link(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -660,12 +656,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -673,12 +669,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `tidalLink` field (optional)
-    pub fn tidal_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn tidal_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `tidalLink` field to an Option value (optional)
-    pub fn maybe_tidal_link(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_tidal_link(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -692,7 +688,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AlbumBuilder<'a, album_state::SetTitle<S>> {
         self._fields.11 = Option::Some(value.into());
         AlbumBuilder {
@@ -718,12 +714,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `youtubeLink` field (optional)
-    pub fn youtube_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn youtube_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `youtubeLink` field to an Option value (optional)
-    pub fn maybe_youtube_link(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_youtube_link(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -732,9 +728,9 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 impl<'a, S> AlbumBuilder<'a, S>
 where
     S: album_state::State,
-    S::Title: album_state::IsSet,
     S::Artist: album_state::IsSet,
     S::CreatedAt: album_state::IsSet,
+    S::Title: album_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Album<'a> {
@@ -757,10 +753,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Album<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Album<'a> {
         Album {
             album_art: self._fields.0,
             album_art_url: self._fields.1,

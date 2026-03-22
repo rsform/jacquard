@@ -10,36 +10,49 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{Did, Handle, Nsid};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DescribeRepo<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DescribeRepo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub repo: AtIdentifier<'a>,
+    pub repo: AtIdentifier<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DescribeRepoOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DescribeRepoOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of all the collections (NSIDs) for which this repo contains at least one record.
-    #[serde(borrow)]
-    pub collections: Vec<Nsid<'a>>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub collections: Vec<Nsid<S>>,
+    pub did: Did<S>,
     ///The complete DID document for this account.
-    #[serde(borrow)]
-    pub did_doc: Data<'a>,
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub did_doc: Data<S>,
+    pub handle: Handle<S>,
     ///Indicates if handle is currently valid (resolves bi-directionally)
     pub handle_is_correct: bool,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.atproto.repo.describeRepo
@@ -47,11 +60,12 @@ pub struct DescribeRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeRepoResponse {
     const NSID: &'static str = "com.atproto.repo.describeRepo";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DescribeRepoOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DescribeRepoOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DescribeRepo<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DescribeRepo<S> {
     const NSID: &'static str = "com.atproto.repo.describeRepo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = DescribeRepoResponse;
@@ -62,7 +76,7 @@ pub struct DescribeRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeRepoRequest {
     const PATH: &'static str = "/xrpc/com.atproto.repo.describeRepo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = DescribeRepo<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DescribeRepo<S>;
     type Response = DescribeRepoResponse;
 }
 
@@ -101,7 +115,7 @@ pub mod describe_repo_state {
 /// Builder for constructing an instance of this type
 pub struct DescribeRepoBuilder<'a, S: describe_repo_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>,),
+    _fields: (Option<AtIdentifier<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -131,7 +145,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> DescribeRepoBuilder<'a, describe_repo_state::SetRepo<S>> {
         self._fields.0 = Option::Some(value.into());
         DescribeRepoBuilder {

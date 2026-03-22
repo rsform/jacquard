@@ -10,10 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -22,16 +25,22 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BlueskyEmbed<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BlueskyEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Strong reference to the Bluesky post
-    #[serde(borrow)]
-    pub post_ref: StrongRef<'a>,
+    pub post_ref: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for BlueskyEmbed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BlueskyEmbed<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.blueskyEmbed"
     }
@@ -81,7 +90,7 @@ pub mod bluesky_embed_state {
 /// Builder for constructing an instance of this type
 pub struct BlueskyEmbedBuilder<'a, S: bluesky_embed_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>,),
+    _fields: (Option<StrongRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -111,7 +120,7 @@ where
     /// Set the `postRef` field (required)
     pub fn post_ref(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> BlueskyEmbedBuilder<'a, bluesky_embed_state::SetPostRef<S>> {
         self._fields.0 = Option::Some(value.into());
         BlueskyEmbedBuilder {
@@ -137,10 +146,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BlueskyEmbed<'a> {
         BlueskyEmbed {
             post_ref: self._fields.0.unwrap(),

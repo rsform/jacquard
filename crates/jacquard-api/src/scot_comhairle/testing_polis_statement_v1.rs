@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,57 +30,68 @@ use serde::{Serialize, Deserialize};
 use crate::scot_comhairle::testing_polis_statement_v1;
 /// A statement in the Polis-style deliberation system
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "scot.comhairle.testingPolisStatementV1",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct TestingPolisStatementV1<'a> {
+pub struct TestingPolisStatementV1<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when the statement was created
     pub created_at: Datetime,
     ///Reference to the poll this statement belongs to
-    #[serde(borrow)]
-    pub poll: testing_polis_statement_v1::PollRef<'a>,
+    pub poll: testing_polis_statement_v1::PollRef<S>,
     ///The text content of the statement
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TestingPolisStatementV1GetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TestingPolisStatementV1GetRecordOutput<
+    S: Bos<str> + AsRef<str> = DefaultStr,
+> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: TestingPolisStatementV1<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: TestingPolisStatementV1<S>,
 }
 
 /// Reference to a poll record
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PollRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PollRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Content identifier of the poll record
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///AT-URI of the poll record
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> TestingPolisStatementV1<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TestingPolisStatementV1Record>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> TestingPolisStatementV1<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TestingPolisStatementV1Record>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -89,18 +102,18 @@ pub struct TestingPolisStatementV1Record;
 impl XrpcResp for TestingPolisStatementV1Record {
     const NSID: &'static str = "scot.comhairle.testingPolisStatementV1";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TestingPolisStatementV1GetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TestingPolisStatementV1GetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TestingPolisStatementV1GetRecordOutput<'_>> for TestingPolisStatementV1<'_> {
-    fn from(output: TestingPolisStatementV1GetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TestingPolisStatementV1GetRecordOutput<S>>
+for TestingPolisStatementV1<S> {
+    fn from(output: TestingPolisStatementV1GetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for TestingPolisStatementV1<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for TestingPolisStatementV1<S> {
     const NSID: &'static str = "scot.comhairle.testingPolisStatementV1";
     type Record = TestingPolisStatementV1Record;
 }
@@ -110,7 +123,7 @@ impl Collection for TestingPolisStatementV1Record {
     type Record = TestingPolisStatementV1Record;
 }
 
-impl<'a> LexiconSchema for TestingPolisStatementV1<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TestingPolisStatementV1<S> {
     fn nsid() -> &'static str {
         "scot.comhairle.testingPolisStatementV1"
     }
@@ -136,7 +149,7 @@ impl<'a> LexiconSchema for TestingPolisStatementV1<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PollRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PollRef<S> {
     fn nsid() -> &'static str {
         "scot.comhairle.testingPolisStatementV1"
     }
@@ -161,51 +174,51 @@ pub mod testing_polis_statement_v1_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Poll;
         type CreatedAt;
         type Text;
-        type Poll;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Poll = Unset;
         type CreatedAt = Unset;
         type Text = Unset;
-        type Poll = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Text = S::Text;
-        type Poll = S::Poll;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type CreatedAt = S::CreatedAt;
-        type Text = Set<members::text>;
-        type Poll = S::Poll;
     }
     ///State transition - sets the `poll` field to Set
     pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPoll<S> {}
     impl<S: State> State for SetPoll<S> {
+        type Poll = Set<members::poll>;
         type CreatedAt = S::CreatedAt;
         type Text = S::Text;
-        type Poll = Set<members::poll>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Poll = S::Poll;
+        type CreatedAt = Set<members::created_at>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Poll = S::Poll;
+        type CreatedAt = S::CreatedAt;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `poll` field
+        pub struct poll(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `poll` field
-        pub struct poll(());
     }
 }
 
@@ -217,8 +230,8 @@ pub struct TestingPolisStatementV1Builder<
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<testing_polis_statement_v1::PollRef<'a>>,
-        Option<CowStr<'a>>,
+        Option<testing_polis_statement_v1::PollRef<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -274,7 +287,7 @@ where
     /// Set the `poll` field (required)
     pub fn poll(
         mut self,
-        value: impl Into<testing_polis_statement_v1::PollRef<'a>>,
+        value: impl Into<testing_polis_statement_v1::PollRef<S>>,
     ) -> TestingPolisStatementV1Builder<
         'a,
         testing_polis_statement_v1_state::SetPoll<S>,
@@ -296,7 +309,7 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TestingPolisStatementV1Builder<
         'a,
         testing_polis_statement_v1_state::SetText<S>,
@@ -313,9 +326,9 @@ where
 impl<'a, S> TestingPolisStatementV1Builder<'a, S>
 where
     S: testing_polis_statement_v1_state::State,
+    S::Poll: testing_polis_statement_v1_state::IsSet,
     S::CreatedAt: testing_polis_statement_v1_state::IsSet,
     S::Text: testing_polis_statement_v1_state::IsSet,
-    S::Poll: testing_polis_statement_v1_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TestingPolisStatementV1<'a> {
@@ -329,10 +342,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TestingPolisStatementV1<'a> {
         TestingPolisStatementV1 {
             created_at: self._fields.0.unwrap(),
@@ -496,7 +506,7 @@ pub mod poll_ref_state {
 /// Builder for constructing an instance of this type
 pub struct PollRefBuilder<'a, S: poll_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -526,7 +536,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> PollRefBuilder<'a, poll_ref_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         PollRefBuilder {
@@ -545,7 +555,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> PollRefBuilder<'a, poll_ref_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         PollRefBuilder {
@@ -573,10 +583,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PollRef<'a> {
         PollRef {
             cid: self._fields.0.unwrap(),

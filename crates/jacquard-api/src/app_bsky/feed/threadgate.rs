@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,90 +30,136 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::threadgate;
 /// Allow replies from actors who follow you.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct FollowerRule<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FollowerRule<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Allow replies from actors you follow.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct FollowingRule<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FollowingRule<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Allow replies from actors on a list.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ListRule<'a> {
-    #[serde(borrow)]
-    pub list: AtUri<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListRule<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub list: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Record defining interaction gating rules for a thread (aka, reply controls). The record key (rkey) of the threadgate record must match the record key of the thread's root post, and that record must be in the same repository.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.bsky.feed.threadgate", tag = "$type")]
-pub struct Threadgate<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.bsky.feed.threadgate",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Threadgate<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub allow: Option<Vec<ThreadgateAllowItem<'a>>>,
+    pub allow: Option<Vec<ThreadgateAllowItem<S>>>,
     pub created_at: Datetime,
     ///List of hidden reply URIs.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub hidden_replies: Option<Vec<AtUri<'a>>>,
+    pub hidden_replies: Option<Vec<AtUri<S>>>,
     ///Reference (AT-URI) to the post record.
-    #[serde(borrow)]
-    pub post: AtUri<'a>,
+    pub post: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ThreadgateAllowItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ThreadgateAllowItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
-    MentionRule(Box<threadgate::MentionRule<'a>>),
+    MentionRule(Box<threadgate::MentionRule<S>>),
     #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
-    FollowerRule(Box<threadgate::FollowerRule<'a>>),
+    FollowerRule(Box<threadgate::FollowerRule<S>>),
     #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
-    FollowingRule(Box<threadgate::FollowingRule<'a>>),
+    FollowingRule(Box<threadgate::FollowingRule<S>>),
     #[serde(rename = "app.bsky.feed.threadgate#listRule")]
-    ListRule(Box<threadgate::ListRule<'a>>),
+    ListRule(Box<threadgate::ListRule<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadgateGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ThreadgateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Threadgate<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Threadgate<S>,
 }
 
 /// Allow replies from actors mentioned in your post.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct MentionRule<'a> {}
-impl<'a> Threadgate<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ThreadgateRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MentionRule<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+impl<S: Bos<str> + AsRef<str>> Threadgate<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ThreadgateRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for FollowerRule<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FollowerRule<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
@@ -126,7 +174,7 @@ impl<'a> LexiconSchema for FollowerRule<'a> {
     }
 }
 
-impl<'a> LexiconSchema for FollowingRule<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FollowingRule<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
@@ -141,7 +189,7 @@ impl<'a> LexiconSchema for FollowingRule<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ListRule<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListRule<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
@@ -163,18 +211,17 @@ pub struct ThreadgateRecord;
 impl XrpcResp for ThreadgateRecord {
     const NSID: &'static str = "app.bsky.feed.threadgate";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ThreadgateGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ThreadgateGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ThreadgateGetRecordOutput<'_>> for Threadgate<'_> {
-    fn from(output: ThreadgateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ThreadgateGetRecordOutput<S>> for Threadgate<S> {
+    fn from(output: ThreadgateGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Threadgate<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Threadgate<S> {
     const NSID: &'static str = "app.bsky.feed.threadgate";
     type Record = ThreadgateRecord;
 }
@@ -184,7 +231,7 @@ impl Collection for ThreadgateRecord {
     type Record = ThreadgateRecord;
 }
 
-impl<'a> LexiconSchema for Threadgate<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Threadgate<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
@@ -219,7 +266,7 @@ impl<'a> LexiconSchema for Threadgate<'a> {
     }
 }
 
-impl<'a> LexiconSchema for MentionRule<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for MentionRule<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
@@ -429,7 +476,7 @@ pub mod list_rule_state {
 /// Builder for constructing an instance of this type
 pub struct ListRuleBuilder<'a, S: list_rule_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -459,7 +506,7 @@ where
     /// Set the `list` field (required)
     pub fn list(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ListRuleBuilder<'a, list_rule_state::SetList<S>> {
         self._fields.0 = Option::Some(value.into());
         ListRuleBuilder {
@@ -485,10 +532,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ListRule<'a> {
         ListRule {
             list: self._fields.0.unwrap(),
@@ -545,10 +589,10 @@ pub mod threadgate_state {
 pub struct ThreadgateBuilder<'a, S: threadgate_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<ThreadgateAllowItem<'a>>>,
+        Option<Vec<ThreadgateAllowItem<S>>>,
         Option<Datetime>,
-        Option<Vec<AtUri<'a>>>,
-        Option<AtUri<'a>>,
+        Option<Vec<AtUri<S>>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -575,13 +619,13 @@ impl<'a, S: threadgate_state::State> ThreadgateBuilder<'a, S> {
     /// Set the `allow` field (optional)
     pub fn allow(
         mut self,
-        value: impl Into<Option<Vec<ThreadgateAllowItem<'a>>>>,
+        value: impl Into<Option<Vec<ThreadgateAllowItem<S>>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `allow` field to an Option value (optional)
-    pub fn maybe_allow(mut self, value: Option<Vec<ThreadgateAllowItem<'a>>>) -> Self {
+    pub fn maybe_allow(mut self, value: Option<Vec<ThreadgateAllowItem<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -608,12 +652,12 @@ where
 
 impl<'a, S: threadgate_state::State> ThreadgateBuilder<'a, S> {
     /// Set the `hiddenReplies` field (optional)
-    pub fn hidden_replies(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn hidden_replies(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `hiddenReplies` field to an Option value (optional)
-    pub fn maybe_hidden_replies(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_hidden_replies(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -627,7 +671,7 @@ where
     /// Set the `post` field (required)
     pub fn post(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ThreadgateBuilder<'a, threadgate_state::SetPost<S>> {
         self._fields.3 = Option::Some(value.into());
         ThreadgateBuilder {
@@ -657,10 +701,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Threadgate<'a> {
         Threadgate {
             allow: self._fields.0,

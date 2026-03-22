@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,18 +30,23 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A FitSky-specific user profile with custom banner and bio
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.fitsky.profile", tag = "$type")]
-pub struct Profile<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.fitsky.profile",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Custom FitSky banner image. Falls back to Bluesky banner if not set.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub banner: Option<BlobRef<'a>>,
+    pub banner: Option<BlobRef<S>>,
     ///FitSky-specific bio text
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub bio: Option<CowStr<'a>>,
+    pub bio: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///User's date of birth (ISO 8601). Used for max HR calculation.
@@ -53,23 +60,24 @@ pub struct Profile<'a> {
     pub public_profile: Option<bool>,
     ///User's preferred unit system
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub unit_system: Option<ProfileUnitSystem<'a>>,
+    pub unit_system: Option<ProfileUnitSystem<S>>,
     ///Weight in grams
     #[serde(skip_serializing_if = "Option::is_none")]
     pub weight_grams: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// User's preferred unit system
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileUnitSystem<'a> {
+pub enum ProfileUnitSystem<S: Bos<str> + AsRef<str> = DefaultStr> {
     Metric,
     Imperial,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ProfileUnitSystem<'a> {
+impl<S: Bos<str> + AsRef<str>> ProfileUnitSystem<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Metric => "metric",
@@ -77,70 +85,56 @@ impl<'a> ProfileUnitSystem<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ProfileUnitSystem<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "metric" => Self::Metric,
             "imperial" => Self::Imperial,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ProfileUnitSystem<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "metric" => Self::Metric,
-            "imperial" => Self::Imperial,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ProfileUnitSystem<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ProfileUnitSystem<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ProfileUnitSystem<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ProfileUnitSystem<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ProfileUnitSystem<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ProfileUnitSystem<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ProfileUnitSystem<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ProfileUnitSystem<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ProfileUnitSystem<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ProfileUnitSystem<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ProfileUnitSystem<'_> {
-    type Output = ProfileUnitSystem<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileUnitSystem<S> {
+    type Output = ProfileUnitSystem<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ProfileUnitSystem::Metric => ProfileUnitSystem::Metric,
@@ -153,22 +147,23 @@ impl jacquard_common::IntoStatic for ProfileUnitSystem<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProfileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Profile<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Profile<S>,
 }
 
-impl<'a> Profile<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ProfileRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Profile<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ProfileRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -179,18 +174,17 @@ pub struct ProfileRecord;
 impl XrpcResp for ProfileRecord {
     const NSID: &'static str = "app.fitsky.profile";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProfileGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ProfileGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
-    fn from(output: ProfileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ProfileGetRecordOutput<S>> for Profile<S> {
+    fn from(output: ProfileGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Profile<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Profile<S> {
     const NSID: &'static str = "app.fitsky.profile";
     type Record = ProfileRecord;
 }
@@ -200,7 +194,7 @@ impl Collection for ProfileRecord {
     type Record = ProfileRecord;
 }
 
-impl<'a> LexiconSchema for Profile<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Profile<S> {
     fn nsid() -> &'static str {
         "app.fitsky.profile"
     }
@@ -329,13 +323,13 @@ pub mod profile_state {
 pub struct ProfileBuilder<'a, S: profile_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
+        Option<BlobRef<S>>,
+        Option<S>,
         Option<Datetime>,
         Option<Datetime>,
         Option<i64>,
         Option<bool>,
-        Option<ProfileUnitSystem<'a>>,
+        Option<ProfileUnitSystem<S>>,
         Option<i64>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -361,12 +355,12 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `banner` field (optional)
-    pub fn banner(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn banner(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `banner` field to an Option value (optional)
-    pub fn maybe_banner(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_banner(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -374,12 +368,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `bio` field (optional)
-    pub fn bio(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn bio(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `bio` field to an Option value (optional)
-    pub fn maybe_bio(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_bio(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -441,13 +435,13 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `unitSystem` field (optional)
     pub fn unit_system(
         mut self,
-        value: impl Into<Option<ProfileUnitSystem<'a>>>,
+        value: impl Into<Option<ProfileUnitSystem<S>>>,
     ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `unitSystem` field to an Option value (optional)
-    pub fn maybe_unit_system(mut self, value: Option<ProfileUnitSystem<'a>>) -> Self {
+    pub fn maybe_unit_system(mut self, value: Option<ProfileUnitSystem<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -487,10 +481,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Profile<'a> {
         Profile {
             banner: self._fields.0,

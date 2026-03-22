@@ -10,45 +10,52 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Avatar<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Avatar<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///DID of the blob owner. Used to resolve blob URLs.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub did: Option<Did<'a>>,
+    pub did: Option<Did<S>>,
     ///Pull the avatar up by half its own height, overlapping the element above.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lift: Option<bool>,
     ///Size token.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub size: Option<AvatarSize<'a>>,
+    pub size: Option<AvatarSize<S>>,
     ///Blob ref for the image.
-    #[serde(borrow)]
-    pub src: Data<'a>,
+    pub src: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Size token.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AvatarSize<'a> {
+pub enum AvatarSize<S: Bos<str> + AsRef<str> = DefaultStr> {
     Xsmall,
     Small,
     Medium,
     Large,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> AvatarSize<'a> {
+impl<S: Bos<str> + AsRef<str>> AvatarSize<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Xsmall => "xsmall",
@@ -58,74 +65,58 @@ impl<'a> AvatarSize<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for AvatarSize<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "xsmall" => Self::Xsmall,
             "small" => Self::Small,
             "medium" => Self::Medium,
             "large" => Self::Large,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for AvatarSize<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "xsmall" => Self::Xsmall,
-            "small" => Self::Small,
-            "medium" => Self::Medium,
-            "large" => Self::Large,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for AvatarSize<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for AvatarSize<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for AvatarSize<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for AvatarSize<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for AvatarSize<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for AvatarSize<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for AvatarSize<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for AvatarSize<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for AvatarSize<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for AvatarSize<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for AvatarSize<'_> {
-    type Output = AvatarSize<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for AvatarSize<S> {
+    type Output = AvatarSize<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             AvatarSize::Xsmall => AvatarSize::Xsmall,
@@ -138,13 +129,22 @@ impl jacquard_common::IntoStatic for AvatarSize<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct AvatarOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AvatarOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Response<'a>,
+    pub value: Response<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for org.atsui.Avatar
@@ -152,11 +152,12 @@ pub struct AvatarResponse;
 impl jacquard_common::xrpc::XrpcResp for AvatarResponse {
     const NSID: &'static str = "org.atsui.Avatar";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AvatarOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AvatarOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Avatar<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Avatar<S> {
     const NSID: &'static str = "org.atsui.Avatar";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -171,7 +172,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for AvatarRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Avatar<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Avatar<S>;
     type Response = AvatarResponse;
 }
 
@@ -210,7 +211,7 @@ pub mod avatar_state {
 /// Builder for constructing an instance of this type
 pub struct AvatarBuilder<'a, S: avatar_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<bool>, Option<AvatarSize<'a>>, Option<Data<'a>>),
+    _fields: (Option<Did<S>>, Option<bool>, Option<AvatarSize<S>>, Option<Data<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -234,12 +235,12 @@ impl<'a> AvatarBuilder<'a, avatar_state::Empty> {
 
 impl<'a, S: avatar_state::State> AvatarBuilder<'a, S> {
     /// Set the `did` field (optional)
-    pub fn did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_did(mut self, value: Option<Did<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -260,12 +261,12 @@ impl<'a, S: avatar_state::State> AvatarBuilder<'a, S> {
 
 impl<'a, S: avatar_state::State> AvatarBuilder<'a, S> {
     /// Set the `size` field (optional)
-    pub fn size(mut self, value: impl Into<Option<AvatarSize<'a>>>) -> Self {
+    pub fn size(mut self, value: impl Into<Option<AvatarSize<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
-    pub fn maybe_size(mut self, value: Option<AvatarSize<'a>>) -> Self {
+    pub fn maybe_size(mut self, value: Option<AvatarSize<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -279,7 +280,7 @@ where
     /// Set the `src` field (required)
     pub fn src(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> AvatarBuilder<'a, avatar_state::SetSrc<S>> {
         self._fields.3 = Option::Some(value.into());
         AvatarBuilder {
@@ -306,10 +307,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Avatar<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Avatar<'a> {
         Avatar {
             did: self._fields.0,
             lift: self._fields.1,

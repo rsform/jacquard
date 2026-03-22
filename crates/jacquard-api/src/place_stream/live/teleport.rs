@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,39 +29,48 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Record defining a 'teleport', that is active during a certain time.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "place.stream.live.teleport", tag = "$type")]
-pub struct Teleport<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "place.stream.live.teleport",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Teleport<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The time limit in seconds for the teleport. If not set, the teleport is permanent. Must be at least 60 seconds, and no more than 32,400 seconds (9 hours).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration_seconds: Option<i64>,
     ///The time the teleport becomes active.
     pub starts_at: Datetime,
     ///The DID of the streamer to teleport to.
-    #[serde(borrow)]
-    pub streamer: Did<'a>,
+    pub streamer: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TeleportGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TeleportGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Teleport<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Teleport<S>,
 }
 
-impl<'a> Teleport<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TeleportRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Teleport<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TeleportRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -70,18 +81,17 @@ pub struct TeleportRecord;
 impl XrpcResp for TeleportRecord {
     const NSID: &'static str = "place.stream.live.teleport";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TeleportGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TeleportGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TeleportGetRecordOutput<'_>> for Teleport<'_> {
-    fn from(output: TeleportGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TeleportGetRecordOutput<S>> for Teleport<S> {
+    fn from(output: TeleportGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Teleport<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Teleport<S> {
     const NSID: &'static str = "place.stream.live.teleport";
     type Record = TeleportRecord;
 }
@@ -91,7 +101,7 @@ impl Collection for TeleportRecord {
     type Record = TeleportRecord;
 }
 
-impl<'a> LexiconSchema for Teleport<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Teleport<S> {
     fn nsid() -> &'static str {
         "place.stream.live.teleport"
     }
@@ -134,44 +144,44 @@ pub mod teleport_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartsAt;
         type Streamer;
+        type StartsAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartsAt = Unset;
         type Streamer = Unset;
-    }
-    ///State transition - sets the `starts_at` field to Set
-    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
-    impl<S: State> State for SetStartsAt<S> {
-        type StartsAt = Set<members::starts_at>;
-        type Streamer = S::Streamer;
+        type StartsAt = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
-        type StartsAt = S::StartsAt;
         type Streamer = Set<members::streamer>;
+        type StartsAt = S::StartsAt;
+    }
+    ///State transition - sets the `starts_at` field to Set
+    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
+    impl<S: State> State for SetStartsAt<S> {
+        type Streamer = S::Streamer;
+        type StartsAt = Set<members::starts_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `starts_at` field
-        pub struct starts_at(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `starts_at` field
+        pub struct starts_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TeleportBuilder<'a, S: teleport_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<Datetime>, Option<Did<'a>>),
+    _fields: (Option<i64>, Option<Datetime>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -233,7 +243,7 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> TeleportBuilder<'a, teleport_state::SetStreamer<S>> {
         self._fields.2 = Option::Some(value.into());
         TeleportBuilder {
@@ -247,8 +257,8 @@ where
 impl<'a, S> TeleportBuilder<'a, S>
 where
     S: teleport_state::State,
-    S::StartsAt: teleport_state::IsSet,
     S::Streamer: teleport_state::IsSet,
+    S::StartsAt: teleport_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Teleport<'a> {
@@ -262,10 +272,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Teleport<'a> {
         Teleport {
             duration_seconds: self._fields.0,

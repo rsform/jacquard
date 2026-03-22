@@ -10,21 +10,29 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::GameSummaryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListGames<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListGames<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did: Option<Did<'a>>,
+    pub did: Option<Did<S>>,
     ///Defaults to `20`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -33,24 +41,31 @@ pub struct ListGames<'a> {
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort: Option<CowStr<'a>>,
+    pub sort: Option<S>,
     ///Defaults to `"desc"`.
     #[serde(default = "_default_sort_direction")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort_direction: Option<CowStr<'a>>,
+    pub sort_direction: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListGamesOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListGamesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub games: Vec<GameSummaryView<'a>>,
+    pub cursor: Option<S>,
+    pub games: Vec<GameSummaryView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for games.gamesgamesgamesgames.listGames
@@ -58,11 +73,12 @@ pub struct ListGamesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListGamesResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.listGames";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListGamesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListGamesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListGames<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListGames<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.listGames";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListGamesResponse;
@@ -73,7 +89,7 @@ pub struct ListGamesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListGamesRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.listGames";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListGames<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListGames<S>;
     type Response = ListGamesResponse;
 }
 
@@ -111,13 +127,7 @@ pub mod list_games_state {
 /// Builder for constructing an instance of this type
 pub struct ListGamesBuilder<'a, S: list_games_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<Did<S>>, Option<i64>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -141,12 +151,12 @@ impl<'a> ListGamesBuilder<'a, list_games_state::Empty> {
 
 impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -154,12 +164,12 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
 
 impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     /// Set the `did` field (optional)
-    pub fn did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_did(mut self, value: Option<Did<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -180,12 +190,12 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
 
 impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -193,12 +203,12 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
 
 impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     /// Set the `sortDirection` field (optional)
-    pub fn sort_direction(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sort_direction(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
-    pub fn maybe_sort_direction(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sort_direction(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }

@@ -15,11 +15,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -29,33 +32,42 @@ use serde::{Serialize, Deserialize};
 use crate::blue_recipes::actor::ProfileViewBasic;
 use crate::blue_recipes::feed::recipe::Recipe;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct NotFoundRecipe<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct NotFoundRecipe<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub not_found: bool,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response model for fetching multiple recipes.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RecipeView<'a> {
-    #[serde(borrow)]
-    pub author: ProfileViewBasic<'a>,
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RecipeView<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub author: ProfileViewBasic<S>,
+    pub cid: Cid<S>,
     pub indexed_at: Datetime,
-    #[serde(borrow)]
-    pub record: Recipe<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub record: Recipe<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for NotFoundRecipe<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for NotFoundRecipe<S> {
     fn nsid() -> &'static str {
         "blue.recipes.feed.defs"
     }
@@ -70,7 +82,7 @@ impl<'a> LexiconSchema for NotFoundRecipe<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RecipeView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RecipeView<S> {
     fn nsid() -> &'static str {
         "blue.recipes.feed.defs"
     }
@@ -95,44 +107,44 @@ pub mod not_found_recipe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type NotFound;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type NotFound = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type NotFound = S::NotFound;
+        type Uri = Unset;
     }
     ///State transition - sets the `not_found` field to Set
     pub struct SetNotFound<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotFound<S> {}
     impl<S: State> State for SetNotFound<S> {
-        type Uri = S::Uri;
         type NotFound = Set<members::not_found>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type NotFound = S::NotFound;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `not_found` field
         pub struct not_found(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct NotFoundRecipeBuilder<'a, S: not_found_recipe_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<AtUri<'a>>),
+    _fields: (Option<bool>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -181,7 +193,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> NotFoundRecipeBuilder<'a, not_found_recipe_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         NotFoundRecipeBuilder {
@@ -195,8 +207,8 @@ where
 impl<'a, S> NotFoundRecipeBuilder<'a, S>
 where
     S: not_found_recipe_state::State,
-    S::Uri: not_found_recipe_state::IsSet,
     S::NotFound: not_found_recipe_state::IsSet,
+    S::Uri: not_found_recipe_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NotFoundRecipe<'a> {
@@ -209,10 +221,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> NotFoundRecipe<'a> {
         NotFoundRecipe {
             not_found: self._fields.0.unwrap(),
@@ -335,83 +344,83 @@ pub mod recipe_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
-        type Author;
         type IndexedAt;
+        type Record;
         type Uri;
+        type Author;
         type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
-        type Author = Unset;
         type IndexedAt = Unset;
+        type Record = Unset;
         type Uri = Unset;
+        type Author = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Record = S::Record;
-        type Author = Set<members::author>;
-        type IndexedAt = S::IndexedAt;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Record = S::Record;
-        type Author = S::Author;
         type IndexedAt = Set<members::indexed_at>;
+        type Record = S::Record;
         type Uri = S::Uri;
+        type Author = S::Author;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type IndexedAt = S::IndexedAt;
+        type Record = Set<members::record>;
+        type Uri = S::Uri;
+        type Author = S::Author;
         type Cid = S::Cid;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Record = S::Record;
-        type Author = S::Author;
         type IndexedAt = S::IndexedAt;
+        type Record = S::Record;
         type Uri = Set<members::uri>;
+        type Author = S::Author;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type IndexedAt = S::IndexedAt;
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type Author = Set<members::author>;
         type Cid = S::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Record = S::Record;
-        type Author = S::Author;
         type IndexedAt = S::IndexedAt;
+        type Record = S::Record;
         type Uri = S::Uri;
+        type Author = S::Author;
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `author` field
+        pub struct author(());
         ///Marker type for the `cid` field
         pub struct cid(());
     }
@@ -421,11 +430,11 @@ pub mod recipe_view_state {
 pub struct RecipeViewBuilder<'a, S: recipe_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ProfileViewBasic<'a>>,
-        Option<Cid<'a>>,
+        Option<ProfileViewBasic<S>>,
+        Option<Cid<S>>,
         Option<Datetime>,
-        Option<Recipe<'a>>,
-        Option<AtUri<'a>>,
+        Option<Recipe<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -456,7 +465,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<S>>,
     ) -> RecipeViewBuilder<'a, recipe_view_state::SetAuthor<S>> {
         self._fields.0 = Option::Some(value.into());
         RecipeViewBuilder {
@@ -475,7 +484,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> RecipeViewBuilder<'a, recipe_view_state::SetCid<S>> {
         self._fields.1 = Option::Some(value.into());
         RecipeViewBuilder {
@@ -513,7 +522,7 @@ where
     /// Set the `record` field (required)
     pub fn record(
         mut self,
-        value: impl Into<Recipe<'a>>,
+        value: impl Into<Recipe<S>>,
     ) -> RecipeViewBuilder<'a, recipe_view_state::SetRecord<S>> {
         self._fields.3 = Option::Some(value.into());
         RecipeViewBuilder {
@@ -532,7 +541,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> RecipeViewBuilder<'a, recipe_view_state::SetUri<S>> {
         self._fields.4 = Option::Some(value.into());
         RecipeViewBuilder {
@@ -546,10 +555,10 @@ where
 impl<'a, S> RecipeViewBuilder<'a, S>
 where
     S: recipe_view_state::State,
-    S::Record: recipe_view_state::IsSet,
-    S::Author: recipe_view_state::IsSet,
     S::IndexedAt: recipe_view_state::IsSet,
+    S::Record: recipe_view_state::IsSet,
     S::Uri: recipe_view_state::IsSet,
+    S::Author: recipe_view_state::IsSet,
     S::Cid: recipe_view_state::IsSet,
 {
     /// Build the final struct
@@ -566,10 +575,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RecipeView<'a> {
         RecipeView {
             author: self._fields.0.unwrap(),

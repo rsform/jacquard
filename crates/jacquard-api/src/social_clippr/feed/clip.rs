@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, Language, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,29 +30,32 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Record containing a bookmarked item, or 'clip'.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.clippr.feed.clip", tag = "$type")]
-pub struct Clip<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.clippr.feed.clip",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Clip<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Client-declared timestamp when the bookmark is created
     pub created_at: Datetime,
     ///A description of the bookmark's content. This should be ripped from the URL metadata and be static for all records using the URL.
-    #[serde(borrow)]
-    pub description: CowStr<'a>,
+    pub description: S,
     ///Indicates human language of the given URL
     #[serde(skip_serializing_if = "Option::is_none")]
     pub languages: Option<Vec<Language>>,
     ///User-written notes for the bookmark. Public and personal.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notes: Option<CowStr<'a>>,
+    pub notes: Option<S>,
     ///An array of tags. A format of solely alphanumeric characters and dashes should be used.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<StrongRef<'a>>>,
+    pub tags: Option<Vec<StrongRef<S>>>,
     ///The title of the bookmark. If left empty, reuse the URL.
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
     ///Whether the bookmark can be used for feed indexing and aggregation  Defaults to `false`.
     #[serde(default = "_default_clip_unlisted")]
     pub unlisted: bool,
@@ -59,29 +64,31 @@ pub struct Clip<'a> {
     #[serde(default = "_default_clip_unread")]
     pub unread: Option<bool>,
     ///The URL of the bookmark. Cannot be left empty or be modified after creation.
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ClipGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ClipGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Clip<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Clip<S>,
 }
 
-impl<'a> Clip<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ClipRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Clip<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ClipRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -92,18 +99,17 @@ pub struct ClipRecord;
 impl XrpcResp for ClipRecord {
     const NSID: &'static str = "social.clippr.feed.clip";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ClipGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ClipGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ClipGetRecordOutput<'_>> for Clip<'_> {
-    fn from(output: ClipGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ClipGetRecordOutput<S>> for Clip<S> {
+    fn from(output: ClipGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Clip<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Clip<S> {
     const NSID: &'static str = "social.clippr.feed.clip";
     type Record = ClipRecord;
 }
@@ -113,7 +119,7 @@ impl Collection for ClipRecord {
     type Record = ClipRecord;
 }
 
-impl<'a> LexiconSchema for Clip<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Clip<S> {
     fn nsid() -> &'static str {
         "social.clippr.feed.clip"
     }
@@ -250,85 +256,85 @@ pub mod clip_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type CreatedAt;
-        type Description;
         type Url;
+        type Title;
         type Unlisted;
+        type Description;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type CreatedAt = Unset;
-        type Description = Unset;
         type Url = Unset;
+        type Title = Unset;
         type Unlisted = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
-        type Url = S::Url;
-        type Unlisted = S::Unlisted;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type Description = S::Description;
-        type Url = S::Url;
-        type Unlisted = S::Unlisted;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Description = Set<members::description>;
-        type Url = S::Url;
-        type Unlisted = S::Unlisted;
+        type Description = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
         type Url = Set<members::url>;
+        type Title = S::Title;
         type Unlisted = S::Unlisted;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Url = S::Url;
+        type Title = Set<members::title>;
+        type Unlisted = S::Unlisted;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `unlisted` field to Set
     pub struct SetUnlisted<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUnlisted<S> {}
     impl<S: State> State for SetUnlisted<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
         type Url = S::Url;
+        type Title = S::Title;
         type Unlisted = Set<members::unlisted>;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Url = S::Url;
+        type Title = S::Title;
+        type Unlisted = S::Unlisted;
+        type Description = Set<members::description>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Url = S::Url;
+        type Title = S::Title;
+        type Unlisted = S::Unlisted;
+        type Description = S::Description;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `unlisted` field
         pub struct unlisted(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -337,14 +343,14 @@ pub struct ClipBuilder<'a, S: clip_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Vec<Language>>,
-        Option<CowStr<'a>>,
-        Option<Vec<StrongRef<'a>>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<Vec<StrongRef<S>>>,
+        Option<S>,
         Option<bool>,
         Option<bool>,
-        Option<UriValue<'a>>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -394,7 +400,7 @@ where
     /// Set the `description` field (required)
     pub fn description(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ClipBuilder<'a, clip_state::SetDescription<S>> {
         self._fields.1 = Option::Some(value.into());
         ClipBuilder {
@@ -420,12 +426,12 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
 
 impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
-    pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_notes(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -433,12 +439,12 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
 
 impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<StrongRef<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -452,7 +458,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ClipBuilder<'a, clip_state::SetTitle<S>> {
         self._fields.5 = Option::Some(value.into());
         ClipBuilder {
@@ -503,7 +509,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ClipBuilder<'a, clip_state::SetUrl<S>> {
         self._fields.8 = Option::Some(value.into());
         ClipBuilder {
@@ -517,11 +523,11 @@ where
 impl<'a, S> ClipBuilder<'a, S>
 where
     S: clip_state::State,
-    S::Title: clip_state::IsSet,
-    S::CreatedAt: clip_state::IsSet,
-    S::Description: clip_state::IsSet,
     S::Url: clip_state::IsSet,
+    S::Title: clip_state::IsSet,
     S::Unlisted: clip_state::IsSet,
+    S::Description: clip_state::IsSet,
+    S::CreatedAt: clip_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Clip<'a> {
@@ -539,13 +545,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Clip<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Clip<'a> {
         Clip {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1.unwrap(),

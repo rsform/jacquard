@@ -10,17 +10,27 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct LoginOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LoginOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The code used to login on the InstantDB website
-    #[serde(borrow)]
-    pub code: CowStr<'a>,
+    pub code: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// XRPC request marker type.
@@ -32,8 +42,8 @@ pub struct LoginResponse;
 impl jacquard_common::xrpc::XrpcResp for LoginResponse {
     const NSID: &'static str = "app.ocho.state.login";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LoginOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LoginOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for Login {
@@ -47,6 +57,6 @@ pub struct LoginRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LoginRequest {
     const PATH: &'static str = "/xrpc/app.ocho.state.login";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Login;
+    type Request<S: Bos<str> + AsRef<str>> = Login;
     type Response = LoginResponse;
 }

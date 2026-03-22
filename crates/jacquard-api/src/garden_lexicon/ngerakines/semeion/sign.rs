@@ -29,18 +29,22 @@ pub struct SignResponse;
 impl jacquard_common::xrpc::XrpcResp for SignResponse {
     const NSID: &'static str = "garden.lexicon.ngerakines.semeion.Sign";
     const ENCODING: &'static str = "application/octet-stream";
-    type Output<'de> = SignOutput;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = SignOutput;
+    type Err = jacquard_common::xrpc::GenericError;
+    fn encode_output<S: jacquard_common::Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: jacquard_common::Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(SignOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -61,7 +65,7 @@ impl jacquard_common::xrpc::XrpcRequest for Sign {
         body: &'de [u8],
     ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
     where
-        Self: serde::Deserialize<'de>,
+        Self: Deserialize<'de>,
     {
         Ok(
             Box::new(Self {
@@ -78,6 +82,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for SignRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "*/*",
     );
-    type Request<'de> = Sign;
+    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = Sign;
     type Response = SignResponse;
 }

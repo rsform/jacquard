@@ -7,6 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_common::types::string::Did;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -14,19 +15,39 @@ use crate::com_atproto::admin::AccountView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetAccountInfo<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetAccountInfo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetAccountInfoOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetAccountInfoOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: AccountView<'a>,
+    pub value: AccountView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for com.atproto.admin.getAccountInfo
@@ -34,11 +55,12 @@ pub struct GetAccountInfoResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAccountInfoResponse {
     const NSID: &'static str = "com.atproto.admin.getAccountInfo";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetAccountInfoOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetAccountInfoOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetAccountInfo<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetAccountInfo<S> {
     const NSID: &'static str = "com.atproto.admin.getAccountInfo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAccountInfoResponse;
@@ -49,7 +71,7 @@ pub struct GetAccountInfoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInfoRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.getAccountInfo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetAccountInfo<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetAccountInfo<S>;
     type Response = GetAccountInfoResponse;
 }
 
@@ -88,7 +110,7 @@ pub mod get_account_info_state {
 /// Builder for constructing an instance of this type
 pub struct GetAccountInfoBuilder<'a, S: get_account_info_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -118,7 +140,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetAccountInfoBuilder<'a, get_account_info_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetAccountInfoBuilder {

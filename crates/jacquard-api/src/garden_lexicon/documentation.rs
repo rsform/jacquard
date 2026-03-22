@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Nsid, Cid, Datetime, Language};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,99 +30,117 @@ use serde::{Serialize, Deserialize};
 use crate::garden_lexicon::documentation;
 /// Documentation for a definition within a lexicon.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DefinitionDoc<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DefinitionDoc<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Localized descriptions for this definition.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<Vec<documentation::LocalizedString<'a>>>,
+    pub description: Option<Vec<documentation::LocalizedString<S>>>,
     ///The name of the definition being documented (e.g., 'main', 'replyRef').
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Documentation for properties within this definition.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub properties: Option<Vec<documentation::PropertyDoc<'a>>>,
+    pub properties: Option<Vec<documentation::PropertyDoc<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A string with an associated language code.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LocalizedString<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LocalizedString<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///ISO 639 language code (e.g., 'en', 'es', 'ja').
     pub lang: Language,
     ///The localized string value.
-    #[serde(borrow)]
-    pub value: CowStr<'a>,
+    pub value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Auxiliary documentation for a lexicon schema, supporting localized descriptions for the lexicon and its properties.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "garden.lexicon.documentation",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Documentation<'a> {
+pub struct Documentation<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when this documentation was created.
     pub created_at: Datetime,
     ///Documentation for specific definitions within the lexicon (e.g., main, replyRef).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub definitions: Option<Vec<documentation::DefinitionDoc<'a>>>,
+    pub definitions: Option<Vec<documentation::DefinitionDoc<S>>>,
     ///Localized descriptions for the lexicon.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<Vec<documentation::LocalizedString<'a>>>,
+    pub description: Option<Vec<documentation::LocalizedString<S>>>,
     ///The NSID of the lexicon being documented.
-    #[serde(borrow)]
-    pub lexicon: Nsid<'a>,
+    pub lexicon: Nsid<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DocumentationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DocumentationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Documentation<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Documentation<S>,
 }
 
 /// Documentation for a specific property within a definition.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct PropertyDoc<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PropertyDoc<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Localized descriptions for this property.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<Vec<documentation::LocalizedString<'a>>>,
+    pub description: Option<Vec<documentation::LocalizedString<S>>>,
     ///The property name being documented.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Documentation<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DocumentationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Documentation<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DocumentationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for DefinitionDoc<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DefinitionDoc<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.documentation"
     }
@@ -146,7 +166,7 @@ impl<'a> LexiconSchema for DefinitionDoc<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LocalizedString<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocalizedString<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.documentation"
     }
@@ -179,18 +199,18 @@ pub struct DocumentationRecord;
 impl XrpcResp for DocumentationRecord {
     const NSID: &'static str = "garden.lexicon.documentation";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DocumentationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DocumentationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DocumentationGetRecordOutput<'_>> for Documentation<'_> {
-    fn from(output: DocumentationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DocumentationGetRecordOutput<S>>
+for Documentation<S> {
+    fn from(output: DocumentationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Documentation<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Documentation<S> {
     const NSID: &'static str = "garden.lexicon.documentation";
     type Record = DocumentationRecord;
 }
@@ -200,7 +220,7 @@ impl Collection for DocumentationRecord {
     type Record = DocumentationRecord;
 }
 
-impl<'a> LexiconSchema for Documentation<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Documentation<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.documentation"
     }
@@ -215,7 +235,7 @@ impl<'a> LexiconSchema for Documentation<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PropertyDoc<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PropertyDoc<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.documentation"
     }
@@ -524,7 +544,7 @@ pub mod localized_string_state {
 /// Builder for constructing an instance of this type
 pub struct LocalizedStringBuilder<'a, S: localized_string_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Language>, Option<CowStr<'a>>),
+    _fields: (Option<Language>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -573,7 +593,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LocalizedStringBuilder<'a, localized_string_state::SetValue<S>> {
         self._fields.1 = Option::Some(value.into());
         LocalizedStringBuilder {
@@ -601,10 +621,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LocalizedString<'a> {
         LocalizedString {
             lang: self._fields.0.unwrap(),
@@ -624,37 +641,37 @@ pub mod documentation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lexicon;
         type CreatedAt;
+        type Lexicon;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lexicon = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `lexicon` field to Set
-    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLexicon<S> {}
-    impl<S: State> State for SetLexicon<S> {
-        type Lexicon = Set<members::lexicon>;
-        type CreatedAt = S::CreatedAt;
+        type Lexicon = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Lexicon = S::Lexicon;
         type CreatedAt = Set<members::created_at>;
+        type Lexicon = S::Lexicon;
+    }
+    ///State transition - sets the `lexicon` field to Set
+    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLexicon<S> {}
+    impl<S: State> State for SetLexicon<S> {
+        type CreatedAt = S::CreatedAt;
+        type Lexicon = Set<members::lexicon>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lexicon` field
-        pub struct lexicon(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `lexicon` field
+        pub struct lexicon(());
     }
 }
 
@@ -663,9 +680,9 @@ pub struct DocumentationBuilder<'a, S: documentation_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<Vec<documentation::DefinitionDoc<'a>>>,
-        Option<Vec<documentation::LocalizedString<'a>>>,
-        Option<Nsid<'a>>,
+        Option<Vec<documentation::DefinitionDoc<S>>>,
+        Option<Vec<documentation::LocalizedString<S>>>,
+        Option<Nsid<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -711,7 +728,7 @@ impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
     /// Set the `definitions` field (optional)
     pub fn definitions(
         mut self,
-        value: impl Into<Option<Vec<documentation::DefinitionDoc<'a>>>>,
+        value: impl Into<Option<Vec<documentation::DefinitionDoc<S>>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -719,7 +736,7 @@ impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
     /// Set the `definitions` field to an Option value (optional)
     pub fn maybe_definitions(
         mut self,
-        value: Option<Vec<documentation::DefinitionDoc<'a>>>,
+        value: Option<Vec<documentation::DefinitionDoc<S>>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -730,7 +747,7 @@ impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
-        value: impl Into<Option<Vec<documentation::LocalizedString<'a>>>>,
+        value: impl Into<Option<Vec<documentation::LocalizedString<S>>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -738,7 +755,7 @@ impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(
         mut self,
-        value: Option<Vec<documentation::LocalizedString<'a>>>,
+        value: Option<Vec<documentation::LocalizedString<S>>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -753,7 +770,7 @@ where
     /// Set the `lexicon` field (required)
     pub fn lexicon(
         mut self,
-        value: impl Into<Nsid<'a>>,
+        value: impl Into<Nsid<S>>,
     ) -> DocumentationBuilder<'a, documentation_state::SetLexicon<S>> {
         self._fields.3 = Option::Some(value.into());
         DocumentationBuilder {
@@ -767,8 +784,8 @@ where
 impl<'a, S> DocumentationBuilder<'a, S>
 where
     S: documentation_state::State,
-    S::Lexicon: documentation_state::IsSet,
     S::CreatedAt: documentation_state::IsSet,
+    S::Lexicon: documentation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Documentation<'a> {
@@ -783,10 +800,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Documentation<'a> {
         Documentation {
             created_at: self._fields.0.unwrap(),

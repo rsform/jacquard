@@ -17,13 +17,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -32,34 +33,42 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::place_stream::multistream;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Event<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Event<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub message: CowStr<'a>,
-    #[serde(borrow)]
-    pub status: CowStr<'a>,
+    pub message: S,
+    pub status: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TargetView<'a> {
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TargetView<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub cid: Cid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub latest_event: Option<multistream::Event<'a>>,
-    #[serde(borrow)]
-    pub record: Data<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub latest_event: Option<multistream::Event<S>>,
+    pub record: Data<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Event<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Event<S> {
     fn nsid() -> &'static str {
         "place.stream.multistream.defs"
     }
@@ -74,7 +83,7 @@ impl<'a> LexiconSchema for Event<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TargetView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TargetView<S> {
     fn nsid() -> &'static str {
         "place.stream.multistream.defs"
     }
@@ -99,49 +108,49 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Message;
+        type CreatedAt;
         type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Message = Unset;
+        type CreatedAt = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Message = S::Message;
-        type Status = S::Status;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
-        type CreatedAt = S::CreatedAt;
         type Message = Set<members::message>;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Message = S::Message;
+        type CreatedAt = Set<members::created_at>;
         type Status = S::Status;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type CreatedAt = S::CreatedAt;
         type Message = S::Message;
+        type CreatedAt = S::CreatedAt;
         type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `status` field
         pub struct status(());
     }
@@ -150,7 +159,7 @@ pub mod event_state {
 /// Builder for constructing an instance of this type
 pub struct EventBuilder<'a, S: event_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Datetime>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -199,7 +208,7 @@ where
     /// Set the `message` field (required)
     pub fn message(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EventBuilder<'a, event_state::SetMessage<S>> {
         self._fields.1 = Option::Some(value.into());
         EventBuilder {
@@ -218,7 +227,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EventBuilder<'a, event_state::SetStatus<S>> {
         self._fields.2 = Option::Some(value.into());
         EventBuilder {
@@ -232,8 +241,8 @@ where
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::CreatedAt: event_state::IsSet,
     S::Message: event_state::IsSet,
+    S::CreatedAt: event_state::IsSet,
     S::Status: event_state::IsSet,
 {
     /// Build the final struct
@@ -246,10 +255,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Event<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Event<'a> {
         Event {
             created_at: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -416,10 +422,10 @@ pub mod target_view_state {
 pub struct TargetViewBuilder<'a, S: target_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Cid<'a>>,
-        Option<multistream::Event<'a>>,
-        Option<Data<'a>>,
-        Option<AtUri<'a>>,
+        Option<Cid<S>>,
+        Option<multistream::Event<S>>,
+        Option<Data<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -450,7 +456,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> TargetViewBuilder<'a, target_view_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         TargetViewBuilder {
@@ -465,13 +471,13 @@ impl<'a, S: target_view_state::State> TargetViewBuilder<'a, S> {
     /// Set the `latestEvent` field (optional)
     pub fn latest_event(
         mut self,
-        value: impl Into<Option<multistream::Event<'a>>>,
+        value: impl Into<Option<multistream::Event<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `latestEvent` field to an Option value (optional)
-    pub fn maybe_latest_event(mut self, value: Option<multistream::Event<'a>>) -> Self {
+    pub fn maybe_latest_event(mut self, value: Option<multistream::Event<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -485,7 +491,7 @@ where
     /// Set the `record` field (required)
     pub fn record(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> TargetViewBuilder<'a, target_view_state::SetRecord<S>> {
         self._fields.2 = Option::Some(value.into());
         TargetViewBuilder {
@@ -504,7 +510,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> TargetViewBuilder<'a, target_view_state::SetUri<S>> {
         self._fields.3 = Option::Some(value.into());
         TargetViewBuilder {
@@ -535,7 +541,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TargetView<'a> {
         TargetView {
             cid: self._fields.0.unwrap(),

@@ -7,26 +7,43 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct RemoveApikeyParams<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RemoveApikeyParams<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct RemoveApikeyOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RemoveApikeyOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Data<'a>,
+    pub value: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<S>>,
+    >,
 }
 
 /// XRPC request marker type.
@@ -38,8 +55,8 @@ pub struct RemoveApikeyResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveApikeyResponse {
     const NSID: &'static str = "app.rocksky.apikey.removeApikey";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RemoveApikeyOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RemoveApikeyOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for RemoveApikey {
@@ -57,7 +74,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for RemoveApikeyRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = RemoveApikey;
+    type Request<S: Bos<str> + AsRef<str>> = RemoveApikey;
     type Response = RemoveApikeyResponse;
 }
 
@@ -96,7 +113,7 @@ pub mod remove_apikey_params_state {
 /// Builder for constructing an instance of this type
 pub struct RemoveApikeyParamsBuilder<'a, S: remove_apikey_params_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -126,7 +143,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RemoveApikeyParamsBuilder<'a, remove_apikey_params_state::SetId<S>> {
         self._fields.0 = Option::Some(value.into());
         RemoveApikeyParamsBuilder {

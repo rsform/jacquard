@@ -10,10 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,28 +28,39 @@ use crate::app_bsky::richtext::facet::Link;
 use crate::app_bsky::richtext::facet::Mention;
 /// Annotation of a sub-string within rich text.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Facet<'a> {
-    #[serde(borrow)]
-    pub features: Vec<FacetFeaturesItem<'a>>,
-    #[serde(borrow)]
-    pub index: ByteSlice<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Facet<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub features: Vec<FacetFeaturesItem<S>>,
+    pub index: ByteSlice<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum FacetFeaturesItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum FacetFeaturesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.richtext.facet#mention")]
-    FacetMention(Box<Mention<'a>>),
+    FacetMention(Box<Mention<S>>),
     #[serde(rename = "app.bsky.richtext.facet#link")]
-    FacetLink(Box<Link<'a>>),
+    FacetLink(Box<Link<S>>),
 }
 
-impl<'a> LexiconSchema for Facet<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Facet<S> {
     fn nsid() -> &'static str {
         "place.stream.richtext.facet"
     }
@@ -71,44 +85,44 @@ pub mod facet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Index;
         type Features;
+        type Index;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Index = Unset;
         type Features = Unset;
-    }
-    ///State transition - sets the `index` field to Set
-    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndex<S> {}
-    impl<S: State> State for SetIndex<S> {
-        type Index = Set<members::index>;
-        type Features = S::Features;
+        type Index = Unset;
     }
     ///State transition - sets the `features` field to Set
     pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFeatures<S> {}
     impl<S: State> State for SetFeatures<S> {
-        type Index = S::Index;
         type Features = Set<members::features>;
+        type Index = S::Index;
+    }
+    ///State transition - sets the `index` field to Set
+    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndex<S> {}
+    impl<S: State> State for SetIndex<S> {
+        type Features = S::Features;
+        type Index = Set<members::index>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `index` field
-        pub struct index(());
         ///Marker type for the `features` field
         pub struct features(());
+        ///Marker type for the `index` field
+        pub struct index(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FacetBuilder<'a, S: facet_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<FacetFeaturesItem<'a>>>, Option<ByteSlice<'a>>),
+    _fields: (Option<Vec<FacetFeaturesItem<S>>>, Option<ByteSlice<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -138,7 +152,7 @@ where
     /// Set the `features` field (required)
     pub fn features(
         mut self,
-        value: impl Into<Vec<FacetFeaturesItem<'a>>>,
+        value: impl Into<Vec<FacetFeaturesItem<S>>>,
     ) -> FacetBuilder<'a, facet_state::SetFeatures<S>> {
         self._fields.0 = Option::Some(value.into());
         FacetBuilder {
@@ -157,7 +171,7 @@ where
     /// Set the `index` field (required)
     pub fn index(
         mut self,
-        value: impl Into<ByteSlice<'a>>,
+        value: impl Into<ByteSlice<S>>,
     ) -> FacetBuilder<'a, facet_state::SetIndex<S>> {
         self._fields.1 = Option::Some(value.into());
         FacetBuilder {
@@ -171,8 +185,8 @@ where
 impl<'a, S> FacetBuilder<'a, S>
 where
     S: facet_state::State,
-    S::Index: facet_state::IsSet,
     S::Features: facet_state::IsSet,
+    S::Index: facet_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Facet<'a> {
@@ -183,13 +197,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Facet<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Facet<'a> {
         Facet {
             features: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,47 +29,53 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Setting Post based auto labeling.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blue.rito.label.auto.post", tag = "$type")]
-pub struct Post<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "blue.rito.label.auto.post",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Post<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Required for 'account', It should be 'add' or 'remove'
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub action: Option<CowStr<'a>>,
+    pub action: Option<S>,
     ///'account' or 'post'
-    #[serde(borrow)]
-    pub applied_to: CowStr<'a>,
+    pub applied_to: S,
     ///Setting apply condition with regex
-    #[serde(borrow)]
-    pub condition: CowStr<'a>,
+    pub condition: S,
     pub created_at: Datetime,
     ///Hour based label dulation. 0 will be no duration.
     pub duration_in_hours: i64,
     ///If condition are matched, which label are applyed or removed.
-    #[serde(borrow)]
-    pub label: CowStr<'a>,
+    pub label: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PostGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PostGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Post<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Post<S>,
 }
 
-impl<'a> Post<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PostRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Post<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PostRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -78,18 +86,17 @@ pub struct PostRecord;
 impl XrpcResp for PostRecord {
     const NSID: &'static str = "blue.rito.label.auto.post";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PostGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PostGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PostGetRecordOutput<'_>> for Post<'_> {
-    fn from(output: PostGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PostGetRecordOutput<S>> for Post<S> {
+    fn from(output: PostGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Post<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Post<S> {
     const NSID: &'static str = "blue.rito.label.auto.post";
     type Record = PostRecord;
 }
@@ -99,7 +106,7 @@ impl Collection for PostRecord {
     type Record = PostRecord;
 }
 
-impl<'a> LexiconSchema for Post<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Post<S> {
     fn nsid() -> &'static str {
         "blue.rito.label.auto.post"
     }
@@ -124,9 +131,9 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type DurationInHours;
         type Label;
+        type DurationInHours;
+        type CreatedAt;
         type Condition;
         type AppliedTo;
     }
@@ -134,19 +141,19 @@ pub mod post_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type DurationInHours = Unset;
         type Label = Unset;
+        type DurationInHours = Unset;
+        type CreatedAt = Unset;
         type Condition = Unset;
         type AppliedTo = Unset;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
+    ///State transition - sets the `label` field to Set
+    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLabel<S> {}
+    impl<S: State> State for SetLabel<S> {
+        type Label = Set<members::label>;
         type DurationInHours = S::DurationInHours;
-        type Label = S::Label;
+        type CreatedAt = S::CreatedAt;
         type Condition = S::Condition;
         type AppliedTo = S::AppliedTo;
     }
@@ -154,19 +161,19 @@ pub mod post_state {
     pub struct SetDurationInHours<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDurationInHours<S> {}
     impl<S: State> State for SetDurationInHours<S> {
-        type CreatedAt = S::CreatedAt;
-        type DurationInHours = Set<members::duration_in_hours>;
         type Label = S::Label;
+        type DurationInHours = Set<members::duration_in_hours>;
+        type CreatedAt = S::CreatedAt;
         type Condition = S::Condition;
         type AppliedTo = S::AppliedTo;
     }
-    ///State transition - sets the `label` field to Set
-    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLabel<S> {}
-    impl<S: State> State for SetLabel<S> {
-        type CreatedAt = S::CreatedAt;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Label = S::Label;
         type DurationInHours = S::DurationInHours;
-        type Label = Set<members::label>;
+        type CreatedAt = Set<members::created_at>;
         type Condition = S::Condition;
         type AppliedTo = S::AppliedTo;
     }
@@ -174,9 +181,9 @@ pub mod post_state {
     pub struct SetCondition<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCondition<S> {}
     impl<S: State> State for SetCondition<S> {
-        type CreatedAt = S::CreatedAt;
-        type DurationInHours = S::DurationInHours;
         type Label = S::Label;
+        type DurationInHours = S::DurationInHours;
+        type CreatedAt = S::CreatedAt;
         type Condition = Set<members::condition>;
         type AppliedTo = S::AppliedTo;
     }
@@ -184,21 +191,21 @@ pub mod post_state {
     pub struct SetAppliedTo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAppliedTo<S> {}
     impl<S: State> State for SetAppliedTo<S> {
-        type CreatedAt = S::CreatedAt;
-        type DurationInHours = S::DurationInHours;
         type Label = S::Label;
+        type DurationInHours = S::DurationInHours;
+        type CreatedAt = S::CreatedAt;
         type Condition = S::Condition;
         type AppliedTo = Set<members::applied_to>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `duration_in_hours` field
-        pub struct duration_in_hours(());
         ///Marker type for the `label` field
         pub struct label(());
+        ///Marker type for the `duration_in_hours` field
+        pub struct duration_in_hours(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `condition` field
         pub struct condition(());
         ///Marker type for the `applied_to` field
@@ -209,14 +216,7 @@ pub mod post_state {
 /// Builder for constructing an instance of this type
 pub struct PostBuilder<'a, S: post_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<S>, Option<Datetime>, Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -240,12 +240,12 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `action` field (optional)
-    pub fn action(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn action(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `action` field to an Option value (optional)
-    pub fn maybe_action(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_action(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -259,7 +259,7 @@ where
     /// Set the `appliedTo` field (required)
     pub fn applied_to(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PostBuilder<'a, post_state::SetAppliedTo<S>> {
         self._fields.1 = Option::Some(value.into());
         PostBuilder {
@@ -278,7 +278,7 @@ where
     /// Set the `condition` field (required)
     pub fn condition(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PostBuilder<'a, post_state::SetCondition<S>> {
         self._fields.2 = Option::Some(value.into());
         PostBuilder {
@@ -335,7 +335,7 @@ where
     /// Set the `label` field (required)
     pub fn label(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PostBuilder<'a, post_state::SetLabel<S>> {
         self._fields.5 = Option::Some(value.into());
         PostBuilder {
@@ -349,9 +349,9 @@ where
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::CreatedAt: post_state::IsSet,
-    S::DurationInHours: post_state::IsSet,
     S::Label: post_state::IsSet,
+    S::DurationInHours: post_state::IsSet,
+    S::CreatedAt: post_state::IsSet,
     S::Condition: post_state::IsSet,
     S::AppliedTo: post_state::IsSet,
 {
@@ -368,13 +368,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Post<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Post<'a> {
         Post {
             action: self._fields.0,
             applied_to: self._fields.1.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,24 +26,27 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Website<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Website<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub preview_image: Option<BlobRef<'a>>,
-    #[serde(borrow)]
-    pub src: UriValue<'a>,
+    pub preview_image: Option<BlobRef<S>>,
+    pub src: UriValue<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Website<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Website<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.website"
     }
@@ -129,12 +134,7 @@ pub mod website_state {
 /// Builder for constructing an instance of this type
 pub struct WebsiteBuilder<'a, S: website_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<BlobRef<S>>, Option<UriValue<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -158,12 +158,12 @@ impl<'a> WebsiteBuilder<'a, website_state::Empty> {
 
 impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -171,12 +171,12 @@ impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
 
 impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
     /// Set the `previewImage` field (optional)
-    pub fn preview_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn preview_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `previewImage` field to an Option value (optional)
-    pub fn maybe_preview_image(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_preview_image(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -190,7 +190,7 @@ where
     /// Set the `src` field (required)
     pub fn src(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> WebsiteBuilder<'a, website_state::SetSrc<S>> {
         self._fields.2 = Option::Some(value.into());
         WebsiteBuilder {
@@ -203,12 +203,12 @@ where
 
 impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -232,10 +232,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Website<'a> {
         Website {
             description: self._fields.0,

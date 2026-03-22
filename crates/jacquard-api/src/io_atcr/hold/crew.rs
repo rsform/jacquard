@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,39 +29,44 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Crew member in a hold's embedded PDS. Grants access permissions to push blobs to the hold. Stored in the hold's embedded PDS (one record per member).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "io.atcr.hold.crew", tag = "$type")]
-pub struct Crew<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "io.atcr.hold.crew",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Crew<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///RFC3339 timestamp of when the member was added
     pub added_at: Datetime,
     ///DID of the crew member
-    #[serde(borrow)]
-    pub member: Did<'a>,
+    pub member: Did<S>,
     ///Specific permissions granted to this member
-    #[serde(borrow)]
-    pub permissions: Vec<CowStr<'a>>,
+    pub permissions: Vec<S>,
     ///Member's role in the hold
-    #[serde(borrow)]
-    pub role: CrewRole<'a>,
+    pub role: CrewRole<S>,
     ///Optional tier for quota limits (e.g., 'deckhand', 'bosun', 'quartermaster'). If empty, uses defaults.new_crew_tier from quotas.yaml.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tier: Option<CowStr<'a>>,
+    pub tier: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Member's role in the hold
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CrewRole<'a> {
+pub enum CrewRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     Owner,
     Admin,
     Write,
     Read,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> CrewRole<'a> {
+impl<S: Bos<str> + AsRef<str>> CrewRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Owner => "owner",
@@ -69,74 +76,57 @@ impl<'a> CrewRole<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for CrewRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "owner" => Self::Owner,
             "admin" => Self::Admin,
             "write" => Self::Write,
             "read" => Self::Read,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for CrewRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "owner" => Self::Owner,
-            "admin" => Self::Admin,
-            "write" => Self::Write,
-            "read" => Self::Read,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CrewRole<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CrewRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for CrewRole<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for CrewRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for CrewRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for CrewRole<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for CrewRole<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for CrewRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for CrewRole<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for CrewRole<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for CrewRole<'_> {
-    type Output = CrewRole<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for CrewRole<S> {
+    type Output = CrewRole<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             CrewRole::Owner => CrewRole::Owner,
@@ -151,22 +141,23 @@ impl jacquard_common::IntoStatic for CrewRole<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CrewGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CrewGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Crew<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Crew<S>,
 }
 
-impl<'a> Crew<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CrewRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Crew<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CrewRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -177,18 +168,17 @@ pub struct CrewRecord;
 impl XrpcResp for CrewRecord {
     const NSID: &'static str = "io.atcr.hold.crew";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CrewGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CrewGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CrewGetRecordOutput<'_>> for Crew<'_> {
-    fn from(output: CrewGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CrewGetRecordOutput<S>> for Crew<S> {
+    fn from(output: CrewGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Crew<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Crew<S> {
     const NSID: &'static str = "io.atcr.hold.crew";
     type Record = CrewRecord;
 }
@@ -198,7 +188,7 @@ impl Collection for CrewRecord {
     type Record = CrewRecord;
 }
 
-impl<'a> LexiconSchema for Crew<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Crew<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.crew"
     }
@@ -244,67 +234,67 @@ pub mod crew_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Role;
         type Member;
-        type Permissions;
         type AddedAt;
+        type Permissions;
+        type Role;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Role = Unset;
         type Member = Unset;
-        type Permissions = Unset;
         type AddedAt = Unset;
-    }
-    ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type Role = Set<members::role>;
-        type Member = S::Member;
-        type Permissions = S::Permissions;
-        type AddedAt = S::AddedAt;
+        type Permissions = Unset;
+        type Role = Unset;
     }
     ///State transition - sets the `member` field to Set
     pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMember<S> {}
     impl<S: State> State for SetMember<S> {
-        type Role = S::Role;
         type Member = Set<members::member>;
+        type AddedAt = S::AddedAt;
         type Permissions = S::Permissions;
-        type AddedAt = S::AddedAt;
-    }
-    ///State transition - sets the `permissions` field to Set
-    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPermissions<S> {}
-    impl<S: State> State for SetPermissions<S> {
         type Role = S::Role;
-        type Member = S::Member;
-        type Permissions = Set<members::permissions>;
-        type AddedAt = S::AddedAt;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Role = S::Role;
         type Member = S::Member;
-        type Permissions = S::Permissions;
         type AddedAt = Set<members::added_at>;
+        type Permissions = S::Permissions;
+        type Role = S::Role;
+    }
+    ///State transition - sets the `permissions` field to Set
+    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPermissions<S> {}
+    impl<S: State> State for SetPermissions<S> {
+        type Member = S::Member;
+        type AddedAt = S::AddedAt;
+        type Permissions = Set<members::permissions>;
+        type Role = S::Role;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRole<S> {}
+    impl<S: State> State for SetRole<S> {
+        type Member = S::Member;
+        type AddedAt = S::AddedAt;
+        type Permissions = S::Permissions;
+        type Role = Set<members::role>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `role` field
-        pub struct role(());
         ///Marker type for the `member` field
         pub struct member(());
-        ///Marker type for the `permissions` field
-        pub struct permissions(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `permissions` field
+        pub struct permissions(());
+        ///Marker type for the `role` field
+        pub struct role(());
     }
 }
 
@@ -313,10 +303,10 @@ pub struct CrewBuilder<'a, S: crew_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<Did<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CrewRole<'a>>,
-        Option<CowStr<'a>>,
+        Option<Did<S>>,
+        Option<Vec<S>>,
+        Option<CrewRole<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -366,7 +356,7 @@ where
     /// Set the `member` field (required)
     pub fn member(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> CrewBuilder<'a, crew_state::SetMember<S>> {
         self._fields.1 = Option::Some(value.into());
         CrewBuilder {
@@ -385,7 +375,7 @@ where
     /// Set the `permissions` field (required)
     pub fn permissions(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> CrewBuilder<'a, crew_state::SetPermissions<S>> {
         self._fields.2 = Option::Some(value.into());
         CrewBuilder {
@@ -404,7 +394,7 @@ where
     /// Set the `role` field (required)
     pub fn role(
         mut self,
-        value: impl Into<CrewRole<'a>>,
+        value: impl Into<CrewRole<S>>,
     ) -> CrewBuilder<'a, crew_state::SetRole<S>> {
         self._fields.3 = Option::Some(value.into());
         CrewBuilder {
@@ -417,12 +407,12 @@ where
 
 impl<'a, S: crew_state::State> CrewBuilder<'a, S> {
     /// Set the `tier` field (optional)
-    pub fn tier(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn tier(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `tier` field to an Option value (optional)
-    pub fn maybe_tier(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_tier(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -431,10 +421,10 @@ impl<'a, S: crew_state::State> CrewBuilder<'a, S> {
 impl<'a, S> CrewBuilder<'a, S>
 where
     S: crew_state::State,
-    S::Role: crew_state::IsSet,
     S::Member: crew_state::IsSet,
-    S::Permissions: crew_state::IsSet,
     S::AddedAt: crew_state::IsSet,
+    S::Permissions: crew_state::IsSet,
+    S::Role: crew_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Crew<'a> {
@@ -448,13 +438,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Crew<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Crew<'a> {
         Crew {
             added_at: self._fields.0.unwrap(),
             member: self._fields.1.unwrap(),

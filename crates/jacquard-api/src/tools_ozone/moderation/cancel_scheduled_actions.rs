@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,57 +26,82 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::cancel_scheduled_actions;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CancellationResults<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CancellationResults<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///DIDs for which cancellation failed with error details
-    #[serde(borrow)]
-    pub failed: Vec<cancel_scheduled_actions::FailedCancellation<'a>>,
+    pub failed: Vec<cancel_scheduled_actions::FailedCancellation<S>>,
     ///DIDs for which all pending scheduled actions were successfully cancelled
-    #[serde(borrow)]
-    pub succeeded: Vec<Did<'a>>,
+    pub succeeded: Vec<Did<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct FailedCancellation<'a> {
-    #[serde(borrow)]
-    pub did: Did<'a>,
-    #[serde(borrow)]
-    pub error: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FailedCancellation<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub did: Did<S>,
+    pub error: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub error_code: Option<CowStr<'a>>,
+    pub error_code: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CancelScheduledActions<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CancelScheduledActions<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional comment describing the reason for cancellation
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<CowStr<'a>>,
+    pub comment: Option<S>,
     ///Array of DID subjects to cancel scheduled actions for
-    #[serde(borrow)]
-    pub subjects: Vec<Did<'a>>,
+    pub subjects: Vec<Did<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CancelScheduledActionsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CancelScheduledActionsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
+    pub value: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for CancellationResults<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CancellationResults<S> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.cancelScheduledActions"
     }
@@ -89,7 +116,7 @@ impl<'a> LexiconSchema for CancellationResults<'a> {
     }
 }
 
-impl<'a> LexiconSchema for FailedCancellation<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FailedCancellation<S> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.cancelScheduledActions"
     }
@@ -109,11 +136,12 @@ pub struct CancelScheduledActionsResponse;
 impl jacquard_common::xrpc::XrpcResp for CancelScheduledActionsResponse {
     const NSID: &'static str = "tools.ozone.moderation.cancelScheduledActions";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CancelScheduledActionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CancelScheduledActionsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CancelScheduledActions<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CancelScheduledActions<S> {
     const NSID: &'static str = "tools.ozone.moderation.cancelScheduledActions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -128,7 +156,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CancelScheduledActionsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CancelScheduledActions<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CancelScheduledActions<S>;
     type Response = CancelScheduledActionsResponse;
 }
 
@@ -142,37 +170,37 @@ pub mod cancellation_results_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Failed;
         type Succeeded;
+        type Failed;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Failed = Unset;
         type Succeeded = Unset;
-    }
-    ///State transition - sets the `failed` field to Set
-    pub struct SetFailed<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFailed<S> {}
-    impl<S: State> State for SetFailed<S> {
-        type Failed = Set<members::failed>;
-        type Succeeded = S::Succeeded;
+        type Failed = Unset;
     }
     ///State transition - sets the `succeeded` field to Set
     pub struct SetSucceeded<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSucceeded<S> {}
     impl<S: State> State for SetSucceeded<S> {
-        type Failed = S::Failed;
         type Succeeded = Set<members::succeeded>;
+        type Failed = S::Failed;
+    }
+    ///State transition - sets the `failed` field to Set
+    pub struct SetFailed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFailed<S> {}
+    impl<S: State> State for SetFailed<S> {
+        type Succeeded = S::Succeeded;
+        type Failed = Set<members::failed>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `failed` field
-        pub struct failed(());
         ///Marker type for the `succeeded` field
         pub struct succeeded(());
+        ///Marker type for the `failed` field
+        pub struct failed(());
     }
 }
 
@@ -180,8 +208,8 @@ pub mod cancellation_results_state {
 pub struct CancellationResultsBuilder<'a, S: cancellation_results_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<cancel_scheduled_actions::FailedCancellation<'a>>>,
-        Option<Vec<Did<'a>>>,
+        Option<Vec<cancel_scheduled_actions::FailedCancellation<S>>>,
+        Option<Vec<Did<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -212,7 +240,7 @@ where
     /// Set the `failed` field (required)
     pub fn failed(
         mut self,
-        value: impl Into<Vec<cancel_scheduled_actions::FailedCancellation<'a>>>,
+        value: impl Into<Vec<cancel_scheduled_actions::FailedCancellation<S>>>,
     ) -> CancellationResultsBuilder<'a, cancellation_results_state::SetFailed<S>> {
         self._fields.0 = Option::Some(value.into());
         CancellationResultsBuilder {
@@ -231,7 +259,7 @@ where
     /// Set the `succeeded` field (required)
     pub fn succeeded(
         mut self,
-        value: impl Into<Vec<Did<'a>>>,
+        value: impl Into<Vec<Did<S>>>,
     ) -> CancellationResultsBuilder<'a, cancellation_results_state::SetSucceeded<S>> {
         self._fields.1 = Option::Some(value.into());
         CancellationResultsBuilder {
@@ -245,8 +273,8 @@ where
 impl<'a, S> CancellationResultsBuilder<'a, S>
 where
     S: cancellation_results_state::State,
-    S::Failed: cancellation_results_state::IsSet,
     S::Succeeded: cancellation_results_state::IsSet,
+    S::Failed: cancellation_results_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CancellationResults<'a> {
@@ -259,10 +287,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CancellationResults<'a> {
         CancellationResults {
             failed: self._fields.0.unwrap(),
@@ -422,44 +447,44 @@ pub mod failed_cancellation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Error;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Error = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Error = S::Error;
+        type Did = Unset;
     }
     ///State transition - sets the `error` field to Set
     pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetError<S> {}
     impl<S: State> State for SetError<S> {
-        type Did = S::Did;
         type Error = Set<members::error>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Error = S::Error;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `error` field
         pub struct error(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FailedCancellationBuilder<'a, S: failed_cancellation_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Did<S>>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -489,7 +514,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> FailedCancellationBuilder<'a, failed_cancellation_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         FailedCancellationBuilder {
@@ -508,7 +533,7 @@ where
     /// Set the `error` field (required)
     pub fn error(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> FailedCancellationBuilder<'a, failed_cancellation_state::SetError<S>> {
         self._fields.1 = Option::Some(value.into());
         FailedCancellationBuilder {
@@ -521,12 +546,12 @@ where
 
 impl<'a, S: failed_cancellation_state::State> FailedCancellationBuilder<'a, S> {
     /// Set the `errorCode` field (optional)
-    pub fn error_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn error_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `errorCode` field to an Option value (optional)
-    pub fn maybe_error_code(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_error_code(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -535,8 +560,8 @@ impl<'a, S: failed_cancellation_state::State> FailedCancellationBuilder<'a, S> {
 impl<'a, S> FailedCancellationBuilder<'a, S>
 where
     S: failed_cancellation_state::State,
-    S::Did: failed_cancellation_state::IsSet,
     S::Error: failed_cancellation_state::IsSet,
+    S::Did: failed_cancellation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FailedCancellation<'a> {
@@ -550,10 +575,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> FailedCancellation<'a> {
         FailedCancellation {
             did: self._fields.0.unwrap(),
@@ -599,7 +621,7 @@ pub mod cancel_scheduled_actions_state {
 /// Builder for constructing an instance of this type
 pub struct CancelScheduledActionsBuilder<'a, S: cancel_scheduled_actions_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Vec<Did<'a>>>),
+    _fields: (Option<S>, Option<Vec<Did<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -626,12 +648,12 @@ impl<'a> CancelScheduledActionsBuilder<'a, cancel_scheduled_actions_state::Empty
 
 impl<'a, S: cancel_scheduled_actions_state::State> CancelScheduledActionsBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_comment(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -645,7 +667,7 @@ where
     /// Set the `subjects` field (required)
     pub fn subjects(
         mut self,
-        value: impl Into<Vec<Did<'a>>>,
+        value: impl Into<Vec<Did<S>>>,
     ) -> CancelScheduledActionsBuilder<
         'a,
         cancel_scheduled_actions_state::SetSubjects<S>,
@@ -675,10 +697,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CancelScheduledActions<'a> {
         CancelScheduledActions {
             comment: self._fields.0,

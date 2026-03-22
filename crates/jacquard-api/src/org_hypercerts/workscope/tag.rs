@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,68 +32,63 @@ use crate::org_hypercerts::SmallBlob;
 use crate::org_hypercerts::Uri;
 /// A reusable scope atom for work scope logic expressions. Scopes can represent topics, languages, domains, deliverables, methods, regions, tags, or other categorical labels. Tags are composed into structured expressions via CEL (Common Expression Language) on activity records.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.hypercerts.workscope.tag",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Tag<'a> {
+pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alternative human-readable names for this scope (e.g., translations, abbreviations, or common synonyms). Unlike sameAs, these are plain-text labels, not links to external ontologies.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aliases: Option<Vec<CowStr<'a>>>,
+    pub aliases: Option<Vec<S>>,
     ///Category type of this scope.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category: Option<TagCategory<'a>>,
+    pub category: Option<TagCategory<S>>,
     ///Client-declared timestamp when this record was originally created.
     pub created_at: Datetime,
     ///Optional longer description of this scope.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Lowercase, underscore-separated machine-readable key for this scope (e.g., 'mangrove_restoration', 'biodiversity_monitoring'). Used as the canonical identifier in CEL expressions.
-    #[serde(borrow)]
-    pub key: CowStr<'a>,
+    pub key: S,
     ///Human-readable name for this scope.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Optional strong reference to a parent work scope tag record for taxonomy/hierarchy support. The record referenced must conform with the lexicon org.hypercerts.workscope.tag.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent: Option<StrongRef<'a>>,
+    pub parent: Option<StrongRef<S>>,
     ///Link to a governance or reference document where this work scope tag is defined and further explained.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reference_document: Option<TagReferenceDocument<'a>>,
+    pub reference_document: Option<TagReferenceDocument<S>>,
     ///URIs to semantically equivalent concepts in external ontologies or taxonomies (e.g., Wikidata QIDs, ENVO terms, SDG targets). Used for interoperability, not as documentation.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<Vec<UriValue<'a>>>,
+    pub same_as: Option<Vec<UriValue<S>>>,
     ///Lifecycle status of this tag. Communities propose tags, curators accept them, deprecated tags point to replacements via supersededBy.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<TagStatus<'a>>,
+    pub status: Option<TagStatus<S>>,
     ///When status is 'deprecated', points to the replacement work scope tag record. The record referenced must conform with the lexicon org.hypercerts.workscope.tag.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub superseded_by: Option<StrongRef<'a>>,
+    pub superseded_by: Option<StrongRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Category type of this scope.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TagCategory<'a> {
+pub enum TagCategory<S: Bos<str> + AsRef<str> = DefaultStr> {
     Topic,
     Language,
     Domain,
     Method,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> TagCategory<'a> {
+impl<S: Bos<str> + AsRef<str>> TagCategory<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Topic => "topic",
@@ -101,74 +98,58 @@ impl<'a> TagCategory<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for TagCategory<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "topic" => Self::Topic,
             "language" => Self::Language,
             "domain" => Self::Domain,
             "method" => Self::Method,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for TagCategory<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "topic" => Self::Topic,
-            "language" => Self::Language,
-            "domain" => Self::Domain,
-            "method" => Self::Method,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TagCategory<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for TagCategory<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for TagCategory<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for TagCategory<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for TagCategory<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for TagCategory<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for TagCategory<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for TagCategory<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for TagCategory<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for TagCategory<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for TagCategory<'_> {
-    type Output = TagCategory<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for TagCategory<S> {
+    type Output = TagCategory<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             TagCategory::Topic => TagCategory::Topic,
@@ -183,25 +164,31 @@ impl jacquard_common::IntoStatic for TagCategory<'_> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TagReferenceDocument<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TagReferenceDocument<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallBlob")]
-    SmallBlob(Box<SmallBlob<'a>>),
+    SmallBlob(Box<SmallBlob<S>>),
 }
 
 /// Lifecycle status of this tag. Communities propose tags, curators accept them, deprecated tags point to replacements via supersededBy.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TagStatus<'a> {
+pub enum TagStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Proposed,
     Accepted,
     Deprecated,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> TagStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> TagStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Proposed => "proposed",
@@ -210,72 +197,57 @@ impl<'a> TagStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for TagStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "proposed" => Self::Proposed,
             "accepted" => Self::Accepted,
             "deprecated" => Self::Deprecated,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for TagStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "proposed" => Self::Proposed,
-            "accepted" => Self::Accepted,
-            "deprecated" => Self::Deprecated,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TagStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for TagStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for TagStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for TagStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for TagStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for TagStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for TagStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for TagStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for TagStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for TagStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for TagStatus<'_> {
-    type Output = TagStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for TagStatus<S> {
+    type Output = TagStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             TagStatus::Proposed => TagStatus::Proposed,
@@ -289,22 +261,23 @@ impl jacquard_common::IntoStatic for TagStatus<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TagGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TagGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Tag<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Tag<S>,
 }
 
-impl<'a> Tag<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TagRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Tag<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TagRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -315,18 +288,17 @@ pub struct TagRecord;
 impl XrpcResp for TagRecord {
     const NSID: &'static str = "org.hypercerts.workscope.tag";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TagGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TagGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TagGetRecordOutput<'_>> for Tag<'_> {
-    fn from(output: TagGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TagGetRecordOutput<S>> for Tag<S> {
+    fn from(output: TagGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Tag<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Tag<S> {
     const NSID: &'static str = "org.hypercerts.workscope.tag";
     type Record = TagRecord;
 }
@@ -336,7 +308,7 @@ impl Collection for TagRecord {
     type Record = TagRecord;
 }
 
-impl<'a> LexiconSchema for Tag<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tag<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.workscope.tag"
     }
@@ -497,17 +469,17 @@ pub mod tag_state {
 pub struct TagBuilder<'a, S: tag_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<CowStr<'a>>>,
-        Option<TagCategory<'a>>,
+        Option<Vec<S>>,
+        Option<TagCategory<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<StrongRef<'a>>,
-        Option<TagReferenceDocument<'a>>,
-        Option<Vec<UriValue<'a>>>,
-        Option<TagStatus<'a>>,
-        Option<StrongRef<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<StrongRef<S>>,
+        Option<TagReferenceDocument<S>>,
+        Option<Vec<UriValue<S>>>,
+        Option<TagStatus<S>>,
+        Option<StrongRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -532,12 +504,12 @@ impl<'a> TagBuilder<'a, tag_state::Empty> {
 
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `aliases` field (optional)
-    pub fn aliases(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn aliases(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `aliases` field to an Option value (optional)
-    pub fn maybe_aliases(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_aliases(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -545,12 +517,12 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(mut self, value: impl Into<Option<TagCategory<'a>>>) -> Self {
+    pub fn category(mut self, value: impl Into<Option<TagCategory<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<TagCategory<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<TagCategory<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -577,12 +549,12 @@ where
 
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -594,10 +566,7 @@ where
     S::Key: tag_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(
-        mut self,
-        value: impl Into<CowStr<'a>>,
-    ) -> TagBuilder<'a, tag_state::SetKey<S>> {
+    pub fn key(mut self, value: impl Into<S>) -> TagBuilder<'a, tag_state::SetKey<S>> {
         self._fields.4 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
@@ -613,10 +582,7 @@ where
     S::Name: tag_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<CowStr<'a>>,
-    ) -> TagBuilder<'a, tag_state::SetName<S>> {
+    pub fn name(mut self, value: impl Into<S>) -> TagBuilder<'a, tag_state::SetName<S>> {
         self._fields.5 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
@@ -628,12 +594,12 @@ where
 
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `parent` field (optional)
-    pub fn parent(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn parent(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
-    pub fn maybe_parent(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_parent(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -643,7 +609,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `referenceDocument` field (optional)
     pub fn reference_document(
         mut self,
-        value: impl Into<Option<TagReferenceDocument<'a>>>,
+        value: impl Into<Option<TagReferenceDocument<S>>>,
     ) -> Self {
         self._fields.7 = value.into();
         self
@@ -651,7 +617,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `referenceDocument` field to an Option value (optional)
     pub fn maybe_reference_document(
         mut self,
-        value: Option<TagReferenceDocument<'a>>,
+        value: Option<TagReferenceDocument<S>>,
     ) -> Self {
         self._fields.7 = value;
         self
@@ -660,12 +626,12 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
-    pub fn same_as(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
+    pub fn same_as(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
-    pub fn maybe_same_as(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
+    pub fn maybe_same_as(mut self, value: Option<Vec<UriValue<S>>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -673,12 +639,12 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<TagStatus<'a>>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<TagStatus<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<TagStatus<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<TagStatus<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -686,12 +652,12 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `supersededBy` field (optional)
-    pub fn superseded_by(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn superseded_by(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `supersededBy` field to an Option value (optional)
-    pub fn maybe_superseded_by(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_superseded_by(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -722,13 +688,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Tag<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Tag<'a> {
         Tag {
             aliases: self._fields.0,
             category: self._fields.1,

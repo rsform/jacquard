@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,84 +30,82 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A goal to track daily completions for a year.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "garden.goals.goal", tag = "$type")]
-pub struct Goal<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "garden.goals.goal",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Goal<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Preset name or hex color for incomplete state
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accent_color: Option<CowStr<'a>>,
+    pub accent_color: Option<S>,
     ///Array of category UUIDs this goal belongs to
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub categories: Option<Vec<CowStr<'a>>>,
+    pub categories: Option<Vec<S>>,
     ///Preset name or hex color for complete state
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub completed_accent_color: Option<CowStr<'a>>,
+    pub completed_accent_color: Option<S>,
     ///Shape name or emoji for complete state
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub completed_piece: Option<CowStr<'a>>,
+    pub completed_piece: Option<S>,
     ///Uploaded image for complete state
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub completed_piece_blob: Option<BlobRef<'a>>,
+    pub completed_piece_blob: Option<BlobRef<S>>,
     ///Favicon URL for complete state
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub completed_piece_url: Option<UriValue<'a>>,
+    pub completed_piece_url: Option<UriValue<S>>,
     ///Timestamp when the goal was created
     pub created_at: Datetime,
     ///Optional description of the goal
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Unique identifier for the goal (UUID)
-    #[serde(borrow)]
-    pub goal_id: CowStr<'a>,
+    pub goal_id: S,
     ///Display name of the goal
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Shape name or emoji for incomplete state
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub piece: Option<CowStr<'a>>,
+    pub piece: Option<S>,
     ///Uploaded image for incomplete state
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub piece_blob: Option<BlobRef<'a>>,
+    pub piece_blob: Option<BlobRef<S>>,
     ///Favicon URL for incomplete state
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub piece_url: Option<UriValue<'a>>,
+    pub piece_url: Option<UriValue<S>>,
     ///Target count for countable goals
     #[serde(skip_serializing_if = "Option::is_none")]
     pub target_count: Option<i64>,
     ///Year this goal is tracked for
     pub year: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GoalGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GoalGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Goal<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Goal<S>,
 }
 
-impl<'a> Goal<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, GoalRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Goal<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, GoalRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -116,18 +116,17 @@ pub struct GoalRecord;
 impl XrpcResp for GoalRecord {
     const NSID: &'static str = "garden.goals.goal";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GoalGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GoalGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<GoalGetRecordOutput<'_>> for Goal<'_> {
-    fn from(output: GoalGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<GoalGetRecordOutput<S>> for Goal<S> {
+    fn from(output: GoalGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Goal<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Goal<S> {
     const NSID: &'static str = "garden.goals.goal";
     type Record = GoalRecord;
 }
@@ -137,7 +136,7 @@ impl Collection for GoalRecord {
     type Record = GoalRecord;
 }
 
-impl<'a> LexiconSchema for Goal<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Goal<S> {
     fn nsid() -> &'static str {
         "garden.goals.goal"
     }
@@ -329,8 +328,8 @@ pub mod goal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GoalId;
         type CreatedAt;
+        type GoalId;
         type Name;
         type Year;
     }
@@ -338,26 +337,26 @@ pub mod goal_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GoalId = Unset;
         type CreatedAt = Unset;
+        type GoalId = Unset;
         type Name = Unset;
         type Year = Unset;
-    }
-    ///State transition - sets the `goal_id` field to Set
-    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGoalId<S> {}
-    impl<S: State> State for SetGoalId<S> {
-        type GoalId = Set<members::goal_id>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Year = S::Year;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type GoalId = S::GoalId;
         type CreatedAt = Set<members::created_at>;
+        type GoalId = S::GoalId;
+        type Name = S::Name;
+        type Year = S::Year;
+    }
+    ///State transition - sets the `goal_id` field to Set
+    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGoalId<S> {}
+    impl<S: State> State for SetGoalId<S> {
+        type CreatedAt = S::CreatedAt;
+        type GoalId = Set<members::goal_id>;
         type Name = S::Name;
         type Year = S::Year;
     }
@@ -365,8 +364,8 @@ pub mod goal_state {
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type GoalId = S::GoalId;
         type CreatedAt = S::CreatedAt;
+        type GoalId = S::GoalId;
         type Name = Set<members::name>;
         type Year = S::Year;
     }
@@ -374,18 +373,18 @@ pub mod goal_state {
     pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetYear<S> {}
     impl<S: State> State for SetYear<S> {
-        type GoalId = S::GoalId;
         type CreatedAt = S::CreatedAt;
+        type GoalId = S::GoalId;
         type Name = S::Name;
         type Year = Set<members::year>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `goal_id` field
-        pub struct goal_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `goal_id` field
+        pub struct goal_id(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `year` field
@@ -397,19 +396,19 @@ pub mod goal_state {
 pub struct GoalBuilder<'a, S: goal_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<UriValue<'a>>,
+        Option<S>,
+        Option<Vec<S>>,
+        Option<S>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<UriValue<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<UriValue<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<UriValue<S>>,
         Option<i64>,
         Option<i64>,
     ),
@@ -452,12 +451,12 @@ impl<'a> GoalBuilder<'a, goal_state::Empty> {
 
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `accentColor` field (optional)
-    pub fn accent_color(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn accent_color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `accentColor` field to an Option value (optional)
-    pub fn maybe_accent_color(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_accent_color(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -465,12 +464,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
 
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `categories` field (optional)
-    pub fn categories(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn categories(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `categories` field to an Option value (optional)
-    pub fn maybe_categories(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_categories(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -478,15 +477,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
 
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `completedAccentColor` field (optional)
-    pub fn completed_accent_color(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn completed_accent_color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `completedAccentColor` field to an Option value (optional)
-    pub fn maybe_completed_accent_color(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_completed_accent_color(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -494,12 +490,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
 
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `completedPiece` field (optional)
-    pub fn completed_piece(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn completed_piece(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `completedPiece` field to an Option value (optional)
-    pub fn maybe_completed_piece(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_completed_piece(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -507,15 +503,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
 
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `completedPieceBlob` field (optional)
-    pub fn completed_piece_blob(
-        mut self,
-        value: impl Into<Option<BlobRef<'a>>>,
-    ) -> Self {
+    pub fn completed_piece_blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `completedPieceBlob` field to an Option value (optional)
-    pub fn maybe_completed_piece_blob(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_completed_piece_blob(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -523,15 +516,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
 
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `completedPieceUrl` field (optional)
-    pub fn completed_piece_url(
-        mut self,
-        value: impl Into<Option<UriValue<'a>>>,
-    ) -> Self {
+    pub fn completed_piece_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `completedPieceUrl` field to an Option value (optional)
-    pub fn maybe_completed_piece_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_completed_piece_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -558,12 +548,12 @@ where
 
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -577,7 +567,7 @@ where
     /// Set the `goalId` field (required)
     pub fn goal_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GoalBuilder<'a, goal_state::SetGoalId<S>> {
         self._fields.8 = Option::Some(value.into());
         GoalBuilder {
@@ -596,7 +586,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GoalBuilder<'a, goal_state::SetName<S>> {
         self._fields.9 = Option::Some(value.into());
         GoalBuilder {
@@ -609,12 +599,12 @@ where
 
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `piece` field (optional)
-    pub fn piece(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn piece(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `piece` field to an Option value (optional)
-    pub fn maybe_piece(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_piece(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -622,12 +612,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
 
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `pieceBlob` field (optional)
-    pub fn piece_blob(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn piece_blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `pieceBlob` field to an Option value (optional)
-    pub fn maybe_piece_blob(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_piece_blob(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -635,12 +625,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
 
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `pieceUrl` field (optional)
-    pub fn piece_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn piece_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `pieceUrl` field to an Option value (optional)
-    pub fn maybe_piece_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_piece_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -681,8 +671,8 @@ where
 impl<'a, S> GoalBuilder<'a, S>
 where
     S: goal_state::State,
-    S::GoalId: goal_state::IsSet,
     S::CreatedAt: goal_state::IsSet,
+    S::GoalId: goal_state::IsSet,
     S::Name: goal_state::IsSet,
     S::Year: goal_state::IsSet,
 {
@@ -708,13 +698,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Goal<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Goal<'a> {
         Goal {
             accent_color: self._fields.0,
             categories: self._fields.1,

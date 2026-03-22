@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -35,2694 +36,4197 @@ use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
 /// An image file.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Embedded<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub about: Option<EmbeddedAbout<'a>>,
+    pub about: Option<EmbeddedAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#abstract: Option<EmbeddedAbstract<'a>>,
+    pub r#abstract: Option<EmbeddedAbstract<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode: Option<EmbeddedAccessMode<'a>>,
+    pub access_mode: Option<EmbeddedAccessMode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode_sufficient: Option<EmbeddedAccessModeSufficient<'a>>,
+    pub access_mode_sufficient: Option<EmbeddedAccessModeSufficient<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_api: Option<EmbeddedAccessibilityApi<'a>>,
+    pub accessibility_api: Option<EmbeddedAccessibilityApi<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_control: Option<EmbeddedAccessibilityControl<'a>>,
+    pub accessibility_control: Option<EmbeddedAccessibilityControl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_feature: Option<EmbeddedAccessibilityFeature<'a>>,
+    pub accessibility_feature: Option<EmbeddedAccessibilityFeature<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_hazard: Option<EmbeddedAccessibilityHazard<'a>>,
+    pub accessibility_hazard: Option<EmbeddedAccessibilityHazard<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_summary: Option<EmbeddedAccessibilitySummary<'a>>,
+    pub accessibility_summary: Option<EmbeddedAccessibilitySummary<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accountable_person: Option<EmbeddedAccountablePerson<'a>>,
+    pub accountable_person: Option<EmbeddedAccountablePerson<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub acquire_license_page: Option<EmbeddedAcquireLicensePage<'a>>,
+    pub acquire_license_page: Option<EmbeddedAcquireLicensePage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<EmbeddedAdditionalType<'a>>,
+    pub additional_type: Option<EmbeddedAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<EmbeddedAggregateRating<'a>>,
+    pub aggregate_rating: Option<EmbeddedAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<EmbeddedAlternateName<'a>>,
+    pub alternate_name: Option<EmbeddedAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternative_headline: Option<EmbeddedAlternativeHeadline<'a>>,
+    pub alternative_headline: Option<EmbeddedAlternativeHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub archived_at: Option<EmbeddedArchivedAt<'a>>,
+    pub archived_at: Option<EmbeddedArchivedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub assesses: Option<EmbeddedAssesses<'a>>,
+    pub assesses: Option<EmbeddedAssesses<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_article: Option<EmbeddedAssociatedArticle<'a>>,
+    pub associated_article: Option<EmbeddedAssociatedArticle<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_media: Option<EmbeddedAssociatedMedia<'a>>,
+    pub associated_media: Option<EmbeddedAssociatedMedia<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audience: Option<EmbeddedAudience<'a>>,
+    pub audience: Option<EmbeddedAudience<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audio: Option<EmbeddedAudio<'a>>,
+    pub audio: Option<EmbeddedAudio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<EmbeddedAuthor<'a>>,
+    pub author: Option<EmbeddedAuthor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<EmbeddedAward<'a>>,
+    pub award: Option<EmbeddedAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<EmbeddedAwards<'a>>,
+    pub awards: Option<EmbeddedAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub bitrate: Option<EmbeddedBitrate<'a>>,
+    pub bitrate: Option<EmbeddedBitrate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub caption: Option<EmbeddedCaption<'a>>,
+    pub caption: Option<EmbeddedCaption<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub character: Option<EmbeddedCharacter<'a>>,
+    pub character: Option<EmbeddedCharacter<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub citation: Option<EmbeddedCitation<'a>>,
+    pub citation: Option<EmbeddedCitation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<EmbeddedComment<'a>>,
+    pub comment: Option<EmbeddedComment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment_count: Option<EmbeddedCommentCount<'a>>,
+    pub comment_count: Option<EmbeddedCommentCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub conditions_of_access: Option<EmbeddedConditionsOfAccess<'a>>,
+    pub conditions_of_access: Option<EmbeddedConditionsOfAccess<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_location: Option<EmbeddedContentLocation<'a>>,
+    pub content_location: Option<EmbeddedContentLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_rating: Option<EmbeddedContentRating<'a>>,
+    pub content_rating: Option<EmbeddedContentRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_reference_time: Option<EmbeddedContentReferenceTime<'a>>,
+    pub content_reference_time: Option<EmbeddedContentReferenceTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_size: Option<EmbeddedContentSize<'a>>,
+    pub content_size: Option<EmbeddedContentSize<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_url: Option<EmbeddedContentUrl<'a>>,
+    pub content_url: Option<EmbeddedContentUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contributor: Option<EmbeddedContributor<'a>>,
+    pub contributor: Option<EmbeddedContributor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_holder: Option<EmbeddedCopyrightHolder<'a>>,
+    pub copyright_holder: Option<EmbeddedCopyrightHolder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_notice: Option<EmbeddedCopyrightNotice<'a>>,
+    pub copyright_notice: Option<EmbeddedCopyrightNotice<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_year: Option<EmbeddedCopyrightYear<'a>>,
+    pub copyright_year: Option<EmbeddedCopyrightYear<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub correction: Option<EmbeddedCorrection<'a>>,
+    pub correction: Option<EmbeddedCorrection<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_origin: Option<EmbeddedCountryOfOrigin<'a>>,
+    pub country_of_origin: Option<EmbeddedCountryOfOrigin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creative_work_status: Option<EmbeddedCreativeWorkStatus<'a>>,
+    pub creative_work_status: Option<EmbeddedCreativeWorkStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creator: Option<EmbeddedCreator<'a>>,
+    pub creator: Option<EmbeddedCreator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub credit_text: Option<EmbeddedCreditText<'a>>,
+    pub credit_text: Option<EmbeddedCreditText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_created: Option<EmbeddedDateCreated<'a>>,
+    pub date_created: Option<EmbeddedDateCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_modified: Option<EmbeddedDateModified<'a>>,
+    pub date_modified: Option<EmbeddedDateModified<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_published: Option<EmbeddedDatePublished<'a>>,
+    pub date_published: Option<EmbeddedDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<EmbeddedDescription<'a>>,
+    pub description: Option<EmbeddedDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub digital_source_type: Option<EmbeddedDigitalSourceType<'a>>,
+    pub digital_source_type: Option<EmbeddedDigitalSourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub discussion_url: Option<EmbeddedDiscussionUrl<'a>>,
+    pub discussion_url: Option<EmbeddedDiscussionUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub duration: Option<EmbeddedDuration<'a>>,
+    pub duration: Option<EmbeddedDuration<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub edit_eidr: Option<EmbeddedEditEidr<'a>>,
+    pub edit_eidr: Option<EmbeddedEditEidr<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub editor: Option<EmbeddedEditor<'a>>,
+    pub editor: Option<EmbeddedEditor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_alignment: Option<EmbeddedEducationalAlignment<'a>>,
+    pub educational_alignment: Option<EmbeddedEducationalAlignment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_level: Option<EmbeddedEducationalLevel<'a>>,
+    pub educational_level: Option<EmbeddedEducationalLevel<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_use: Option<EmbeddedEducationalUse<'a>>,
+    pub educational_use: Option<EmbeddedEducationalUse<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub embed_url: Option<EmbeddedEmbedUrl<'a>>,
+    pub embed_url: Option<EmbeddedEmbedUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub embedded_text_caption: Option<EmbeddedEmbeddedTextCaption<'a>>,
+    pub embedded_text_caption: Option<EmbeddedEmbeddedTextCaption<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encodes_creative_work: Option<EmbeddedEncodesCreativeWork<'a>>,
+    pub encodes_creative_work: Option<EmbeddedEncodesCreativeWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding: Option<EmbeddedEncoding<'a>>,
+    pub encoding: Option<EmbeddedEncoding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding_format: Option<EmbeddedEncodingFormat<'a>>,
+    pub encoding_format: Option<EmbeddedEncodingFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encodings: Option<EmbeddedEncodings<'a>>,
+    pub encodings: Option<EmbeddedEncodings<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub end_time: Option<EmbeddedEndTime<'a>>,
+    pub end_time: Option<EmbeddedEndTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub example_of_work: Option<EmbeddedExampleOfWork<'a>>,
+    pub example_of_work: Option<EmbeddedExampleOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub exif_data: Option<EmbeddedExifData<'a>>,
+    pub exif_data: Option<EmbeddedExifData<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub expires: Option<EmbeddedExpires<'a>>,
+    pub expires: Option<EmbeddedExpires<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub file_format: Option<EmbeddedFileFormat<'a>>,
+    pub file_format: Option<EmbeddedFileFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funder: Option<EmbeddedFunder<'a>>,
+    pub funder: Option<EmbeddedFunder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<EmbeddedFunding<'a>>,
+    pub funding: Option<EmbeddedFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genre: Option<EmbeddedGenre<'a>>,
+    pub genre: Option<EmbeddedGenre<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_part: Option<EmbeddedHasPart<'a>>,
+    pub has_part: Option<EmbeddedHasPart<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub headline: Option<EmbeddedHeadline<'a>>,
+    pub headline: Option<EmbeddedHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub height: Option<EmbeddedHeight<'a>>,
+    pub height: Option<EmbeddedHeight<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<EmbeddedIdentifier<'a>>,
+    pub identifier: Option<EmbeddedIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<EmbeddedImage<'a>>,
+    pub image: Option<EmbeddedImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub in_language: Option<EmbeddedInLanguage<'a>>,
+    pub in_language: Option<EmbeddedInLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ineligible_region: Option<EmbeddedIneligibleRegion<'a>>,
+    pub ineligible_region: Option<EmbeddedIneligibleRegion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interaction_statistic: Option<EmbeddedInteractionStatistic<'a>>,
+    pub interaction_statistic: Option<EmbeddedInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interactivity_type: Option<EmbeddedInteractivityType<'a>>,
+    pub interactivity_type: Option<EmbeddedInteractivityType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interpreted_as_claim: Option<EmbeddedInterpretedAsClaim<'a>>,
+    pub interpreted_as_claim: Option<EmbeddedInterpretedAsClaim<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_accessible_for_free: Option<EmbeddedIsAccessibleForFree<'a>>,
+    pub is_accessible_for_free: Option<EmbeddedIsAccessibleForFree<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on: Option<EmbeddedIsBasedOn<'a>>,
+    pub is_based_on: Option<EmbeddedIsBasedOn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on_url: Option<EmbeddedIsBasedOnUrl<'a>>,
+    pub is_based_on_url: Option<EmbeddedIsBasedOnUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_family_friendly: Option<EmbeddedIsFamilyFriendly<'a>>,
+    pub is_family_friendly: Option<EmbeddedIsFamilyFriendly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_part_of: Option<EmbeddedIsPartOf<'a>>,
+    pub is_part_of: Option<EmbeddedIsPartOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<EmbeddedKeywords<'a>>,
+    pub keywords: Option<EmbeddedKeywords<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub learning_resource_type: Option<EmbeddedLearningResourceType<'a>>,
+    pub learning_resource_type: Option<EmbeddedLearningResourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub license: Option<EmbeddedLicense<'a>>,
+    pub license: Option<EmbeddedLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location_created: Option<EmbeddedLocationCreated<'a>>,
+    pub location_created: Option<EmbeddedLocationCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity: Option<EmbeddedMainEntity<'a>>,
+    pub main_entity: Option<EmbeddedMainEntity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub maintainer: Option<EmbeddedMaintainer<'a>>,
+    pub maintainer: Option<EmbeddedMaintainer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material: Option<EmbeddedMaterial<'a>>,
+    pub material: Option<EmbeddedMaterial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material_extent: Option<EmbeddedMaterialExtent<'a>>,
+    pub material_extent: Option<EmbeddedMaterialExtent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mentions: Option<EmbeddedMentions<'a>>,
+    pub mentions: Option<EmbeddedMentions<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<EmbeddedName<'a>>,
+    pub name: Option<EmbeddedName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub offers: Option<EmbeddedOffers<'a>>,
+    pub offers: Option<EmbeddedOffers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pattern: Option<EmbeddedPattern<'a>>,
+    pub pattern: Option<EmbeddedPattern<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub player_type: Option<EmbeddedPlayerType<'a>>,
+    pub player_type: Option<EmbeddedPlayerType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub position: Option<EmbeddedPosition<'a>>,
+    pub position: Option<EmbeddedPosition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<EmbeddedPotentialAction<'a>>,
+    pub potential_action: Option<EmbeddedPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub producer: Option<EmbeddedProducer<'a>>,
+    pub producer: Option<EmbeddedProducer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub production_company: Option<EmbeddedProductionCompany<'a>>,
+    pub production_company: Option<EmbeddedProductionCompany<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub provider: Option<EmbeddedProvider<'a>>,
+    pub provider: Option<EmbeddedProvider<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publication: Option<EmbeddedPublication<'a>>,
+    pub publication: Option<EmbeddedPublication<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher: Option<EmbeddedPublisher<'a>>,
+    pub publisher: Option<EmbeddedPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher_imprint: Option<EmbeddedPublisherImprint<'a>>,
+    pub publisher_imprint: Option<EmbeddedPublisherImprint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publishing_principles: Option<EmbeddedPublishingPrinciples<'a>>,
+    pub publishing_principles: Option<EmbeddedPublishingPrinciples<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recorded_at: Option<EmbeddedRecordedAt<'a>>,
+    pub recorded_at: Option<EmbeddedRecordedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub regions_allowed: Option<EmbeddedRegionsAllowed<'a>>,
+    pub regions_allowed: Option<EmbeddedRegionsAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub released_event: Option<EmbeddedReleasedEvent<'a>>,
+    pub released_event: Option<EmbeddedReleasedEvent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub representative_of_page: Option<EmbeddedRepresentativeOfPage<'a>>,
+    pub representative_of_page: Option<EmbeddedRepresentativeOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub requires_subscription: Option<EmbeddedRequiresSubscription<'a>>,
+    pub requires_subscription: Option<EmbeddedRequiresSubscription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<EmbeddedReview<'a>>,
+    pub review: Option<EmbeddedReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<EmbeddedReviews<'a>>,
+    pub reviews: Option<EmbeddedReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<EmbeddedSameAs<'a>>,
+    pub same_as: Option<EmbeddedSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub schema_version: Option<EmbeddedSchemaVersion<'a>>,
+    pub schema_version: Option<EmbeddedSchemaVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_date_published: Option<EmbeddedSdDatePublished<'a>>,
+    pub sd_date_published: Option<EmbeddedSdDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_license: Option<EmbeddedSdLicense<'a>>,
+    pub sd_license: Option<EmbeddedSdLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_publisher: Option<EmbeddedSdPublisher<'a>>,
+    pub sd_publisher: Option<EmbeddedSdPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sha256: Option<EmbeddedSha256<'a>>,
+    pub sha256: Option<EmbeddedSha256<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub size: Option<EmbeddedSize<'a>>,
+    pub size: Option<EmbeddedSize<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_organization: Option<EmbeddedSourceOrganization<'a>>,
+    pub source_organization: Option<EmbeddedSourceOrganization<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial: Option<EmbeddedSpatial<'a>>,
+    pub spatial: Option<EmbeddedSpatial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial_coverage: Option<EmbeddedSpatialCoverage<'a>>,
+    pub spatial_coverage: Option<EmbeddedSpatialCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sponsor: Option<EmbeddedSponsor<'a>>,
+    pub sponsor: Option<EmbeddedSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub start_time: Option<EmbeddedStartTime<'a>>,
+    pub start_time: Option<EmbeddedStartTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<EmbeddedSubjectOf<'a>>,
+    pub subject_of: Option<EmbeddedSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub teaches: Option<EmbeddedTeaches<'a>>,
+    pub teaches: Option<EmbeddedTeaches<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal: Option<EmbeddedTemporal<'a>>,
+    pub temporal: Option<EmbeddedTemporal<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal_coverage: Option<EmbeddedTemporalCoverage<'a>>,
+    pub temporal_coverage: Option<EmbeddedTemporalCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<EmbeddedText<'a>>,
+    pub text: Option<EmbeddedText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail: Option<EmbeddedThumbnail<'a>>,
+    pub thumbnail: Option<EmbeddedThumbnail<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail_url: Option<EmbeddedThumbnailUrl<'a>>,
+    pub thumbnail_url: Option<EmbeddedThumbnailUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub time_required: Option<EmbeddedTimeRequired<'a>>,
+    pub time_required: Option<EmbeddedTimeRequired<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translation_of_work: Option<EmbeddedTranslationOfWork<'a>>,
+    pub translation_of_work: Option<EmbeddedTranslationOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translator: Option<EmbeddedTranslator<'a>>,
+    pub translator: Option<EmbeddedTranslator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub typical_age_range: Option<EmbeddedTypicalAgeRange<'a>>,
+    pub typical_age_range: Option<EmbeddedTypicalAgeRange<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub upload_date: Option<EmbeddedUploadDate<'a>>,
+    pub upload_date: Option<EmbeddedUploadDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<EmbeddedUrl<'a>>,
+    pub url: Option<EmbeddedUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub usage_info: Option<EmbeddedUsageInfo<'a>>,
+    pub usage_info: Option<EmbeddedUsageInfo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub version: Option<EmbeddedVersion<'a>>,
+    pub version: Option<EmbeddedVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub video: Option<EmbeddedVideo<'a>>,
+    pub video: Option<EmbeddedVideo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub width: Option<EmbeddedWidth<'a>>,
+    pub width: Option<EmbeddedWidth<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub word_count: Option<EmbeddedWordCount<'a>>,
+    pub word_count: Option<EmbeddedWordCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_example: Option<EmbeddedWorkExample<'a>>,
+    pub work_example: Option<EmbeddedWorkExample<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_translation: Option<EmbeddedWorkTranslation<'a>>,
+    pub work_translation: Option<EmbeddedWorkTranslation<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAbout<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAbstract<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAbstract<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessMode<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessMode<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessModeSufficient<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessModeSufficient<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityApi<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityApi<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityControl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityControl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityFeature<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityFeature<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityHazard<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityHazard<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilitySummary<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilitySummary<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccountablePerson<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccountablePerson<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAcquireLicensePage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAcquireLicensePage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlternativeHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlternativeHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedArchivedAt<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedArchivedAt<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAssesses<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAssesses<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAssociatedArticle<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAssociatedArticle<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.NewsArticle#embedded")]
-    NewsArticleEmbedded(Box<news_article::Embedded<'a>>),
+    NewsArticleEmbedded(Box<news_article::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAssociatedMedia<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAssociatedMedia<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAudience<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAudio<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAudio<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAuthor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAuthor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedBitrate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedBitrate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCaption<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCaption<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCharacter<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCharacter<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCitation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCitation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedComment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedComment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCommentCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCommentCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedConditionsOfAccess<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedConditionsOfAccess<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentReferenceTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentReferenceTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentSize<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContributor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContributor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCopyrightHolder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCopyrightHolder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCopyrightNotice<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCopyrightNotice<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCopyrightYear<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCopyrightYear<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCorrection<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCorrection<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCountryOfOrigin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCreativeWorkStatus<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCreativeWorkStatus<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCreator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCreator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCreditText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCreditText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDateCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDateCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDateModified<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDateModified<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDigitalSourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDigitalSourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDiscussionUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDiscussionUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDuration<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDuration<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEditEidr<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEditEidr<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEditor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEditor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEducationalAlignment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEducationalAlignment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEducationalLevel<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEducationalLevel<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEducationalUse<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEducationalUse<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEmbedUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEmbedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEmbeddedTextCaption<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEmbeddedTextCaption<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEncodesCreativeWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEncodesCreativeWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEncoding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEncoding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEncodingFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEncodingFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEncodings<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEncodings<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEndTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEndTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedExampleOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedExampleOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedExifData<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedExifData<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedExpires<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedExpires<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFileFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFileFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFunder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGenre<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGenre<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasPart<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasPart<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHeight<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    Embedded(Box<image_object::Embedded<'a>>),
+    Embedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIneligibleRegion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIneligibleRegion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInteractivityType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInteractivityType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInterpretedAsClaim<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInterpretedAsClaim<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsAccessibleForFree<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsAccessibleForFree<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsBasedOn<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsBasedOn<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsBasedOnUrl<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsBasedOnUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsFamilyFriendly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsPartOf<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsPartOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedKeywords<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLearningResourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLearningResourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLocationCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLocationCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMainEntity<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMainEntity<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaintainer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaintainer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaterial<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaterialExtent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaterialExtent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMentions<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMentions<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedOffers<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPattern<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPlayerType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPlayerType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPosition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPosition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedProducer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedProducer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedProductionCompany<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedProductionCompany<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedProvider<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedProvider<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublication<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublication<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublisherImprint<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublisherImprint<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublishingPrinciples<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedRecordedAt<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedRecordedAt<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedRegionsAllowed<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedRegionsAllowed<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReleasedEvent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReleasedEvent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedRepresentativeOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedRepresentativeOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedRequiresSubscription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedRequiresSubscription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSchemaVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSchemaVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSdDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSdDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSdLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSdLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSdPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSdPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSha256<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSha256<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSize<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSourceOrganization<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSourceOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSpatial<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSpatial<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSpatialCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSpatialCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSponsor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedStartTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedStartTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTeaches<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTeaches<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTemporal<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTemporal<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTemporalCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTemporalCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedThumbnail<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedThumbnail<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    Embedded(Box<image_object::Embedded<'a>>),
+    Embedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedThumbnailUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedThumbnailUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTimeRequired<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTimeRequired<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTranslationOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTranslationOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTranslator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTranslator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTypicalAgeRange<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTypicalAgeRange<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUploadDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUploadDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUsageInfo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUsageInfo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedVideo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedVideo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWidth<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWidth<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWordCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWordCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWorkExample<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWorkExample<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWorkTranslation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWorkTranslation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "social.flockfeeds.lexical.type.ImageObject",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct ImageObject<'a> {
+pub struct ImageObject<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub about: Option<ImageObjectAbout<'a>>,
+    pub about: Option<ImageObjectAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#abstract: Option<ImageObjectAbstract<'a>>,
+    pub r#abstract: Option<ImageObjectAbstract<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode: Option<ImageObjectAccessMode<'a>>,
+    pub access_mode: Option<ImageObjectAccessMode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode_sufficient: Option<ImageObjectAccessModeSufficient<'a>>,
+    pub access_mode_sufficient: Option<ImageObjectAccessModeSufficient<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_api: Option<ImageObjectAccessibilityApi<'a>>,
+    pub accessibility_api: Option<ImageObjectAccessibilityApi<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_control: Option<ImageObjectAccessibilityControl<'a>>,
+    pub accessibility_control: Option<ImageObjectAccessibilityControl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_feature: Option<ImageObjectAccessibilityFeature<'a>>,
+    pub accessibility_feature: Option<ImageObjectAccessibilityFeature<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_hazard: Option<ImageObjectAccessibilityHazard<'a>>,
+    pub accessibility_hazard: Option<ImageObjectAccessibilityHazard<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_summary: Option<ImageObjectAccessibilitySummary<'a>>,
+    pub accessibility_summary: Option<ImageObjectAccessibilitySummary<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accountable_person: Option<ImageObjectAccountablePerson<'a>>,
+    pub accountable_person: Option<ImageObjectAccountablePerson<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub acquire_license_page: Option<ImageObjectAcquireLicensePage<'a>>,
+    pub acquire_license_page: Option<ImageObjectAcquireLicensePage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<ImageObjectAdditionalType<'a>>,
+    pub additional_type: Option<ImageObjectAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<ImageObjectAggregateRating<'a>>,
+    pub aggregate_rating: Option<ImageObjectAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<ImageObjectAlternateName<'a>>,
+    pub alternate_name: Option<ImageObjectAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternative_headline: Option<ImageObjectAlternativeHeadline<'a>>,
+    pub alternative_headline: Option<ImageObjectAlternativeHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub archived_at: Option<ImageObjectArchivedAt<'a>>,
+    pub archived_at: Option<ImageObjectArchivedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub assesses: Option<ImageObjectAssesses<'a>>,
+    pub assesses: Option<ImageObjectAssesses<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_article: Option<ImageObjectAssociatedArticle<'a>>,
+    pub associated_article: Option<ImageObjectAssociatedArticle<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_media: Option<ImageObjectAssociatedMedia<'a>>,
+    pub associated_media: Option<ImageObjectAssociatedMedia<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audience: Option<ImageObjectAudience<'a>>,
+    pub audience: Option<ImageObjectAudience<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audio: Option<ImageObjectAudio<'a>>,
+    pub audio: Option<ImageObjectAudio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<ImageObjectAuthor<'a>>,
+    pub author: Option<ImageObjectAuthor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<ImageObjectAward<'a>>,
+    pub award: Option<ImageObjectAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<ImageObjectAwards<'a>>,
+    pub awards: Option<ImageObjectAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub bitrate: Option<ImageObjectBitrate<'a>>,
+    pub bitrate: Option<ImageObjectBitrate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub caption: Option<ImageObjectCaption<'a>>,
+    pub caption: Option<ImageObjectCaption<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub character: Option<ImageObjectCharacter<'a>>,
+    pub character: Option<ImageObjectCharacter<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub citation: Option<ImageObjectCitation<'a>>,
+    pub citation: Option<ImageObjectCitation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<ImageObjectComment<'a>>,
+    pub comment: Option<ImageObjectComment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment_count: Option<ImageObjectCommentCount<'a>>,
+    pub comment_count: Option<ImageObjectCommentCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub conditions_of_access: Option<ImageObjectConditionsOfAccess<'a>>,
+    pub conditions_of_access: Option<ImageObjectConditionsOfAccess<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_location: Option<ImageObjectContentLocation<'a>>,
+    pub content_location: Option<ImageObjectContentLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_rating: Option<ImageObjectContentRating<'a>>,
+    pub content_rating: Option<ImageObjectContentRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_reference_time: Option<ImageObjectContentReferenceTime<'a>>,
+    pub content_reference_time: Option<ImageObjectContentReferenceTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_size: Option<ImageObjectContentSize<'a>>,
+    pub content_size: Option<ImageObjectContentSize<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_url: Option<ImageObjectContentUrl<'a>>,
+    pub content_url: Option<ImageObjectContentUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contributor: Option<ImageObjectContributor<'a>>,
+    pub contributor: Option<ImageObjectContributor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_holder: Option<ImageObjectCopyrightHolder<'a>>,
+    pub copyright_holder: Option<ImageObjectCopyrightHolder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_notice: Option<ImageObjectCopyrightNotice<'a>>,
+    pub copyright_notice: Option<ImageObjectCopyrightNotice<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_year: Option<ImageObjectCopyrightYear<'a>>,
+    pub copyright_year: Option<ImageObjectCopyrightYear<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub correction: Option<ImageObjectCorrection<'a>>,
+    pub correction: Option<ImageObjectCorrection<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_origin: Option<ImageObjectCountryOfOrigin<'a>>,
+    pub country_of_origin: Option<ImageObjectCountryOfOrigin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creative_work_status: Option<ImageObjectCreativeWorkStatus<'a>>,
+    pub creative_work_status: Option<ImageObjectCreativeWorkStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creator: Option<ImageObjectCreator<'a>>,
+    pub creator: Option<ImageObjectCreator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub credit_text: Option<ImageObjectCreditText<'a>>,
+    pub credit_text: Option<ImageObjectCreditText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_created: Option<ImageObjectDateCreated<'a>>,
+    pub date_created: Option<ImageObjectDateCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_modified: Option<ImageObjectDateModified<'a>>,
+    pub date_modified: Option<ImageObjectDateModified<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_published: Option<ImageObjectDatePublished<'a>>,
+    pub date_published: Option<ImageObjectDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<ImageObjectDescription<'a>>,
+    pub description: Option<ImageObjectDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub digital_source_type: Option<ImageObjectDigitalSourceType<'a>>,
+    pub digital_source_type: Option<ImageObjectDigitalSourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<ImageObjectDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<ImageObjectDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub discussion_url: Option<ImageObjectDiscussionUrl<'a>>,
+    pub discussion_url: Option<ImageObjectDiscussionUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub duration: Option<ImageObjectDuration<'a>>,
+    pub duration: Option<ImageObjectDuration<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub edit_eidr: Option<ImageObjectEditEidr<'a>>,
+    pub edit_eidr: Option<ImageObjectEditEidr<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub editor: Option<ImageObjectEditor<'a>>,
+    pub editor: Option<ImageObjectEditor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_alignment: Option<ImageObjectEducationalAlignment<'a>>,
+    pub educational_alignment: Option<ImageObjectEducationalAlignment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_level: Option<ImageObjectEducationalLevel<'a>>,
+    pub educational_level: Option<ImageObjectEducationalLevel<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_use: Option<ImageObjectEducationalUse<'a>>,
+    pub educational_use: Option<ImageObjectEducationalUse<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub embed_url: Option<ImageObjectEmbedUrl<'a>>,
+    pub embed_url: Option<ImageObjectEmbedUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub embedded_text_caption: Option<ImageObjectEmbeddedTextCaption<'a>>,
+    pub embedded_text_caption: Option<ImageObjectEmbeddedTextCaption<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encodes_creative_work: Option<ImageObjectEncodesCreativeWork<'a>>,
+    pub encodes_creative_work: Option<ImageObjectEncodesCreativeWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding: Option<ImageObjectEncoding<'a>>,
+    pub encoding: Option<ImageObjectEncoding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding_format: Option<ImageObjectEncodingFormat<'a>>,
+    pub encoding_format: Option<ImageObjectEncodingFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encodings: Option<ImageObjectEncodings<'a>>,
+    pub encodings: Option<ImageObjectEncodings<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub end_time: Option<ImageObjectEndTime<'a>>,
+    pub end_time: Option<ImageObjectEndTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub example_of_work: Option<ImageObjectExampleOfWork<'a>>,
+    pub example_of_work: Option<ImageObjectExampleOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub exif_data: Option<ImageObjectExifData<'a>>,
+    pub exif_data: Option<ImageObjectExifData<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub expires: Option<ImageObjectExpires<'a>>,
+    pub expires: Option<ImageObjectExpires<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub file_format: Option<ImageObjectFileFormat<'a>>,
+    pub file_format: Option<ImageObjectFileFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funder: Option<ImageObjectFunder<'a>>,
+    pub funder: Option<ImageObjectFunder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<ImageObjectFunding<'a>>,
+    pub funding: Option<ImageObjectFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genre: Option<ImageObjectGenre<'a>>,
+    pub genre: Option<ImageObjectGenre<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_part: Option<ImageObjectHasPart<'a>>,
+    pub has_part: Option<ImageObjectHasPart<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub headline: Option<ImageObjectHeadline<'a>>,
+    pub headline: Option<ImageObjectHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub height: Option<ImageObjectHeight<'a>>,
+    pub height: Option<ImageObjectHeight<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<ImageObjectIdentifier<'a>>,
+    pub identifier: Option<ImageObjectIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<ImageObjectImage<'a>>,
+    pub image: Option<ImageObjectImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub in_language: Option<ImageObjectInLanguage<'a>>,
+    pub in_language: Option<ImageObjectInLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ineligible_region: Option<ImageObjectIneligibleRegion<'a>>,
+    pub ineligible_region: Option<ImageObjectIneligibleRegion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interaction_statistic: Option<ImageObjectInteractionStatistic<'a>>,
+    pub interaction_statistic: Option<ImageObjectInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interactivity_type: Option<ImageObjectInteractivityType<'a>>,
+    pub interactivity_type: Option<ImageObjectInteractivityType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interpreted_as_claim: Option<ImageObjectInterpretedAsClaim<'a>>,
+    pub interpreted_as_claim: Option<ImageObjectInterpretedAsClaim<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_accessible_for_free: Option<ImageObjectIsAccessibleForFree<'a>>,
+    pub is_accessible_for_free: Option<ImageObjectIsAccessibleForFree<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on: Option<ImageObjectIsBasedOn<'a>>,
+    pub is_based_on: Option<ImageObjectIsBasedOn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on_url: Option<ImageObjectIsBasedOnUrl<'a>>,
+    pub is_based_on_url: Option<ImageObjectIsBasedOnUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_family_friendly: Option<ImageObjectIsFamilyFriendly<'a>>,
+    pub is_family_friendly: Option<ImageObjectIsFamilyFriendly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_part_of: Option<ImageObjectIsPartOf<'a>>,
+    pub is_part_of: Option<ImageObjectIsPartOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<ImageObjectKeywords<'a>>,
+    pub keywords: Option<ImageObjectKeywords<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub learning_resource_type: Option<ImageObjectLearningResourceType<'a>>,
+    pub learning_resource_type: Option<ImageObjectLearningResourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub license: Option<ImageObjectLicense<'a>>,
+    pub license: Option<ImageObjectLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location_created: Option<ImageObjectLocationCreated<'a>>,
+    pub location_created: Option<ImageObjectLocationCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity: Option<ImageObjectMainEntity<'a>>,
+    pub main_entity: Option<ImageObjectMainEntity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<ImageObjectMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<ImageObjectMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub maintainer: Option<ImageObjectMaintainer<'a>>,
+    pub maintainer: Option<ImageObjectMaintainer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material: Option<ImageObjectMaterial<'a>>,
+    pub material: Option<ImageObjectMaterial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material_extent: Option<ImageObjectMaterialExtent<'a>>,
+    pub material_extent: Option<ImageObjectMaterialExtent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mentions: Option<ImageObjectMentions<'a>>,
+    pub mentions: Option<ImageObjectMentions<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<ImageObjectName<'a>>,
+    pub name: Option<ImageObjectName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub offers: Option<ImageObjectOffers<'a>>,
+    pub offers: Option<ImageObjectOffers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pattern: Option<ImageObjectPattern<'a>>,
+    pub pattern: Option<ImageObjectPattern<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub player_type: Option<ImageObjectPlayerType<'a>>,
+    pub player_type: Option<ImageObjectPlayerType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub position: Option<ImageObjectPosition<'a>>,
+    pub position: Option<ImageObjectPosition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<ImageObjectPotentialAction<'a>>,
+    pub potential_action: Option<ImageObjectPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub producer: Option<ImageObjectProducer<'a>>,
+    pub producer: Option<ImageObjectProducer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub production_company: Option<ImageObjectProductionCompany<'a>>,
+    pub production_company: Option<ImageObjectProductionCompany<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub provider: Option<ImageObjectProvider<'a>>,
+    pub provider: Option<ImageObjectProvider<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publication: Option<ImageObjectPublication<'a>>,
+    pub publication: Option<ImageObjectPublication<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher: Option<ImageObjectPublisher<'a>>,
+    pub publisher: Option<ImageObjectPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher_imprint: Option<ImageObjectPublisherImprint<'a>>,
+    pub publisher_imprint: Option<ImageObjectPublisherImprint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publishing_principles: Option<ImageObjectPublishingPrinciples<'a>>,
+    pub publishing_principles: Option<ImageObjectPublishingPrinciples<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recorded_at: Option<ImageObjectRecordedAt<'a>>,
+    pub recorded_at: Option<ImageObjectRecordedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub regions_allowed: Option<ImageObjectRegionsAllowed<'a>>,
+    pub regions_allowed: Option<ImageObjectRegionsAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub released_event: Option<ImageObjectReleasedEvent<'a>>,
+    pub released_event: Option<ImageObjectReleasedEvent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub representative_of_page: Option<ImageObjectRepresentativeOfPage<'a>>,
+    pub representative_of_page: Option<ImageObjectRepresentativeOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub requires_subscription: Option<ImageObjectRequiresSubscription<'a>>,
+    pub requires_subscription: Option<ImageObjectRequiresSubscription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<ImageObjectReview<'a>>,
+    pub review: Option<ImageObjectReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<ImageObjectReviews<'a>>,
+    pub reviews: Option<ImageObjectReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<ImageObjectSameAs<'a>>,
+    pub same_as: Option<ImageObjectSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub schema_version: Option<ImageObjectSchemaVersion<'a>>,
+    pub schema_version: Option<ImageObjectSchemaVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_date_published: Option<ImageObjectSdDatePublished<'a>>,
+    pub sd_date_published: Option<ImageObjectSdDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_license: Option<ImageObjectSdLicense<'a>>,
+    pub sd_license: Option<ImageObjectSdLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_publisher: Option<ImageObjectSdPublisher<'a>>,
+    pub sd_publisher: Option<ImageObjectSdPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sha256: Option<ImageObjectSha256<'a>>,
+    pub sha256: Option<ImageObjectSha256<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub size: Option<ImageObjectSize<'a>>,
+    pub size: Option<ImageObjectSize<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_organization: Option<ImageObjectSourceOrganization<'a>>,
+    pub source_organization: Option<ImageObjectSourceOrganization<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial: Option<ImageObjectSpatial<'a>>,
+    pub spatial: Option<ImageObjectSpatial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial_coverage: Option<ImageObjectSpatialCoverage<'a>>,
+    pub spatial_coverage: Option<ImageObjectSpatialCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sponsor: Option<ImageObjectSponsor<'a>>,
+    pub sponsor: Option<ImageObjectSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub start_time: Option<ImageObjectStartTime<'a>>,
+    pub start_time: Option<ImageObjectStartTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<ImageObjectSubjectOf<'a>>,
+    pub subject_of: Option<ImageObjectSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub teaches: Option<ImageObjectTeaches<'a>>,
+    pub teaches: Option<ImageObjectTeaches<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal: Option<ImageObjectTemporal<'a>>,
+    pub temporal: Option<ImageObjectTemporal<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal_coverage: Option<ImageObjectTemporalCoverage<'a>>,
+    pub temporal_coverage: Option<ImageObjectTemporalCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<ImageObjectText<'a>>,
+    pub text: Option<ImageObjectText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail: Option<ImageObjectThumbnail<'a>>,
+    pub thumbnail: Option<ImageObjectThumbnail<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail_url: Option<ImageObjectThumbnailUrl<'a>>,
+    pub thumbnail_url: Option<ImageObjectThumbnailUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub time_required: Option<ImageObjectTimeRequired<'a>>,
+    pub time_required: Option<ImageObjectTimeRequired<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translation_of_work: Option<ImageObjectTranslationOfWork<'a>>,
+    pub translation_of_work: Option<ImageObjectTranslationOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translator: Option<ImageObjectTranslator<'a>>,
+    pub translator: Option<ImageObjectTranslator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub typical_age_range: Option<ImageObjectTypicalAgeRange<'a>>,
+    pub typical_age_range: Option<ImageObjectTypicalAgeRange<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub upload_date: Option<ImageObjectUploadDate<'a>>,
+    pub upload_date: Option<ImageObjectUploadDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<ImageObjectUrl<'a>>,
+    pub url: Option<ImageObjectUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub usage_info: Option<ImageObjectUsageInfo<'a>>,
+    pub usage_info: Option<ImageObjectUsageInfo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub version: Option<ImageObjectVersion<'a>>,
+    pub version: Option<ImageObjectVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub video: Option<ImageObjectVideo<'a>>,
+    pub video: Option<ImageObjectVideo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub width: Option<ImageObjectWidth<'a>>,
+    pub width: Option<ImageObjectWidth<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub word_count: Option<ImageObjectWordCount<'a>>,
+    pub word_count: Option<ImageObjectWordCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_example: Option<ImageObjectWorkExample<'a>>,
+    pub work_example: Option<ImageObjectWorkExample<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_translation: Option<ImageObjectWorkTranslation<'a>>,
+    pub work_translation: Option<ImageObjectWorkTranslation<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAbout<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAbstract<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAbstract<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAccessMode<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAccessMode<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAccessModeSufficient<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAccessModeSufficient<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAccessibilityApi<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAccessibilityApi<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAccessibilityControl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAccessibilityControl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAccessibilityFeature<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAccessibilityFeature<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAccessibilityHazard<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAccessibilityHazard<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAccessibilitySummary<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAccessibilitySummary<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAccountablePerson<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAccountablePerson<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAcquireLicensePage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAcquireLicensePage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAlternativeHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAlternativeHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectArchivedAt<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectArchivedAt<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAssesses<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAssesses<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAssociatedArticle<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAssociatedArticle<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.NewsArticle#embedded")]
-    NewsArticleEmbedded(Box<news_article::Embedded<'a>>),
+    NewsArticleEmbedded(Box<news_article::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAssociatedMedia<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAssociatedMedia<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAudience<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAudio<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAudio<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAuthor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAuthor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectBitrate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectBitrate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectCaption<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectCaption<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectCharacter<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectCharacter<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectCitation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectCitation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectComment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectComment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectCommentCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectCommentCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectConditionsOfAccess<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectConditionsOfAccess<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectContentLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectContentLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectContentRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectContentRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectContentReferenceTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectContentReferenceTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectContentSize<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectContentSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectContentUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectContentUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectContributor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectContributor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectCopyrightHolder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectCopyrightHolder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectCopyrightNotice<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectCopyrightNotice<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectCopyrightYear<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectCopyrightYear<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectCorrection<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectCorrection<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectCountryOfOrigin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectCreativeWorkStatus<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectCreativeWorkStatus<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectCreator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectCreator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectCreditText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectCreditText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectDateCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectDateCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectDateModified<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectDateModified<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectDigitalSourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectDigitalSourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectDiscussionUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectDiscussionUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectDuration<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectDuration<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectEditEidr<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectEditEidr<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectEditor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectEditor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectEducationalAlignment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectEducationalAlignment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectEducationalLevel<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectEducationalLevel<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectEducationalUse<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectEducationalUse<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectEmbedUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectEmbedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectEmbeddedTextCaption<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectEmbeddedTextCaption<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectEncodesCreativeWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectEncodesCreativeWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectEncoding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectEncoding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectEncodingFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectEncodingFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectEncodings<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectEncodings<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectEndTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectEndTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectExampleOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectExampleOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectExifData<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectExifData<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectExpires<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectExpires<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectFileFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectFileFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectFunder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectGenre<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectGenre<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectHasPart<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectHasPart<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectHeight<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectHeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    Embedded(Box<image_object::Embedded<'a>>),
+    Embedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectInLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectInLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectIneligibleRegion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectIneligibleRegion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectInteractivityType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectInteractivityType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectInterpretedAsClaim<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectInterpretedAsClaim<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectIsAccessibleForFree<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectIsAccessibleForFree<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectIsBasedOn<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectIsBasedOn<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectIsBasedOnUrl<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectIsBasedOnUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectIsFamilyFriendly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectIsPartOf<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectIsPartOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectKeywords<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectLearningResourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectLearningResourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectLocationCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectLocationCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectMainEntity<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectMainEntity<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectMaintainer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectMaintainer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectMaterial<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectMaterialExtent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectMaterialExtent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectMentions<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectMentions<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectOffers<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectPattern<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectPattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectPlayerType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectPlayerType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectPosition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectPosition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectProducer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectProducer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectProductionCompany<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectProductionCompany<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectProvider<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectProvider<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectPublication<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectPublication<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectPublisherImprint<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectPublisherImprint<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectPublishingPrinciples<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectPublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectRecordedAt<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectRecordedAt<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectRegionsAllowed<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectRegionsAllowed<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectReleasedEvent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectReleasedEvent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectRepresentativeOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectRepresentativeOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectRequiresSubscription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectRequiresSubscription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectSchemaVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectSchemaVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectSdDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectSdDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectSdLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectSdLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectSdPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectSdPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectSha256<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectSha256<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectSize<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectSourceOrganization<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectSourceOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectSpatial<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectSpatial<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectSpatialCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectSpatialCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectSponsor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectStartTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectStartTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectTeaches<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectTeaches<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectTemporal<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectTemporal<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectTemporalCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectTemporalCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectThumbnail<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectThumbnail<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    Embedded(Box<image_object::Embedded<'a>>),
+    Embedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectThumbnailUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectThumbnailUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectTimeRequired<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectTimeRequired<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectTranslationOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectTranslationOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectTranslator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectTranslator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectTypicalAgeRange<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectTypicalAgeRange<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectUploadDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectUploadDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectUsageInfo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectUsageInfo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectVideo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectVideo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectWidth<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectWidth<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectWordCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectWordCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectWorkExample<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectWorkExample<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ImageObjectWorkTranslation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ImageObjectWorkTranslation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageObjectGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImageObjectGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: ImageObject<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: ImageObject<S>,
 }
 
-impl<'a> ImageObject<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ImageObjectRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> ImageObject<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ImageObjectRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Embedded<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Embedded<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.ImageObject"
     }
@@ -2744,18 +4248,17 @@ pub struct ImageObjectRecord;
 impl XrpcResp for ImageObjectRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.ImageObject";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ImageObjectGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ImageObjectGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ImageObjectGetRecordOutput<'_>> for ImageObject<'_> {
-    fn from(output: ImageObjectGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ImageObjectGetRecordOutput<S>> for ImageObject<S> {
+    fn from(output: ImageObjectGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for ImageObject<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for ImageObject<S> {
     const NSID: &'static str = "social.flockfeeds.lexical.type.ImageObject";
     type Record = ImageObjectRecord;
 }
@@ -2765,7 +4268,7 @@ impl Collection for ImageObjectRecord {
     type Record = ImageObjectRecord;
 }
 
-impl<'a> LexiconSchema for ImageObject<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageObject<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.ImageObject"
     }
@@ -5947,155 +7450,155 @@ pub mod image_object_state {
 pub struct ImageObjectBuilder<'a, S: image_object_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ImageObjectAbout<'a>>,
-        Option<ImageObjectAbstract<'a>>,
-        Option<ImageObjectAccessMode<'a>>,
-        Option<ImageObjectAccessModeSufficient<'a>>,
-        Option<ImageObjectAccessibilityApi<'a>>,
-        Option<ImageObjectAccessibilityControl<'a>>,
-        Option<ImageObjectAccessibilityFeature<'a>>,
-        Option<ImageObjectAccessibilityHazard<'a>>,
-        Option<ImageObjectAccessibilitySummary<'a>>,
-        Option<ImageObjectAccountablePerson<'a>>,
-        Option<ImageObjectAcquireLicensePage<'a>>,
-        Option<ImageObjectAdditionalType<'a>>,
-        Option<ImageObjectAggregateRating<'a>>,
-        Option<ImageObjectAlternateName<'a>>,
-        Option<ImageObjectAlternativeHeadline<'a>>,
-        Option<ImageObjectArchivedAt<'a>>,
-        Option<ImageObjectAssesses<'a>>,
-        Option<ImageObjectAssociatedArticle<'a>>,
-        Option<ImageObjectAssociatedMedia<'a>>,
-        Option<ImageObjectAudience<'a>>,
-        Option<ImageObjectAudio<'a>>,
-        Option<ImageObjectAuthor<'a>>,
-        Option<ImageObjectAward<'a>>,
-        Option<ImageObjectAwards<'a>>,
-        Option<ImageObjectBitrate<'a>>,
-        Option<ImageObjectCaption<'a>>,
-        Option<ImageObjectCharacter<'a>>,
-        Option<ImageObjectCitation<'a>>,
-        Option<ImageObjectComment<'a>>,
-        Option<ImageObjectCommentCount<'a>>,
-        Option<ImageObjectConditionsOfAccess<'a>>,
-        Option<ImageObjectContentLocation<'a>>,
-        Option<ImageObjectContentRating<'a>>,
-        Option<ImageObjectContentReferenceTime<'a>>,
-        Option<ImageObjectContentSize<'a>>,
-        Option<ImageObjectContentUrl<'a>>,
-        Option<ImageObjectContributor<'a>>,
-        Option<ImageObjectCopyrightHolder<'a>>,
-        Option<ImageObjectCopyrightNotice<'a>>,
-        Option<ImageObjectCopyrightYear<'a>>,
-        Option<ImageObjectCorrection<'a>>,
-        Option<ImageObjectCountryOfOrigin<'a>>,
-        Option<ImageObjectCreativeWorkStatus<'a>>,
-        Option<ImageObjectCreator<'a>>,
-        Option<ImageObjectCreditText<'a>>,
-        Option<ImageObjectDateCreated<'a>>,
-        Option<ImageObjectDateModified<'a>>,
-        Option<ImageObjectDatePublished<'a>>,
-        Option<ImageObjectDescription<'a>>,
-        Option<ImageObjectDigitalSourceType<'a>>,
-        Option<ImageObjectDisambiguatingDescription<'a>>,
-        Option<ImageObjectDiscussionUrl<'a>>,
-        Option<ImageObjectDuration<'a>>,
-        Option<ImageObjectEditEidr<'a>>,
-        Option<ImageObjectEditor<'a>>,
-        Option<ImageObjectEducationalAlignment<'a>>,
-        Option<ImageObjectEducationalLevel<'a>>,
-        Option<ImageObjectEducationalUse<'a>>,
-        Option<ImageObjectEmbedUrl<'a>>,
-        Option<ImageObjectEmbeddedTextCaption<'a>>,
-        Option<ImageObjectEncodesCreativeWork<'a>>,
-        Option<ImageObjectEncoding<'a>>,
-        Option<ImageObjectEncodingFormat<'a>>,
-        Option<ImageObjectEncodings<'a>>,
-        Option<ImageObjectEndTime<'a>>,
-        Option<ImageObjectExampleOfWork<'a>>,
-        Option<ImageObjectExifData<'a>>,
-        Option<ImageObjectExpires<'a>>,
-        Option<ImageObjectFileFormat<'a>>,
-        Option<ImageObjectFunder<'a>>,
-        Option<ImageObjectFunding<'a>>,
-        Option<ImageObjectGenre<'a>>,
-        Option<ImageObjectHasPart<'a>>,
-        Option<ImageObjectHeadline<'a>>,
-        Option<ImageObjectHeight<'a>>,
-        Option<ImageObjectIdentifier<'a>>,
-        Option<ImageObjectImage<'a>>,
-        Option<ImageObjectInLanguage<'a>>,
-        Option<ImageObjectIneligibleRegion<'a>>,
-        Option<ImageObjectInteractionStatistic<'a>>,
-        Option<ImageObjectInteractivityType<'a>>,
-        Option<ImageObjectInterpretedAsClaim<'a>>,
-        Option<ImageObjectIsAccessibleForFree<'a>>,
-        Option<ImageObjectIsBasedOn<'a>>,
-        Option<ImageObjectIsBasedOnUrl<'a>>,
-        Option<ImageObjectIsFamilyFriendly<'a>>,
-        Option<ImageObjectIsPartOf<'a>>,
-        Option<ImageObjectKeywords<'a>>,
-        Option<ImageObjectLearningResourceType<'a>>,
-        Option<ImageObjectLicense<'a>>,
-        Option<ImageObjectLocationCreated<'a>>,
-        Option<ImageObjectMainEntity<'a>>,
-        Option<ImageObjectMainEntityOfPage<'a>>,
-        Option<ImageObjectMaintainer<'a>>,
-        Option<ImageObjectMaterial<'a>>,
-        Option<ImageObjectMaterialExtent<'a>>,
-        Option<ImageObjectMentions<'a>>,
-        Option<ImageObjectName<'a>>,
-        Option<ImageObjectOffers<'a>>,
-        Option<ImageObjectPattern<'a>>,
-        Option<ImageObjectPlayerType<'a>>,
-        Option<ImageObjectPosition<'a>>,
-        Option<ImageObjectPotentialAction<'a>>,
-        Option<ImageObjectProducer<'a>>,
-        Option<ImageObjectProductionCompany<'a>>,
-        Option<ImageObjectProvider<'a>>,
-        Option<ImageObjectPublication<'a>>,
-        Option<ImageObjectPublisher<'a>>,
-        Option<ImageObjectPublisherImprint<'a>>,
-        Option<ImageObjectPublishingPrinciples<'a>>,
-        Option<ImageObjectRecordedAt<'a>>,
-        Option<ImageObjectRegionsAllowed<'a>>,
-        Option<ImageObjectReleasedEvent<'a>>,
-        Option<ImageObjectRepresentativeOfPage<'a>>,
-        Option<ImageObjectRequiresSubscription<'a>>,
-        Option<ImageObjectReview<'a>>,
-        Option<ImageObjectReviews<'a>>,
-        Option<ImageObjectSameAs<'a>>,
-        Option<ImageObjectSchemaVersion<'a>>,
-        Option<ImageObjectSdDatePublished<'a>>,
-        Option<ImageObjectSdLicense<'a>>,
-        Option<ImageObjectSdPublisher<'a>>,
-        Option<ImageObjectSha256<'a>>,
-        Option<ImageObjectSize<'a>>,
-        Option<ImageObjectSourceOrganization<'a>>,
-        Option<ImageObjectSpatial<'a>>,
-        Option<ImageObjectSpatialCoverage<'a>>,
-        Option<ImageObjectSponsor<'a>>,
-        Option<ImageObjectStartTime<'a>>,
-        Option<ImageObjectSubjectOf<'a>>,
-        Option<ImageObjectTeaches<'a>>,
-        Option<ImageObjectTemporal<'a>>,
-        Option<ImageObjectTemporalCoverage<'a>>,
-        Option<ImageObjectText<'a>>,
-        Option<ImageObjectThumbnail<'a>>,
-        Option<ImageObjectThumbnailUrl<'a>>,
-        Option<ImageObjectTimeRequired<'a>>,
-        Option<ImageObjectTranslationOfWork<'a>>,
-        Option<ImageObjectTranslator<'a>>,
-        Option<ImageObjectTypicalAgeRange<'a>>,
-        Option<ImageObjectUploadDate<'a>>,
-        Option<ImageObjectUrl<'a>>,
-        Option<ImageObjectUsageInfo<'a>>,
-        Option<ImageObjectVersion<'a>>,
-        Option<ImageObjectVideo<'a>>,
-        Option<ImageObjectWidth<'a>>,
-        Option<ImageObjectWordCount<'a>>,
-        Option<ImageObjectWorkExample<'a>>,
-        Option<ImageObjectWorkTranslation<'a>>,
+        Option<ImageObjectAbout<S>>,
+        Option<ImageObjectAbstract<S>>,
+        Option<ImageObjectAccessMode<S>>,
+        Option<ImageObjectAccessModeSufficient<S>>,
+        Option<ImageObjectAccessibilityApi<S>>,
+        Option<ImageObjectAccessibilityControl<S>>,
+        Option<ImageObjectAccessibilityFeature<S>>,
+        Option<ImageObjectAccessibilityHazard<S>>,
+        Option<ImageObjectAccessibilitySummary<S>>,
+        Option<ImageObjectAccountablePerson<S>>,
+        Option<ImageObjectAcquireLicensePage<S>>,
+        Option<ImageObjectAdditionalType<S>>,
+        Option<ImageObjectAggregateRating<S>>,
+        Option<ImageObjectAlternateName<S>>,
+        Option<ImageObjectAlternativeHeadline<S>>,
+        Option<ImageObjectArchivedAt<S>>,
+        Option<ImageObjectAssesses<S>>,
+        Option<ImageObjectAssociatedArticle<S>>,
+        Option<ImageObjectAssociatedMedia<S>>,
+        Option<ImageObjectAudience<S>>,
+        Option<ImageObjectAudio<S>>,
+        Option<ImageObjectAuthor<S>>,
+        Option<ImageObjectAward<S>>,
+        Option<ImageObjectAwards<S>>,
+        Option<ImageObjectBitrate<S>>,
+        Option<ImageObjectCaption<S>>,
+        Option<ImageObjectCharacter<S>>,
+        Option<ImageObjectCitation<S>>,
+        Option<ImageObjectComment<S>>,
+        Option<ImageObjectCommentCount<S>>,
+        Option<ImageObjectConditionsOfAccess<S>>,
+        Option<ImageObjectContentLocation<S>>,
+        Option<ImageObjectContentRating<S>>,
+        Option<ImageObjectContentReferenceTime<S>>,
+        Option<ImageObjectContentSize<S>>,
+        Option<ImageObjectContentUrl<S>>,
+        Option<ImageObjectContributor<S>>,
+        Option<ImageObjectCopyrightHolder<S>>,
+        Option<ImageObjectCopyrightNotice<S>>,
+        Option<ImageObjectCopyrightYear<S>>,
+        Option<ImageObjectCorrection<S>>,
+        Option<ImageObjectCountryOfOrigin<S>>,
+        Option<ImageObjectCreativeWorkStatus<S>>,
+        Option<ImageObjectCreator<S>>,
+        Option<ImageObjectCreditText<S>>,
+        Option<ImageObjectDateCreated<S>>,
+        Option<ImageObjectDateModified<S>>,
+        Option<ImageObjectDatePublished<S>>,
+        Option<ImageObjectDescription<S>>,
+        Option<ImageObjectDigitalSourceType<S>>,
+        Option<ImageObjectDisambiguatingDescription<S>>,
+        Option<ImageObjectDiscussionUrl<S>>,
+        Option<ImageObjectDuration<S>>,
+        Option<ImageObjectEditEidr<S>>,
+        Option<ImageObjectEditor<S>>,
+        Option<ImageObjectEducationalAlignment<S>>,
+        Option<ImageObjectEducationalLevel<S>>,
+        Option<ImageObjectEducationalUse<S>>,
+        Option<ImageObjectEmbedUrl<S>>,
+        Option<ImageObjectEmbeddedTextCaption<S>>,
+        Option<ImageObjectEncodesCreativeWork<S>>,
+        Option<ImageObjectEncoding<S>>,
+        Option<ImageObjectEncodingFormat<S>>,
+        Option<ImageObjectEncodings<S>>,
+        Option<ImageObjectEndTime<S>>,
+        Option<ImageObjectExampleOfWork<S>>,
+        Option<ImageObjectExifData<S>>,
+        Option<ImageObjectExpires<S>>,
+        Option<ImageObjectFileFormat<S>>,
+        Option<ImageObjectFunder<S>>,
+        Option<ImageObjectFunding<S>>,
+        Option<ImageObjectGenre<S>>,
+        Option<ImageObjectHasPart<S>>,
+        Option<ImageObjectHeadline<S>>,
+        Option<ImageObjectHeight<S>>,
+        Option<ImageObjectIdentifier<S>>,
+        Option<ImageObjectImage<S>>,
+        Option<ImageObjectInLanguage<S>>,
+        Option<ImageObjectIneligibleRegion<S>>,
+        Option<ImageObjectInteractionStatistic<S>>,
+        Option<ImageObjectInteractivityType<S>>,
+        Option<ImageObjectInterpretedAsClaim<S>>,
+        Option<ImageObjectIsAccessibleForFree<S>>,
+        Option<ImageObjectIsBasedOn<S>>,
+        Option<ImageObjectIsBasedOnUrl<S>>,
+        Option<ImageObjectIsFamilyFriendly<S>>,
+        Option<ImageObjectIsPartOf<S>>,
+        Option<ImageObjectKeywords<S>>,
+        Option<ImageObjectLearningResourceType<S>>,
+        Option<ImageObjectLicense<S>>,
+        Option<ImageObjectLocationCreated<S>>,
+        Option<ImageObjectMainEntity<S>>,
+        Option<ImageObjectMainEntityOfPage<S>>,
+        Option<ImageObjectMaintainer<S>>,
+        Option<ImageObjectMaterial<S>>,
+        Option<ImageObjectMaterialExtent<S>>,
+        Option<ImageObjectMentions<S>>,
+        Option<ImageObjectName<S>>,
+        Option<ImageObjectOffers<S>>,
+        Option<ImageObjectPattern<S>>,
+        Option<ImageObjectPlayerType<S>>,
+        Option<ImageObjectPosition<S>>,
+        Option<ImageObjectPotentialAction<S>>,
+        Option<ImageObjectProducer<S>>,
+        Option<ImageObjectProductionCompany<S>>,
+        Option<ImageObjectProvider<S>>,
+        Option<ImageObjectPublication<S>>,
+        Option<ImageObjectPublisher<S>>,
+        Option<ImageObjectPublisherImprint<S>>,
+        Option<ImageObjectPublishingPrinciples<S>>,
+        Option<ImageObjectRecordedAt<S>>,
+        Option<ImageObjectRegionsAllowed<S>>,
+        Option<ImageObjectReleasedEvent<S>>,
+        Option<ImageObjectRepresentativeOfPage<S>>,
+        Option<ImageObjectRequiresSubscription<S>>,
+        Option<ImageObjectReview<S>>,
+        Option<ImageObjectReviews<S>>,
+        Option<ImageObjectSameAs<S>>,
+        Option<ImageObjectSchemaVersion<S>>,
+        Option<ImageObjectSdDatePublished<S>>,
+        Option<ImageObjectSdLicense<S>>,
+        Option<ImageObjectSdPublisher<S>>,
+        Option<ImageObjectSha256<S>>,
+        Option<ImageObjectSize<S>>,
+        Option<ImageObjectSourceOrganization<S>>,
+        Option<ImageObjectSpatial<S>>,
+        Option<ImageObjectSpatialCoverage<S>>,
+        Option<ImageObjectSponsor<S>>,
+        Option<ImageObjectStartTime<S>>,
+        Option<ImageObjectSubjectOf<S>>,
+        Option<ImageObjectTeaches<S>>,
+        Option<ImageObjectTemporal<S>>,
+        Option<ImageObjectTemporalCoverage<S>>,
+        Option<ImageObjectText<S>>,
+        Option<ImageObjectThumbnail<S>>,
+        Option<ImageObjectThumbnailUrl<S>>,
+        Option<ImageObjectTimeRequired<S>>,
+        Option<ImageObjectTranslationOfWork<S>>,
+        Option<ImageObjectTranslator<S>>,
+        Option<ImageObjectTypicalAgeRange<S>>,
+        Option<ImageObjectUploadDate<S>>,
+        Option<ImageObjectUrl<S>>,
+        Option<ImageObjectUsageInfo<S>>,
+        Option<ImageObjectVersion<S>>,
+        Option<ImageObjectVideo<S>>,
+        Option<ImageObjectWidth<S>>,
+        Option<ImageObjectWordCount<S>>,
+        Option<ImageObjectWorkExample<S>>,
+        Option<ImageObjectWorkTranslation<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -6270,12 +7773,12 @@ impl<'a> ImageObjectBuilder<'a, image_object_state::Empty> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `about` field (optional)
-    pub fn about(mut self, value: impl Into<Option<ImageObjectAbout<'a>>>) -> Self {
+    pub fn about(mut self, value: impl Into<Option<ImageObjectAbout<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `about` field to an Option value (optional)
-    pub fn maybe_about(mut self, value: Option<ImageObjectAbout<'a>>) -> Self {
+    pub fn maybe_about(mut self, value: Option<ImageObjectAbout<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -6285,13 +7788,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `abstract` field (optional)
     pub fn r#abstract(
         mut self,
-        value: impl Into<Option<ImageObjectAbstract<'a>>>,
+        value: impl Into<Option<ImageObjectAbstract<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `abstract` field to an Option value (optional)
-    pub fn maybe_abstract(mut self, value: Option<ImageObjectAbstract<'a>>) -> Self {
+    pub fn maybe_abstract(mut self, value: Option<ImageObjectAbstract<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -6301,16 +7804,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accessMode` field (optional)
     pub fn access_mode(
         mut self,
-        value: impl Into<Option<ImageObjectAccessMode<'a>>>,
+        value: impl Into<Option<ImageObjectAccessMode<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `accessMode` field to an Option value (optional)
-    pub fn maybe_access_mode(
-        mut self,
-        value: Option<ImageObjectAccessMode<'a>>,
-    ) -> Self {
+    pub fn maybe_access_mode(mut self, value: Option<ImageObjectAccessMode<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -6320,7 +7820,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accessModeSufficient` field (optional)
     pub fn access_mode_sufficient(
         mut self,
-        value: impl Into<Option<ImageObjectAccessModeSufficient<'a>>>,
+        value: impl Into<Option<ImageObjectAccessModeSufficient<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -6328,7 +7828,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accessModeSufficient` field to an Option value (optional)
     pub fn maybe_access_mode_sufficient(
         mut self,
-        value: Option<ImageObjectAccessModeSufficient<'a>>,
+        value: Option<ImageObjectAccessModeSufficient<S>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -6339,7 +7839,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accessibilityAPI` field (optional)
     pub fn accessibility_api(
         mut self,
-        value: impl Into<Option<ImageObjectAccessibilityApi<'a>>>,
+        value: impl Into<Option<ImageObjectAccessibilityApi<S>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
@@ -6347,7 +7847,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accessibilityAPI` field to an Option value (optional)
     pub fn maybe_accessibility_api(
         mut self,
-        value: Option<ImageObjectAccessibilityApi<'a>>,
+        value: Option<ImageObjectAccessibilityApi<S>>,
     ) -> Self {
         self._fields.4 = value;
         self
@@ -6358,7 +7858,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accessibilityControl` field (optional)
     pub fn accessibility_control(
         mut self,
-        value: impl Into<Option<ImageObjectAccessibilityControl<'a>>>,
+        value: impl Into<Option<ImageObjectAccessibilityControl<S>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
@@ -6366,7 +7866,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accessibilityControl` field to an Option value (optional)
     pub fn maybe_accessibility_control(
         mut self,
-        value: Option<ImageObjectAccessibilityControl<'a>>,
+        value: Option<ImageObjectAccessibilityControl<S>>,
     ) -> Self {
         self._fields.5 = value;
         self
@@ -6377,7 +7877,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accessibilityFeature` field (optional)
     pub fn accessibility_feature(
         mut self,
-        value: impl Into<Option<ImageObjectAccessibilityFeature<'a>>>,
+        value: impl Into<Option<ImageObjectAccessibilityFeature<S>>>,
     ) -> Self {
         self._fields.6 = value.into();
         self
@@ -6385,7 +7885,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accessibilityFeature` field to an Option value (optional)
     pub fn maybe_accessibility_feature(
         mut self,
-        value: Option<ImageObjectAccessibilityFeature<'a>>,
+        value: Option<ImageObjectAccessibilityFeature<S>>,
     ) -> Self {
         self._fields.6 = value;
         self
@@ -6396,7 +7896,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accessibilityHazard` field (optional)
     pub fn accessibility_hazard(
         mut self,
-        value: impl Into<Option<ImageObjectAccessibilityHazard<'a>>>,
+        value: impl Into<Option<ImageObjectAccessibilityHazard<S>>>,
     ) -> Self {
         self._fields.7 = value.into();
         self
@@ -6404,7 +7904,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accessibilityHazard` field to an Option value (optional)
     pub fn maybe_accessibility_hazard(
         mut self,
-        value: Option<ImageObjectAccessibilityHazard<'a>>,
+        value: Option<ImageObjectAccessibilityHazard<S>>,
     ) -> Self {
         self._fields.7 = value;
         self
@@ -6415,7 +7915,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accessibilitySummary` field (optional)
     pub fn accessibility_summary(
         mut self,
-        value: impl Into<Option<ImageObjectAccessibilitySummary<'a>>>,
+        value: impl Into<Option<ImageObjectAccessibilitySummary<S>>>,
     ) -> Self {
         self._fields.8 = value.into();
         self
@@ -6423,7 +7923,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accessibilitySummary` field to an Option value (optional)
     pub fn maybe_accessibility_summary(
         mut self,
-        value: Option<ImageObjectAccessibilitySummary<'a>>,
+        value: Option<ImageObjectAccessibilitySummary<S>>,
     ) -> Self {
         self._fields.8 = value;
         self
@@ -6434,7 +7934,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accountablePerson` field (optional)
     pub fn accountable_person(
         mut self,
-        value: impl Into<Option<ImageObjectAccountablePerson<'a>>>,
+        value: impl Into<Option<ImageObjectAccountablePerson<S>>>,
     ) -> Self {
         self._fields.9 = value.into();
         self
@@ -6442,7 +7942,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `accountablePerson` field to an Option value (optional)
     pub fn maybe_accountable_person(
         mut self,
-        value: Option<ImageObjectAccountablePerson<'a>>,
+        value: Option<ImageObjectAccountablePerson<S>>,
     ) -> Self {
         self._fields.9 = value;
         self
@@ -6453,7 +7953,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `acquireLicensePage` field (optional)
     pub fn acquire_license_page(
         mut self,
-        value: impl Into<Option<ImageObjectAcquireLicensePage<'a>>>,
+        value: impl Into<Option<ImageObjectAcquireLicensePage<S>>>,
     ) -> Self {
         self._fields.10 = value.into();
         self
@@ -6461,7 +7961,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `acquireLicensePage` field to an Option value (optional)
     pub fn maybe_acquire_license_page(
         mut self,
-        value: Option<ImageObjectAcquireLicensePage<'a>>,
+        value: Option<ImageObjectAcquireLicensePage<S>>,
     ) -> Self {
         self._fields.10 = value;
         self
@@ -6472,7 +7972,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `additionalType` field (optional)
     pub fn additional_type(
         mut self,
-        value: impl Into<Option<ImageObjectAdditionalType<'a>>>,
+        value: impl Into<Option<ImageObjectAdditionalType<S>>>,
     ) -> Self {
         self._fields.11 = value.into();
         self
@@ -6480,7 +7980,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `additionalType` field to an Option value (optional)
     pub fn maybe_additional_type(
         mut self,
-        value: Option<ImageObjectAdditionalType<'a>>,
+        value: Option<ImageObjectAdditionalType<S>>,
     ) -> Self {
         self._fields.11 = value;
         self
@@ -6491,7 +7991,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `aggregateRating` field (optional)
     pub fn aggregate_rating(
         mut self,
-        value: impl Into<Option<ImageObjectAggregateRating<'a>>>,
+        value: impl Into<Option<ImageObjectAggregateRating<S>>>,
     ) -> Self {
         self._fields.12 = value.into();
         self
@@ -6499,7 +7999,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `aggregateRating` field to an Option value (optional)
     pub fn maybe_aggregate_rating(
         mut self,
-        value: Option<ImageObjectAggregateRating<'a>>,
+        value: Option<ImageObjectAggregateRating<S>>,
     ) -> Self {
         self._fields.12 = value;
         self
@@ -6510,7 +8010,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `alternateName` field (optional)
     pub fn alternate_name(
         mut self,
-        value: impl Into<Option<ImageObjectAlternateName<'a>>>,
+        value: impl Into<Option<ImageObjectAlternateName<S>>>,
     ) -> Self {
         self._fields.13 = value.into();
         self
@@ -6518,7 +8018,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `alternateName` field to an Option value (optional)
     pub fn maybe_alternate_name(
         mut self,
-        value: Option<ImageObjectAlternateName<'a>>,
+        value: Option<ImageObjectAlternateName<S>>,
     ) -> Self {
         self._fields.13 = value;
         self
@@ -6529,7 +8029,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `alternativeHeadline` field (optional)
     pub fn alternative_headline(
         mut self,
-        value: impl Into<Option<ImageObjectAlternativeHeadline<'a>>>,
+        value: impl Into<Option<ImageObjectAlternativeHeadline<S>>>,
     ) -> Self {
         self._fields.14 = value.into();
         self
@@ -6537,7 +8037,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `alternativeHeadline` field to an Option value (optional)
     pub fn maybe_alternative_headline(
         mut self,
-        value: Option<ImageObjectAlternativeHeadline<'a>>,
+        value: Option<ImageObjectAlternativeHeadline<S>>,
     ) -> Self {
         self._fields.14 = value;
         self
@@ -6548,16 +8048,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `archivedAt` field (optional)
     pub fn archived_at(
         mut self,
-        value: impl Into<Option<ImageObjectArchivedAt<'a>>>,
+        value: impl Into<Option<ImageObjectArchivedAt<S>>>,
     ) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `archivedAt` field to an Option value (optional)
-    pub fn maybe_archived_at(
-        mut self,
-        value: Option<ImageObjectArchivedAt<'a>>,
-    ) -> Self {
+    pub fn maybe_archived_at(mut self, value: Option<ImageObjectArchivedAt<S>>) -> Self {
         self._fields.15 = value;
         self
     }
@@ -6565,15 +8062,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `assesses` field (optional)
-    pub fn assesses(
-        mut self,
-        value: impl Into<Option<ImageObjectAssesses<'a>>>,
-    ) -> Self {
+    pub fn assesses(mut self, value: impl Into<Option<ImageObjectAssesses<S>>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `assesses` field to an Option value (optional)
-    pub fn maybe_assesses(mut self, value: Option<ImageObjectAssesses<'a>>) -> Self {
+    pub fn maybe_assesses(mut self, value: Option<ImageObjectAssesses<S>>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -6583,7 +8077,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `associatedArticle` field (optional)
     pub fn associated_article(
         mut self,
-        value: impl Into<Option<ImageObjectAssociatedArticle<'a>>>,
+        value: impl Into<Option<ImageObjectAssociatedArticle<S>>>,
     ) -> Self {
         self._fields.17 = value.into();
         self
@@ -6591,7 +8085,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `associatedArticle` field to an Option value (optional)
     pub fn maybe_associated_article(
         mut self,
-        value: Option<ImageObjectAssociatedArticle<'a>>,
+        value: Option<ImageObjectAssociatedArticle<S>>,
     ) -> Self {
         self._fields.17 = value;
         self
@@ -6602,7 +8096,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `associatedMedia` field (optional)
     pub fn associated_media(
         mut self,
-        value: impl Into<Option<ImageObjectAssociatedMedia<'a>>>,
+        value: impl Into<Option<ImageObjectAssociatedMedia<S>>>,
     ) -> Self {
         self._fields.18 = value.into();
         self
@@ -6610,7 +8104,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `associatedMedia` field to an Option value (optional)
     pub fn maybe_associated_media(
         mut self,
-        value: Option<ImageObjectAssociatedMedia<'a>>,
+        value: Option<ImageObjectAssociatedMedia<S>>,
     ) -> Self {
         self._fields.18 = value;
         self
@@ -6619,15 +8113,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `audience` field (optional)
-    pub fn audience(
-        mut self,
-        value: impl Into<Option<ImageObjectAudience<'a>>>,
-    ) -> Self {
+    pub fn audience(mut self, value: impl Into<Option<ImageObjectAudience<S>>>) -> Self {
         self._fields.19 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
-    pub fn maybe_audience(mut self, value: Option<ImageObjectAudience<'a>>) -> Self {
+    pub fn maybe_audience(mut self, value: Option<ImageObjectAudience<S>>) -> Self {
         self._fields.19 = value;
         self
     }
@@ -6635,12 +8126,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `audio` field (optional)
-    pub fn audio(mut self, value: impl Into<Option<ImageObjectAudio<'a>>>) -> Self {
+    pub fn audio(mut self, value: impl Into<Option<ImageObjectAudio<S>>>) -> Self {
         self._fields.20 = value.into();
         self
     }
     /// Set the `audio` field to an Option value (optional)
-    pub fn maybe_audio(mut self, value: Option<ImageObjectAudio<'a>>) -> Self {
+    pub fn maybe_audio(mut self, value: Option<ImageObjectAudio<S>>) -> Self {
         self._fields.20 = value;
         self
     }
@@ -6648,12 +8139,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `author` field (optional)
-    pub fn author(mut self, value: impl Into<Option<ImageObjectAuthor<'a>>>) -> Self {
+    pub fn author(mut self, value: impl Into<Option<ImageObjectAuthor<S>>>) -> Self {
         self._fields.21 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
-    pub fn maybe_author(mut self, value: Option<ImageObjectAuthor<'a>>) -> Self {
+    pub fn maybe_author(mut self, value: Option<ImageObjectAuthor<S>>) -> Self {
         self._fields.21 = value;
         self
     }
@@ -6661,12 +8152,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `award` field (optional)
-    pub fn award(mut self, value: impl Into<Option<ImageObjectAward<'a>>>) -> Self {
+    pub fn award(mut self, value: impl Into<Option<ImageObjectAward<S>>>) -> Self {
         self._fields.22 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
-    pub fn maybe_award(mut self, value: Option<ImageObjectAward<'a>>) -> Self {
+    pub fn maybe_award(mut self, value: Option<ImageObjectAward<S>>) -> Self {
         self._fields.22 = value;
         self
     }
@@ -6674,12 +8165,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `awards` field (optional)
-    pub fn awards(mut self, value: impl Into<Option<ImageObjectAwards<'a>>>) -> Self {
+    pub fn awards(mut self, value: impl Into<Option<ImageObjectAwards<S>>>) -> Self {
         self._fields.23 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
-    pub fn maybe_awards(mut self, value: Option<ImageObjectAwards<'a>>) -> Self {
+    pub fn maybe_awards(mut self, value: Option<ImageObjectAwards<S>>) -> Self {
         self._fields.23 = value;
         self
     }
@@ -6687,12 +8178,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `bitrate` field (optional)
-    pub fn bitrate(mut self, value: impl Into<Option<ImageObjectBitrate<'a>>>) -> Self {
+    pub fn bitrate(mut self, value: impl Into<Option<ImageObjectBitrate<S>>>) -> Self {
         self._fields.24 = value.into();
         self
     }
     /// Set the `bitrate` field to an Option value (optional)
-    pub fn maybe_bitrate(mut self, value: Option<ImageObjectBitrate<'a>>) -> Self {
+    pub fn maybe_bitrate(mut self, value: Option<ImageObjectBitrate<S>>) -> Self {
         self._fields.24 = value;
         self
     }
@@ -6700,12 +8191,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `caption` field (optional)
-    pub fn caption(mut self, value: impl Into<Option<ImageObjectCaption<'a>>>) -> Self {
+    pub fn caption(mut self, value: impl Into<Option<ImageObjectCaption<S>>>) -> Self {
         self._fields.25 = value.into();
         self
     }
     /// Set the `caption` field to an Option value (optional)
-    pub fn maybe_caption(mut self, value: Option<ImageObjectCaption<'a>>) -> Self {
+    pub fn maybe_caption(mut self, value: Option<ImageObjectCaption<S>>) -> Self {
         self._fields.25 = value;
         self
     }
@@ -6715,13 +8206,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `character` field (optional)
     pub fn character(
         mut self,
-        value: impl Into<Option<ImageObjectCharacter<'a>>>,
+        value: impl Into<Option<ImageObjectCharacter<S>>>,
     ) -> Self {
         self._fields.26 = value.into();
         self
     }
     /// Set the `character` field to an Option value (optional)
-    pub fn maybe_character(mut self, value: Option<ImageObjectCharacter<'a>>) -> Self {
+    pub fn maybe_character(mut self, value: Option<ImageObjectCharacter<S>>) -> Self {
         self._fields.26 = value;
         self
     }
@@ -6729,15 +8220,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `citation` field (optional)
-    pub fn citation(
-        mut self,
-        value: impl Into<Option<ImageObjectCitation<'a>>>,
-    ) -> Self {
+    pub fn citation(mut self, value: impl Into<Option<ImageObjectCitation<S>>>) -> Self {
         self._fields.27 = value.into();
         self
     }
     /// Set the `citation` field to an Option value (optional)
-    pub fn maybe_citation(mut self, value: Option<ImageObjectCitation<'a>>) -> Self {
+    pub fn maybe_citation(mut self, value: Option<ImageObjectCitation<S>>) -> Self {
         self._fields.27 = value;
         self
     }
@@ -6745,12 +8233,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(mut self, value: impl Into<Option<ImageObjectComment<'a>>>) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<ImageObjectComment<S>>>) -> Self {
         self._fields.28 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(mut self, value: Option<ImageObjectComment<'a>>) -> Self {
+    pub fn maybe_comment(mut self, value: Option<ImageObjectComment<S>>) -> Self {
         self._fields.28 = value;
         self
     }
@@ -6760,7 +8248,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `commentCount` field (optional)
     pub fn comment_count(
         mut self,
-        value: impl Into<Option<ImageObjectCommentCount<'a>>>,
+        value: impl Into<Option<ImageObjectCommentCount<S>>>,
     ) -> Self {
         self._fields.29 = value.into();
         self
@@ -6768,7 +8256,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `commentCount` field to an Option value (optional)
     pub fn maybe_comment_count(
         mut self,
-        value: Option<ImageObjectCommentCount<'a>>,
+        value: Option<ImageObjectCommentCount<S>>,
     ) -> Self {
         self._fields.29 = value;
         self
@@ -6779,7 +8267,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `conditionsOfAccess` field (optional)
     pub fn conditions_of_access(
         mut self,
-        value: impl Into<Option<ImageObjectConditionsOfAccess<'a>>>,
+        value: impl Into<Option<ImageObjectConditionsOfAccess<S>>>,
     ) -> Self {
         self._fields.30 = value.into();
         self
@@ -6787,7 +8275,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `conditionsOfAccess` field to an Option value (optional)
     pub fn maybe_conditions_of_access(
         mut self,
-        value: Option<ImageObjectConditionsOfAccess<'a>>,
+        value: Option<ImageObjectConditionsOfAccess<S>>,
     ) -> Self {
         self._fields.30 = value;
         self
@@ -6798,7 +8286,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `contentLocation` field (optional)
     pub fn content_location(
         mut self,
-        value: impl Into<Option<ImageObjectContentLocation<'a>>>,
+        value: impl Into<Option<ImageObjectContentLocation<S>>>,
     ) -> Self {
         self._fields.31 = value.into();
         self
@@ -6806,7 +8294,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `contentLocation` field to an Option value (optional)
     pub fn maybe_content_location(
         mut self,
-        value: Option<ImageObjectContentLocation<'a>>,
+        value: Option<ImageObjectContentLocation<S>>,
     ) -> Self {
         self._fields.31 = value;
         self
@@ -6817,7 +8305,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `contentRating` field (optional)
     pub fn content_rating(
         mut self,
-        value: impl Into<Option<ImageObjectContentRating<'a>>>,
+        value: impl Into<Option<ImageObjectContentRating<S>>>,
     ) -> Self {
         self._fields.32 = value.into();
         self
@@ -6825,7 +8313,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `contentRating` field to an Option value (optional)
     pub fn maybe_content_rating(
         mut self,
-        value: Option<ImageObjectContentRating<'a>>,
+        value: Option<ImageObjectContentRating<S>>,
     ) -> Self {
         self._fields.32 = value;
         self
@@ -6836,7 +8324,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `contentReferenceTime` field (optional)
     pub fn content_reference_time(
         mut self,
-        value: impl Into<Option<ImageObjectContentReferenceTime<'a>>>,
+        value: impl Into<Option<ImageObjectContentReferenceTime<S>>>,
     ) -> Self {
         self._fields.33 = value.into();
         self
@@ -6844,7 +8332,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `contentReferenceTime` field to an Option value (optional)
     pub fn maybe_content_reference_time(
         mut self,
-        value: Option<ImageObjectContentReferenceTime<'a>>,
+        value: Option<ImageObjectContentReferenceTime<S>>,
     ) -> Self {
         self._fields.33 = value;
         self
@@ -6855,7 +8343,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `contentSize` field (optional)
     pub fn content_size(
         mut self,
-        value: impl Into<Option<ImageObjectContentSize<'a>>>,
+        value: impl Into<Option<ImageObjectContentSize<S>>>,
     ) -> Self {
         self._fields.34 = value.into();
         self
@@ -6863,7 +8351,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `contentSize` field to an Option value (optional)
     pub fn maybe_content_size(
         mut self,
-        value: Option<ImageObjectContentSize<'a>>,
+        value: Option<ImageObjectContentSize<S>>,
     ) -> Self {
         self._fields.34 = value;
         self
@@ -6874,16 +8362,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `contentUrl` field (optional)
     pub fn content_url(
         mut self,
-        value: impl Into<Option<ImageObjectContentUrl<'a>>>,
+        value: impl Into<Option<ImageObjectContentUrl<S>>>,
     ) -> Self {
         self._fields.35 = value.into();
         self
     }
     /// Set the `contentUrl` field to an Option value (optional)
-    pub fn maybe_content_url(
-        mut self,
-        value: Option<ImageObjectContentUrl<'a>>,
-    ) -> Self {
+    pub fn maybe_content_url(mut self, value: Option<ImageObjectContentUrl<S>>) -> Self {
         self._fields.35 = value;
         self
     }
@@ -6893,7 +8378,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `contributor` field (optional)
     pub fn contributor(
         mut self,
-        value: impl Into<Option<ImageObjectContributor<'a>>>,
+        value: impl Into<Option<ImageObjectContributor<S>>>,
     ) -> Self {
         self._fields.36 = value.into();
         self
@@ -6901,7 +8386,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `contributor` field to an Option value (optional)
     pub fn maybe_contributor(
         mut self,
-        value: Option<ImageObjectContributor<'a>>,
+        value: Option<ImageObjectContributor<S>>,
     ) -> Self {
         self._fields.36 = value;
         self
@@ -6912,7 +8397,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `copyrightHolder` field (optional)
     pub fn copyright_holder(
         mut self,
-        value: impl Into<Option<ImageObjectCopyrightHolder<'a>>>,
+        value: impl Into<Option<ImageObjectCopyrightHolder<S>>>,
     ) -> Self {
         self._fields.37 = value.into();
         self
@@ -6920,7 +8405,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `copyrightHolder` field to an Option value (optional)
     pub fn maybe_copyright_holder(
         mut self,
-        value: Option<ImageObjectCopyrightHolder<'a>>,
+        value: Option<ImageObjectCopyrightHolder<S>>,
     ) -> Self {
         self._fields.37 = value;
         self
@@ -6931,7 +8416,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `copyrightNotice` field (optional)
     pub fn copyright_notice(
         mut self,
-        value: impl Into<Option<ImageObjectCopyrightNotice<'a>>>,
+        value: impl Into<Option<ImageObjectCopyrightNotice<S>>>,
     ) -> Self {
         self._fields.38 = value.into();
         self
@@ -6939,7 +8424,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `copyrightNotice` field to an Option value (optional)
     pub fn maybe_copyright_notice(
         mut self,
-        value: Option<ImageObjectCopyrightNotice<'a>>,
+        value: Option<ImageObjectCopyrightNotice<S>>,
     ) -> Self {
         self._fields.38 = value;
         self
@@ -6950,7 +8435,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `copyrightYear` field (optional)
     pub fn copyright_year(
         mut self,
-        value: impl Into<Option<ImageObjectCopyrightYear<'a>>>,
+        value: impl Into<Option<ImageObjectCopyrightYear<S>>>,
     ) -> Self {
         self._fields.39 = value.into();
         self
@@ -6958,7 +8443,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `copyrightYear` field to an Option value (optional)
     pub fn maybe_copyright_year(
         mut self,
-        value: Option<ImageObjectCopyrightYear<'a>>,
+        value: Option<ImageObjectCopyrightYear<S>>,
     ) -> Self {
         self._fields.39 = value;
         self
@@ -6969,13 +8454,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `correction` field (optional)
     pub fn correction(
         mut self,
-        value: impl Into<Option<ImageObjectCorrection<'a>>>,
+        value: impl Into<Option<ImageObjectCorrection<S>>>,
     ) -> Self {
         self._fields.40 = value.into();
         self
     }
     /// Set the `correction` field to an Option value (optional)
-    pub fn maybe_correction(mut self, value: Option<ImageObjectCorrection<'a>>) -> Self {
+    pub fn maybe_correction(mut self, value: Option<ImageObjectCorrection<S>>) -> Self {
         self._fields.40 = value;
         self
     }
@@ -6985,7 +8470,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `countryOfOrigin` field (optional)
     pub fn country_of_origin(
         mut self,
-        value: impl Into<Option<ImageObjectCountryOfOrigin<'a>>>,
+        value: impl Into<Option<ImageObjectCountryOfOrigin<S>>>,
     ) -> Self {
         self._fields.41 = value.into();
         self
@@ -6993,7 +8478,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `countryOfOrigin` field to an Option value (optional)
     pub fn maybe_country_of_origin(
         mut self,
-        value: Option<ImageObjectCountryOfOrigin<'a>>,
+        value: Option<ImageObjectCountryOfOrigin<S>>,
     ) -> Self {
         self._fields.41 = value;
         self
@@ -7004,7 +8489,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `creativeWorkStatus` field (optional)
     pub fn creative_work_status(
         mut self,
-        value: impl Into<Option<ImageObjectCreativeWorkStatus<'a>>>,
+        value: impl Into<Option<ImageObjectCreativeWorkStatus<S>>>,
     ) -> Self {
         self._fields.42 = value.into();
         self
@@ -7012,7 +8497,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `creativeWorkStatus` field to an Option value (optional)
     pub fn maybe_creative_work_status(
         mut self,
-        value: Option<ImageObjectCreativeWorkStatus<'a>>,
+        value: Option<ImageObjectCreativeWorkStatus<S>>,
     ) -> Self {
         self._fields.42 = value;
         self
@@ -7021,12 +8506,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `creator` field (optional)
-    pub fn creator(mut self, value: impl Into<Option<ImageObjectCreator<'a>>>) -> Self {
+    pub fn creator(mut self, value: impl Into<Option<ImageObjectCreator<S>>>) -> Self {
         self._fields.43 = value.into();
         self
     }
     /// Set the `creator` field to an Option value (optional)
-    pub fn maybe_creator(mut self, value: Option<ImageObjectCreator<'a>>) -> Self {
+    pub fn maybe_creator(mut self, value: Option<ImageObjectCreator<S>>) -> Self {
         self._fields.43 = value;
         self
     }
@@ -7036,16 +8521,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `creditText` field (optional)
     pub fn credit_text(
         mut self,
-        value: impl Into<Option<ImageObjectCreditText<'a>>>,
+        value: impl Into<Option<ImageObjectCreditText<S>>>,
     ) -> Self {
         self._fields.44 = value.into();
         self
     }
     /// Set the `creditText` field to an Option value (optional)
-    pub fn maybe_credit_text(
-        mut self,
-        value: Option<ImageObjectCreditText<'a>>,
-    ) -> Self {
+    pub fn maybe_credit_text(mut self, value: Option<ImageObjectCreditText<S>>) -> Self {
         self._fields.44 = value;
         self
     }
@@ -7055,7 +8537,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `dateCreated` field (optional)
     pub fn date_created(
         mut self,
-        value: impl Into<Option<ImageObjectDateCreated<'a>>>,
+        value: impl Into<Option<ImageObjectDateCreated<S>>>,
     ) -> Self {
         self._fields.45 = value.into();
         self
@@ -7063,7 +8545,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `dateCreated` field to an Option value (optional)
     pub fn maybe_date_created(
         mut self,
-        value: Option<ImageObjectDateCreated<'a>>,
+        value: Option<ImageObjectDateCreated<S>>,
     ) -> Self {
         self._fields.45 = value;
         self
@@ -7074,7 +8556,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `dateModified` field (optional)
     pub fn date_modified(
         mut self,
-        value: impl Into<Option<ImageObjectDateModified<'a>>>,
+        value: impl Into<Option<ImageObjectDateModified<S>>>,
     ) -> Self {
         self._fields.46 = value.into();
         self
@@ -7082,7 +8564,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `dateModified` field to an Option value (optional)
     pub fn maybe_date_modified(
         mut self,
-        value: Option<ImageObjectDateModified<'a>>,
+        value: Option<ImageObjectDateModified<S>>,
     ) -> Self {
         self._fields.46 = value;
         self
@@ -7093,7 +8575,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `datePublished` field (optional)
     pub fn date_published(
         mut self,
-        value: impl Into<Option<ImageObjectDatePublished<'a>>>,
+        value: impl Into<Option<ImageObjectDatePublished<S>>>,
     ) -> Self {
         self._fields.47 = value.into();
         self
@@ -7101,7 +8583,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `datePublished` field to an Option value (optional)
     pub fn maybe_date_published(
         mut self,
-        value: Option<ImageObjectDatePublished<'a>>,
+        value: Option<ImageObjectDatePublished<S>>,
     ) -> Self {
         self._fields.47 = value;
         self
@@ -7112,7 +8594,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
-        value: impl Into<Option<ImageObjectDescription<'a>>>,
+        value: impl Into<Option<ImageObjectDescription<S>>>,
     ) -> Self {
         self._fields.48 = value.into();
         self
@@ -7120,7 +8602,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(
         mut self,
-        value: Option<ImageObjectDescription<'a>>,
+        value: Option<ImageObjectDescription<S>>,
     ) -> Self {
         self._fields.48 = value;
         self
@@ -7131,7 +8613,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `digitalSourceType` field (optional)
     pub fn digital_source_type(
         mut self,
-        value: impl Into<Option<ImageObjectDigitalSourceType<'a>>>,
+        value: impl Into<Option<ImageObjectDigitalSourceType<S>>>,
     ) -> Self {
         self._fields.49 = value.into();
         self
@@ -7139,7 +8621,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `digitalSourceType` field to an Option value (optional)
     pub fn maybe_digital_source_type(
         mut self,
-        value: Option<ImageObjectDigitalSourceType<'a>>,
+        value: Option<ImageObjectDigitalSourceType<S>>,
     ) -> Self {
         self._fields.49 = value;
         self
@@ -7150,7 +8632,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
-        value: impl Into<Option<ImageObjectDisambiguatingDescription<'a>>>,
+        value: impl Into<Option<ImageObjectDisambiguatingDescription<S>>>,
     ) -> Self {
         self._fields.50 = value.into();
         self
@@ -7158,7 +8640,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field to an Option value (optional)
     pub fn maybe_disambiguating_description(
         mut self,
-        value: Option<ImageObjectDisambiguatingDescription<'a>>,
+        value: Option<ImageObjectDisambiguatingDescription<S>>,
     ) -> Self {
         self._fields.50 = value;
         self
@@ -7169,7 +8651,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `discussionUrl` field (optional)
     pub fn discussion_url(
         mut self,
-        value: impl Into<Option<ImageObjectDiscussionUrl<'a>>>,
+        value: impl Into<Option<ImageObjectDiscussionUrl<S>>>,
     ) -> Self {
         self._fields.51 = value.into();
         self
@@ -7177,7 +8659,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `discussionUrl` field to an Option value (optional)
     pub fn maybe_discussion_url(
         mut self,
-        value: Option<ImageObjectDiscussionUrl<'a>>,
+        value: Option<ImageObjectDiscussionUrl<S>>,
     ) -> Self {
         self._fields.51 = value;
         self
@@ -7186,15 +8668,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `duration` field (optional)
-    pub fn duration(
-        mut self,
-        value: impl Into<Option<ImageObjectDuration<'a>>>,
-    ) -> Self {
+    pub fn duration(mut self, value: impl Into<Option<ImageObjectDuration<S>>>) -> Self {
         self._fields.52 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
-    pub fn maybe_duration(mut self, value: Option<ImageObjectDuration<'a>>) -> Self {
+    pub fn maybe_duration(mut self, value: Option<ImageObjectDuration<S>>) -> Self {
         self._fields.52 = value;
         self
     }
@@ -7204,13 +8683,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `editEIDR` field (optional)
     pub fn edit_eidr(
         mut self,
-        value: impl Into<Option<ImageObjectEditEidr<'a>>>,
+        value: impl Into<Option<ImageObjectEditEidr<S>>>,
     ) -> Self {
         self._fields.53 = value.into();
         self
     }
     /// Set the `editEIDR` field to an Option value (optional)
-    pub fn maybe_edit_eidr(mut self, value: Option<ImageObjectEditEidr<'a>>) -> Self {
+    pub fn maybe_edit_eidr(mut self, value: Option<ImageObjectEditEidr<S>>) -> Self {
         self._fields.53 = value;
         self
     }
@@ -7218,12 +8697,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `editor` field (optional)
-    pub fn editor(mut self, value: impl Into<Option<ImageObjectEditor<'a>>>) -> Self {
+    pub fn editor(mut self, value: impl Into<Option<ImageObjectEditor<S>>>) -> Self {
         self._fields.54 = value.into();
         self
     }
     /// Set the `editor` field to an Option value (optional)
-    pub fn maybe_editor(mut self, value: Option<ImageObjectEditor<'a>>) -> Self {
+    pub fn maybe_editor(mut self, value: Option<ImageObjectEditor<S>>) -> Self {
         self._fields.54 = value;
         self
     }
@@ -7233,7 +8712,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `educationalAlignment` field (optional)
     pub fn educational_alignment(
         mut self,
-        value: impl Into<Option<ImageObjectEducationalAlignment<'a>>>,
+        value: impl Into<Option<ImageObjectEducationalAlignment<S>>>,
     ) -> Self {
         self._fields.55 = value.into();
         self
@@ -7241,7 +8720,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `educationalAlignment` field to an Option value (optional)
     pub fn maybe_educational_alignment(
         mut self,
-        value: Option<ImageObjectEducationalAlignment<'a>>,
+        value: Option<ImageObjectEducationalAlignment<S>>,
     ) -> Self {
         self._fields.55 = value;
         self
@@ -7252,7 +8731,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `educationalLevel` field (optional)
     pub fn educational_level(
         mut self,
-        value: impl Into<Option<ImageObjectEducationalLevel<'a>>>,
+        value: impl Into<Option<ImageObjectEducationalLevel<S>>>,
     ) -> Self {
         self._fields.56 = value.into();
         self
@@ -7260,7 +8739,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `educationalLevel` field to an Option value (optional)
     pub fn maybe_educational_level(
         mut self,
-        value: Option<ImageObjectEducationalLevel<'a>>,
+        value: Option<ImageObjectEducationalLevel<S>>,
     ) -> Self {
         self._fields.56 = value;
         self
@@ -7271,7 +8750,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `educationalUse` field (optional)
     pub fn educational_use(
         mut self,
-        value: impl Into<Option<ImageObjectEducationalUse<'a>>>,
+        value: impl Into<Option<ImageObjectEducationalUse<S>>>,
     ) -> Self {
         self._fields.57 = value.into();
         self
@@ -7279,7 +8758,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `educationalUse` field to an Option value (optional)
     pub fn maybe_educational_use(
         mut self,
-        value: Option<ImageObjectEducationalUse<'a>>,
+        value: Option<ImageObjectEducationalUse<S>>,
     ) -> Self {
         self._fields.57 = value;
         self
@@ -7290,13 +8769,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `embedUrl` field (optional)
     pub fn embed_url(
         mut self,
-        value: impl Into<Option<ImageObjectEmbedUrl<'a>>>,
+        value: impl Into<Option<ImageObjectEmbedUrl<S>>>,
     ) -> Self {
         self._fields.58 = value.into();
         self
     }
     /// Set the `embedUrl` field to an Option value (optional)
-    pub fn maybe_embed_url(mut self, value: Option<ImageObjectEmbedUrl<'a>>) -> Self {
+    pub fn maybe_embed_url(mut self, value: Option<ImageObjectEmbedUrl<S>>) -> Self {
         self._fields.58 = value;
         self
     }
@@ -7306,7 +8785,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `embeddedTextCaption` field (optional)
     pub fn embedded_text_caption(
         mut self,
-        value: impl Into<Option<ImageObjectEmbeddedTextCaption<'a>>>,
+        value: impl Into<Option<ImageObjectEmbeddedTextCaption<S>>>,
     ) -> Self {
         self._fields.59 = value.into();
         self
@@ -7314,7 +8793,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `embeddedTextCaption` field to an Option value (optional)
     pub fn maybe_embedded_text_caption(
         mut self,
-        value: Option<ImageObjectEmbeddedTextCaption<'a>>,
+        value: Option<ImageObjectEmbeddedTextCaption<S>>,
     ) -> Self {
         self._fields.59 = value;
         self
@@ -7325,7 +8804,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `encodesCreativeWork` field (optional)
     pub fn encodes_creative_work(
         mut self,
-        value: impl Into<Option<ImageObjectEncodesCreativeWork<'a>>>,
+        value: impl Into<Option<ImageObjectEncodesCreativeWork<S>>>,
     ) -> Self {
         self._fields.60 = value.into();
         self
@@ -7333,7 +8812,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `encodesCreativeWork` field to an Option value (optional)
     pub fn maybe_encodes_creative_work(
         mut self,
-        value: Option<ImageObjectEncodesCreativeWork<'a>>,
+        value: Option<ImageObjectEncodesCreativeWork<S>>,
     ) -> Self {
         self._fields.60 = value;
         self
@@ -7342,15 +8821,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `encoding` field (optional)
-    pub fn encoding(
-        mut self,
-        value: impl Into<Option<ImageObjectEncoding<'a>>>,
-    ) -> Self {
+    pub fn encoding(mut self, value: impl Into<Option<ImageObjectEncoding<S>>>) -> Self {
         self._fields.61 = value.into();
         self
     }
     /// Set the `encoding` field to an Option value (optional)
-    pub fn maybe_encoding(mut self, value: Option<ImageObjectEncoding<'a>>) -> Self {
+    pub fn maybe_encoding(mut self, value: Option<ImageObjectEncoding<S>>) -> Self {
         self._fields.61 = value;
         self
     }
@@ -7360,7 +8836,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `encodingFormat` field (optional)
     pub fn encoding_format(
         mut self,
-        value: impl Into<Option<ImageObjectEncodingFormat<'a>>>,
+        value: impl Into<Option<ImageObjectEncodingFormat<S>>>,
     ) -> Self {
         self._fields.62 = value.into();
         self
@@ -7368,7 +8844,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `encodingFormat` field to an Option value (optional)
     pub fn maybe_encoding_format(
         mut self,
-        value: Option<ImageObjectEncodingFormat<'a>>,
+        value: Option<ImageObjectEncodingFormat<S>>,
     ) -> Self {
         self._fields.62 = value;
         self
@@ -7379,13 +8855,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `encodings` field (optional)
     pub fn encodings(
         mut self,
-        value: impl Into<Option<ImageObjectEncodings<'a>>>,
+        value: impl Into<Option<ImageObjectEncodings<S>>>,
     ) -> Self {
         self._fields.63 = value.into();
         self
     }
     /// Set the `encodings` field to an Option value (optional)
-    pub fn maybe_encodings(mut self, value: Option<ImageObjectEncodings<'a>>) -> Self {
+    pub fn maybe_encodings(mut self, value: Option<ImageObjectEncodings<S>>) -> Self {
         self._fields.63 = value;
         self
     }
@@ -7393,12 +8869,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `endTime` field (optional)
-    pub fn end_time(mut self, value: impl Into<Option<ImageObjectEndTime<'a>>>) -> Self {
+    pub fn end_time(mut self, value: impl Into<Option<ImageObjectEndTime<S>>>) -> Self {
         self._fields.64 = value.into();
         self
     }
     /// Set the `endTime` field to an Option value (optional)
-    pub fn maybe_end_time(mut self, value: Option<ImageObjectEndTime<'a>>) -> Self {
+    pub fn maybe_end_time(mut self, value: Option<ImageObjectEndTime<S>>) -> Self {
         self._fields.64 = value;
         self
     }
@@ -7408,7 +8884,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `exampleOfWork` field (optional)
     pub fn example_of_work(
         mut self,
-        value: impl Into<Option<ImageObjectExampleOfWork<'a>>>,
+        value: impl Into<Option<ImageObjectExampleOfWork<S>>>,
     ) -> Self {
         self._fields.65 = value.into();
         self
@@ -7416,7 +8892,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `exampleOfWork` field to an Option value (optional)
     pub fn maybe_example_of_work(
         mut self,
-        value: Option<ImageObjectExampleOfWork<'a>>,
+        value: Option<ImageObjectExampleOfWork<S>>,
     ) -> Self {
         self._fields.65 = value;
         self
@@ -7427,13 +8903,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `exifData` field (optional)
     pub fn exif_data(
         mut self,
-        value: impl Into<Option<ImageObjectExifData<'a>>>,
+        value: impl Into<Option<ImageObjectExifData<S>>>,
     ) -> Self {
         self._fields.66 = value.into();
         self
     }
     /// Set the `exifData` field to an Option value (optional)
-    pub fn maybe_exif_data(mut self, value: Option<ImageObjectExifData<'a>>) -> Self {
+    pub fn maybe_exif_data(mut self, value: Option<ImageObjectExifData<S>>) -> Self {
         self._fields.66 = value;
         self
     }
@@ -7441,12 +8917,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `expires` field (optional)
-    pub fn expires(mut self, value: impl Into<Option<ImageObjectExpires<'a>>>) -> Self {
+    pub fn expires(mut self, value: impl Into<Option<ImageObjectExpires<S>>>) -> Self {
         self._fields.67 = value.into();
         self
     }
     /// Set the `expires` field to an Option value (optional)
-    pub fn maybe_expires(mut self, value: Option<ImageObjectExpires<'a>>) -> Self {
+    pub fn maybe_expires(mut self, value: Option<ImageObjectExpires<S>>) -> Self {
         self._fields.67 = value;
         self
     }
@@ -7456,16 +8932,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `fileFormat` field (optional)
     pub fn file_format(
         mut self,
-        value: impl Into<Option<ImageObjectFileFormat<'a>>>,
+        value: impl Into<Option<ImageObjectFileFormat<S>>>,
     ) -> Self {
         self._fields.68 = value.into();
         self
     }
     /// Set the `fileFormat` field to an Option value (optional)
-    pub fn maybe_file_format(
-        mut self,
-        value: Option<ImageObjectFileFormat<'a>>,
-    ) -> Self {
+    pub fn maybe_file_format(mut self, value: Option<ImageObjectFileFormat<S>>) -> Self {
         self._fields.68 = value;
         self
     }
@@ -7473,12 +8946,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `funder` field (optional)
-    pub fn funder(mut self, value: impl Into<Option<ImageObjectFunder<'a>>>) -> Self {
+    pub fn funder(mut self, value: impl Into<Option<ImageObjectFunder<S>>>) -> Self {
         self._fields.69 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
-    pub fn maybe_funder(mut self, value: Option<ImageObjectFunder<'a>>) -> Self {
+    pub fn maybe_funder(mut self, value: Option<ImageObjectFunder<S>>) -> Self {
         self._fields.69 = value;
         self
     }
@@ -7486,12 +8959,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `funding` field (optional)
-    pub fn funding(mut self, value: impl Into<Option<ImageObjectFunding<'a>>>) -> Self {
+    pub fn funding(mut self, value: impl Into<Option<ImageObjectFunding<S>>>) -> Self {
         self._fields.70 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
-    pub fn maybe_funding(mut self, value: Option<ImageObjectFunding<'a>>) -> Self {
+    pub fn maybe_funding(mut self, value: Option<ImageObjectFunding<S>>) -> Self {
         self._fields.70 = value;
         self
     }
@@ -7499,12 +8972,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<ImageObjectGenre<'a>>>) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<ImageObjectGenre<S>>>) -> Self {
         self._fields.71 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<ImageObjectGenre<'a>>) -> Self {
+    pub fn maybe_genre(mut self, value: Option<ImageObjectGenre<S>>) -> Self {
         self._fields.71 = value;
         self
     }
@@ -7512,12 +8985,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `hasPart` field (optional)
-    pub fn has_part(mut self, value: impl Into<Option<ImageObjectHasPart<'a>>>) -> Self {
+    pub fn has_part(mut self, value: impl Into<Option<ImageObjectHasPart<S>>>) -> Self {
         self._fields.72 = value.into();
         self
     }
     /// Set the `hasPart` field to an Option value (optional)
-    pub fn maybe_has_part(mut self, value: Option<ImageObjectHasPart<'a>>) -> Self {
+    pub fn maybe_has_part(mut self, value: Option<ImageObjectHasPart<S>>) -> Self {
         self._fields.72 = value;
         self
     }
@@ -7525,15 +8998,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `headline` field (optional)
-    pub fn headline(
-        mut self,
-        value: impl Into<Option<ImageObjectHeadline<'a>>>,
-    ) -> Self {
+    pub fn headline(mut self, value: impl Into<Option<ImageObjectHeadline<S>>>) -> Self {
         self._fields.73 = value.into();
         self
     }
     /// Set the `headline` field to an Option value (optional)
-    pub fn maybe_headline(mut self, value: Option<ImageObjectHeadline<'a>>) -> Self {
+    pub fn maybe_headline(mut self, value: Option<ImageObjectHeadline<S>>) -> Self {
         self._fields.73 = value;
         self
     }
@@ -7541,12 +9011,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `height` field (optional)
-    pub fn height(mut self, value: impl Into<Option<ImageObjectHeight<'a>>>) -> Self {
+    pub fn height(mut self, value: impl Into<Option<ImageObjectHeight<S>>>) -> Self {
         self._fields.74 = value.into();
         self
     }
     /// Set the `height` field to an Option value (optional)
-    pub fn maybe_height(mut self, value: Option<ImageObjectHeight<'a>>) -> Self {
+    pub fn maybe_height(mut self, value: Option<ImageObjectHeight<S>>) -> Self {
         self._fields.74 = value;
         self
     }
@@ -7556,13 +9026,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `identifier` field (optional)
     pub fn identifier(
         mut self,
-        value: impl Into<Option<ImageObjectIdentifier<'a>>>,
+        value: impl Into<Option<ImageObjectIdentifier<S>>>,
     ) -> Self {
         self._fields.75 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
-    pub fn maybe_identifier(mut self, value: Option<ImageObjectIdentifier<'a>>) -> Self {
+    pub fn maybe_identifier(mut self, value: Option<ImageObjectIdentifier<S>>) -> Self {
         self._fields.75 = value;
         self
     }
@@ -7570,12 +9040,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<ImageObjectImage<'a>>>) -> Self {
+    pub fn image(mut self, value: impl Into<Option<ImageObjectImage<S>>>) -> Self {
         self._fields.76 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<ImageObjectImage<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<ImageObjectImage<S>>) -> Self {
         self._fields.76 = value;
         self
     }
@@ -7585,16 +9055,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `inLanguage` field (optional)
     pub fn in_language(
         mut self,
-        value: impl Into<Option<ImageObjectInLanguage<'a>>>,
+        value: impl Into<Option<ImageObjectInLanguage<S>>>,
     ) -> Self {
         self._fields.77 = value.into();
         self
     }
     /// Set the `inLanguage` field to an Option value (optional)
-    pub fn maybe_in_language(
-        mut self,
-        value: Option<ImageObjectInLanguage<'a>>,
-    ) -> Self {
+    pub fn maybe_in_language(mut self, value: Option<ImageObjectInLanguage<S>>) -> Self {
         self._fields.77 = value;
         self
     }
@@ -7604,7 +9071,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `ineligibleRegion` field (optional)
     pub fn ineligible_region(
         mut self,
-        value: impl Into<Option<ImageObjectIneligibleRegion<'a>>>,
+        value: impl Into<Option<ImageObjectIneligibleRegion<S>>>,
     ) -> Self {
         self._fields.78 = value.into();
         self
@@ -7612,7 +9079,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `ineligibleRegion` field to an Option value (optional)
     pub fn maybe_ineligible_region(
         mut self,
-        value: Option<ImageObjectIneligibleRegion<'a>>,
+        value: Option<ImageObjectIneligibleRegion<S>>,
     ) -> Self {
         self._fields.78 = value;
         self
@@ -7623,7 +9090,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `interactionStatistic` field (optional)
     pub fn interaction_statistic(
         mut self,
-        value: impl Into<Option<ImageObjectInteractionStatistic<'a>>>,
+        value: impl Into<Option<ImageObjectInteractionStatistic<S>>>,
     ) -> Self {
         self._fields.79 = value.into();
         self
@@ -7631,7 +9098,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `interactionStatistic` field to an Option value (optional)
     pub fn maybe_interaction_statistic(
         mut self,
-        value: Option<ImageObjectInteractionStatistic<'a>>,
+        value: Option<ImageObjectInteractionStatistic<S>>,
     ) -> Self {
         self._fields.79 = value;
         self
@@ -7642,7 +9109,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `interactivityType` field (optional)
     pub fn interactivity_type(
         mut self,
-        value: impl Into<Option<ImageObjectInteractivityType<'a>>>,
+        value: impl Into<Option<ImageObjectInteractivityType<S>>>,
     ) -> Self {
         self._fields.80 = value.into();
         self
@@ -7650,7 +9117,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `interactivityType` field to an Option value (optional)
     pub fn maybe_interactivity_type(
         mut self,
-        value: Option<ImageObjectInteractivityType<'a>>,
+        value: Option<ImageObjectInteractivityType<S>>,
     ) -> Self {
         self._fields.80 = value;
         self
@@ -7661,7 +9128,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `interpretedAsClaim` field (optional)
     pub fn interpreted_as_claim(
         mut self,
-        value: impl Into<Option<ImageObjectInterpretedAsClaim<'a>>>,
+        value: impl Into<Option<ImageObjectInterpretedAsClaim<S>>>,
     ) -> Self {
         self._fields.81 = value.into();
         self
@@ -7669,7 +9136,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `interpretedAsClaim` field to an Option value (optional)
     pub fn maybe_interpreted_as_claim(
         mut self,
-        value: Option<ImageObjectInterpretedAsClaim<'a>>,
+        value: Option<ImageObjectInterpretedAsClaim<S>>,
     ) -> Self {
         self._fields.81 = value;
         self
@@ -7680,7 +9147,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `isAccessibleForFree` field (optional)
     pub fn is_accessible_for_free(
         mut self,
-        value: impl Into<Option<ImageObjectIsAccessibleForFree<'a>>>,
+        value: impl Into<Option<ImageObjectIsAccessibleForFree<S>>>,
     ) -> Self {
         self._fields.82 = value.into();
         self
@@ -7688,7 +9155,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `isAccessibleForFree` field to an Option value (optional)
     pub fn maybe_is_accessible_for_free(
         mut self,
-        value: Option<ImageObjectIsAccessibleForFree<'a>>,
+        value: Option<ImageObjectIsAccessibleForFree<S>>,
     ) -> Self {
         self._fields.82 = value;
         self
@@ -7699,13 +9166,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `isBasedOn` field (optional)
     pub fn is_based_on(
         mut self,
-        value: impl Into<Option<ImageObjectIsBasedOn<'a>>>,
+        value: impl Into<Option<ImageObjectIsBasedOn<S>>>,
     ) -> Self {
         self._fields.83 = value.into();
         self
     }
     /// Set the `isBasedOn` field to an Option value (optional)
-    pub fn maybe_is_based_on(mut self, value: Option<ImageObjectIsBasedOn<'a>>) -> Self {
+    pub fn maybe_is_based_on(mut self, value: Option<ImageObjectIsBasedOn<S>>) -> Self {
         self._fields.83 = value;
         self
     }
@@ -7715,7 +9182,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `isBasedOnUrl` field (optional)
     pub fn is_based_on_url(
         mut self,
-        value: impl Into<Option<ImageObjectIsBasedOnUrl<'a>>>,
+        value: impl Into<Option<ImageObjectIsBasedOnUrl<S>>>,
     ) -> Self {
         self._fields.84 = value.into();
         self
@@ -7723,7 +9190,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `isBasedOnUrl` field to an Option value (optional)
     pub fn maybe_is_based_on_url(
         mut self,
-        value: Option<ImageObjectIsBasedOnUrl<'a>>,
+        value: Option<ImageObjectIsBasedOnUrl<S>>,
     ) -> Self {
         self._fields.84 = value;
         self
@@ -7734,7 +9201,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `isFamilyFriendly` field (optional)
     pub fn is_family_friendly(
         mut self,
-        value: impl Into<Option<ImageObjectIsFamilyFriendly<'a>>>,
+        value: impl Into<Option<ImageObjectIsFamilyFriendly<S>>>,
     ) -> Self {
         self._fields.85 = value.into();
         self
@@ -7742,7 +9209,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `isFamilyFriendly` field to an Option value (optional)
     pub fn maybe_is_family_friendly(
         mut self,
-        value: Option<ImageObjectIsFamilyFriendly<'a>>,
+        value: Option<ImageObjectIsFamilyFriendly<S>>,
     ) -> Self {
         self._fields.85 = value;
         self
@@ -7753,13 +9220,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `isPartOf` field (optional)
     pub fn is_part_of(
         mut self,
-        value: impl Into<Option<ImageObjectIsPartOf<'a>>>,
+        value: impl Into<Option<ImageObjectIsPartOf<S>>>,
     ) -> Self {
         self._fields.86 = value.into();
         self
     }
     /// Set the `isPartOf` field to an Option value (optional)
-    pub fn maybe_is_part_of(mut self, value: Option<ImageObjectIsPartOf<'a>>) -> Self {
+    pub fn maybe_is_part_of(mut self, value: Option<ImageObjectIsPartOf<S>>) -> Self {
         self._fields.86 = value;
         self
     }
@@ -7767,15 +9234,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(
-        mut self,
-        value: impl Into<Option<ImageObjectKeywords<'a>>>,
-    ) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<ImageObjectKeywords<S>>>) -> Self {
         self._fields.87 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(mut self, value: Option<ImageObjectKeywords<'a>>) -> Self {
+    pub fn maybe_keywords(mut self, value: Option<ImageObjectKeywords<S>>) -> Self {
         self._fields.87 = value;
         self
     }
@@ -7785,7 +9249,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `learningResourceType` field (optional)
     pub fn learning_resource_type(
         mut self,
-        value: impl Into<Option<ImageObjectLearningResourceType<'a>>>,
+        value: impl Into<Option<ImageObjectLearningResourceType<S>>>,
     ) -> Self {
         self._fields.88 = value.into();
         self
@@ -7793,7 +9257,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `learningResourceType` field to an Option value (optional)
     pub fn maybe_learning_resource_type(
         mut self,
-        value: Option<ImageObjectLearningResourceType<'a>>,
+        value: Option<ImageObjectLearningResourceType<S>>,
     ) -> Self {
         self._fields.88 = value;
         self
@@ -7802,12 +9266,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `license` field (optional)
-    pub fn license(mut self, value: impl Into<Option<ImageObjectLicense<'a>>>) -> Self {
+    pub fn license(mut self, value: impl Into<Option<ImageObjectLicense<S>>>) -> Self {
         self._fields.89 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
-    pub fn maybe_license(mut self, value: Option<ImageObjectLicense<'a>>) -> Self {
+    pub fn maybe_license(mut self, value: Option<ImageObjectLicense<S>>) -> Self {
         self._fields.89 = value;
         self
     }
@@ -7817,7 +9281,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `locationCreated` field (optional)
     pub fn location_created(
         mut self,
-        value: impl Into<Option<ImageObjectLocationCreated<'a>>>,
+        value: impl Into<Option<ImageObjectLocationCreated<S>>>,
     ) -> Self {
         self._fields.90 = value.into();
         self
@@ -7825,7 +9289,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `locationCreated` field to an Option value (optional)
     pub fn maybe_location_created(
         mut self,
-        value: Option<ImageObjectLocationCreated<'a>>,
+        value: Option<ImageObjectLocationCreated<S>>,
     ) -> Self {
         self._fields.90 = value;
         self
@@ -7836,16 +9300,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `mainEntity` field (optional)
     pub fn main_entity(
         mut self,
-        value: impl Into<Option<ImageObjectMainEntity<'a>>>,
+        value: impl Into<Option<ImageObjectMainEntity<S>>>,
     ) -> Self {
         self._fields.91 = value.into();
         self
     }
     /// Set the `mainEntity` field to an Option value (optional)
-    pub fn maybe_main_entity(
-        mut self,
-        value: Option<ImageObjectMainEntity<'a>>,
-    ) -> Self {
+    pub fn maybe_main_entity(mut self, value: Option<ImageObjectMainEntity<S>>) -> Self {
         self._fields.91 = value;
         self
     }
@@ -7855,7 +9316,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
-        value: impl Into<Option<ImageObjectMainEntityOfPage<'a>>>,
+        value: impl Into<Option<ImageObjectMainEntityOfPage<S>>>,
     ) -> Self {
         self._fields.92 = value.into();
         self
@@ -7863,7 +9324,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field to an Option value (optional)
     pub fn maybe_main_entity_of_page(
         mut self,
-        value: Option<ImageObjectMainEntityOfPage<'a>>,
+        value: Option<ImageObjectMainEntityOfPage<S>>,
     ) -> Self {
         self._fields.92 = value;
         self
@@ -7874,13 +9335,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `maintainer` field (optional)
     pub fn maintainer(
         mut self,
-        value: impl Into<Option<ImageObjectMaintainer<'a>>>,
+        value: impl Into<Option<ImageObjectMaintainer<S>>>,
     ) -> Self {
         self._fields.93 = value.into();
         self
     }
     /// Set the `maintainer` field to an Option value (optional)
-    pub fn maybe_maintainer(mut self, value: Option<ImageObjectMaintainer<'a>>) -> Self {
+    pub fn maybe_maintainer(mut self, value: Option<ImageObjectMaintainer<S>>) -> Self {
         self._fields.93 = value;
         self
     }
@@ -7888,15 +9349,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `material` field (optional)
-    pub fn material(
-        mut self,
-        value: impl Into<Option<ImageObjectMaterial<'a>>>,
-    ) -> Self {
+    pub fn material(mut self, value: impl Into<Option<ImageObjectMaterial<S>>>) -> Self {
         self._fields.94 = value.into();
         self
     }
     /// Set the `material` field to an Option value (optional)
-    pub fn maybe_material(mut self, value: Option<ImageObjectMaterial<'a>>) -> Self {
+    pub fn maybe_material(mut self, value: Option<ImageObjectMaterial<S>>) -> Self {
         self._fields.94 = value;
         self
     }
@@ -7906,7 +9364,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `materialExtent` field (optional)
     pub fn material_extent(
         mut self,
-        value: impl Into<Option<ImageObjectMaterialExtent<'a>>>,
+        value: impl Into<Option<ImageObjectMaterialExtent<S>>>,
     ) -> Self {
         self._fields.95 = value.into();
         self
@@ -7914,7 +9372,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `materialExtent` field to an Option value (optional)
     pub fn maybe_material_extent(
         mut self,
-        value: Option<ImageObjectMaterialExtent<'a>>,
+        value: Option<ImageObjectMaterialExtent<S>>,
     ) -> Self {
         self._fields.95 = value;
         self
@@ -7923,15 +9381,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `mentions` field (optional)
-    pub fn mentions(
-        mut self,
-        value: impl Into<Option<ImageObjectMentions<'a>>>,
-    ) -> Self {
+    pub fn mentions(mut self, value: impl Into<Option<ImageObjectMentions<S>>>) -> Self {
         self._fields.96 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
-    pub fn maybe_mentions(mut self, value: Option<ImageObjectMentions<'a>>) -> Self {
+    pub fn maybe_mentions(mut self, value: Option<ImageObjectMentions<S>>) -> Self {
         self._fields.96 = value;
         self
     }
@@ -7939,12 +9394,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<ImageObjectName<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<ImageObjectName<S>>>) -> Self {
         self._fields.97 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<ImageObjectName<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<ImageObjectName<S>>) -> Self {
         self._fields.97 = value;
         self
     }
@@ -7952,12 +9407,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `offers` field (optional)
-    pub fn offers(mut self, value: impl Into<Option<ImageObjectOffers<'a>>>) -> Self {
+    pub fn offers(mut self, value: impl Into<Option<ImageObjectOffers<S>>>) -> Self {
         self._fields.98 = value.into();
         self
     }
     /// Set the `offers` field to an Option value (optional)
-    pub fn maybe_offers(mut self, value: Option<ImageObjectOffers<'a>>) -> Self {
+    pub fn maybe_offers(mut self, value: Option<ImageObjectOffers<S>>) -> Self {
         self._fields.98 = value;
         self
     }
@@ -7965,12 +9420,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `pattern` field (optional)
-    pub fn pattern(mut self, value: impl Into<Option<ImageObjectPattern<'a>>>) -> Self {
+    pub fn pattern(mut self, value: impl Into<Option<ImageObjectPattern<S>>>) -> Self {
         self._fields.99 = value.into();
         self
     }
     /// Set the `pattern` field to an Option value (optional)
-    pub fn maybe_pattern(mut self, value: Option<ImageObjectPattern<'a>>) -> Self {
+    pub fn maybe_pattern(mut self, value: Option<ImageObjectPattern<S>>) -> Self {
         self._fields.99 = value;
         self
     }
@@ -7980,16 +9435,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `playerType` field (optional)
     pub fn player_type(
         mut self,
-        value: impl Into<Option<ImageObjectPlayerType<'a>>>,
+        value: impl Into<Option<ImageObjectPlayerType<S>>>,
     ) -> Self {
         self._fields.100 = value.into();
         self
     }
     /// Set the `playerType` field to an Option value (optional)
-    pub fn maybe_player_type(
-        mut self,
-        value: Option<ImageObjectPlayerType<'a>>,
-    ) -> Self {
+    pub fn maybe_player_type(mut self, value: Option<ImageObjectPlayerType<S>>) -> Self {
         self._fields.100 = value;
         self
     }
@@ -7997,15 +9449,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `position` field (optional)
-    pub fn position(
-        mut self,
-        value: impl Into<Option<ImageObjectPosition<'a>>>,
-    ) -> Self {
+    pub fn position(mut self, value: impl Into<Option<ImageObjectPosition<S>>>) -> Self {
         self._fields.101 = value.into();
         self
     }
     /// Set the `position` field to an Option value (optional)
-    pub fn maybe_position(mut self, value: Option<ImageObjectPosition<'a>>) -> Self {
+    pub fn maybe_position(mut self, value: Option<ImageObjectPosition<S>>) -> Self {
         self._fields.101 = value;
         self
     }
@@ -8015,7 +9464,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `potentialAction` field (optional)
     pub fn potential_action(
         mut self,
-        value: impl Into<Option<ImageObjectPotentialAction<'a>>>,
+        value: impl Into<Option<ImageObjectPotentialAction<S>>>,
     ) -> Self {
         self._fields.102 = value.into();
         self
@@ -8023,7 +9472,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `potentialAction` field to an Option value (optional)
     pub fn maybe_potential_action(
         mut self,
-        value: Option<ImageObjectPotentialAction<'a>>,
+        value: Option<ImageObjectPotentialAction<S>>,
     ) -> Self {
         self._fields.102 = value;
         self
@@ -8032,15 +9481,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `producer` field (optional)
-    pub fn producer(
-        mut self,
-        value: impl Into<Option<ImageObjectProducer<'a>>>,
-    ) -> Self {
+    pub fn producer(mut self, value: impl Into<Option<ImageObjectProducer<S>>>) -> Self {
         self._fields.103 = value.into();
         self
     }
     /// Set the `producer` field to an Option value (optional)
-    pub fn maybe_producer(mut self, value: Option<ImageObjectProducer<'a>>) -> Self {
+    pub fn maybe_producer(mut self, value: Option<ImageObjectProducer<S>>) -> Self {
         self._fields.103 = value;
         self
     }
@@ -8050,7 +9496,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `productionCompany` field (optional)
     pub fn production_company(
         mut self,
-        value: impl Into<Option<ImageObjectProductionCompany<'a>>>,
+        value: impl Into<Option<ImageObjectProductionCompany<S>>>,
     ) -> Self {
         self._fields.104 = value.into();
         self
@@ -8058,7 +9504,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `productionCompany` field to an Option value (optional)
     pub fn maybe_production_company(
         mut self,
-        value: Option<ImageObjectProductionCompany<'a>>,
+        value: Option<ImageObjectProductionCompany<S>>,
     ) -> Self {
         self._fields.104 = value;
         self
@@ -8067,15 +9513,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `provider` field (optional)
-    pub fn provider(
-        mut self,
-        value: impl Into<Option<ImageObjectProvider<'a>>>,
-    ) -> Self {
+    pub fn provider(mut self, value: impl Into<Option<ImageObjectProvider<S>>>) -> Self {
         self._fields.105 = value.into();
         self
     }
     /// Set the `provider` field to an Option value (optional)
-    pub fn maybe_provider(mut self, value: Option<ImageObjectProvider<'a>>) -> Self {
+    pub fn maybe_provider(mut self, value: Option<ImageObjectProvider<S>>) -> Self {
         self._fields.105 = value;
         self
     }
@@ -8085,7 +9528,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `publication` field (optional)
     pub fn publication(
         mut self,
-        value: impl Into<Option<ImageObjectPublication<'a>>>,
+        value: impl Into<Option<ImageObjectPublication<S>>>,
     ) -> Self {
         self._fields.106 = value.into();
         self
@@ -8093,7 +9536,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `publication` field to an Option value (optional)
     pub fn maybe_publication(
         mut self,
-        value: Option<ImageObjectPublication<'a>>,
+        value: Option<ImageObjectPublication<S>>,
     ) -> Self {
         self._fields.106 = value;
         self
@@ -8104,13 +9547,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `publisher` field (optional)
     pub fn publisher(
         mut self,
-        value: impl Into<Option<ImageObjectPublisher<'a>>>,
+        value: impl Into<Option<ImageObjectPublisher<S>>>,
     ) -> Self {
         self._fields.107 = value.into();
         self
     }
     /// Set the `publisher` field to an Option value (optional)
-    pub fn maybe_publisher(mut self, value: Option<ImageObjectPublisher<'a>>) -> Self {
+    pub fn maybe_publisher(mut self, value: Option<ImageObjectPublisher<S>>) -> Self {
         self._fields.107 = value;
         self
     }
@@ -8120,7 +9563,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `publisherImprint` field (optional)
     pub fn publisher_imprint(
         mut self,
-        value: impl Into<Option<ImageObjectPublisherImprint<'a>>>,
+        value: impl Into<Option<ImageObjectPublisherImprint<S>>>,
     ) -> Self {
         self._fields.108 = value.into();
         self
@@ -8128,7 +9571,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `publisherImprint` field to an Option value (optional)
     pub fn maybe_publisher_imprint(
         mut self,
-        value: Option<ImageObjectPublisherImprint<'a>>,
+        value: Option<ImageObjectPublisherImprint<S>>,
     ) -> Self {
         self._fields.108 = value;
         self
@@ -8139,7 +9582,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `publishingPrinciples` field (optional)
     pub fn publishing_principles(
         mut self,
-        value: impl Into<Option<ImageObjectPublishingPrinciples<'a>>>,
+        value: impl Into<Option<ImageObjectPublishingPrinciples<S>>>,
     ) -> Self {
         self._fields.109 = value.into();
         self
@@ -8147,7 +9590,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `publishingPrinciples` field to an Option value (optional)
     pub fn maybe_publishing_principles(
         mut self,
-        value: Option<ImageObjectPublishingPrinciples<'a>>,
+        value: Option<ImageObjectPublishingPrinciples<S>>,
     ) -> Self {
         self._fields.109 = value;
         self
@@ -8158,16 +9601,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `recordedAt` field (optional)
     pub fn recorded_at(
         mut self,
-        value: impl Into<Option<ImageObjectRecordedAt<'a>>>,
+        value: impl Into<Option<ImageObjectRecordedAt<S>>>,
     ) -> Self {
         self._fields.110 = value.into();
         self
     }
     /// Set the `recordedAt` field to an Option value (optional)
-    pub fn maybe_recorded_at(
-        mut self,
-        value: Option<ImageObjectRecordedAt<'a>>,
-    ) -> Self {
+    pub fn maybe_recorded_at(mut self, value: Option<ImageObjectRecordedAt<S>>) -> Self {
         self._fields.110 = value;
         self
     }
@@ -8177,7 +9617,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `regionsAllowed` field (optional)
     pub fn regions_allowed(
         mut self,
-        value: impl Into<Option<ImageObjectRegionsAllowed<'a>>>,
+        value: impl Into<Option<ImageObjectRegionsAllowed<S>>>,
     ) -> Self {
         self._fields.111 = value.into();
         self
@@ -8185,7 +9625,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `regionsAllowed` field to an Option value (optional)
     pub fn maybe_regions_allowed(
         mut self,
-        value: Option<ImageObjectRegionsAllowed<'a>>,
+        value: Option<ImageObjectRegionsAllowed<S>>,
     ) -> Self {
         self._fields.111 = value;
         self
@@ -8196,7 +9636,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `releasedEvent` field (optional)
     pub fn released_event(
         mut self,
-        value: impl Into<Option<ImageObjectReleasedEvent<'a>>>,
+        value: impl Into<Option<ImageObjectReleasedEvent<S>>>,
     ) -> Self {
         self._fields.112 = value.into();
         self
@@ -8204,7 +9644,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `releasedEvent` field to an Option value (optional)
     pub fn maybe_released_event(
         mut self,
-        value: Option<ImageObjectReleasedEvent<'a>>,
+        value: Option<ImageObjectReleasedEvent<S>>,
     ) -> Self {
         self._fields.112 = value;
         self
@@ -8215,7 +9655,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `representativeOfPage` field (optional)
     pub fn representative_of_page(
         mut self,
-        value: impl Into<Option<ImageObjectRepresentativeOfPage<'a>>>,
+        value: impl Into<Option<ImageObjectRepresentativeOfPage<S>>>,
     ) -> Self {
         self._fields.113 = value.into();
         self
@@ -8223,7 +9663,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `representativeOfPage` field to an Option value (optional)
     pub fn maybe_representative_of_page(
         mut self,
-        value: Option<ImageObjectRepresentativeOfPage<'a>>,
+        value: Option<ImageObjectRepresentativeOfPage<S>>,
     ) -> Self {
         self._fields.113 = value;
         self
@@ -8234,7 +9674,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `requiresSubscription` field (optional)
     pub fn requires_subscription(
         mut self,
-        value: impl Into<Option<ImageObjectRequiresSubscription<'a>>>,
+        value: impl Into<Option<ImageObjectRequiresSubscription<S>>>,
     ) -> Self {
         self._fields.114 = value.into();
         self
@@ -8242,7 +9682,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `requiresSubscription` field to an Option value (optional)
     pub fn maybe_requires_subscription(
         mut self,
-        value: Option<ImageObjectRequiresSubscription<'a>>,
+        value: Option<ImageObjectRequiresSubscription<S>>,
     ) -> Self {
         self._fields.114 = value;
         self
@@ -8251,12 +9691,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `review` field (optional)
-    pub fn review(mut self, value: impl Into<Option<ImageObjectReview<'a>>>) -> Self {
+    pub fn review(mut self, value: impl Into<Option<ImageObjectReview<S>>>) -> Self {
         self._fields.115 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
-    pub fn maybe_review(mut self, value: Option<ImageObjectReview<'a>>) -> Self {
+    pub fn maybe_review(mut self, value: Option<ImageObjectReview<S>>) -> Self {
         self._fields.115 = value;
         self
     }
@@ -8264,12 +9704,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `reviews` field (optional)
-    pub fn reviews(mut self, value: impl Into<Option<ImageObjectReviews<'a>>>) -> Self {
+    pub fn reviews(mut self, value: impl Into<Option<ImageObjectReviews<S>>>) -> Self {
         self._fields.116 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
-    pub fn maybe_reviews(mut self, value: Option<ImageObjectReviews<'a>>) -> Self {
+    pub fn maybe_reviews(mut self, value: Option<ImageObjectReviews<S>>) -> Self {
         self._fields.116 = value;
         self
     }
@@ -8277,12 +9717,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
-    pub fn same_as(mut self, value: impl Into<Option<ImageObjectSameAs<'a>>>) -> Self {
+    pub fn same_as(mut self, value: impl Into<Option<ImageObjectSameAs<S>>>) -> Self {
         self._fields.117 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
-    pub fn maybe_same_as(mut self, value: Option<ImageObjectSameAs<'a>>) -> Self {
+    pub fn maybe_same_as(mut self, value: Option<ImageObjectSameAs<S>>) -> Self {
         self._fields.117 = value;
         self
     }
@@ -8292,7 +9732,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `schemaVersion` field (optional)
     pub fn schema_version(
         mut self,
-        value: impl Into<Option<ImageObjectSchemaVersion<'a>>>,
+        value: impl Into<Option<ImageObjectSchemaVersion<S>>>,
     ) -> Self {
         self._fields.118 = value.into();
         self
@@ -8300,7 +9740,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `schemaVersion` field to an Option value (optional)
     pub fn maybe_schema_version(
         mut self,
-        value: Option<ImageObjectSchemaVersion<'a>>,
+        value: Option<ImageObjectSchemaVersion<S>>,
     ) -> Self {
         self._fields.118 = value;
         self
@@ -8311,7 +9751,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `sdDatePublished` field (optional)
     pub fn sd_date_published(
         mut self,
-        value: impl Into<Option<ImageObjectSdDatePublished<'a>>>,
+        value: impl Into<Option<ImageObjectSdDatePublished<S>>>,
     ) -> Self {
         self._fields.119 = value.into();
         self
@@ -8319,7 +9759,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `sdDatePublished` field to an Option value (optional)
     pub fn maybe_sd_date_published(
         mut self,
-        value: Option<ImageObjectSdDatePublished<'a>>,
+        value: Option<ImageObjectSdDatePublished<S>>,
     ) -> Self {
         self._fields.119 = value;
         self
@@ -8330,13 +9770,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `sdLicense` field (optional)
     pub fn sd_license(
         mut self,
-        value: impl Into<Option<ImageObjectSdLicense<'a>>>,
+        value: impl Into<Option<ImageObjectSdLicense<S>>>,
     ) -> Self {
         self._fields.120 = value.into();
         self
     }
     /// Set the `sdLicense` field to an Option value (optional)
-    pub fn maybe_sd_license(mut self, value: Option<ImageObjectSdLicense<'a>>) -> Self {
+    pub fn maybe_sd_license(mut self, value: Option<ImageObjectSdLicense<S>>) -> Self {
         self._fields.120 = value;
         self
     }
@@ -8346,7 +9786,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `sdPublisher` field (optional)
     pub fn sd_publisher(
         mut self,
-        value: impl Into<Option<ImageObjectSdPublisher<'a>>>,
+        value: impl Into<Option<ImageObjectSdPublisher<S>>>,
     ) -> Self {
         self._fields.121 = value.into();
         self
@@ -8354,7 +9794,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `sdPublisher` field to an Option value (optional)
     pub fn maybe_sd_publisher(
         mut self,
-        value: Option<ImageObjectSdPublisher<'a>>,
+        value: Option<ImageObjectSdPublisher<S>>,
     ) -> Self {
         self._fields.121 = value;
         self
@@ -8363,12 +9803,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `sha256` field (optional)
-    pub fn sha256(mut self, value: impl Into<Option<ImageObjectSha256<'a>>>) -> Self {
+    pub fn sha256(mut self, value: impl Into<Option<ImageObjectSha256<S>>>) -> Self {
         self._fields.122 = value.into();
         self
     }
     /// Set the `sha256` field to an Option value (optional)
-    pub fn maybe_sha256(mut self, value: Option<ImageObjectSha256<'a>>) -> Self {
+    pub fn maybe_sha256(mut self, value: Option<ImageObjectSha256<S>>) -> Self {
         self._fields.122 = value;
         self
     }
@@ -8376,12 +9816,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `size` field (optional)
-    pub fn size(mut self, value: impl Into<Option<ImageObjectSize<'a>>>) -> Self {
+    pub fn size(mut self, value: impl Into<Option<ImageObjectSize<S>>>) -> Self {
         self._fields.123 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
-    pub fn maybe_size(mut self, value: Option<ImageObjectSize<'a>>) -> Self {
+    pub fn maybe_size(mut self, value: Option<ImageObjectSize<S>>) -> Self {
         self._fields.123 = value;
         self
     }
@@ -8391,7 +9831,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `sourceOrganization` field (optional)
     pub fn source_organization(
         mut self,
-        value: impl Into<Option<ImageObjectSourceOrganization<'a>>>,
+        value: impl Into<Option<ImageObjectSourceOrganization<S>>>,
     ) -> Self {
         self._fields.124 = value.into();
         self
@@ -8399,7 +9839,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `sourceOrganization` field to an Option value (optional)
     pub fn maybe_source_organization(
         mut self,
-        value: Option<ImageObjectSourceOrganization<'a>>,
+        value: Option<ImageObjectSourceOrganization<S>>,
     ) -> Self {
         self._fields.124 = value;
         self
@@ -8408,12 +9848,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `spatial` field (optional)
-    pub fn spatial(mut self, value: impl Into<Option<ImageObjectSpatial<'a>>>) -> Self {
+    pub fn spatial(mut self, value: impl Into<Option<ImageObjectSpatial<S>>>) -> Self {
         self._fields.125 = value.into();
         self
     }
     /// Set the `spatial` field to an Option value (optional)
-    pub fn maybe_spatial(mut self, value: Option<ImageObjectSpatial<'a>>) -> Self {
+    pub fn maybe_spatial(mut self, value: Option<ImageObjectSpatial<S>>) -> Self {
         self._fields.125 = value;
         self
     }
@@ -8423,7 +9863,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `spatialCoverage` field (optional)
     pub fn spatial_coverage(
         mut self,
-        value: impl Into<Option<ImageObjectSpatialCoverage<'a>>>,
+        value: impl Into<Option<ImageObjectSpatialCoverage<S>>>,
     ) -> Self {
         self._fields.126 = value.into();
         self
@@ -8431,7 +9871,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `spatialCoverage` field to an Option value (optional)
     pub fn maybe_spatial_coverage(
         mut self,
-        value: Option<ImageObjectSpatialCoverage<'a>>,
+        value: Option<ImageObjectSpatialCoverage<S>>,
     ) -> Self {
         self._fields.126 = value;
         self
@@ -8440,12 +9880,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
-    pub fn sponsor(mut self, value: impl Into<Option<ImageObjectSponsor<'a>>>) -> Self {
+    pub fn sponsor(mut self, value: impl Into<Option<ImageObjectSponsor<S>>>) -> Self {
         self._fields.127 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
-    pub fn maybe_sponsor(mut self, value: Option<ImageObjectSponsor<'a>>) -> Self {
+    pub fn maybe_sponsor(mut self, value: Option<ImageObjectSponsor<S>>) -> Self {
         self._fields.127 = value;
         self
     }
@@ -8455,13 +9895,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `startTime` field (optional)
     pub fn start_time(
         mut self,
-        value: impl Into<Option<ImageObjectStartTime<'a>>>,
+        value: impl Into<Option<ImageObjectStartTime<S>>>,
     ) -> Self {
         self._fields.128 = value.into();
         self
     }
     /// Set the `startTime` field to an Option value (optional)
-    pub fn maybe_start_time(mut self, value: Option<ImageObjectStartTime<'a>>) -> Self {
+    pub fn maybe_start_time(mut self, value: Option<ImageObjectStartTime<S>>) -> Self {
         self._fields.128 = value;
         self
     }
@@ -8471,13 +9911,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(
         mut self,
-        value: impl Into<Option<ImageObjectSubjectOf<'a>>>,
+        value: impl Into<Option<ImageObjectSubjectOf<S>>>,
     ) -> Self {
         self._fields.129 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
-    pub fn maybe_subject_of(mut self, value: Option<ImageObjectSubjectOf<'a>>) -> Self {
+    pub fn maybe_subject_of(mut self, value: Option<ImageObjectSubjectOf<S>>) -> Self {
         self._fields.129 = value;
         self
     }
@@ -8485,12 +9925,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `teaches` field (optional)
-    pub fn teaches(mut self, value: impl Into<Option<ImageObjectTeaches<'a>>>) -> Self {
+    pub fn teaches(mut self, value: impl Into<Option<ImageObjectTeaches<S>>>) -> Self {
         self._fields.130 = value.into();
         self
     }
     /// Set the `teaches` field to an Option value (optional)
-    pub fn maybe_teaches(mut self, value: Option<ImageObjectTeaches<'a>>) -> Self {
+    pub fn maybe_teaches(mut self, value: Option<ImageObjectTeaches<S>>) -> Self {
         self._fields.130 = value;
         self
     }
@@ -8498,15 +9938,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `temporal` field (optional)
-    pub fn temporal(
-        mut self,
-        value: impl Into<Option<ImageObjectTemporal<'a>>>,
-    ) -> Self {
+    pub fn temporal(mut self, value: impl Into<Option<ImageObjectTemporal<S>>>) -> Self {
         self._fields.131 = value.into();
         self
     }
     /// Set the `temporal` field to an Option value (optional)
-    pub fn maybe_temporal(mut self, value: Option<ImageObjectTemporal<'a>>) -> Self {
+    pub fn maybe_temporal(mut self, value: Option<ImageObjectTemporal<S>>) -> Self {
         self._fields.131 = value;
         self
     }
@@ -8516,7 +9953,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `temporalCoverage` field (optional)
     pub fn temporal_coverage(
         mut self,
-        value: impl Into<Option<ImageObjectTemporalCoverage<'a>>>,
+        value: impl Into<Option<ImageObjectTemporalCoverage<S>>>,
     ) -> Self {
         self._fields.132 = value.into();
         self
@@ -8524,7 +9961,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `temporalCoverage` field to an Option value (optional)
     pub fn maybe_temporal_coverage(
         mut self,
-        value: Option<ImageObjectTemporalCoverage<'a>>,
+        value: Option<ImageObjectTemporalCoverage<S>>,
     ) -> Self {
         self._fields.132 = value;
         self
@@ -8533,12 +9970,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `text` field (optional)
-    pub fn text(mut self, value: impl Into<Option<ImageObjectText<'a>>>) -> Self {
+    pub fn text(mut self, value: impl Into<Option<ImageObjectText<S>>>) -> Self {
         self._fields.133 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
-    pub fn maybe_text(mut self, value: Option<ImageObjectText<'a>>) -> Self {
+    pub fn maybe_text(mut self, value: Option<ImageObjectText<S>>) -> Self {
         self._fields.133 = value;
         self
     }
@@ -8548,13 +9985,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(
         mut self,
-        value: impl Into<Option<ImageObjectThumbnail<'a>>>,
+        value: impl Into<Option<ImageObjectThumbnail<S>>>,
     ) -> Self {
         self._fields.134 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
-    pub fn maybe_thumbnail(mut self, value: Option<ImageObjectThumbnail<'a>>) -> Self {
+    pub fn maybe_thumbnail(mut self, value: Option<ImageObjectThumbnail<S>>) -> Self {
         self._fields.134 = value;
         self
     }
@@ -8564,7 +10001,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `thumbnailUrl` field (optional)
     pub fn thumbnail_url(
         mut self,
-        value: impl Into<Option<ImageObjectThumbnailUrl<'a>>>,
+        value: impl Into<Option<ImageObjectThumbnailUrl<S>>>,
     ) -> Self {
         self._fields.135 = value.into();
         self
@@ -8572,7 +10009,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `thumbnailUrl` field to an Option value (optional)
     pub fn maybe_thumbnail_url(
         mut self,
-        value: Option<ImageObjectThumbnailUrl<'a>>,
+        value: Option<ImageObjectThumbnailUrl<S>>,
     ) -> Self {
         self._fields.135 = value;
         self
@@ -8583,7 +10020,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `timeRequired` field (optional)
     pub fn time_required(
         mut self,
-        value: impl Into<Option<ImageObjectTimeRequired<'a>>>,
+        value: impl Into<Option<ImageObjectTimeRequired<S>>>,
     ) -> Self {
         self._fields.136 = value.into();
         self
@@ -8591,7 +10028,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `timeRequired` field to an Option value (optional)
     pub fn maybe_time_required(
         mut self,
-        value: Option<ImageObjectTimeRequired<'a>>,
+        value: Option<ImageObjectTimeRequired<S>>,
     ) -> Self {
         self._fields.136 = value;
         self
@@ -8602,7 +10039,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `translationOfWork` field (optional)
     pub fn translation_of_work(
         mut self,
-        value: impl Into<Option<ImageObjectTranslationOfWork<'a>>>,
+        value: impl Into<Option<ImageObjectTranslationOfWork<S>>>,
     ) -> Self {
         self._fields.137 = value.into();
         self
@@ -8610,7 +10047,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `translationOfWork` field to an Option value (optional)
     pub fn maybe_translation_of_work(
         mut self,
-        value: Option<ImageObjectTranslationOfWork<'a>>,
+        value: Option<ImageObjectTranslationOfWork<S>>,
     ) -> Self {
         self._fields.137 = value;
         self
@@ -8621,13 +10058,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `translator` field (optional)
     pub fn translator(
         mut self,
-        value: impl Into<Option<ImageObjectTranslator<'a>>>,
+        value: impl Into<Option<ImageObjectTranslator<S>>>,
     ) -> Self {
         self._fields.138 = value.into();
         self
     }
     /// Set the `translator` field to an Option value (optional)
-    pub fn maybe_translator(mut self, value: Option<ImageObjectTranslator<'a>>) -> Self {
+    pub fn maybe_translator(mut self, value: Option<ImageObjectTranslator<S>>) -> Self {
         self._fields.138 = value;
         self
     }
@@ -8637,7 +10074,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `typicalAgeRange` field (optional)
     pub fn typical_age_range(
         mut self,
-        value: impl Into<Option<ImageObjectTypicalAgeRange<'a>>>,
+        value: impl Into<Option<ImageObjectTypicalAgeRange<S>>>,
     ) -> Self {
         self._fields.139 = value.into();
         self
@@ -8645,7 +10082,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `typicalAgeRange` field to an Option value (optional)
     pub fn maybe_typical_age_range(
         mut self,
-        value: Option<ImageObjectTypicalAgeRange<'a>>,
+        value: Option<ImageObjectTypicalAgeRange<S>>,
     ) -> Self {
         self._fields.139 = value;
         self
@@ -8656,16 +10093,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `uploadDate` field (optional)
     pub fn upload_date(
         mut self,
-        value: impl Into<Option<ImageObjectUploadDate<'a>>>,
+        value: impl Into<Option<ImageObjectUploadDate<S>>>,
     ) -> Self {
         self._fields.140 = value.into();
         self
     }
     /// Set the `uploadDate` field to an Option value (optional)
-    pub fn maybe_upload_date(
-        mut self,
-        value: Option<ImageObjectUploadDate<'a>>,
-    ) -> Self {
+    pub fn maybe_upload_date(mut self, value: Option<ImageObjectUploadDate<S>>) -> Self {
         self._fields.140 = value;
         self
     }
@@ -8673,12 +10107,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<ImageObjectUrl<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<ImageObjectUrl<S>>>) -> Self {
         self._fields.141 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<ImageObjectUrl<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<ImageObjectUrl<S>>) -> Self {
         self._fields.141 = value;
         self
     }
@@ -8688,13 +10122,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `usageInfo` field (optional)
     pub fn usage_info(
         mut self,
-        value: impl Into<Option<ImageObjectUsageInfo<'a>>>,
+        value: impl Into<Option<ImageObjectUsageInfo<S>>>,
     ) -> Self {
         self._fields.142 = value.into();
         self
     }
     /// Set the `usageInfo` field to an Option value (optional)
-    pub fn maybe_usage_info(mut self, value: Option<ImageObjectUsageInfo<'a>>) -> Self {
+    pub fn maybe_usage_info(mut self, value: Option<ImageObjectUsageInfo<S>>) -> Self {
         self._fields.142 = value;
         self
     }
@@ -8702,12 +10136,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `version` field (optional)
-    pub fn version(mut self, value: impl Into<Option<ImageObjectVersion<'a>>>) -> Self {
+    pub fn version(mut self, value: impl Into<Option<ImageObjectVersion<S>>>) -> Self {
         self._fields.143 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
-    pub fn maybe_version(mut self, value: Option<ImageObjectVersion<'a>>) -> Self {
+    pub fn maybe_version(mut self, value: Option<ImageObjectVersion<S>>) -> Self {
         self._fields.143 = value;
         self
     }
@@ -8715,12 +10149,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `video` field (optional)
-    pub fn video(mut self, value: impl Into<Option<ImageObjectVideo<'a>>>) -> Self {
+    pub fn video(mut self, value: impl Into<Option<ImageObjectVideo<S>>>) -> Self {
         self._fields.144 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
-    pub fn maybe_video(mut self, value: Option<ImageObjectVideo<'a>>) -> Self {
+    pub fn maybe_video(mut self, value: Option<ImageObjectVideo<S>>) -> Self {
         self._fields.144 = value;
         self
     }
@@ -8728,12 +10162,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `width` field (optional)
-    pub fn width(mut self, value: impl Into<Option<ImageObjectWidth<'a>>>) -> Self {
+    pub fn width(mut self, value: impl Into<Option<ImageObjectWidth<S>>>) -> Self {
         self._fields.145 = value.into();
         self
     }
     /// Set the `width` field to an Option value (optional)
-    pub fn maybe_width(mut self, value: Option<ImageObjectWidth<'a>>) -> Self {
+    pub fn maybe_width(mut self, value: Option<ImageObjectWidth<S>>) -> Self {
         self._fields.145 = value;
         self
     }
@@ -8743,13 +10177,13 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `wordCount` field (optional)
     pub fn word_count(
         mut self,
-        value: impl Into<Option<ImageObjectWordCount<'a>>>,
+        value: impl Into<Option<ImageObjectWordCount<S>>>,
     ) -> Self {
         self._fields.146 = value.into();
         self
     }
     /// Set the `wordCount` field to an Option value (optional)
-    pub fn maybe_word_count(mut self, value: Option<ImageObjectWordCount<'a>>) -> Self {
+    pub fn maybe_word_count(mut self, value: Option<ImageObjectWordCount<S>>) -> Self {
         self._fields.146 = value;
         self
     }
@@ -8759,7 +10193,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `workExample` field (optional)
     pub fn work_example(
         mut self,
-        value: impl Into<Option<ImageObjectWorkExample<'a>>>,
+        value: impl Into<Option<ImageObjectWorkExample<S>>>,
     ) -> Self {
         self._fields.147 = value.into();
         self
@@ -8767,7 +10201,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `workExample` field to an Option value (optional)
     pub fn maybe_work_example(
         mut self,
-        value: Option<ImageObjectWorkExample<'a>>,
+        value: Option<ImageObjectWorkExample<S>>,
     ) -> Self {
         self._fields.147 = value;
         self
@@ -8778,7 +10212,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `workTranslation` field (optional)
     pub fn work_translation(
         mut self,
-        value: impl Into<Option<ImageObjectWorkTranslation<'a>>>,
+        value: impl Into<Option<ImageObjectWorkTranslation<S>>>,
     ) -> Self {
         self._fields.148 = value.into();
         self
@@ -8786,7 +10220,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `workTranslation` field to an Option value (optional)
     pub fn maybe_work_translation(
         mut self,
-        value: Option<ImageObjectWorkTranslation<'a>>,
+        value: Option<ImageObjectWorkTranslation<S>>,
     ) -> Self {
         self._fields.148 = value;
         self
@@ -8955,7 +10389,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ImageObject<'a> {
         ImageObject {
             about: self._fields.0,

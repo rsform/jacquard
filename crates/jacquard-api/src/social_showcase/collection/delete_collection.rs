@@ -10,18 +10,29 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteCollection<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteCollection<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The AT-URI of the collection to delete
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
@@ -36,11 +47,12 @@ pub struct DeleteCollectionResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteCollectionResponse {
     const NSID: &'static str = "social.showcase.collection.deleteCollection";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeleteCollectionOutput;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DeleteCollectionOutput;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteCollection<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DeleteCollection<S> {
     const NSID: &'static str = "social.showcase.collection.deleteCollection";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -55,7 +67,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteCollectionRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DeleteCollection<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DeleteCollection<S>;
     type Response = DeleteCollectionResponse;
 }
 
@@ -94,7 +106,7 @@ pub mod delete_collection_state {
 /// Builder for constructing an instance of this type
 pub struct DeleteCollectionBuilder<'a, S: delete_collection_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -124,7 +136,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> DeleteCollectionBuilder<'a, delete_collection_state::SetUri<S>> {
         self._fields.0 = Option::Some(value.into());
         DeleteCollectionBuilder {
@@ -150,10 +162,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DeleteCollection<'a> {
         DeleteCollection {
             uri: self._fields.0.unwrap(),

@@ -10,28 +10,44 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::fm_teal::alpha::feed::PlayView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPlay<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPlay<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub author_did: AtIdentifier<'a>,
+    pub author_did: AtIdentifier<S>,
     #[serde(borrow)]
-    pub rkey: CowStr<'a>,
+    pub rkey: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPlayOutput<'a> {
-    #[serde(borrow)]
-    pub play: PlayView<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPlayOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub play: PlayView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for fm.teal.alpha.feed.getPlay
@@ -39,11 +55,12 @@ pub struct GetPlayResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPlayResponse {
     const NSID: &'static str = "fm.teal.alpha.feed.getPlay";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPlayOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetPlayOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPlay<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetPlay<S> {
     const NSID: &'static str = "fm.teal.alpha.feed.getPlay";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPlayResponse;
@@ -54,7 +71,7 @@ pub struct GetPlayRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPlayRequest {
     const PATH: &'static str = "/xrpc/fm.teal.alpha.feed.getPlay";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPlay<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetPlay<S>;
     type Response = GetPlayResponse;
 }
 
@@ -105,7 +122,7 @@ pub mod get_play_state {
 /// Builder for constructing an instance of this type
 pub struct GetPlayBuilder<'a, S: get_play_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<AtIdentifier<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -135,7 +152,7 @@ where
     /// Set the `authorDID` field (required)
     pub fn author_did(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetPlayBuilder<'a, get_play_state::SetAuthorDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetPlayBuilder {
@@ -154,7 +171,7 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetPlayBuilder<'a, get_play_state::SetRkey<S>> {
         self._fields.1 = Option::Some(value.into());
         GetPlayBuilder {

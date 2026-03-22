@@ -18,8 +18,8 @@ pub struct NextResponse;
 impl jacquard_common::xrpc::XrpcResp for NextResponse {
     const NSID: &'static str = "app.rocksky.spotify.next";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for Next {
@@ -37,6 +37,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for NextRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Next;
+    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = Next;
     type Response = NextResponse;
 }

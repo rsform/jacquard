@@ -10,40 +10,48 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Grid<'a> {
-    #[serde(borrow)]
-    pub children: Data<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Grid<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub children: Data<S>,
     ///Number of equal columns.  Defaults to `3`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_grid_columns")]
     pub columns: Option<i64>,
     ///Space between children.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gap: Option<GridGap<'a>>,
+    pub gap: Option<GridGap<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Space between children.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum GridGap<'a> {
+pub enum GridGap<S: Bos<str> + AsRef<str> = DefaultStr> {
     None,
     Small,
     Medium,
     Large,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> GridGap<'a> {
+impl<S: Bos<str> + AsRef<str>> GridGap<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -53,74 +61,57 @@ impl<'a> GridGap<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for GridGap<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "none" => Self::None,
             "small" => Self::Small,
             "medium" => Self::Medium,
             "large" => Self::Large,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for GridGap<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "small" => Self::Small,
-            "medium" => Self::Medium,
-            "large" => Self::Large,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for GridGap<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for GridGap<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for GridGap<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for GridGap<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for GridGap<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for GridGap<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for GridGap<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for GridGap<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for GridGap<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for GridGap<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for GridGap<'_> {
-    type Output = GridGap<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for GridGap<S> {
+    type Output = GridGap<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             GridGap::None => GridGap::None,
@@ -133,13 +124,22 @@ impl jacquard_common::IntoStatic for GridGap<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GridOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GridOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Response<'a>,
+    pub value: Response<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for org.atsui.Grid
@@ -147,11 +147,12 @@ pub struct GridResponse;
 impl jacquard_common::xrpc::XrpcResp for GridResponse {
     const NSID: &'static str = "org.atsui.Grid";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GridOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GridOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Grid<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Grid<S> {
     const NSID: &'static str = "org.atsui.Grid";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -166,7 +167,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GridRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Grid<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Grid<S>;
     type Response = GridResponse;
 }
 
@@ -209,7 +210,7 @@ pub mod grid_state {
 /// Builder for constructing an instance of this type
 pub struct GridBuilder<'a, S: grid_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Data<'a>>, Option<i64>, Option<GridGap<'a>>),
+    _fields: (Option<Data<S>>, Option<i64>, Option<GridGap<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -239,7 +240,7 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> GridBuilder<'a, grid_state::SetChildren<S>> {
         self._fields.0 = Option::Some(value.into());
         GridBuilder {
@@ -265,12 +266,12 @@ impl<'a, S: grid_state::State> GridBuilder<'a, S> {
 
 impl<'a, S: grid_state::State> GridBuilder<'a, S> {
     /// Set the `gap` field (optional)
-    pub fn gap(mut self, value: impl Into<Option<GridGap<'a>>>) -> Self {
+    pub fn gap(mut self, value: impl Into<Option<GridGap<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `gap` field to an Option value (optional)
-    pub fn maybe_gap(mut self, value: Option<GridGap<'a>>) -> Self {
+    pub fn maybe_gap(mut self, value: Option<GridGap<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -291,10 +292,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Grid<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Grid<'a> {
         Grid {
             children: self._fields.0.unwrap(),
             columns: self._fields.1.or_else(|| Some(3i64)),

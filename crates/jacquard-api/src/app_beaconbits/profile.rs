@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,61 +29,64 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// User preferences and settings for BeaconBits
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.beaconbits.profile", tag = "$type")]
-pub struct Profile<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.beaconbits.profile",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Who can tag this user in beacons
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub allow_tags: Option<ProfileAllowTags<'a>>,
+    pub allow_tags: Option<ProfileAllowTags<S>>,
     ///Timestamp when settings were first created
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///Default delayed reveal setting for new beacons
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub default_delayed_reveal: Option<ProfileDefaultDelayedReveal<'a>>,
+    pub default_delayed_reveal: Option<ProfileDefaultDelayedReveal<S>>,
     ///Default visibility for new beacons
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub default_visibility: Option<ProfileDefaultVisibility<'a>>,
+    pub default_visibility: Option<ProfileDefaultVisibility<S>>,
     ///Preferred distance unit
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub distance_unit: Option<ProfileDistanceUnit<'a>>,
+    pub distance_unit: Option<ProfileDistanceUnit<S>>,
     ///Whether to hide past beacons from public view  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_profile_hide_past_beacons")]
     pub hide_past_beacons: Option<bool>,
     ///Preferred language setting
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub language: Option<ProfileLanguage<'a>>,
+    pub language: Option<ProfileLanguage<S>>,
     ///Hex color code for map marker (e.g., #e24630)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub marker_color: Option<CowStr<'a>>,
+    pub marker_color: Option<S>,
     ///Whether to include beacon links in Bluesky posts  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_profile_post_beacon_links")]
     pub post_beacon_links: Option<bool>,
     ///Timestamp when settings were last updated
     pub updated_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Who can tag this user in beacons
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileAllowTags<'a> {
+pub enum ProfileAllowTags<S: Bos<str> + AsRef<str> = DefaultStr> {
     All,
     Followers,
     Mutuals,
     None,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ProfileAllowTags<'a> {
+impl<S: Bos<str> + AsRef<str>> ProfileAllowTags<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::All => "all",
@@ -91,74 +96,58 @@ impl<'a> ProfileAllowTags<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ProfileAllowTags<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "all" => Self::All,
             "followers" => Self::Followers,
             "mutuals" => Self::Mutuals,
             "none" => Self::None,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ProfileAllowTags<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "all" => Self::All,
-            "followers" => Self::Followers,
-            "mutuals" => Self::Mutuals,
-            "none" => Self::None,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ProfileAllowTags<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ProfileAllowTags<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ProfileAllowTags<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ProfileAllowTags<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ProfileAllowTags<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ProfileAllowTags<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ProfileAllowTags<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ProfileAllowTags<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ProfileAllowTags<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ProfileAllowTags<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ProfileAllowTags<'_> {
-    type Output = ProfileAllowTags<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileAllowTags<S> {
+    type Output = ProfileAllowTags<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ProfileAllowTags::All => ProfileAllowTags::All,
@@ -173,15 +162,15 @@ impl jacquard_common::IntoStatic for ProfileAllowTags<'_> {
 /// Default delayed reveal setting for new beacons
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileDefaultDelayedReveal<'a> {
+pub enum ProfileDefaultDelayedReveal<S: Bos<str> + AsRef<str> = DefaultStr> {
     None,
     _1h,
     _1d,
     Custom,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ProfileDefaultDelayedReveal<'a> {
+impl<S: Bos<str> + AsRef<str>> ProfileDefaultDelayedReveal<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -191,74 +180,58 @@ impl<'a> ProfileDefaultDelayedReveal<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ProfileDefaultDelayedReveal<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "none" => Self::None,
             "1h" => Self::_1h,
             "1d" => Self::_1d,
             "custom" => Self::Custom,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ProfileDefaultDelayedReveal<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "1h" => Self::_1h,
-            "1d" => Self::_1d,
-            "custom" => Self::Custom,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ProfileDefaultDelayedReveal<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ProfileDefaultDelayedReveal<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ProfileDefaultDelayedReveal<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ProfileDefaultDelayedReveal<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ProfileDefaultDelayedReveal<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ProfileDefaultDelayedReveal<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ProfileDefaultDelayedReveal<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ProfileDefaultDelayedReveal<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ProfileDefaultDelayedReveal<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ProfileDefaultDelayedReveal<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ProfileDefaultDelayedReveal<'_> {
-    type Output = ProfileDefaultDelayedReveal<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileDefaultDelayedReveal<S> {
+    type Output = ProfileDefaultDelayedReveal<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ProfileDefaultDelayedReveal::None => ProfileDefaultDelayedReveal::None,
@@ -275,15 +248,15 @@ impl jacquard_common::IntoStatic for ProfileDefaultDelayedReveal<'_> {
 /// Default visibility for new beacons
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileDefaultVisibility<'a> {
+pub enum ProfileDefaultVisibility<S: Bos<str> + AsRef<str> = DefaultStr> {
     Public,
     Followers,
     Mutuals,
     Hidden,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ProfileDefaultVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> ProfileDefaultVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -293,74 +266,58 @@ impl<'a> ProfileDefaultVisibility<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ProfileDefaultVisibility<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "public" => Self::Public,
             "followers" => Self::Followers,
             "mutuals" => Self::Mutuals,
             "hidden" => Self::Hidden,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ProfileDefaultVisibility<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "followers" => Self::Followers,
-            "mutuals" => Self::Mutuals,
-            "hidden" => Self::Hidden,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ProfileDefaultVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ProfileDefaultVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ProfileDefaultVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ProfileDefaultVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ProfileDefaultVisibility<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ProfileDefaultVisibility<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ProfileDefaultVisibility<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ProfileDefaultVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ProfileDefaultVisibility<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ProfileDefaultVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ProfileDefaultVisibility<'_> {
-    type Output = ProfileDefaultVisibility<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileDefaultVisibility<S> {
+    type Output = ProfileDefaultVisibility<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ProfileDefaultVisibility::Public => ProfileDefaultVisibility::Public,
@@ -377,13 +334,13 @@ impl jacquard_common::IntoStatic for ProfileDefaultVisibility<'_> {
 /// Preferred distance unit
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileDistanceUnit<'a> {
+pub enum ProfileDistanceUnit<S: Bos<str> + AsRef<str> = DefaultStr> {
     Km,
     Miles,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ProfileDistanceUnit<'a> {
+impl<S: Bos<str> + AsRef<str>> ProfileDistanceUnit<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Km => "km",
@@ -391,70 +348,56 @@ impl<'a> ProfileDistanceUnit<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ProfileDistanceUnit<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "km" => Self::Km,
             "miles" => Self::Miles,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ProfileDistanceUnit<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "km" => Self::Km,
-            "miles" => Self::Miles,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ProfileDistanceUnit<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ProfileDistanceUnit<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ProfileDistanceUnit<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ProfileDistanceUnit<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ProfileDistanceUnit<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ProfileDistanceUnit<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ProfileDistanceUnit<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ProfileDistanceUnit<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ProfileDistanceUnit<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ProfileDistanceUnit<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ProfileDistanceUnit<'_> {
-    type Output = ProfileDistanceUnit<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileDistanceUnit<S> {
+    type Output = ProfileDistanceUnit<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ProfileDistanceUnit::Km => ProfileDistanceUnit::Km,
@@ -467,7 +410,7 @@ impl jacquard_common::IntoStatic for ProfileDistanceUnit<'_> {
 /// Preferred language setting
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileLanguage<'a> {
+pub enum ProfileLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {
     Auto,
     En,
     Es,
@@ -477,10 +420,10 @@ pub enum ProfileLanguage<'a> {
     Ja,
     ZhHans,
     Ko,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ProfileLanguage<'a> {
+impl<S: Bos<str> + AsRef<str>> ProfileLanguage<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Auto => "auto",
@@ -495,11 +438,9 @@ impl<'a> ProfileLanguage<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ProfileLanguage<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "auto" => Self::Auto,
             "en" => Self::En,
             "es" => Self::Es,
@@ -509,70 +450,51 @@ impl<'a> From<&'a str> for ProfileLanguage<'a> {
             "ja" => Self::Ja,
             "zh-Hans" => Self::ZhHans,
             "ko" => Self::Ko,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ProfileLanguage<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "auto" => Self::Auto,
-            "en" => Self::En,
-            "es" => Self::Es,
-            "fr" => Self::Fr,
-            "de" => Self::De,
-            "pt-BR" => Self::PtBr,
-            "ja" => Self::Ja,
-            "zh-Hans" => Self::ZhHans,
-            "ko" => Self::Ko,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ProfileLanguage<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ProfileLanguage<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ProfileLanguage<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ProfileLanguage<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ProfileLanguage<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ProfileLanguage<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ProfileLanguage<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ProfileLanguage<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ProfileLanguage<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ProfileLanguage<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ProfileLanguage<'_> {
-    type Output = ProfileLanguage<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileLanguage<S> {
+    type Output = ProfileLanguage<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ProfileLanguage::Auto => ProfileLanguage::Auto,
@@ -592,22 +514,23 @@ impl jacquard_common::IntoStatic for ProfileLanguage<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProfileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Profile<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Profile<S>,
 }
 
-impl<'a> Profile<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ProfileRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Profile<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ProfileRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -618,18 +541,17 @@ pub struct ProfileRecord;
 impl XrpcResp for ProfileRecord {
     const NSID: &'static str = "app.beaconbits.profile";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProfileGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ProfileGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
-    fn from(output: ProfileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ProfileGetRecordOutput<S>> for Profile<S> {
+    fn from(output: ProfileGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Profile<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Profile<S> {
     const NSID: &'static str = "app.beaconbits.profile";
     type Record = ProfileRecord;
 }
@@ -639,7 +561,7 @@ impl Collection for ProfileRecord {
     type Record = ProfileRecord;
 }
 
-impl<'a> LexiconSchema for Profile<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Profile<S> {
     fn nsid() -> &'static str {
         "app.beaconbits.profile"
     }
@@ -770,14 +692,14 @@ pub mod profile_state {
 pub struct ProfileBuilder<'a, S: profile_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ProfileAllowTags<'a>>,
+        Option<ProfileAllowTags<S>>,
         Option<Datetime>,
-        Option<ProfileDefaultDelayedReveal<'a>>,
-        Option<ProfileDefaultVisibility<'a>>,
-        Option<ProfileDistanceUnit<'a>>,
+        Option<ProfileDefaultDelayedReveal<S>>,
+        Option<ProfileDefaultVisibility<S>>,
+        Option<ProfileDistanceUnit<S>>,
         Option<bool>,
-        Option<ProfileLanguage<'a>>,
-        Option<CowStr<'a>>,
+        Option<ProfileLanguage<S>>,
+        Option<S>,
         Option<bool>,
         Option<Datetime>,
     ),
@@ -804,12 +726,12 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `allowTags` field (optional)
-    pub fn allow_tags(mut self, value: impl Into<Option<ProfileAllowTags<'a>>>) -> Self {
+    pub fn allow_tags(mut self, value: impl Into<Option<ProfileAllowTags<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `allowTags` field to an Option value (optional)
-    pub fn maybe_allow_tags(mut self, value: Option<ProfileAllowTags<'a>>) -> Self {
+    pub fn maybe_allow_tags(mut self, value: Option<ProfileAllowTags<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -832,7 +754,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `defaultDelayedReveal` field (optional)
     pub fn default_delayed_reveal(
         mut self,
-        value: impl Into<Option<ProfileDefaultDelayedReveal<'a>>>,
+        value: impl Into<Option<ProfileDefaultDelayedReveal<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -840,7 +762,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `defaultDelayedReveal` field to an Option value (optional)
     pub fn maybe_default_delayed_reveal(
         mut self,
-        value: Option<ProfileDefaultDelayedReveal<'a>>,
+        value: Option<ProfileDefaultDelayedReveal<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -851,7 +773,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `defaultVisibility` field (optional)
     pub fn default_visibility(
         mut self,
-        value: impl Into<Option<ProfileDefaultVisibility<'a>>>,
+        value: impl Into<Option<ProfileDefaultVisibility<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -859,7 +781,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `defaultVisibility` field to an Option value (optional)
     pub fn maybe_default_visibility(
         mut self,
-        value: Option<ProfileDefaultVisibility<'a>>,
+        value: Option<ProfileDefaultVisibility<S>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -870,16 +792,13 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `distanceUnit` field (optional)
     pub fn distance_unit(
         mut self,
-        value: impl Into<Option<ProfileDistanceUnit<'a>>>,
+        value: impl Into<Option<ProfileDistanceUnit<S>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `distanceUnit` field to an Option value (optional)
-    pub fn maybe_distance_unit(
-        mut self,
-        value: Option<ProfileDistanceUnit<'a>>,
-    ) -> Self {
+    pub fn maybe_distance_unit(mut self, value: Option<ProfileDistanceUnit<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -900,12 +819,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `language` field (optional)
-    pub fn language(mut self, value: impl Into<Option<ProfileLanguage<'a>>>) -> Self {
+    pub fn language(mut self, value: impl Into<Option<ProfileLanguage<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `language` field to an Option value (optional)
-    pub fn maybe_language(mut self, value: Option<ProfileLanguage<'a>>) -> Self {
+    pub fn maybe_language(mut self, value: Option<ProfileLanguage<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -913,12 +832,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `markerColor` field (optional)
-    pub fn marker_color(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn marker_color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `markerColor` field to an Option value (optional)
-    pub fn maybe_marker_color(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_marker_color(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -980,10 +899,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Profile<'a> {
         Profile {
             allow_tags: self._fields.0,

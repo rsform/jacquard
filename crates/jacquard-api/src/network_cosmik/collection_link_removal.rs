@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,43 +30,47 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A record representing the removal of a collection link by a collection owner when they cannot delete the original link (which exists in another user's repository). The creator of this record (determined from the AT-URI) is the user who performed the removal.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "network.cosmik.collectionLinkRemoval",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct CollectionLinkRemoval<'a> {
+pub struct CollectionLinkRemoval<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Strong reference to the collection record.
-    #[serde(borrow)]
-    pub collection: StrongRef<'a>,
+    pub collection: StrongRef<S>,
     ///Timestamp when the link was removed from the collection.
     pub removed_at: Datetime,
     ///Strong reference to the collectionLink record that is being removed.
-    #[serde(borrow)]
-    pub removed_link: StrongRef<'a>,
+    pub removed_link: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionLinkRemovalGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollectionLinkRemovalGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: CollectionLinkRemoval<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: CollectionLinkRemoval<S>,
 }
 
-impl<'a> CollectionLinkRemoval<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CollectionLinkRemovalRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> CollectionLinkRemoval<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CollectionLinkRemovalRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -75,18 +81,18 @@ pub struct CollectionLinkRemovalRecord;
 impl XrpcResp for CollectionLinkRemovalRecord {
     const NSID: &'static str = "network.cosmik.collectionLinkRemoval";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollectionLinkRemovalGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CollectionLinkRemovalGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CollectionLinkRemovalGetRecordOutput<'_>> for CollectionLinkRemoval<'_> {
-    fn from(output: CollectionLinkRemovalGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CollectionLinkRemovalGetRecordOutput<S>>
+for CollectionLinkRemoval<S> {
+    fn from(output: CollectionLinkRemovalGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for CollectionLinkRemoval<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for CollectionLinkRemoval<S> {
     const NSID: &'static str = "network.cosmik.collectionLinkRemoval";
     type Record = CollectionLinkRemovalRecord;
 }
@@ -96,7 +102,7 @@ impl Collection for CollectionLinkRemovalRecord {
     type Record = CollectionLinkRemovalRecord;
 }
 
-impl<'a> LexiconSchema for CollectionLinkRemoval<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionLinkRemoval<S> {
     fn nsid() -> &'static str {
         "network.cosmik.collectionLinkRemoval"
     }
@@ -121,58 +127,58 @@ pub mod collection_link_removal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type RemovedAt;
         type Collection;
         type RemovedLink;
-        type RemovedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type RemovedAt = Unset;
         type Collection = Unset;
         type RemovedLink = Unset;
-        type RemovedAt = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type RemovedLink = S::RemovedLink;
-        type RemovedAt = S::RemovedAt;
-    }
-    ///State transition - sets the `removed_link` field to Set
-    pub struct SetRemovedLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRemovedLink<S> {}
-    impl<S: State> State for SetRemovedLink<S> {
-        type Collection = S::Collection;
-        type RemovedLink = Set<members::removed_link>;
-        type RemovedAt = S::RemovedAt;
     }
     ///State transition - sets the `removed_at` field to Set
     pub struct SetRemovedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRemovedAt<S> {}
     impl<S: State> State for SetRemovedAt<S> {
+        type RemovedAt = Set<members::removed_at>;
         type Collection = S::Collection;
         type RemovedLink = S::RemovedLink;
-        type RemovedAt = Set<members::removed_at>;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type RemovedAt = S::RemovedAt;
+        type Collection = Set<members::collection>;
+        type RemovedLink = S::RemovedLink;
+    }
+    ///State transition - sets the `removed_link` field to Set
+    pub struct SetRemovedLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRemovedLink<S> {}
+    impl<S: State> State for SetRemovedLink<S> {
+        type RemovedAt = S::RemovedAt;
+        type Collection = S::Collection;
+        type RemovedLink = Set<members::removed_link>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `removed_at` field
+        pub struct removed_at(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `removed_link` field
         pub struct removed_link(());
-        ///Marker type for the `removed_at` field
-        pub struct removed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CollectionLinkRemovalBuilder<'a, S: collection_link_removal_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>, Option<Datetime>, Option<StrongRef<'a>>),
+    _fields: (Option<StrongRef<S>>, Option<Datetime>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -205,7 +211,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> CollectionLinkRemovalBuilder<
         'a,
         collection_link_removal_state::SetCollection<S>,
@@ -249,7 +255,7 @@ where
     /// Set the `removedLink` field (required)
     pub fn removed_link(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> CollectionLinkRemovalBuilder<
         'a,
         collection_link_removal_state::SetRemovedLink<S>,
@@ -266,9 +272,9 @@ where
 impl<'a, S> CollectionLinkRemovalBuilder<'a, S>
 where
     S: collection_link_removal_state::State,
+    S::RemovedAt: collection_link_removal_state::IsSet,
     S::Collection: collection_link_removal_state::IsSet,
     S::RemovedLink: collection_link_removal_state::IsSet,
-    S::RemovedAt: collection_link_removal_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionLinkRemoval<'a> {
@@ -282,10 +288,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CollectionLinkRemoval<'a> {
         CollectionLinkRemoval {
             collection: self._fields.0.unwrap(),

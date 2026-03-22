@@ -10,34 +10,50 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct VerifyPhone<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct VerifyPhone<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The code received via SMS as a result of the call to `app.bsky.contact.startPhoneVerification`.
-    #[serde(borrow)]
-    pub code: CowStr<'a>,
+    pub code: S,
     ///The phone number to verify. Should be the same as the one passed to `app.bsky.contact.startPhoneVerification`.
-    #[serde(borrow)]
-    pub phone: CowStr<'a>,
+    pub phone: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct VerifyPhoneOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct VerifyPhoneOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///JWT to be used in a call to `app.bsky.contact.importContacts`. It is only valid for a single call.
-    #[serde(borrow)]
-    pub token: CowStr<'a>,
+    pub token: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -46,26 +62,27 @@ pub struct VerifyPhoneOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum VerifyPhoneError<'a> {
+pub enum VerifyPhoneError {
     #[serde(rename = "RateLimitExceeded")]
-    RateLimitExceeded(Option<CowStr<'a>>),
+    RateLimitExceeded(Option<SmolStr>),
     #[serde(rename = "InvalidDid")]
-    InvalidDid(Option<CowStr<'a>>),
+    InvalidDid(Option<SmolStr>),
     #[serde(rename = "InvalidPhone")]
-    InvalidPhone(Option<CowStr<'a>>),
+    InvalidPhone(Option<SmolStr>),
     #[serde(rename = "InvalidCode")]
-    InvalidCode(Option<CowStr<'a>>),
+    InvalidCode(Option<SmolStr>),
     #[serde(rename = "InternalError")]
-    InternalError(Option<CowStr<'a>>),
+    InternalError(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for VerifyPhoneError<'_> {
+impl core::fmt::Display for VerifyPhoneError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RateLimitExceeded(msg) => {
@@ -103,7 +120,13 @@ impl core::fmt::Display for VerifyPhoneError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -113,11 +136,12 @@ pub struct VerifyPhoneResponse;
 impl jacquard_common::xrpc::XrpcResp for VerifyPhoneResponse {
     const NSID: &'static str = "app.bsky.contact.verifyPhone";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = VerifyPhoneOutput<'de>;
-    type Err<'de> = VerifyPhoneError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = VerifyPhoneOutput<S>;
+    type Err = VerifyPhoneError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for VerifyPhone<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for VerifyPhone<S> {
     const NSID: &'static str = "app.bsky.contact.verifyPhone";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -132,6 +156,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for VerifyPhoneRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = VerifyPhone<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = VerifyPhone<S>;
     type Response = VerifyPhoneResponse;
 }

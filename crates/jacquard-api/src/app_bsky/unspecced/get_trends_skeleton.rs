@@ -10,30 +10,47 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::unspecced::SkeletonTrend;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTrendsSkeleton<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTrendsSkeleton<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 25.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub viewer: Option<Did<'a>>,
+    pub viewer: Option<Did<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTrendsSkeletonOutput<'a> {
-    #[serde(borrow)]
-    pub trends: Vec<SkeletonTrend<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTrendsSkeletonOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub trends: Vec<SkeletonTrend<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.unspecced.getTrendsSkeleton
@@ -41,11 +58,12 @@ pub struct GetTrendsSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTrendsSkeletonResponse {
     const NSID: &'static str = "app.bsky.unspecced.getTrendsSkeleton";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTrendsSkeletonOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetTrendsSkeletonOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTrendsSkeleton<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetTrendsSkeleton<S> {
     const NSID: &'static str = "app.bsky.unspecced.getTrendsSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTrendsSkeletonResponse;
@@ -56,7 +74,7 @@ pub struct GetTrendsSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTrendsSkeletonRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getTrendsSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTrendsSkeleton<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetTrendsSkeleton<S>;
     type Response = GetTrendsSkeletonResponse;
 }
 
@@ -86,7 +104,7 @@ pub mod get_trends_skeleton_state {
 /// Builder for constructing an instance of this type
 pub struct GetTrendsSkeletonBuilder<'a, S: get_trends_skeleton_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<Did<'a>>),
+    _fields: (Option<i64>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -123,12 +141,12 @@ impl<'a, S: get_trends_skeleton_state::State> GetTrendsSkeletonBuilder<'a, S> {
 
 impl<'a, S: get_trends_skeleton_state::State> GetTrendsSkeletonBuilder<'a, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn viewer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_viewer(mut self, value: Option<Did<S>>) -> Self {
         self._fields.1 = value;
         self
     }

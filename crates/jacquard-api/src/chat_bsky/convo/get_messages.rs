@@ -10,20 +10,28 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::chat_bsky::convo::DeletedMessageView;
 use crate::chat_bsky::convo::MessageView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetMessages<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetMessages<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub convo_id: CowStr<'a>,
+    pub convo_id: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -31,26 +39,39 @@ pub struct GetMessages<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetMessagesOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetMessagesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub messages: Vec<GetMessagesOutputMessagesItem<'a>>,
+    pub cursor: Option<S>,
+    pub messages: Vec<GetMessagesOutputMessagesItem<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum GetMessagesOutputMessagesItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum GetMessagesOutputMessagesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#messageView")]
-    MessageView(Box<MessageView<'a>>),
+    MessageView(Box<MessageView<S>>),
     #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
-    DeletedMessageView(Box<DeletedMessageView<'a>>),
+    DeletedMessageView(Box<DeletedMessageView<S>>),
 }
 
 /// Response type for chat.bsky.convo.getMessages
@@ -58,11 +79,12 @@ pub struct GetMessagesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMessagesResponse {
     const NSID: &'static str = "chat.bsky.convo.getMessages";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetMessagesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetMessagesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetMessages<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetMessages<S> {
     const NSID: &'static str = "chat.bsky.convo.getMessages";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetMessagesResponse;
@@ -73,7 +95,7 @@ pub struct GetMessagesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMessagesRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.getMessages";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetMessages<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetMessages<S>;
     type Response = GetMessagesResponse;
 }
 
@@ -116,7 +138,7 @@ pub mod get_messages_state {
 /// Builder for constructing an instance of this type
 pub struct GetMessagesBuilder<'a, S: get_messages_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -146,7 +168,7 @@ where
     /// Set the `convoId` field (required)
     pub fn convo_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetMessagesBuilder<'a, get_messages_state::SetConvoId<S>> {
         self._fields.0 = Option::Some(value.into());
         GetMessagesBuilder {
@@ -159,12 +181,12 @@ where
 
 impl<'a, S: get_messages_state::State> GetMessagesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }

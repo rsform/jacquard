@@ -10,42 +10,63 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
 use crate::com_shinolabs::pinksea::app_view_defs::OekakiTombstone;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetOekaki<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetOekaki<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: AtIdentifier<'a>,
+    pub did: AtIdentifier<S>,
     #[serde(borrow)]
-    pub rkey: CowStr<'a>,
+    pub rkey: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetOekakiOutput<'a> {
-    #[serde(borrow)]
-    pub children: Vec<HydratedOekaki<'a>>,
-    #[serde(borrow)]
-    pub parent: GetOekakiOutputParent<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetOekakiOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub children: Vec<HydratedOekaki<S>>,
+    pub parent: GetOekakiOutputParent<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum GetOekakiOutputParent<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum GetOekakiOutputParent<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.shinolabs.pinksea.appViewDefs#hydratedOekaki")]
-    AppViewDefsHydratedOekaki(Box<HydratedOekaki<'a>>),
+    AppViewDefsHydratedOekaki(Box<HydratedOekaki<S>>),
     #[serde(rename = "com.shinolabs.pinksea.appViewDefs#oekakiTombstone")]
-    AppViewDefsOekakiTombstone(Box<OekakiTombstone<'a>>),
+    AppViewDefsOekakiTombstone(Box<OekakiTombstone<S>>),
 }
 
 /// Response type for com.shinolabs.pinksea.getOekaki
@@ -53,11 +74,12 @@ pub struct GetOekakiResponse;
 impl jacquard_common::xrpc::XrpcResp for GetOekakiResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getOekaki";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetOekakiOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetOekakiOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetOekaki<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetOekaki<S> {
     const NSID: &'static str = "com.shinolabs.pinksea.getOekaki";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetOekakiResponse;
@@ -68,7 +90,7 @@ pub struct GetOekakiRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetOekakiRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getOekaki";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetOekaki<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetOekaki<S>;
     type Response = GetOekakiResponse;
 }
 
@@ -119,7 +141,7 @@ pub mod get_oekaki_state {
 /// Builder for constructing an instance of this type
 pub struct GetOekakiBuilder<'a, S: get_oekaki_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<AtIdentifier<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -149,7 +171,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetOekakiBuilder<'a, get_oekaki_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetOekakiBuilder {
@@ -168,7 +190,7 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetOekakiBuilder<'a, get_oekaki_state::SetRkey<S>> {
         self._fields.1 = Option::Some(value.into());
         GetOekakiBuilder {

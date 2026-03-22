@@ -10,9 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::BlockedPost;
 use crate::app_bsky::feed::NotFoundPost;
@@ -21,7 +23,13 @@ use crate::app_bsky::feed::ThreadgateView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPostThread<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPostThread<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `6`. Min: 0. Max: 1000.
     #[serde(default = "_default_depth")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -31,36 +39,48 @@ pub struct GetPostThread<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_height: Option<i64>,
     #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPostThreadOutput<'a> {
-    #[serde(borrow)]
-    pub thread: GetPostThreadOutputThread<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPostThreadOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub thread: GetPostThreadOutputThread<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub threadgate: Option<ThreadgateView<'a>>,
+    pub threadgate: Option<ThreadgateView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum GetPostThreadOutputThread<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum GetPostThreadOutputThread<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.feed.defs#threadViewPost")]
-    ThreadViewPost(Box<ThreadViewPost<'a>>),
+    ThreadViewPost(Box<ThreadViewPost<S>>),
     #[serde(rename = "app.bsky.feed.defs#notFoundPost")]
-    NotFoundPost(Box<NotFoundPost<'a>>),
+    NotFoundPost(Box<NotFoundPost<S>>),
     #[serde(rename = "app.bsky.feed.defs#blockedPost")]
-    BlockedPost(Box<BlockedPost<'a>>),
+    BlockedPost(Box<BlockedPost<S>>),
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -69,18 +89,19 @@ pub enum GetPostThreadOutputThread<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetPostThreadError<'a> {
+pub enum GetPostThreadError {
     #[serde(rename = "NotFound")]
-    NotFound(Option<CowStr<'a>>),
+    NotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetPostThreadError<'_> {
+impl core::fmt::Display for GetPostThreadError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::NotFound(msg) => {
@@ -90,7 +111,13 @@ impl core::fmt::Display for GetPostThreadError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -100,11 +127,12 @@ pub struct GetPostThreadResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostThreadResponse {
     const NSID: &'static str = "app.bsky.feed.getPostThread";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPostThreadOutput<'de>;
-    type Err<'de> = GetPostThreadError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetPostThreadOutput<S>;
+    type Err = GetPostThreadError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPostThread<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetPostThread<S> {
     const NSID: &'static str = "app.bsky.feed.getPostThread";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPostThreadResponse;
@@ -115,7 +143,7 @@ pub struct GetPostThreadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.getPostThread";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPostThread<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetPostThread<S>;
     type Response = GetPostThreadResponse;
 }
 
@@ -162,7 +190,7 @@ pub mod get_post_thread_state {
 /// Builder for constructing an instance of this type
 pub struct GetPostThreadBuilder<'a, S: get_post_thread_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<i64>, Option<AtUri<'a>>),
+    _fields: (Option<i64>, Option<i64>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -218,7 +246,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetPostThreadBuilder<'a, get_post_thread_state::SetUri<S>> {
         self._fields.2 = Option::Some(value.into());
         GetPostThreadBuilder {

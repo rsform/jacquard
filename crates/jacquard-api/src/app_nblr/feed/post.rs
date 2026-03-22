@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,66 +31,78 @@ use serde::{Serialize, Deserialize};
 use crate::app_nblr::feed::post;
 /// width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AspectRatio<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub height: i64,
     pub width: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Record containing a nblr post.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.nblr.feed.post", tag = "$type")]
-pub struct Post<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.nblr.feed.post",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Post<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Approximate aspect ratio of the image (width:height).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<post::AspectRatio<'a>>,
+    pub aspect_ratio: Option<post::AspectRatio<S>>,
     pub created_at: Datetime,
     ///Optional description for the post
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Optional image for the post
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<BlobRef<'a>>,
+    pub image: Option<BlobRef<S>>,
     ///Optional title for the post
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     ///The URI of the linked resource; a web URL or AT URI
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<UriValue<'a>>,
+    pub uri: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PostGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PostGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Post<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Post<S>,
 }
 
-impl<'a> Post<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PostRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Post<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PostRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for AspectRatio<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AspectRatio<S> {
     fn nsid() -> &'static str {
         "app.nblr.feed.post"
     }
@@ -130,18 +144,17 @@ pub struct PostRecord;
 impl XrpcResp for PostRecord {
     const NSID: &'static str = "app.nblr.feed.post";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PostGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PostGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PostGetRecordOutput<'_>> for Post<'_> {
-    fn from(output: PostGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PostGetRecordOutput<S>> for Post<S> {
+    fn from(output: PostGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Post<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Post<S> {
     const NSID: &'static str = "app.nblr.feed.post";
     type Record = PostRecord;
 }
@@ -151,7 +164,7 @@ impl Collection for PostRecord {
     type Record = PostRecord;
 }
 
-impl<'a> LexiconSchema for Post<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Post<S> {
     fn nsid() -> &'static str {
         "app.nblr.feed.post"
     }
@@ -372,10 +385,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> AspectRatio<'a> {
         AspectRatio {
             height: self._fields.0.unwrap(),
@@ -541,12 +551,12 @@ pub mod post_state {
 pub struct PostBuilder<'a, S: post_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<post::AspectRatio<'a>>,
+        Option<post::AspectRatio<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -573,13 +583,13 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(
         mut self,
-        value: impl Into<Option<post::AspectRatio<'a>>>,
+        value: impl Into<Option<post::AspectRatio<S>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(mut self, value: Option<post::AspectRatio<'a>>) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<post::AspectRatio<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -606,12 +616,12 @@ where
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -619,12 +629,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -632,12 +642,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -645,12 +655,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `uri` field (optional)
-    pub fn uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
-    pub fn maybe_uri(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_uri(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -674,13 +684,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Post<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Post<'a> {
         Post {
             aspect_ratio: self._fields.0,
             created_at: self._fields.1.unwrap(),

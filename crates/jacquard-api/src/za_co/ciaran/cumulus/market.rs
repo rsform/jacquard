@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,36 +29,45 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// The record containing a Cumulus Market
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "za.co.ciaran.cumulus.market", tag = "$type")]
-pub struct Market<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "za.co.ciaran.cumulus.market",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Market<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub closes_at: Datetime,
     pub created_at: Datetime,
     pub liquidity: i64,
-    #[serde(borrow)]
-    pub question: CowStr<'a>,
+    pub question: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MarketGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MarketGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Market<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Market<S>,
 }
 
-impl<'a> Market<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, MarketRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Market<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, MarketRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -67,18 +78,17 @@ pub struct MarketRecord;
 impl XrpcResp for MarketRecord {
     const NSID: &'static str = "za.co.ciaran.cumulus.market";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MarketGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MarketGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<MarketGetRecordOutput<'_>> for Market<'_> {
-    fn from(output: MarketGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<MarketGetRecordOutput<S>> for Market<S> {
+    fn from(output: MarketGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Market<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Market<S> {
     const NSID: &'static str = "za.co.ciaran.cumulus.market";
     type Record = MarketRecord;
 }
@@ -88,7 +98,7 @@ impl Collection for MarketRecord {
     type Record = MarketRecord;
 }
 
-impl<'a> LexiconSchema for Market<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Market<S> {
     fn nsid() -> &'static str {
         "za.co.ciaran.cumulus.market"
     }
@@ -124,74 +134,74 @@ pub mod market_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Question;
         type ClosesAt;
         type Liquidity;
         type CreatedAt;
+        type Question;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Question = Unset;
         type ClosesAt = Unset;
         type Liquidity = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `question` field to Set
-    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestion<S> {}
-    impl<S: State> State for SetQuestion<S> {
-        type Question = Set<members::question>;
-        type ClosesAt = S::ClosesAt;
-        type Liquidity = S::Liquidity;
-        type CreatedAt = S::CreatedAt;
+        type Question = Unset;
     }
     ///State transition - sets the `closes_at` field to Set
     pub struct SetClosesAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClosesAt<S> {}
     impl<S: State> State for SetClosesAt<S> {
-        type Question = S::Question;
         type ClosesAt = Set<members::closes_at>;
         type Liquidity = S::Liquidity;
         type CreatedAt = S::CreatedAt;
+        type Question = S::Question;
     }
     ///State transition - sets the `liquidity` field to Set
     pub struct SetLiquidity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLiquidity<S> {}
     impl<S: State> State for SetLiquidity<S> {
-        type Question = S::Question;
         type ClosesAt = S::ClosesAt;
         type Liquidity = Set<members::liquidity>;
         type CreatedAt = S::CreatedAt;
+        type Question = S::Question;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Question = S::Question;
         type ClosesAt = S::ClosesAt;
         type Liquidity = S::Liquidity;
         type CreatedAt = Set<members::created_at>;
+        type Question = S::Question;
+    }
+    ///State transition - sets the `question` field to Set
+    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuestion<S> {}
+    impl<S: State> State for SetQuestion<S> {
+        type ClosesAt = S::ClosesAt;
+        type Liquidity = S::Liquidity;
+        type CreatedAt = S::CreatedAt;
+        type Question = Set<members::question>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `question` field
-        pub struct question(());
         ///Marker type for the `closes_at` field
         pub struct closes_at(());
         ///Marker type for the `liquidity` field
         pub struct liquidity(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `question` field
+        pub struct question(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MarketBuilder<'a, S: market_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Datetime>, Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<Datetime>, Option<Datetime>, Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -278,7 +288,7 @@ where
     /// Set the `question` field (required)
     pub fn question(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MarketBuilder<'a, market_state::SetQuestion<S>> {
         self._fields.3 = Option::Some(value.into());
         MarketBuilder {
@@ -292,10 +302,10 @@ where
 impl<'a, S> MarketBuilder<'a, S>
 where
     S: market_state::State,
-    S::Question: market_state::IsSet,
     S::ClosesAt: market_state::IsSet,
     S::Liquidity: market_state::IsSet,
     S::CreatedAt: market_state::IsSet,
+    S::Question: market_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Market<'a> {
@@ -308,13 +318,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Market<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Market<'a> {
         Market {
             closes_at: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

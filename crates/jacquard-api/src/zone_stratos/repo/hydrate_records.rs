@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,42 +26,60 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::zone_stratos::repo::hydrate_records;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct HydrateRecords<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct HydrateRecords<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of AT-URIs to hydrate (max 100)
-    #[serde(borrow)]
-    pub uris: Vec<AtUri<'a>>,
+    pub uris: Vec<AtUri<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct HydrateRecordsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct HydrateRecordsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///URIs blocked due to boundary restrictions
-    #[serde(borrow)]
-    pub blocked: Vec<AtUri<'a>>,
+    pub blocked: Vec<AtUri<S>>,
     ///URIs that were not found
-    #[serde(borrow)]
-    pub not_found: Vec<AtUri<'a>>,
+    pub not_found: Vec<AtUri<S>>,
     ///Successfully hydrated records
-    #[serde(borrow)]
-    pub records: Vec<hydrate_records::RecordView<'a>>,
+    pub records: Vec<hydrate_records::RecordView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordView<'a> {
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Data<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RecordView<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub cid: Cid<S>,
+    pub uri: AtUri<S>,
+    pub value: Data<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for zone.stratos.repo.hydrateRecords
@@ -67,11 +87,12 @@ pub struct HydrateRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for HydrateRecordsResponse {
     const NSID: &'static str = "zone.stratos.repo.hydrateRecords";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = HydrateRecordsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = HydrateRecordsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for HydrateRecords<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for HydrateRecords<S> {
     const NSID: &'static str = "zone.stratos.repo.hydrateRecords";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -86,11 +107,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for HydrateRecordsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = HydrateRecords<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = HydrateRecords<S>;
     type Response = HydrateRecordsResponse;
 }
 
-impl<'a> LexiconSchema for RecordView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RecordView<S> {
     fn nsid() -> &'static str {
         "zone.stratos.repo.hydrateRecords"
     }
@@ -140,7 +161,7 @@ pub mod hydrate_records_state {
 /// Builder for constructing an instance of this type
 pub struct HydrateRecordsBuilder<'a, S: hydrate_records_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<AtUri<'a>>>,),
+    _fields: (Option<Vec<AtUri<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -170,7 +191,7 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<S>>>,
     ) -> HydrateRecordsBuilder<'a, hydrate_records_state::SetUris<S>> {
         self._fields.0 = Option::Some(value.into());
         HydrateRecordsBuilder {
@@ -196,7 +217,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> HydrateRecords<'a> {
         HydrateRecords {
             uris: self._fields.0.unwrap(),
@@ -215,58 +236,58 @@ pub mod record_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
-        type Cid;
         type Uri;
+        type Cid;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Value = S::Value;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
+        type Value = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Value = S::Value;
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RecordViewBuilder<'a, S: record_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>, Option<Data<'a>>),
+    _fields: (Option<Cid<S>>, Option<AtUri<S>>, Option<Data<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -296,7 +317,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> RecordViewBuilder<'a, record_view_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         RecordViewBuilder {
@@ -315,7 +336,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> RecordViewBuilder<'a, record_view_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         RecordViewBuilder {
@@ -334,7 +355,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> RecordViewBuilder<'a, record_view_state::SetValue<S>> {
         self._fields.2 = Option::Some(value.into());
         RecordViewBuilder {
@@ -348,9 +369,9 @@ where
 impl<'a, S> RecordViewBuilder<'a, S>
 where
     S: record_view_state::State,
-    S::Value: record_view_state::IsSet,
-    S::Cid: record_view_state::IsSet,
     S::Uri: record_view_state::IsSet,
+    S::Cid: record_view_state::IsSet,
+    S::Value: record_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecordView<'a> {
@@ -364,7 +385,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RecordView<'a> {
         RecordView {
             cid: self._fields.0.unwrap(),

@@ -5,12 +5,16 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::CowStr;
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -19,26 +23,30 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Attribution for a creative work
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Credit<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Credit<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Name of the credited person
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Role: composer, lyricist, arranger, etc
-    #[serde(borrow)]
-    pub role: CreditRole<'a>,
+    pub role: CreditRole<S>,
     ///URL to credited person's profile or website
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<UriValue<'a>>,
+    pub url: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Role: composer, lyricist, arranger, etc
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CreditRole<'a> {
+pub enum CreditRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     Composer,
     Arranger,
     Lyricist,
@@ -47,10 +55,10 @@ pub enum CreditRole<'a> {
     Adapter,
     Artist,
     Producer,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> CreditRole<'a> {
+impl<S: Bos<str> + AsRef<str>> CreditRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Composer => "composer",
@@ -64,11 +72,9 @@ impl<'a> CreditRole<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for CreditRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "composer" => Self::Composer,
             "arranger" => Self::Arranger,
             "lyricist" => Self::Lyricist,
@@ -77,69 +83,51 @@ impl<'a> From<&'a str> for CreditRole<'a> {
             "adapter" => Self::Adapter,
             "artist" => Self::Artist,
             "producer" => Self::Producer,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for CreditRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "composer" => Self::Composer,
-            "arranger" => Self::Arranger,
-            "lyricist" => Self::Lyricist,
-            "transcriber" => Self::Transcriber,
-            "orchestrator" => Self::Orchestrator,
-            "adapter" => Self::Adapter,
-            "artist" => Self::Artist,
-            "producer" => Self::Producer,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CreditRole<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CreditRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for CreditRole<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for CreditRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for CreditRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for CreditRole<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for CreditRole<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for CreditRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for CreditRole<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for CreditRole<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for CreditRole<'_> {
-    type Output = CreditRole<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for CreditRole<S> {
+    type Output = CreditRole<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             CreditRole::Composer => CreditRole::Composer,
@@ -155,7 +143,7 @@ impl jacquard_common::IntoStatic for CreditRole<'_> {
     }
 }
 
-impl<'a> LexiconSchema for Credit<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Credit<S> {
     fn nsid() -> &'static str {
         "io.sound.credit"
     }

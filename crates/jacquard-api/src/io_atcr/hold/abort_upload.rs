@@ -10,31 +10,48 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct AbortUpload<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AbortUpload<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Upload session ID from initiateUpload
-    #[serde(borrow)]
-    pub upload_id: CowStr<'a>,
+    pub upload_id: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct AbortUploadOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AbortUploadOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Always 'aborted' on success
-    #[serde(borrow)]
-    pub status: CowStr<'a>,
+    pub status: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -43,20 +60,21 @@ pub struct AbortUploadOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum AbortUploadError<'a> {
+pub enum AbortUploadError {
     #[serde(rename = "InvalidUploadId")]
-    InvalidUploadId(Option<CowStr<'a>>),
+    InvalidUploadId(Option<SmolStr>),
     #[serde(rename = "AbortFailed")]
-    AbortFailed(Option<CowStr<'a>>),
+    AbortFailed(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for AbortUploadError<'_> {
+impl core::fmt::Display for AbortUploadError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidUploadId(msg) => {
@@ -73,7 +91,13 @@ impl core::fmt::Display for AbortUploadError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -83,11 +107,12 @@ pub struct AbortUploadResponse;
 impl jacquard_common::xrpc::XrpcResp for AbortUploadResponse {
     const NSID: &'static str = "io.atcr.hold.abortUpload";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AbortUploadOutput<'de>;
-    type Err<'de> = AbortUploadError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AbortUploadOutput<S>;
+    type Err = AbortUploadError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for AbortUpload<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for AbortUpload<S> {
     const NSID: &'static str = "io.atcr.hold.abortUpload";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -102,6 +127,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for AbortUploadRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = AbortUpload<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = AbortUpload<S>;
     type Response = AbortUploadResponse;
 }

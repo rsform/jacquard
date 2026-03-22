@@ -10,11 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,33 +28,52 @@ use crate::chat_bsky::moderation::get_actor_metadata;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetActorMetadata<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetActorMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub actor: Did<'a>,
+    pub actor: Did<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetActorMetadataOutput<'a> {
-    #[serde(borrow)]
-    pub all: get_actor_metadata::Metadata<'a>,
-    #[serde(borrow)]
-    pub day: get_actor_metadata::Metadata<'a>,
-    #[serde(borrow)]
-    pub month: get_actor_metadata::Metadata<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetActorMetadataOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub all: get_actor_metadata::Metadata<S>,
+    pub day: get_actor_metadata::Metadata<S>,
+    pub month: get_actor_metadata::Metadata<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Metadata<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Metadata<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub convos: i64,
     pub convos_started: i64,
     pub messages_received: i64,
     pub messages_sent: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for chat.bsky.moderation.getActorMetadata
@@ -59,11 +81,12 @@ pub struct GetActorMetadataResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorMetadataResponse {
     const NSID: &'static str = "chat.bsky.moderation.getActorMetadata";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorMetadataOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetActorMetadataOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorMetadata<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetActorMetadata<S> {
     const NSID: &'static str = "chat.bsky.moderation.getActorMetadata";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetActorMetadataResponse;
@@ -74,11 +97,11 @@ pub struct GetActorMetadataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorMetadataRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.moderation.getActorMetadata";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetActorMetadata<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetActorMetadata<S>;
     type Response = GetActorMetadataResponse;
 }
 
-impl<'a> LexiconSchema for Metadata<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Metadata<S> {
     fn nsid() -> &'static str {
         "chat.bsky.moderation.getActorMetadata"
     }
@@ -128,7 +151,7 @@ pub mod get_actor_metadata_state {
 /// Builder for constructing an instance of this type
 pub struct GetActorMetadataBuilder<'a, S: get_actor_metadata_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -158,7 +181,7 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetActorMetadataBuilder<'a, get_actor_metadata_state::SetActor<S>> {
         self._fields.0 = Option::Some(value.into());
         GetActorMetadataBuilder {
@@ -192,67 +215,67 @@ pub mod metadata_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Convos;
-        type MessagesSent;
         type MessagesReceived;
         type ConvosStarted;
+        type Convos;
+        type MessagesSent;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Convos = Unset;
-        type MessagesSent = Unset;
         type MessagesReceived = Unset;
         type ConvosStarted = Unset;
-    }
-    ///State transition - sets the `convos` field to Set
-    pub struct SetConvos<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConvos<S> {}
-    impl<S: State> State for SetConvos<S> {
-        type Convos = Set<members::convos>;
-        type MessagesSent = S::MessagesSent;
-        type MessagesReceived = S::MessagesReceived;
-        type ConvosStarted = S::ConvosStarted;
-    }
-    ///State transition - sets the `messages_sent` field to Set
-    pub struct SetMessagesSent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessagesSent<S> {}
-    impl<S: State> State for SetMessagesSent<S> {
-        type Convos = S::Convos;
-        type MessagesSent = Set<members::messages_sent>;
-        type MessagesReceived = S::MessagesReceived;
-        type ConvosStarted = S::ConvosStarted;
+        type Convos = Unset;
+        type MessagesSent = Unset;
     }
     ///State transition - sets the `messages_received` field to Set
     pub struct SetMessagesReceived<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessagesReceived<S> {}
     impl<S: State> State for SetMessagesReceived<S> {
-        type Convos = S::Convos;
-        type MessagesSent = S::MessagesSent;
         type MessagesReceived = Set<members::messages_received>;
         type ConvosStarted = S::ConvosStarted;
+        type Convos = S::Convos;
+        type MessagesSent = S::MessagesSent;
     }
     ///State transition - sets the `convos_started` field to Set
     pub struct SetConvosStarted<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetConvosStarted<S> {}
     impl<S: State> State for SetConvosStarted<S> {
-        type Convos = S::Convos;
-        type MessagesSent = S::MessagesSent;
         type MessagesReceived = S::MessagesReceived;
         type ConvosStarted = Set<members::convos_started>;
+        type Convos = S::Convos;
+        type MessagesSent = S::MessagesSent;
+    }
+    ///State transition - sets the `convos` field to Set
+    pub struct SetConvos<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvos<S> {}
+    impl<S: State> State for SetConvos<S> {
+        type MessagesReceived = S::MessagesReceived;
+        type ConvosStarted = S::ConvosStarted;
+        type Convos = Set<members::convos>;
+        type MessagesSent = S::MessagesSent;
+    }
+    ///State transition - sets the `messages_sent` field to Set
+    pub struct SetMessagesSent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessagesSent<S> {}
+    impl<S: State> State for SetMessagesSent<S> {
+        type MessagesReceived = S::MessagesReceived;
+        type ConvosStarted = S::ConvosStarted;
+        type Convos = S::Convos;
+        type MessagesSent = Set<members::messages_sent>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `convos` field
-        pub struct convos(());
-        ///Marker type for the `messages_sent` field
-        pub struct messages_sent(());
         ///Marker type for the `messages_received` field
         pub struct messages_received(());
         ///Marker type for the `convos_started` field
         pub struct convos_started(());
+        ///Marker type for the `convos` field
+        pub struct convos(());
+        ///Marker type for the `messages_sent` field
+        pub struct messages_sent(());
     }
 }
 
@@ -360,10 +383,10 @@ where
 impl<'a, S> MetadataBuilder<'a, S>
 where
     S: metadata_state::State,
-    S::Convos: metadata_state::IsSet,
-    S::MessagesSent: metadata_state::IsSet,
     S::MessagesReceived: metadata_state::IsSet,
     S::ConvosStarted: metadata_state::IsSet,
+    S::Convos: metadata_state::IsSet,
+    S::MessagesSent: metadata_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Metadata<'a> {
@@ -378,10 +401,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Metadata<'a> {
         Metadata {
             convos: self._fields.0.unwrap(),

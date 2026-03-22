@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -34,2456 +35,3821 @@ use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
 /// A post to a social media platform, including blog posts, tweets, Facebook posts, etc.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Embedded<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub about: Option<EmbeddedAbout<'a>>,
+    pub about: Option<EmbeddedAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#abstract: Option<EmbeddedAbstract<'a>>,
+    pub r#abstract: Option<EmbeddedAbstract<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode: Option<EmbeddedAccessMode<'a>>,
+    pub access_mode: Option<EmbeddedAccessMode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode_sufficient: Option<EmbeddedAccessModeSufficient<'a>>,
+    pub access_mode_sufficient: Option<EmbeddedAccessModeSufficient<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_api: Option<EmbeddedAccessibilityApi<'a>>,
+    pub accessibility_api: Option<EmbeddedAccessibilityApi<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_control: Option<EmbeddedAccessibilityControl<'a>>,
+    pub accessibility_control: Option<EmbeddedAccessibilityControl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_feature: Option<EmbeddedAccessibilityFeature<'a>>,
+    pub accessibility_feature: Option<EmbeddedAccessibilityFeature<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_hazard: Option<EmbeddedAccessibilityHazard<'a>>,
+    pub accessibility_hazard: Option<EmbeddedAccessibilityHazard<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_summary: Option<EmbeddedAccessibilitySummary<'a>>,
+    pub accessibility_summary: Option<EmbeddedAccessibilitySummary<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accountable_person: Option<EmbeddedAccountablePerson<'a>>,
+    pub accountable_person: Option<EmbeddedAccountablePerson<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub acquire_license_page: Option<EmbeddedAcquireLicensePage<'a>>,
+    pub acquire_license_page: Option<EmbeddedAcquireLicensePage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<EmbeddedAdditionalType<'a>>,
+    pub additional_type: Option<EmbeddedAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<EmbeddedAggregateRating<'a>>,
+    pub aggregate_rating: Option<EmbeddedAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<EmbeddedAlternateName<'a>>,
+    pub alternate_name: Option<EmbeddedAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternative_headline: Option<EmbeddedAlternativeHeadline<'a>>,
+    pub alternative_headline: Option<EmbeddedAlternativeHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub archived_at: Option<EmbeddedArchivedAt<'a>>,
+    pub archived_at: Option<EmbeddedArchivedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub article_body: Option<EmbeddedArticleBody<'a>>,
+    pub article_body: Option<EmbeddedArticleBody<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub article_section: Option<EmbeddedArticleSection<'a>>,
+    pub article_section: Option<EmbeddedArticleSection<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub assesses: Option<EmbeddedAssesses<'a>>,
+    pub assesses: Option<EmbeddedAssesses<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_media: Option<EmbeddedAssociatedMedia<'a>>,
+    pub associated_media: Option<EmbeddedAssociatedMedia<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audience: Option<EmbeddedAudience<'a>>,
+    pub audience: Option<EmbeddedAudience<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audio: Option<EmbeddedAudio<'a>>,
+    pub audio: Option<EmbeddedAudio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<EmbeddedAuthor<'a>>,
+    pub author: Option<EmbeddedAuthor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<EmbeddedAward<'a>>,
+    pub award: Option<EmbeddedAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<EmbeddedAwards<'a>>,
+    pub awards: Option<EmbeddedAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub backstory: Option<EmbeddedBackstory<'a>>,
+    pub backstory: Option<EmbeddedBackstory<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub character: Option<EmbeddedCharacter<'a>>,
+    pub character: Option<EmbeddedCharacter<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub citation: Option<EmbeddedCitation<'a>>,
+    pub citation: Option<EmbeddedCitation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<EmbeddedComment<'a>>,
+    pub comment: Option<EmbeddedComment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment_count: Option<EmbeddedCommentCount<'a>>,
+    pub comment_count: Option<EmbeddedCommentCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub conditions_of_access: Option<EmbeddedConditionsOfAccess<'a>>,
+    pub conditions_of_access: Option<EmbeddedConditionsOfAccess<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_location: Option<EmbeddedContentLocation<'a>>,
+    pub content_location: Option<EmbeddedContentLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_rating: Option<EmbeddedContentRating<'a>>,
+    pub content_rating: Option<EmbeddedContentRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_reference_time: Option<EmbeddedContentReferenceTime<'a>>,
+    pub content_reference_time: Option<EmbeddedContentReferenceTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contributor: Option<EmbeddedContributor<'a>>,
+    pub contributor: Option<EmbeddedContributor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_holder: Option<EmbeddedCopyrightHolder<'a>>,
+    pub copyright_holder: Option<EmbeddedCopyrightHolder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_notice: Option<EmbeddedCopyrightNotice<'a>>,
+    pub copyright_notice: Option<EmbeddedCopyrightNotice<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_year: Option<EmbeddedCopyrightYear<'a>>,
+    pub copyright_year: Option<EmbeddedCopyrightYear<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub correction: Option<EmbeddedCorrection<'a>>,
+    pub correction: Option<EmbeddedCorrection<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_origin: Option<EmbeddedCountryOfOrigin<'a>>,
+    pub country_of_origin: Option<EmbeddedCountryOfOrigin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creative_work_status: Option<EmbeddedCreativeWorkStatus<'a>>,
+    pub creative_work_status: Option<EmbeddedCreativeWorkStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creator: Option<EmbeddedCreator<'a>>,
+    pub creator: Option<EmbeddedCreator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub credit_text: Option<EmbeddedCreditText<'a>>,
+    pub credit_text: Option<EmbeddedCreditText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_created: Option<EmbeddedDateCreated<'a>>,
+    pub date_created: Option<EmbeddedDateCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_modified: Option<EmbeddedDateModified<'a>>,
+    pub date_modified: Option<EmbeddedDateModified<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_published: Option<EmbeddedDatePublished<'a>>,
+    pub date_published: Option<EmbeddedDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<EmbeddedDescription<'a>>,
+    pub description: Option<EmbeddedDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub digital_source_type: Option<EmbeddedDigitalSourceType<'a>>,
+    pub digital_source_type: Option<EmbeddedDigitalSourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub discussion_url: Option<EmbeddedDiscussionUrl<'a>>,
+    pub discussion_url: Option<EmbeddedDiscussionUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub edit_eidr: Option<EmbeddedEditEidr<'a>>,
+    pub edit_eidr: Option<EmbeddedEditEidr<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub editor: Option<EmbeddedEditor<'a>>,
+    pub editor: Option<EmbeddedEditor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_alignment: Option<EmbeddedEducationalAlignment<'a>>,
+    pub educational_alignment: Option<EmbeddedEducationalAlignment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_level: Option<EmbeddedEducationalLevel<'a>>,
+    pub educational_level: Option<EmbeddedEducationalLevel<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_use: Option<EmbeddedEducationalUse<'a>>,
+    pub educational_use: Option<EmbeddedEducationalUse<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding: Option<EmbeddedEncoding<'a>>,
+    pub encoding: Option<EmbeddedEncoding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding_format: Option<EmbeddedEncodingFormat<'a>>,
+    pub encoding_format: Option<EmbeddedEncodingFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encodings: Option<EmbeddedEncodings<'a>>,
+    pub encodings: Option<EmbeddedEncodings<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub example_of_work: Option<EmbeddedExampleOfWork<'a>>,
+    pub example_of_work: Option<EmbeddedExampleOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub expires: Option<EmbeddedExpires<'a>>,
+    pub expires: Option<EmbeddedExpires<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub file_format: Option<EmbeddedFileFormat<'a>>,
+    pub file_format: Option<EmbeddedFileFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funder: Option<EmbeddedFunder<'a>>,
+    pub funder: Option<EmbeddedFunder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<EmbeddedFunding<'a>>,
+    pub funding: Option<EmbeddedFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genre: Option<EmbeddedGenre<'a>>,
+    pub genre: Option<EmbeddedGenre<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_part: Option<EmbeddedHasPart<'a>>,
+    pub has_part: Option<EmbeddedHasPart<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub headline: Option<EmbeddedHeadline<'a>>,
+    pub headline: Option<EmbeddedHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<EmbeddedIdentifier<'a>>,
+    pub identifier: Option<EmbeddedIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<EmbeddedImage<'a>>,
+    pub image: Option<EmbeddedImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub in_language: Option<EmbeddedInLanguage<'a>>,
+    pub in_language: Option<EmbeddedInLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interaction_statistic: Option<EmbeddedInteractionStatistic<'a>>,
+    pub interaction_statistic: Option<EmbeddedInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interactivity_type: Option<EmbeddedInteractivityType<'a>>,
+    pub interactivity_type: Option<EmbeddedInteractivityType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interpreted_as_claim: Option<EmbeddedInterpretedAsClaim<'a>>,
+    pub interpreted_as_claim: Option<EmbeddedInterpretedAsClaim<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_accessible_for_free: Option<EmbeddedIsAccessibleForFree<'a>>,
+    pub is_accessible_for_free: Option<EmbeddedIsAccessibleForFree<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on: Option<EmbeddedIsBasedOn<'a>>,
+    pub is_based_on: Option<EmbeddedIsBasedOn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on_url: Option<EmbeddedIsBasedOnUrl<'a>>,
+    pub is_based_on_url: Option<EmbeddedIsBasedOnUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_family_friendly: Option<EmbeddedIsFamilyFriendly<'a>>,
+    pub is_family_friendly: Option<EmbeddedIsFamilyFriendly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_part_of: Option<EmbeddedIsPartOf<'a>>,
+    pub is_part_of: Option<EmbeddedIsPartOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<EmbeddedKeywords<'a>>,
+    pub keywords: Option<EmbeddedKeywords<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub learning_resource_type: Option<EmbeddedLearningResourceType<'a>>,
+    pub learning_resource_type: Option<EmbeddedLearningResourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub license: Option<EmbeddedLicense<'a>>,
+    pub license: Option<EmbeddedLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location_created: Option<EmbeddedLocationCreated<'a>>,
+    pub location_created: Option<EmbeddedLocationCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity: Option<EmbeddedMainEntity<'a>>,
+    pub main_entity: Option<EmbeddedMainEntity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub maintainer: Option<EmbeddedMaintainer<'a>>,
+    pub maintainer: Option<EmbeddedMaintainer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material: Option<EmbeddedMaterial<'a>>,
+    pub material: Option<EmbeddedMaterial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material_extent: Option<EmbeddedMaterialExtent<'a>>,
+    pub material_extent: Option<EmbeddedMaterialExtent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mentions: Option<EmbeddedMentions<'a>>,
+    pub mentions: Option<EmbeddedMentions<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<EmbeddedName<'a>>,
+    pub name: Option<EmbeddedName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub offers: Option<EmbeddedOffers<'a>>,
+    pub offers: Option<EmbeddedOffers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub page_end: Option<EmbeddedPageEnd<'a>>,
+    pub page_end: Option<EmbeddedPageEnd<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub page_start: Option<EmbeddedPageStart<'a>>,
+    pub page_start: Option<EmbeddedPageStart<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pagination: Option<EmbeddedPagination<'a>>,
+    pub pagination: Option<EmbeddedPagination<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pattern: Option<EmbeddedPattern<'a>>,
+    pub pattern: Option<EmbeddedPattern<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub position: Option<EmbeddedPosition<'a>>,
+    pub position: Option<EmbeddedPosition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<EmbeddedPotentialAction<'a>>,
+    pub potential_action: Option<EmbeddedPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub producer: Option<EmbeddedProducer<'a>>,
+    pub producer: Option<EmbeddedProducer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub provider: Option<EmbeddedProvider<'a>>,
+    pub provider: Option<EmbeddedProvider<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publication: Option<EmbeddedPublication<'a>>,
+    pub publication: Option<EmbeddedPublication<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher: Option<EmbeddedPublisher<'a>>,
+    pub publisher: Option<EmbeddedPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher_imprint: Option<EmbeddedPublisherImprint<'a>>,
+    pub publisher_imprint: Option<EmbeddedPublisherImprint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publishing_principles: Option<EmbeddedPublishingPrinciples<'a>>,
+    pub publishing_principles: Option<EmbeddedPublishingPrinciples<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recorded_at: Option<EmbeddedRecordedAt<'a>>,
+    pub recorded_at: Option<EmbeddedRecordedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub released_event: Option<EmbeddedReleasedEvent<'a>>,
+    pub released_event: Option<EmbeddedReleasedEvent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<EmbeddedReview<'a>>,
+    pub review: Option<EmbeddedReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<EmbeddedReviews<'a>>,
+    pub reviews: Option<EmbeddedReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<EmbeddedSameAs<'a>>,
+    pub same_as: Option<EmbeddedSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub schema_version: Option<EmbeddedSchemaVersion<'a>>,
+    pub schema_version: Option<EmbeddedSchemaVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_date_published: Option<EmbeddedSdDatePublished<'a>>,
+    pub sd_date_published: Option<EmbeddedSdDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_license: Option<EmbeddedSdLicense<'a>>,
+    pub sd_license: Option<EmbeddedSdLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_publisher: Option<EmbeddedSdPublisher<'a>>,
+    pub sd_publisher: Option<EmbeddedSdPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub shared_content: Option<EmbeddedSharedContent<'a>>,
+    pub shared_content: Option<EmbeddedSharedContent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub size: Option<EmbeddedSize<'a>>,
+    pub size: Option<EmbeddedSize<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_organization: Option<EmbeddedSourceOrganization<'a>>,
+    pub source_organization: Option<EmbeddedSourceOrganization<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial: Option<EmbeddedSpatial<'a>>,
+    pub spatial: Option<EmbeddedSpatial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial_coverage: Option<EmbeddedSpatialCoverage<'a>>,
+    pub spatial_coverage: Option<EmbeddedSpatialCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub speakable: Option<EmbeddedSpeakable<'a>>,
+    pub speakable: Option<EmbeddedSpeakable<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sponsor: Option<EmbeddedSponsor<'a>>,
+    pub sponsor: Option<EmbeddedSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<EmbeddedSubjectOf<'a>>,
+    pub subject_of: Option<EmbeddedSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub teaches: Option<EmbeddedTeaches<'a>>,
+    pub teaches: Option<EmbeddedTeaches<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal: Option<EmbeddedTemporal<'a>>,
+    pub temporal: Option<EmbeddedTemporal<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal_coverage: Option<EmbeddedTemporalCoverage<'a>>,
+    pub temporal_coverage: Option<EmbeddedTemporalCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<EmbeddedText<'a>>,
+    pub text: Option<EmbeddedText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail: Option<EmbeddedThumbnail<'a>>,
+    pub thumbnail: Option<EmbeddedThumbnail<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail_url: Option<EmbeddedThumbnailUrl<'a>>,
+    pub thumbnail_url: Option<EmbeddedThumbnailUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub time_required: Option<EmbeddedTimeRequired<'a>>,
+    pub time_required: Option<EmbeddedTimeRequired<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translation_of_work: Option<EmbeddedTranslationOfWork<'a>>,
+    pub translation_of_work: Option<EmbeddedTranslationOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translator: Option<EmbeddedTranslator<'a>>,
+    pub translator: Option<EmbeddedTranslator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub typical_age_range: Option<EmbeddedTypicalAgeRange<'a>>,
+    pub typical_age_range: Option<EmbeddedTypicalAgeRange<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<EmbeddedUrl<'a>>,
+    pub url: Option<EmbeddedUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub usage_info: Option<EmbeddedUsageInfo<'a>>,
+    pub usage_info: Option<EmbeddedUsageInfo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub version: Option<EmbeddedVersion<'a>>,
+    pub version: Option<EmbeddedVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub video: Option<EmbeddedVideo<'a>>,
+    pub video: Option<EmbeddedVideo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub word_count: Option<EmbeddedWordCount<'a>>,
+    pub word_count: Option<EmbeddedWordCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_example: Option<EmbeddedWorkExample<'a>>,
+    pub work_example: Option<EmbeddedWorkExample<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_translation: Option<EmbeddedWorkTranslation<'a>>,
+    pub work_translation: Option<EmbeddedWorkTranslation<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAbout<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAbstract<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAbstract<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessMode<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessMode<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessModeSufficient<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessModeSufficient<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityApi<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityApi<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityControl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityControl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityFeature<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityFeature<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityHazard<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityHazard<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilitySummary<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilitySummary<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccountablePerson<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccountablePerson<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAcquireLicensePage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAcquireLicensePage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlternativeHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlternativeHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedArchivedAt<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedArchivedAt<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedArticleBody<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedArticleBody<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedArticleSection<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedArticleSection<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAssesses<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAssesses<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAssociatedMedia<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAssociatedMedia<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAudience<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAudio<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAudio<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAuthor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAuthor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedBackstory<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedBackstory<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCharacter<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCharacter<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCitation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCitation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedComment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedComment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCommentCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCommentCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedConditionsOfAccess<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedConditionsOfAccess<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentReferenceTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentReferenceTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContributor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContributor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCopyrightHolder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCopyrightHolder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCopyrightNotice<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCopyrightNotice<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCopyrightYear<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCopyrightYear<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCorrection<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCorrection<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCountryOfOrigin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCreativeWorkStatus<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCreativeWorkStatus<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCreator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCreator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCreditText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCreditText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDateCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDateCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDateModified<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDateModified<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDigitalSourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDigitalSourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDiscussionUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDiscussionUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEditEidr<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEditEidr<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEditor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEditor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEducationalAlignment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEducationalAlignment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEducationalLevel<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEducationalLevel<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEducationalUse<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEducationalUse<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEncoding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEncoding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEncodingFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEncodingFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEncodings<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEncodings<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedExampleOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedExampleOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedExpires<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedExpires<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFileFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFileFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFunder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGenre<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGenre<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasPart<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasPart<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInteractivityType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInteractivityType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInterpretedAsClaim<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInterpretedAsClaim<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsAccessibleForFree<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsAccessibleForFree<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsBasedOn<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsBasedOn<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsBasedOnUrl<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsBasedOnUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsFamilyFriendly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsPartOf<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsPartOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedKeywords<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLearningResourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLearningResourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLocationCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLocationCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMainEntity<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMainEntity<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaintainer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaintainer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaterial<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaterialExtent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaterialExtent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMentions<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMentions<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedOffers<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPageEnd<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPageEnd<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPageStart<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPageStart<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPagination<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPagination<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPattern<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPosition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPosition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedProducer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedProducer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedProvider<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedProvider<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublication<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublication<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublisherImprint<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublisherImprint<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublishingPrinciples<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedRecordedAt<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedRecordedAt<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReleasedEvent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReleasedEvent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSchemaVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSchemaVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSdDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSdDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSdLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSdLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSdPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSdPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSharedContent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSharedContent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSize<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSourceOrganization<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSourceOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSpatial<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSpatial<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSpatialCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSpatialCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSpeakable<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSpeakable<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSponsor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTeaches<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTeaches<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTemporal<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTemporal<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTemporalCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTemporalCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedThumbnail<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedThumbnail<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedThumbnailUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedThumbnailUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTimeRequired<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTimeRequired<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTranslationOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTranslationOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTranslator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTranslator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTypicalAgeRange<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTypicalAgeRange<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUsageInfo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUsageInfo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedVideo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedVideo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWordCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWordCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWorkExample<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWorkExample<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWorkTranslation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWorkTranslation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "social.flockfeeds.lexical.type.SocialMediaPosting",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct SocialMediaPosting<'a> {
+pub struct SocialMediaPosting<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub about: Option<SocialMediaPostingAbout<'a>>,
+    pub about: Option<SocialMediaPostingAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#abstract: Option<SocialMediaPostingAbstract<'a>>,
+    pub r#abstract: Option<SocialMediaPostingAbstract<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode: Option<SocialMediaPostingAccessMode<'a>>,
+    pub access_mode: Option<SocialMediaPostingAccessMode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode_sufficient: Option<SocialMediaPostingAccessModeSufficient<'a>>,
+    pub access_mode_sufficient: Option<SocialMediaPostingAccessModeSufficient<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_api: Option<SocialMediaPostingAccessibilityApi<'a>>,
+    pub accessibility_api: Option<SocialMediaPostingAccessibilityApi<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_control: Option<SocialMediaPostingAccessibilityControl<'a>>,
+    pub accessibility_control: Option<SocialMediaPostingAccessibilityControl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_feature: Option<SocialMediaPostingAccessibilityFeature<'a>>,
+    pub accessibility_feature: Option<SocialMediaPostingAccessibilityFeature<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_hazard: Option<SocialMediaPostingAccessibilityHazard<'a>>,
+    pub accessibility_hazard: Option<SocialMediaPostingAccessibilityHazard<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_summary: Option<SocialMediaPostingAccessibilitySummary<'a>>,
+    pub accessibility_summary: Option<SocialMediaPostingAccessibilitySummary<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accountable_person: Option<SocialMediaPostingAccountablePerson<'a>>,
+    pub accountable_person: Option<SocialMediaPostingAccountablePerson<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub acquire_license_page: Option<SocialMediaPostingAcquireLicensePage<'a>>,
+    pub acquire_license_page: Option<SocialMediaPostingAcquireLicensePage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<SocialMediaPostingAdditionalType<'a>>,
+    pub additional_type: Option<SocialMediaPostingAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<SocialMediaPostingAggregateRating<'a>>,
+    pub aggregate_rating: Option<SocialMediaPostingAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<SocialMediaPostingAlternateName<'a>>,
+    pub alternate_name: Option<SocialMediaPostingAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternative_headline: Option<SocialMediaPostingAlternativeHeadline<'a>>,
+    pub alternative_headline: Option<SocialMediaPostingAlternativeHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub archived_at: Option<SocialMediaPostingArchivedAt<'a>>,
+    pub archived_at: Option<SocialMediaPostingArchivedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub article_body: Option<SocialMediaPostingArticleBody<'a>>,
+    pub article_body: Option<SocialMediaPostingArticleBody<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub article_section: Option<SocialMediaPostingArticleSection<'a>>,
+    pub article_section: Option<SocialMediaPostingArticleSection<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub assesses: Option<SocialMediaPostingAssesses<'a>>,
+    pub assesses: Option<SocialMediaPostingAssesses<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_media: Option<SocialMediaPostingAssociatedMedia<'a>>,
+    pub associated_media: Option<SocialMediaPostingAssociatedMedia<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audience: Option<SocialMediaPostingAudience<'a>>,
+    pub audience: Option<SocialMediaPostingAudience<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audio: Option<SocialMediaPostingAudio<'a>>,
+    pub audio: Option<SocialMediaPostingAudio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<SocialMediaPostingAuthor<'a>>,
+    pub author: Option<SocialMediaPostingAuthor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<SocialMediaPostingAward<'a>>,
+    pub award: Option<SocialMediaPostingAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<SocialMediaPostingAwards<'a>>,
+    pub awards: Option<SocialMediaPostingAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub backstory: Option<SocialMediaPostingBackstory<'a>>,
+    pub backstory: Option<SocialMediaPostingBackstory<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub character: Option<SocialMediaPostingCharacter<'a>>,
+    pub character: Option<SocialMediaPostingCharacter<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub citation: Option<SocialMediaPostingCitation<'a>>,
+    pub citation: Option<SocialMediaPostingCitation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<SocialMediaPostingComment<'a>>,
+    pub comment: Option<SocialMediaPostingComment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment_count: Option<SocialMediaPostingCommentCount<'a>>,
+    pub comment_count: Option<SocialMediaPostingCommentCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub conditions_of_access: Option<SocialMediaPostingConditionsOfAccess<'a>>,
+    pub conditions_of_access: Option<SocialMediaPostingConditionsOfAccess<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_location: Option<SocialMediaPostingContentLocation<'a>>,
+    pub content_location: Option<SocialMediaPostingContentLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_rating: Option<SocialMediaPostingContentRating<'a>>,
+    pub content_rating: Option<SocialMediaPostingContentRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_reference_time: Option<SocialMediaPostingContentReferenceTime<'a>>,
+    pub content_reference_time: Option<SocialMediaPostingContentReferenceTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contributor: Option<SocialMediaPostingContributor<'a>>,
+    pub contributor: Option<SocialMediaPostingContributor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_holder: Option<SocialMediaPostingCopyrightHolder<'a>>,
+    pub copyright_holder: Option<SocialMediaPostingCopyrightHolder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_notice: Option<SocialMediaPostingCopyrightNotice<'a>>,
+    pub copyright_notice: Option<SocialMediaPostingCopyrightNotice<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_year: Option<SocialMediaPostingCopyrightYear<'a>>,
+    pub copyright_year: Option<SocialMediaPostingCopyrightYear<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub correction: Option<SocialMediaPostingCorrection<'a>>,
+    pub correction: Option<SocialMediaPostingCorrection<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_origin: Option<SocialMediaPostingCountryOfOrigin<'a>>,
+    pub country_of_origin: Option<SocialMediaPostingCountryOfOrigin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creative_work_status: Option<SocialMediaPostingCreativeWorkStatus<'a>>,
+    pub creative_work_status: Option<SocialMediaPostingCreativeWorkStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creator: Option<SocialMediaPostingCreator<'a>>,
+    pub creator: Option<SocialMediaPostingCreator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub credit_text: Option<SocialMediaPostingCreditText<'a>>,
+    pub credit_text: Option<SocialMediaPostingCreditText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_created: Option<SocialMediaPostingDateCreated<'a>>,
+    pub date_created: Option<SocialMediaPostingDateCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_modified: Option<SocialMediaPostingDateModified<'a>>,
+    pub date_modified: Option<SocialMediaPostingDateModified<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_published: Option<SocialMediaPostingDatePublished<'a>>,
+    pub date_published: Option<SocialMediaPostingDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<SocialMediaPostingDescription<'a>>,
+    pub description: Option<SocialMediaPostingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub digital_source_type: Option<SocialMediaPostingDigitalSourceType<'a>>,
+    pub digital_source_type: Option<SocialMediaPostingDigitalSourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub disambiguating_description: Option<
-        SocialMediaPostingDisambiguatingDescription<'a>,
+        SocialMediaPostingDisambiguatingDescription<S>,
     >,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub discussion_url: Option<SocialMediaPostingDiscussionUrl<'a>>,
+    pub discussion_url: Option<SocialMediaPostingDiscussionUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub edit_eidr: Option<SocialMediaPostingEditEidr<'a>>,
+    pub edit_eidr: Option<SocialMediaPostingEditEidr<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub editor: Option<SocialMediaPostingEditor<'a>>,
+    pub editor: Option<SocialMediaPostingEditor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_alignment: Option<SocialMediaPostingEducationalAlignment<'a>>,
+    pub educational_alignment: Option<SocialMediaPostingEducationalAlignment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_level: Option<SocialMediaPostingEducationalLevel<'a>>,
+    pub educational_level: Option<SocialMediaPostingEducationalLevel<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_use: Option<SocialMediaPostingEducationalUse<'a>>,
+    pub educational_use: Option<SocialMediaPostingEducationalUse<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding: Option<SocialMediaPostingEncoding<'a>>,
+    pub encoding: Option<SocialMediaPostingEncoding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding_format: Option<SocialMediaPostingEncodingFormat<'a>>,
+    pub encoding_format: Option<SocialMediaPostingEncodingFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encodings: Option<SocialMediaPostingEncodings<'a>>,
+    pub encodings: Option<SocialMediaPostingEncodings<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub example_of_work: Option<SocialMediaPostingExampleOfWork<'a>>,
+    pub example_of_work: Option<SocialMediaPostingExampleOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub expires: Option<SocialMediaPostingExpires<'a>>,
+    pub expires: Option<SocialMediaPostingExpires<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub file_format: Option<SocialMediaPostingFileFormat<'a>>,
+    pub file_format: Option<SocialMediaPostingFileFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funder: Option<SocialMediaPostingFunder<'a>>,
+    pub funder: Option<SocialMediaPostingFunder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<SocialMediaPostingFunding<'a>>,
+    pub funding: Option<SocialMediaPostingFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genre: Option<SocialMediaPostingGenre<'a>>,
+    pub genre: Option<SocialMediaPostingGenre<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_part: Option<SocialMediaPostingHasPart<'a>>,
+    pub has_part: Option<SocialMediaPostingHasPart<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub headline: Option<SocialMediaPostingHeadline<'a>>,
+    pub headline: Option<SocialMediaPostingHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<SocialMediaPostingIdentifier<'a>>,
+    pub identifier: Option<SocialMediaPostingIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<SocialMediaPostingImage<'a>>,
+    pub image: Option<SocialMediaPostingImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub in_language: Option<SocialMediaPostingInLanguage<'a>>,
+    pub in_language: Option<SocialMediaPostingInLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interaction_statistic: Option<SocialMediaPostingInteractionStatistic<'a>>,
+    pub interaction_statistic: Option<SocialMediaPostingInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interactivity_type: Option<SocialMediaPostingInteractivityType<'a>>,
+    pub interactivity_type: Option<SocialMediaPostingInteractivityType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interpreted_as_claim: Option<SocialMediaPostingInterpretedAsClaim<'a>>,
+    pub interpreted_as_claim: Option<SocialMediaPostingInterpretedAsClaim<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_accessible_for_free: Option<SocialMediaPostingIsAccessibleForFree<'a>>,
+    pub is_accessible_for_free: Option<SocialMediaPostingIsAccessibleForFree<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on: Option<SocialMediaPostingIsBasedOn<'a>>,
+    pub is_based_on: Option<SocialMediaPostingIsBasedOn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on_url: Option<SocialMediaPostingIsBasedOnUrl<'a>>,
+    pub is_based_on_url: Option<SocialMediaPostingIsBasedOnUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_family_friendly: Option<SocialMediaPostingIsFamilyFriendly<'a>>,
+    pub is_family_friendly: Option<SocialMediaPostingIsFamilyFriendly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_part_of: Option<SocialMediaPostingIsPartOf<'a>>,
+    pub is_part_of: Option<SocialMediaPostingIsPartOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<SocialMediaPostingKeywords<'a>>,
+    pub keywords: Option<SocialMediaPostingKeywords<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub learning_resource_type: Option<SocialMediaPostingLearningResourceType<'a>>,
+    pub learning_resource_type: Option<SocialMediaPostingLearningResourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub license: Option<SocialMediaPostingLicense<'a>>,
+    pub license: Option<SocialMediaPostingLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location_created: Option<SocialMediaPostingLocationCreated<'a>>,
+    pub location_created: Option<SocialMediaPostingLocationCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity: Option<SocialMediaPostingMainEntity<'a>>,
+    pub main_entity: Option<SocialMediaPostingMainEntity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<SocialMediaPostingMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<SocialMediaPostingMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub maintainer: Option<SocialMediaPostingMaintainer<'a>>,
+    pub maintainer: Option<SocialMediaPostingMaintainer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material: Option<SocialMediaPostingMaterial<'a>>,
+    pub material: Option<SocialMediaPostingMaterial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material_extent: Option<SocialMediaPostingMaterialExtent<'a>>,
+    pub material_extent: Option<SocialMediaPostingMaterialExtent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mentions: Option<SocialMediaPostingMentions<'a>>,
+    pub mentions: Option<SocialMediaPostingMentions<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<SocialMediaPostingName<'a>>,
+    pub name: Option<SocialMediaPostingName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub offers: Option<SocialMediaPostingOffers<'a>>,
+    pub offers: Option<SocialMediaPostingOffers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub page_end: Option<SocialMediaPostingPageEnd<'a>>,
+    pub page_end: Option<SocialMediaPostingPageEnd<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub page_start: Option<SocialMediaPostingPageStart<'a>>,
+    pub page_start: Option<SocialMediaPostingPageStart<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pagination: Option<SocialMediaPostingPagination<'a>>,
+    pub pagination: Option<SocialMediaPostingPagination<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pattern: Option<SocialMediaPostingPattern<'a>>,
+    pub pattern: Option<SocialMediaPostingPattern<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub position: Option<SocialMediaPostingPosition<'a>>,
+    pub position: Option<SocialMediaPostingPosition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<SocialMediaPostingPotentialAction<'a>>,
+    pub potential_action: Option<SocialMediaPostingPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub producer: Option<SocialMediaPostingProducer<'a>>,
+    pub producer: Option<SocialMediaPostingProducer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub provider: Option<SocialMediaPostingProvider<'a>>,
+    pub provider: Option<SocialMediaPostingProvider<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publication: Option<SocialMediaPostingPublication<'a>>,
+    pub publication: Option<SocialMediaPostingPublication<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher: Option<SocialMediaPostingPublisher<'a>>,
+    pub publisher: Option<SocialMediaPostingPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher_imprint: Option<SocialMediaPostingPublisherImprint<'a>>,
+    pub publisher_imprint: Option<SocialMediaPostingPublisherImprint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publishing_principles: Option<SocialMediaPostingPublishingPrinciples<'a>>,
+    pub publishing_principles: Option<SocialMediaPostingPublishingPrinciples<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recorded_at: Option<SocialMediaPostingRecordedAt<'a>>,
+    pub recorded_at: Option<SocialMediaPostingRecordedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub released_event: Option<SocialMediaPostingReleasedEvent<'a>>,
+    pub released_event: Option<SocialMediaPostingReleasedEvent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<SocialMediaPostingReview<'a>>,
+    pub review: Option<SocialMediaPostingReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<SocialMediaPostingReviews<'a>>,
+    pub reviews: Option<SocialMediaPostingReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<SocialMediaPostingSameAs<'a>>,
+    pub same_as: Option<SocialMediaPostingSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub schema_version: Option<SocialMediaPostingSchemaVersion<'a>>,
+    pub schema_version: Option<SocialMediaPostingSchemaVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_date_published: Option<SocialMediaPostingSdDatePublished<'a>>,
+    pub sd_date_published: Option<SocialMediaPostingSdDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_license: Option<SocialMediaPostingSdLicense<'a>>,
+    pub sd_license: Option<SocialMediaPostingSdLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_publisher: Option<SocialMediaPostingSdPublisher<'a>>,
+    pub sd_publisher: Option<SocialMediaPostingSdPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub shared_content: Option<SocialMediaPostingSharedContent<'a>>,
+    pub shared_content: Option<SocialMediaPostingSharedContent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub size: Option<SocialMediaPostingSize<'a>>,
+    pub size: Option<SocialMediaPostingSize<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_organization: Option<SocialMediaPostingSourceOrganization<'a>>,
+    pub source_organization: Option<SocialMediaPostingSourceOrganization<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial: Option<SocialMediaPostingSpatial<'a>>,
+    pub spatial: Option<SocialMediaPostingSpatial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial_coverage: Option<SocialMediaPostingSpatialCoverage<'a>>,
+    pub spatial_coverage: Option<SocialMediaPostingSpatialCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub speakable: Option<SocialMediaPostingSpeakable<'a>>,
+    pub speakable: Option<SocialMediaPostingSpeakable<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sponsor: Option<SocialMediaPostingSponsor<'a>>,
+    pub sponsor: Option<SocialMediaPostingSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<SocialMediaPostingSubjectOf<'a>>,
+    pub subject_of: Option<SocialMediaPostingSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub teaches: Option<SocialMediaPostingTeaches<'a>>,
+    pub teaches: Option<SocialMediaPostingTeaches<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal: Option<SocialMediaPostingTemporal<'a>>,
+    pub temporal: Option<SocialMediaPostingTemporal<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal_coverage: Option<SocialMediaPostingTemporalCoverage<'a>>,
+    pub temporal_coverage: Option<SocialMediaPostingTemporalCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<SocialMediaPostingText<'a>>,
+    pub text: Option<SocialMediaPostingText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail: Option<SocialMediaPostingThumbnail<'a>>,
+    pub thumbnail: Option<SocialMediaPostingThumbnail<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail_url: Option<SocialMediaPostingThumbnailUrl<'a>>,
+    pub thumbnail_url: Option<SocialMediaPostingThumbnailUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub time_required: Option<SocialMediaPostingTimeRequired<'a>>,
+    pub time_required: Option<SocialMediaPostingTimeRequired<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translation_of_work: Option<SocialMediaPostingTranslationOfWork<'a>>,
+    pub translation_of_work: Option<SocialMediaPostingTranslationOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translator: Option<SocialMediaPostingTranslator<'a>>,
+    pub translator: Option<SocialMediaPostingTranslator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub typical_age_range: Option<SocialMediaPostingTypicalAgeRange<'a>>,
+    pub typical_age_range: Option<SocialMediaPostingTypicalAgeRange<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<SocialMediaPostingUrl<'a>>,
+    pub url: Option<SocialMediaPostingUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub usage_info: Option<SocialMediaPostingUsageInfo<'a>>,
+    pub usage_info: Option<SocialMediaPostingUsageInfo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub version: Option<SocialMediaPostingVersion<'a>>,
+    pub version: Option<SocialMediaPostingVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub video: Option<SocialMediaPostingVideo<'a>>,
+    pub video: Option<SocialMediaPostingVideo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub word_count: Option<SocialMediaPostingWordCount<'a>>,
+    pub word_count: Option<SocialMediaPostingWordCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_example: Option<SocialMediaPostingWorkExample<'a>>,
+    pub work_example: Option<SocialMediaPostingWorkExample<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_translation: Option<SocialMediaPostingWorkTranslation<'a>>,
+    pub work_translation: Option<SocialMediaPostingWorkTranslation<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAbout<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAbstract<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAbstract<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAccessMode<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAccessMode<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAccessModeSufficient<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAccessModeSufficient<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAccessibilityApi<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAccessibilityApi<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAccessibilityControl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAccessibilityControl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAccessibilityFeature<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAccessibilityFeature<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAccessibilityHazard<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAccessibilityHazard<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAccessibilitySummary<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAccessibilitySummary<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAccountablePerson<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAccountablePerson<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAcquireLicensePage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAcquireLicensePage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAlternativeHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAlternativeHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingArchivedAt<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingArchivedAt<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingArticleBody<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingArticleBody<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingArticleSection<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingArticleSection<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAssesses<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAssesses<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAssociatedMedia<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAssociatedMedia<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAudience<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAudio<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAudio<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAuthor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAuthor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingBackstory<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingBackstory<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingCharacter<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingCharacter<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingCitation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingCitation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingComment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingComment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingCommentCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingCommentCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingConditionsOfAccess<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingConditionsOfAccess<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingContentLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingContentLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingContentRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingContentRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingContentReferenceTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingContentReferenceTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingContributor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingContributor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingCopyrightHolder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingCopyrightHolder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingCopyrightNotice<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingCopyrightNotice<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingCopyrightYear<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingCopyrightYear<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingCorrection<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingCorrection<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingCountryOfOrigin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingCreativeWorkStatus<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingCreativeWorkStatus<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingCreator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingCreator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingCreditText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingCreditText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingDateCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingDateCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingDateModified<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingDateModified<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingDigitalSourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingDigitalSourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingDisambiguatingDescription<
+    S: Bos<str> + AsRef<str> = DefaultStr,
+> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingDiscussionUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingDiscussionUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingEditEidr<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingEditEidr<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingEditor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingEditor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingEducationalAlignment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingEducationalAlignment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingEducationalLevel<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingEducationalLevel<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingEducationalUse<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingEducationalUse<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingEncoding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingEncoding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingEncodingFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingEncodingFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingEncodings<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingEncodings<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingExampleOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingExampleOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingExpires<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingExpires<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingFileFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingFileFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingFunder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingGenre<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingGenre<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingHasPart<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingHasPart<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingInLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingInLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingInteractivityType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingInteractivityType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingInterpretedAsClaim<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingInterpretedAsClaim<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingIsAccessibleForFree<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingIsAccessibleForFree<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingIsBasedOn<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingIsBasedOn<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingIsBasedOnUrl<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingIsBasedOnUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingIsFamilyFriendly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingIsPartOf<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingIsPartOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingKeywords<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingLearningResourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingLearningResourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingLocationCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingLocationCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingMainEntity<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingMainEntity<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingMaintainer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingMaintainer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingMaterial<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingMaterialExtent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingMaterialExtent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingMentions<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingMentions<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingOffers<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingPageEnd<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingPageEnd<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingPageStart<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingPageStart<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingPagination<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingPagination<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingPattern<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingPattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingPosition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingPosition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingProducer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingProducer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingProvider<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingProvider<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingPublication<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingPublication<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingPublisherImprint<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingPublisherImprint<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingPublishingPrinciples<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingPublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingRecordedAt<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingRecordedAt<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingReleasedEvent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingReleasedEvent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingSchemaVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingSchemaVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingSdDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingSdDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingSdLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingSdLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingSdPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingSdPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingSharedContent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingSharedContent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingSize<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingSourceOrganization<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingSourceOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingSpatial<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingSpatial<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingSpatialCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingSpatialCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingSpeakable<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingSpeakable<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingSponsor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingTeaches<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingTeaches<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingTemporal<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingTemporal<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingTemporalCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingTemporalCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingThumbnail<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingThumbnail<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingThumbnailUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingThumbnailUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingTimeRequired<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingTimeRequired<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingTranslationOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingTranslationOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingTranslator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingTranslator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingTypicalAgeRange<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingTypicalAgeRange<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingUsageInfo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingUsageInfo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingVideo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingVideo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingWordCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingWordCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingWorkExample<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingWorkExample<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SocialMediaPostingWorkTranslation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SocialMediaPostingWorkTranslation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SocialMediaPostingGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SocialMediaPostingGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: SocialMediaPosting<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: SocialMediaPosting<S>,
 }
 
-impl<'a> SocialMediaPosting<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SocialMediaPostingRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> SocialMediaPosting<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SocialMediaPostingRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Embedded<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Embedded<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.SocialMediaPosting"
     }
@@ -2505,18 +3871,18 @@ pub struct SocialMediaPostingRecord;
 impl XrpcResp for SocialMediaPostingRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.SocialMediaPosting";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SocialMediaPostingGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SocialMediaPostingGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SocialMediaPostingGetRecordOutput<'_>> for SocialMediaPosting<'_> {
-    fn from(output: SocialMediaPostingGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SocialMediaPostingGetRecordOutput<S>>
+for SocialMediaPosting<S> {
+    fn from(output: SocialMediaPostingGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for SocialMediaPosting<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for SocialMediaPosting<S> {
     const NSID: &'static str = "social.flockfeeds.lexical.type.SocialMediaPosting";
     type Record = SocialMediaPostingRecord;
 }
@@ -2526,7 +3892,7 @@ impl Collection for SocialMediaPostingRecord {
     type Record = SocialMediaPostingRecord;
 }
 
-impl<'a> LexiconSchema for SocialMediaPosting<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SocialMediaPosting<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.SocialMediaPosting"
     }
@@ -5422,141 +6788,141 @@ pub mod social_media_posting_state {
 pub struct SocialMediaPostingBuilder<'a, S: social_media_posting_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<SocialMediaPostingAbout<'a>>,
-        Option<SocialMediaPostingAbstract<'a>>,
-        Option<SocialMediaPostingAccessMode<'a>>,
-        Option<SocialMediaPostingAccessModeSufficient<'a>>,
-        Option<SocialMediaPostingAccessibilityApi<'a>>,
-        Option<SocialMediaPostingAccessibilityControl<'a>>,
-        Option<SocialMediaPostingAccessibilityFeature<'a>>,
-        Option<SocialMediaPostingAccessibilityHazard<'a>>,
-        Option<SocialMediaPostingAccessibilitySummary<'a>>,
-        Option<SocialMediaPostingAccountablePerson<'a>>,
-        Option<SocialMediaPostingAcquireLicensePage<'a>>,
-        Option<SocialMediaPostingAdditionalType<'a>>,
-        Option<SocialMediaPostingAggregateRating<'a>>,
-        Option<SocialMediaPostingAlternateName<'a>>,
-        Option<SocialMediaPostingAlternativeHeadline<'a>>,
-        Option<SocialMediaPostingArchivedAt<'a>>,
-        Option<SocialMediaPostingArticleBody<'a>>,
-        Option<SocialMediaPostingArticleSection<'a>>,
-        Option<SocialMediaPostingAssesses<'a>>,
-        Option<SocialMediaPostingAssociatedMedia<'a>>,
-        Option<SocialMediaPostingAudience<'a>>,
-        Option<SocialMediaPostingAudio<'a>>,
-        Option<SocialMediaPostingAuthor<'a>>,
-        Option<SocialMediaPostingAward<'a>>,
-        Option<SocialMediaPostingAwards<'a>>,
-        Option<SocialMediaPostingBackstory<'a>>,
-        Option<SocialMediaPostingCharacter<'a>>,
-        Option<SocialMediaPostingCitation<'a>>,
-        Option<SocialMediaPostingComment<'a>>,
-        Option<SocialMediaPostingCommentCount<'a>>,
-        Option<SocialMediaPostingConditionsOfAccess<'a>>,
-        Option<SocialMediaPostingContentLocation<'a>>,
-        Option<SocialMediaPostingContentRating<'a>>,
-        Option<SocialMediaPostingContentReferenceTime<'a>>,
-        Option<SocialMediaPostingContributor<'a>>,
-        Option<SocialMediaPostingCopyrightHolder<'a>>,
-        Option<SocialMediaPostingCopyrightNotice<'a>>,
-        Option<SocialMediaPostingCopyrightYear<'a>>,
-        Option<SocialMediaPostingCorrection<'a>>,
-        Option<SocialMediaPostingCountryOfOrigin<'a>>,
-        Option<SocialMediaPostingCreativeWorkStatus<'a>>,
-        Option<SocialMediaPostingCreator<'a>>,
-        Option<SocialMediaPostingCreditText<'a>>,
-        Option<SocialMediaPostingDateCreated<'a>>,
-        Option<SocialMediaPostingDateModified<'a>>,
-        Option<SocialMediaPostingDatePublished<'a>>,
-        Option<SocialMediaPostingDescription<'a>>,
-        Option<SocialMediaPostingDigitalSourceType<'a>>,
-        Option<SocialMediaPostingDisambiguatingDescription<'a>>,
-        Option<SocialMediaPostingDiscussionUrl<'a>>,
-        Option<SocialMediaPostingEditEidr<'a>>,
-        Option<SocialMediaPostingEditor<'a>>,
-        Option<SocialMediaPostingEducationalAlignment<'a>>,
-        Option<SocialMediaPostingEducationalLevel<'a>>,
-        Option<SocialMediaPostingEducationalUse<'a>>,
-        Option<SocialMediaPostingEncoding<'a>>,
-        Option<SocialMediaPostingEncodingFormat<'a>>,
-        Option<SocialMediaPostingEncodings<'a>>,
-        Option<SocialMediaPostingExampleOfWork<'a>>,
-        Option<SocialMediaPostingExpires<'a>>,
-        Option<SocialMediaPostingFileFormat<'a>>,
-        Option<SocialMediaPostingFunder<'a>>,
-        Option<SocialMediaPostingFunding<'a>>,
-        Option<SocialMediaPostingGenre<'a>>,
-        Option<SocialMediaPostingHasPart<'a>>,
-        Option<SocialMediaPostingHeadline<'a>>,
-        Option<SocialMediaPostingIdentifier<'a>>,
-        Option<SocialMediaPostingImage<'a>>,
-        Option<SocialMediaPostingInLanguage<'a>>,
-        Option<SocialMediaPostingInteractionStatistic<'a>>,
-        Option<SocialMediaPostingInteractivityType<'a>>,
-        Option<SocialMediaPostingInterpretedAsClaim<'a>>,
-        Option<SocialMediaPostingIsAccessibleForFree<'a>>,
-        Option<SocialMediaPostingIsBasedOn<'a>>,
-        Option<SocialMediaPostingIsBasedOnUrl<'a>>,
-        Option<SocialMediaPostingIsFamilyFriendly<'a>>,
-        Option<SocialMediaPostingIsPartOf<'a>>,
-        Option<SocialMediaPostingKeywords<'a>>,
-        Option<SocialMediaPostingLearningResourceType<'a>>,
-        Option<SocialMediaPostingLicense<'a>>,
-        Option<SocialMediaPostingLocationCreated<'a>>,
-        Option<SocialMediaPostingMainEntity<'a>>,
-        Option<SocialMediaPostingMainEntityOfPage<'a>>,
-        Option<SocialMediaPostingMaintainer<'a>>,
-        Option<SocialMediaPostingMaterial<'a>>,
-        Option<SocialMediaPostingMaterialExtent<'a>>,
-        Option<SocialMediaPostingMentions<'a>>,
-        Option<SocialMediaPostingName<'a>>,
-        Option<SocialMediaPostingOffers<'a>>,
-        Option<SocialMediaPostingPageEnd<'a>>,
-        Option<SocialMediaPostingPageStart<'a>>,
-        Option<SocialMediaPostingPagination<'a>>,
-        Option<SocialMediaPostingPattern<'a>>,
-        Option<SocialMediaPostingPosition<'a>>,
-        Option<SocialMediaPostingPotentialAction<'a>>,
-        Option<SocialMediaPostingProducer<'a>>,
-        Option<SocialMediaPostingProvider<'a>>,
-        Option<SocialMediaPostingPublication<'a>>,
-        Option<SocialMediaPostingPublisher<'a>>,
-        Option<SocialMediaPostingPublisherImprint<'a>>,
-        Option<SocialMediaPostingPublishingPrinciples<'a>>,
-        Option<SocialMediaPostingRecordedAt<'a>>,
-        Option<SocialMediaPostingReleasedEvent<'a>>,
-        Option<SocialMediaPostingReview<'a>>,
-        Option<SocialMediaPostingReviews<'a>>,
-        Option<SocialMediaPostingSameAs<'a>>,
-        Option<SocialMediaPostingSchemaVersion<'a>>,
-        Option<SocialMediaPostingSdDatePublished<'a>>,
-        Option<SocialMediaPostingSdLicense<'a>>,
-        Option<SocialMediaPostingSdPublisher<'a>>,
-        Option<SocialMediaPostingSharedContent<'a>>,
-        Option<SocialMediaPostingSize<'a>>,
-        Option<SocialMediaPostingSourceOrganization<'a>>,
-        Option<SocialMediaPostingSpatial<'a>>,
-        Option<SocialMediaPostingSpatialCoverage<'a>>,
-        Option<SocialMediaPostingSpeakable<'a>>,
-        Option<SocialMediaPostingSponsor<'a>>,
-        Option<SocialMediaPostingSubjectOf<'a>>,
-        Option<SocialMediaPostingTeaches<'a>>,
-        Option<SocialMediaPostingTemporal<'a>>,
-        Option<SocialMediaPostingTemporalCoverage<'a>>,
-        Option<SocialMediaPostingText<'a>>,
-        Option<SocialMediaPostingThumbnail<'a>>,
-        Option<SocialMediaPostingThumbnailUrl<'a>>,
-        Option<SocialMediaPostingTimeRequired<'a>>,
-        Option<SocialMediaPostingTranslationOfWork<'a>>,
-        Option<SocialMediaPostingTranslator<'a>>,
-        Option<SocialMediaPostingTypicalAgeRange<'a>>,
-        Option<SocialMediaPostingUrl<'a>>,
-        Option<SocialMediaPostingUsageInfo<'a>>,
-        Option<SocialMediaPostingVersion<'a>>,
-        Option<SocialMediaPostingVideo<'a>>,
-        Option<SocialMediaPostingWordCount<'a>>,
-        Option<SocialMediaPostingWorkExample<'a>>,
-        Option<SocialMediaPostingWorkTranslation<'a>>,
+        Option<SocialMediaPostingAbout<S>>,
+        Option<SocialMediaPostingAbstract<S>>,
+        Option<SocialMediaPostingAccessMode<S>>,
+        Option<SocialMediaPostingAccessModeSufficient<S>>,
+        Option<SocialMediaPostingAccessibilityApi<S>>,
+        Option<SocialMediaPostingAccessibilityControl<S>>,
+        Option<SocialMediaPostingAccessibilityFeature<S>>,
+        Option<SocialMediaPostingAccessibilityHazard<S>>,
+        Option<SocialMediaPostingAccessibilitySummary<S>>,
+        Option<SocialMediaPostingAccountablePerson<S>>,
+        Option<SocialMediaPostingAcquireLicensePage<S>>,
+        Option<SocialMediaPostingAdditionalType<S>>,
+        Option<SocialMediaPostingAggregateRating<S>>,
+        Option<SocialMediaPostingAlternateName<S>>,
+        Option<SocialMediaPostingAlternativeHeadline<S>>,
+        Option<SocialMediaPostingArchivedAt<S>>,
+        Option<SocialMediaPostingArticleBody<S>>,
+        Option<SocialMediaPostingArticleSection<S>>,
+        Option<SocialMediaPostingAssesses<S>>,
+        Option<SocialMediaPostingAssociatedMedia<S>>,
+        Option<SocialMediaPostingAudience<S>>,
+        Option<SocialMediaPostingAudio<S>>,
+        Option<SocialMediaPostingAuthor<S>>,
+        Option<SocialMediaPostingAward<S>>,
+        Option<SocialMediaPostingAwards<S>>,
+        Option<SocialMediaPostingBackstory<S>>,
+        Option<SocialMediaPostingCharacter<S>>,
+        Option<SocialMediaPostingCitation<S>>,
+        Option<SocialMediaPostingComment<S>>,
+        Option<SocialMediaPostingCommentCount<S>>,
+        Option<SocialMediaPostingConditionsOfAccess<S>>,
+        Option<SocialMediaPostingContentLocation<S>>,
+        Option<SocialMediaPostingContentRating<S>>,
+        Option<SocialMediaPostingContentReferenceTime<S>>,
+        Option<SocialMediaPostingContributor<S>>,
+        Option<SocialMediaPostingCopyrightHolder<S>>,
+        Option<SocialMediaPostingCopyrightNotice<S>>,
+        Option<SocialMediaPostingCopyrightYear<S>>,
+        Option<SocialMediaPostingCorrection<S>>,
+        Option<SocialMediaPostingCountryOfOrigin<S>>,
+        Option<SocialMediaPostingCreativeWorkStatus<S>>,
+        Option<SocialMediaPostingCreator<S>>,
+        Option<SocialMediaPostingCreditText<S>>,
+        Option<SocialMediaPostingDateCreated<S>>,
+        Option<SocialMediaPostingDateModified<S>>,
+        Option<SocialMediaPostingDatePublished<S>>,
+        Option<SocialMediaPostingDescription<S>>,
+        Option<SocialMediaPostingDigitalSourceType<S>>,
+        Option<SocialMediaPostingDisambiguatingDescription<S>>,
+        Option<SocialMediaPostingDiscussionUrl<S>>,
+        Option<SocialMediaPostingEditEidr<S>>,
+        Option<SocialMediaPostingEditor<S>>,
+        Option<SocialMediaPostingEducationalAlignment<S>>,
+        Option<SocialMediaPostingEducationalLevel<S>>,
+        Option<SocialMediaPostingEducationalUse<S>>,
+        Option<SocialMediaPostingEncoding<S>>,
+        Option<SocialMediaPostingEncodingFormat<S>>,
+        Option<SocialMediaPostingEncodings<S>>,
+        Option<SocialMediaPostingExampleOfWork<S>>,
+        Option<SocialMediaPostingExpires<S>>,
+        Option<SocialMediaPostingFileFormat<S>>,
+        Option<SocialMediaPostingFunder<S>>,
+        Option<SocialMediaPostingFunding<S>>,
+        Option<SocialMediaPostingGenre<S>>,
+        Option<SocialMediaPostingHasPart<S>>,
+        Option<SocialMediaPostingHeadline<S>>,
+        Option<SocialMediaPostingIdentifier<S>>,
+        Option<SocialMediaPostingImage<S>>,
+        Option<SocialMediaPostingInLanguage<S>>,
+        Option<SocialMediaPostingInteractionStatistic<S>>,
+        Option<SocialMediaPostingInteractivityType<S>>,
+        Option<SocialMediaPostingInterpretedAsClaim<S>>,
+        Option<SocialMediaPostingIsAccessibleForFree<S>>,
+        Option<SocialMediaPostingIsBasedOn<S>>,
+        Option<SocialMediaPostingIsBasedOnUrl<S>>,
+        Option<SocialMediaPostingIsFamilyFriendly<S>>,
+        Option<SocialMediaPostingIsPartOf<S>>,
+        Option<SocialMediaPostingKeywords<S>>,
+        Option<SocialMediaPostingLearningResourceType<S>>,
+        Option<SocialMediaPostingLicense<S>>,
+        Option<SocialMediaPostingLocationCreated<S>>,
+        Option<SocialMediaPostingMainEntity<S>>,
+        Option<SocialMediaPostingMainEntityOfPage<S>>,
+        Option<SocialMediaPostingMaintainer<S>>,
+        Option<SocialMediaPostingMaterial<S>>,
+        Option<SocialMediaPostingMaterialExtent<S>>,
+        Option<SocialMediaPostingMentions<S>>,
+        Option<SocialMediaPostingName<S>>,
+        Option<SocialMediaPostingOffers<S>>,
+        Option<SocialMediaPostingPageEnd<S>>,
+        Option<SocialMediaPostingPageStart<S>>,
+        Option<SocialMediaPostingPagination<S>>,
+        Option<SocialMediaPostingPattern<S>>,
+        Option<SocialMediaPostingPosition<S>>,
+        Option<SocialMediaPostingPotentialAction<S>>,
+        Option<SocialMediaPostingProducer<S>>,
+        Option<SocialMediaPostingProvider<S>>,
+        Option<SocialMediaPostingPublication<S>>,
+        Option<SocialMediaPostingPublisher<S>>,
+        Option<SocialMediaPostingPublisherImprint<S>>,
+        Option<SocialMediaPostingPublishingPrinciples<S>>,
+        Option<SocialMediaPostingRecordedAt<S>>,
+        Option<SocialMediaPostingReleasedEvent<S>>,
+        Option<SocialMediaPostingReview<S>>,
+        Option<SocialMediaPostingReviews<S>>,
+        Option<SocialMediaPostingSameAs<S>>,
+        Option<SocialMediaPostingSchemaVersion<S>>,
+        Option<SocialMediaPostingSdDatePublished<S>>,
+        Option<SocialMediaPostingSdLicense<S>>,
+        Option<SocialMediaPostingSdPublisher<S>>,
+        Option<SocialMediaPostingSharedContent<S>>,
+        Option<SocialMediaPostingSize<S>>,
+        Option<SocialMediaPostingSourceOrganization<S>>,
+        Option<SocialMediaPostingSpatial<S>>,
+        Option<SocialMediaPostingSpatialCoverage<S>>,
+        Option<SocialMediaPostingSpeakable<S>>,
+        Option<SocialMediaPostingSponsor<S>>,
+        Option<SocialMediaPostingSubjectOf<S>>,
+        Option<SocialMediaPostingTeaches<S>>,
+        Option<SocialMediaPostingTemporal<S>>,
+        Option<SocialMediaPostingTemporalCoverage<S>>,
+        Option<SocialMediaPostingText<S>>,
+        Option<SocialMediaPostingThumbnail<S>>,
+        Option<SocialMediaPostingThumbnailUrl<S>>,
+        Option<SocialMediaPostingTimeRequired<S>>,
+        Option<SocialMediaPostingTranslationOfWork<S>>,
+        Option<SocialMediaPostingTranslator<S>>,
+        Option<SocialMediaPostingTypicalAgeRange<S>>,
+        Option<SocialMediaPostingUrl<S>>,
+        Option<SocialMediaPostingUsageInfo<S>>,
+        Option<SocialMediaPostingVersion<S>>,
+        Option<SocialMediaPostingVideo<S>>,
+        Option<SocialMediaPostingWordCount<S>>,
+        Option<SocialMediaPostingWorkExample<S>>,
+        Option<SocialMediaPostingWorkTranslation<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -5719,13 +7085,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `about` field (optional)
     pub fn about(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAbout<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAbout<S>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `about` field to an Option value (optional)
-    pub fn maybe_about(mut self, value: Option<SocialMediaPostingAbout<'a>>) -> Self {
+    pub fn maybe_about(mut self, value: Option<SocialMediaPostingAbout<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -5735,7 +7101,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `abstract` field (optional)
     pub fn r#abstract(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAbstract<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAbstract<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -5743,7 +7109,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `abstract` field to an Option value (optional)
     pub fn maybe_abstract(
         mut self,
-        value: Option<SocialMediaPostingAbstract<'a>>,
+        value: Option<SocialMediaPostingAbstract<S>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -5754,7 +7120,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessMode` field (optional)
     pub fn access_mode(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAccessMode<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAccessMode<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -5762,7 +7128,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessMode` field to an Option value (optional)
     pub fn maybe_access_mode(
         mut self,
-        value: Option<SocialMediaPostingAccessMode<'a>>,
+        value: Option<SocialMediaPostingAccessMode<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -5773,7 +7139,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessModeSufficient` field (optional)
     pub fn access_mode_sufficient(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAccessModeSufficient<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAccessModeSufficient<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -5781,7 +7147,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessModeSufficient` field to an Option value (optional)
     pub fn maybe_access_mode_sufficient(
         mut self,
-        value: Option<SocialMediaPostingAccessModeSufficient<'a>>,
+        value: Option<SocialMediaPostingAccessModeSufficient<S>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -5792,7 +7158,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessibilityAPI` field (optional)
     pub fn accessibility_api(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAccessibilityApi<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAccessibilityApi<S>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
@@ -5800,7 +7166,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessibilityAPI` field to an Option value (optional)
     pub fn maybe_accessibility_api(
         mut self,
-        value: Option<SocialMediaPostingAccessibilityApi<'a>>,
+        value: Option<SocialMediaPostingAccessibilityApi<S>>,
     ) -> Self {
         self._fields.4 = value;
         self
@@ -5811,7 +7177,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessibilityControl` field (optional)
     pub fn accessibility_control(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAccessibilityControl<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAccessibilityControl<S>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
@@ -5819,7 +7185,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessibilityControl` field to an Option value (optional)
     pub fn maybe_accessibility_control(
         mut self,
-        value: Option<SocialMediaPostingAccessibilityControl<'a>>,
+        value: Option<SocialMediaPostingAccessibilityControl<S>>,
     ) -> Self {
         self._fields.5 = value;
         self
@@ -5830,7 +7196,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessibilityFeature` field (optional)
     pub fn accessibility_feature(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAccessibilityFeature<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAccessibilityFeature<S>>>,
     ) -> Self {
         self._fields.6 = value.into();
         self
@@ -5838,7 +7204,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessibilityFeature` field to an Option value (optional)
     pub fn maybe_accessibility_feature(
         mut self,
-        value: Option<SocialMediaPostingAccessibilityFeature<'a>>,
+        value: Option<SocialMediaPostingAccessibilityFeature<S>>,
     ) -> Self {
         self._fields.6 = value;
         self
@@ -5849,7 +7215,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessibilityHazard` field (optional)
     pub fn accessibility_hazard(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAccessibilityHazard<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAccessibilityHazard<S>>>,
     ) -> Self {
         self._fields.7 = value.into();
         self
@@ -5857,7 +7223,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessibilityHazard` field to an Option value (optional)
     pub fn maybe_accessibility_hazard(
         mut self,
-        value: Option<SocialMediaPostingAccessibilityHazard<'a>>,
+        value: Option<SocialMediaPostingAccessibilityHazard<S>>,
     ) -> Self {
         self._fields.7 = value;
         self
@@ -5868,7 +7234,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessibilitySummary` field (optional)
     pub fn accessibility_summary(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAccessibilitySummary<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAccessibilitySummary<S>>>,
     ) -> Self {
         self._fields.8 = value.into();
         self
@@ -5876,7 +7242,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accessibilitySummary` field to an Option value (optional)
     pub fn maybe_accessibility_summary(
         mut self,
-        value: Option<SocialMediaPostingAccessibilitySummary<'a>>,
+        value: Option<SocialMediaPostingAccessibilitySummary<S>>,
     ) -> Self {
         self._fields.8 = value;
         self
@@ -5887,7 +7253,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accountablePerson` field (optional)
     pub fn accountable_person(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAccountablePerson<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAccountablePerson<S>>>,
     ) -> Self {
         self._fields.9 = value.into();
         self
@@ -5895,7 +7261,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `accountablePerson` field to an Option value (optional)
     pub fn maybe_accountable_person(
         mut self,
-        value: Option<SocialMediaPostingAccountablePerson<'a>>,
+        value: Option<SocialMediaPostingAccountablePerson<S>>,
     ) -> Self {
         self._fields.9 = value;
         self
@@ -5906,7 +7272,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `acquireLicensePage` field (optional)
     pub fn acquire_license_page(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAcquireLicensePage<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAcquireLicensePage<S>>>,
     ) -> Self {
         self._fields.10 = value.into();
         self
@@ -5914,7 +7280,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `acquireLicensePage` field to an Option value (optional)
     pub fn maybe_acquire_license_page(
         mut self,
-        value: Option<SocialMediaPostingAcquireLicensePage<'a>>,
+        value: Option<SocialMediaPostingAcquireLicensePage<S>>,
     ) -> Self {
         self._fields.10 = value;
         self
@@ -5925,7 +7291,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `additionalType` field (optional)
     pub fn additional_type(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAdditionalType<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAdditionalType<S>>>,
     ) -> Self {
         self._fields.11 = value.into();
         self
@@ -5933,7 +7299,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `additionalType` field to an Option value (optional)
     pub fn maybe_additional_type(
         mut self,
-        value: Option<SocialMediaPostingAdditionalType<'a>>,
+        value: Option<SocialMediaPostingAdditionalType<S>>,
     ) -> Self {
         self._fields.11 = value;
         self
@@ -5944,7 +7310,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `aggregateRating` field (optional)
     pub fn aggregate_rating(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAggregateRating<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAggregateRating<S>>>,
     ) -> Self {
         self._fields.12 = value.into();
         self
@@ -5952,7 +7318,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `aggregateRating` field to an Option value (optional)
     pub fn maybe_aggregate_rating(
         mut self,
-        value: Option<SocialMediaPostingAggregateRating<'a>>,
+        value: Option<SocialMediaPostingAggregateRating<S>>,
     ) -> Self {
         self._fields.12 = value;
         self
@@ -5963,7 +7329,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `alternateName` field (optional)
     pub fn alternate_name(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAlternateName<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAlternateName<S>>>,
     ) -> Self {
         self._fields.13 = value.into();
         self
@@ -5971,7 +7337,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `alternateName` field to an Option value (optional)
     pub fn maybe_alternate_name(
         mut self,
-        value: Option<SocialMediaPostingAlternateName<'a>>,
+        value: Option<SocialMediaPostingAlternateName<S>>,
     ) -> Self {
         self._fields.13 = value;
         self
@@ -5982,7 +7348,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `alternativeHeadline` field (optional)
     pub fn alternative_headline(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAlternativeHeadline<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAlternativeHeadline<S>>>,
     ) -> Self {
         self._fields.14 = value.into();
         self
@@ -5990,7 +7356,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `alternativeHeadline` field to an Option value (optional)
     pub fn maybe_alternative_headline(
         mut self,
-        value: Option<SocialMediaPostingAlternativeHeadline<'a>>,
+        value: Option<SocialMediaPostingAlternativeHeadline<S>>,
     ) -> Self {
         self._fields.14 = value;
         self
@@ -6001,7 +7367,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `archivedAt` field (optional)
     pub fn archived_at(
         mut self,
-        value: impl Into<Option<SocialMediaPostingArchivedAt<'a>>>,
+        value: impl Into<Option<SocialMediaPostingArchivedAt<S>>>,
     ) -> Self {
         self._fields.15 = value.into();
         self
@@ -6009,7 +7375,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `archivedAt` field to an Option value (optional)
     pub fn maybe_archived_at(
         mut self,
-        value: Option<SocialMediaPostingArchivedAt<'a>>,
+        value: Option<SocialMediaPostingArchivedAt<S>>,
     ) -> Self {
         self._fields.15 = value;
         self
@@ -6020,7 +7386,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `articleBody` field (optional)
     pub fn article_body(
         mut self,
-        value: impl Into<Option<SocialMediaPostingArticleBody<'a>>>,
+        value: impl Into<Option<SocialMediaPostingArticleBody<S>>>,
     ) -> Self {
         self._fields.16 = value.into();
         self
@@ -6028,7 +7394,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `articleBody` field to an Option value (optional)
     pub fn maybe_article_body(
         mut self,
-        value: Option<SocialMediaPostingArticleBody<'a>>,
+        value: Option<SocialMediaPostingArticleBody<S>>,
     ) -> Self {
         self._fields.16 = value;
         self
@@ -6039,7 +7405,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `articleSection` field (optional)
     pub fn article_section(
         mut self,
-        value: impl Into<Option<SocialMediaPostingArticleSection<'a>>>,
+        value: impl Into<Option<SocialMediaPostingArticleSection<S>>>,
     ) -> Self {
         self._fields.17 = value.into();
         self
@@ -6047,7 +7413,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `articleSection` field to an Option value (optional)
     pub fn maybe_article_section(
         mut self,
-        value: Option<SocialMediaPostingArticleSection<'a>>,
+        value: Option<SocialMediaPostingArticleSection<S>>,
     ) -> Self {
         self._fields.17 = value;
         self
@@ -6058,7 +7424,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `assesses` field (optional)
     pub fn assesses(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAssesses<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAssesses<S>>>,
     ) -> Self {
         self._fields.18 = value.into();
         self
@@ -6066,7 +7432,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `assesses` field to an Option value (optional)
     pub fn maybe_assesses(
         mut self,
-        value: Option<SocialMediaPostingAssesses<'a>>,
+        value: Option<SocialMediaPostingAssesses<S>>,
     ) -> Self {
         self._fields.18 = value;
         self
@@ -6077,7 +7443,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `associatedMedia` field (optional)
     pub fn associated_media(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAssociatedMedia<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAssociatedMedia<S>>>,
     ) -> Self {
         self._fields.19 = value.into();
         self
@@ -6085,7 +7451,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `associatedMedia` field to an Option value (optional)
     pub fn maybe_associated_media(
         mut self,
-        value: Option<SocialMediaPostingAssociatedMedia<'a>>,
+        value: Option<SocialMediaPostingAssociatedMedia<S>>,
     ) -> Self {
         self._fields.19 = value;
         self
@@ -6096,7 +7462,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `audience` field (optional)
     pub fn audience(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAudience<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAudience<S>>>,
     ) -> Self {
         self._fields.20 = value.into();
         self
@@ -6104,7 +7470,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `audience` field to an Option value (optional)
     pub fn maybe_audience(
         mut self,
-        value: Option<SocialMediaPostingAudience<'a>>,
+        value: Option<SocialMediaPostingAudience<S>>,
     ) -> Self {
         self._fields.20 = value;
         self
@@ -6115,13 +7481,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `audio` field (optional)
     pub fn audio(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAudio<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAudio<S>>>,
     ) -> Self {
         self._fields.21 = value.into();
         self
     }
     /// Set the `audio` field to an Option value (optional)
-    pub fn maybe_audio(mut self, value: Option<SocialMediaPostingAudio<'a>>) -> Self {
+    pub fn maybe_audio(mut self, value: Option<SocialMediaPostingAudio<S>>) -> Self {
         self._fields.21 = value;
         self
     }
@@ -6131,13 +7497,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `author` field (optional)
     pub fn author(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAuthor<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAuthor<S>>>,
     ) -> Self {
         self._fields.22 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
-    pub fn maybe_author(mut self, value: Option<SocialMediaPostingAuthor<'a>>) -> Self {
+    pub fn maybe_author(mut self, value: Option<SocialMediaPostingAuthor<S>>) -> Self {
         self._fields.22 = value;
         self
     }
@@ -6147,13 +7513,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `award` field (optional)
     pub fn award(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAward<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAward<S>>>,
     ) -> Self {
         self._fields.23 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
-    pub fn maybe_award(mut self, value: Option<SocialMediaPostingAward<'a>>) -> Self {
+    pub fn maybe_award(mut self, value: Option<SocialMediaPostingAward<S>>) -> Self {
         self._fields.23 = value;
         self
     }
@@ -6163,13 +7529,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `awards` field (optional)
     pub fn awards(
         mut self,
-        value: impl Into<Option<SocialMediaPostingAwards<'a>>>,
+        value: impl Into<Option<SocialMediaPostingAwards<S>>>,
     ) -> Self {
         self._fields.24 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
-    pub fn maybe_awards(mut self, value: Option<SocialMediaPostingAwards<'a>>) -> Self {
+    pub fn maybe_awards(mut self, value: Option<SocialMediaPostingAwards<S>>) -> Self {
         self._fields.24 = value;
         self
     }
@@ -6179,7 +7545,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `backstory` field (optional)
     pub fn backstory(
         mut self,
-        value: impl Into<Option<SocialMediaPostingBackstory<'a>>>,
+        value: impl Into<Option<SocialMediaPostingBackstory<S>>>,
     ) -> Self {
         self._fields.25 = value.into();
         self
@@ -6187,7 +7553,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `backstory` field to an Option value (optional)
     pub fn maybe_backstory(
         mut self,
-        value: Option<SocialMediaPostingBackstory<'a>>,
+        value: Option<SocialMediaPostingBackstory<S>>,
     ) -> Self {
         self._fields.25 = value;
         self
@@ -6198,7 +7564,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `character` field (optional)
     pub fn character(
         mut self,
-        value: impl Into<Option<SocialMediaPostingCharacter<'a>>>,
+        value: impl Into<Option<SocialMediaPostingCharacter<S>>>,
     ) -> Self {
         self._fields.26 = value.into();
         self
@@ -6206,7 +7572,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `character` field to an Option value (optional)
     pub fn maybe_character(
         mut self,
-        value: Option<SocialMediaPostingCharacter<'a>>,
+        value: Option<SocialMediaPostingCharacter<S>>,
     ) -> Self {
         self._fields.26 = value;
         self
@@ -6217,7 +7583,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `citation` field (optional)
     pub fn citation(
         mut self,
-        value: impl Into<Option<SocialMediaPostingCitation<'a>>>,
+        value: impl Into<Option<SocialMediaPostingCitation<S>>>,
     ) -> Self {
         self._fields.27 = value.into();
         self
@@ -6225,7 +7591,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `citation` field to an Option value (optional)
     pub fn maybe_citation(
         mut self,
-        value: Option<SocialMediaPostingCitation<'a>>,
+        value: Option<SocialMediaPostingCitation<S>>,
     ) -> Self {
         self._fields.27 = value;
         self
@@ -6236,16 +7602,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `comment` field (optional)
     pub fn comment(
         mut self,
-        value: impl Into<Option<SocialMediaPostingComment<'a>>>,
+        value: impl Into<Option<SocialMediaPostingComment<S>>>,
     ) -> Self {
         self._fields.28 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(
-        mut self,
-        value: Option<SocialMediaPostingComment<'a>>,
-    ) -> Self {
+    pub fn maybe_comment(mut self, value: Option<SocialMediaPostingComment<S>>) -> Self {
         self._fields.28 = value;
         self
     }
@@ -6255,7 +7618,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `commentCount` field (optional)
     pub fn comment_count(
         mut self,
-        value: impl Into<Option<SocialMediaPostingCommentCount<'a>>>,
+        value: impl Into<Option<SocialMediaPostingCommentCount<S>>>,
     ) -> Self {
         self._fields.29 = value.into();
         self
@@ -6263,7 +7626,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `commentCount` field to an Option value (optional)
     pub fn maybe_comment_count(
         mut self,
-        value: Option<SocialMediaPostingCommentCount<'a>>,
+        value: Option<SocialMediaPostingCommentCount<S>>,
     ) -> Self {
         self._fields.29 = value;
         self
@@ -6274,7 +7637,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `conditionsOfAccess` field (optional)
     pub fn conditions_of_access(
         mut self,
-        value: impl Into<Option<SocialMediaPostingConditionsOfAccess<'a>>>,
+        value: impl Into<Option<SocialMediaPostingConditionsOfAccess<S>>>,
     ) -> Self {
         self._fields.30 = value.into();
         self
@@ -6282,7 +7645,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `conditionsOfAccess` field to an Option value (optional)
     pub fn maybe_conditions_of_access(
         mut self,
-        value: Option<SocialMediaPostingConditionsOfAccess<'a>>,
+        value: Option<SocialMediaPostingConditionsOfAccess<S>>,
     ) -> Self {
         self._fields.30 = value;
         self
@@ -6293,7 +7656,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `contentLocation` field (optional)
     pub fn content_location(
         mut self,
-        value: impl Into<Option<SocialMediaPostingContentLocation<'a>>>,
+        value: impl Into<Option<SocialMediaPostingContentLocation<S>>>,
     ) -> Self {
         self._fields.31 = value.into();
         self
@@ -6301,7 +7664,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `contentLocation` field to an Option value (optional)
     pub fn maybe_content_location(
         mut self,
-        value: Option<SocialMediaPostingContentLocation<'a>>,
+        value: Option<SocialMediaPostingContentLocation<S>>,
     ) -> Self {
         self._fields.31 = value;
         self
@@ -6312,7 +7675,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `contentRating` field (optional)
     pub fn content_rating(
         mut self,
-        value: impl Into<Option<SocialMediaPostingContentRating<'a>>>,
+        value: impl Into<Option<SocialMediaPostingContentRating<S>>>,
     ) -> Self {
         self._fields.32 = value.into();
         self
@@ -6320,7 +7683,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `contentRating` field to an Option value (optional)
     pub fn maybe_content_rating(
         mut self,
-        value: Option<SocialMediaPostingContentRating<'a>>,
+        value: Option<SocialMediaPostingContentRating<S>>,
     ) -> Self {
         self._fields.32 = value;
         self
@@ -6331,7 +7694,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `contentReferenceTime` field (optional)
     pub fn content_reference_time(
         mut self,
-        value: impl Into<Option<SocialMediaPostingContentReferenceTime<'a>>>,
+        value: impl Into<Option<SocialMediaPostingContentReferenceTime<S>>>,
     ) -> Self {
         self._fields.33 = value.into();
         self
@@ -6339,7 +7702,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `contentReferenceTime` field to an Option value (optional)
     pub fn maybe_content_reference_time(
         mut self,
-        value: Option<SocialMediaPostingContentReferenceTime<'a>>,
+        value: Option<SocialMediaPostingContentReferenceTime<S>>,
     ) -> Self {
         self._fields.33 = value;
         self
@@ -6350,7 +7713,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `contributor` field (optional)
     pub fn contributor(
         mut self,
-        value: impl Into<Option<SocialMediaPostingContributor<'a>>>,
+        value: impl Into<Option<SocialMediaPostingContributor<S>>>,
     ) -> Self {
         self._fields.34 = value.into();
         self
@@ -6358,7 +7721,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `contributor` field to an Option value (optional)
     pub fn maybe_contributor(
         mut self,
-        value: Option<SocialMediaPostingContributor<'a>>,
+        value: Option<SocialMediaPostingContributor<S>>,
     ) -> Self {
         self._fields.34 = value;
         self
@@ -6369,7 +7732,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `copyrightHolder` field (optional)
     pub fn copyright_holder(
         mut self,
-        value: impl Into<Option<SocialMediaPostingCopyrightHolder<'a>>>,
+        value: impl Into<Option<SocialMediaPostingCopyrightHolder<S>>>,
     ) -> Self {
         self._fields.35 = value.into();
         self
@@ -6377,7 +7740,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `copyrightHolder` field to an Option value (optional)
     pub fn maybe_copyright_holder(
         mut self,
-        value: Option<SocialMediaPostingCopyrightHolder<'a>>,
+        value: Option<SocialMediaPostingCopyrightHolder<S>>,
     ) -> Self {
         self._fields.35 = value;
         self
@@ -6388,7 +7751,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `copyrightNotice` field (optional)
     pub fn copyright_notice(
         mut self,
-        value: impl Into<Option<SocialMediaPostingCopyrightNotice<'a>>>,
+        value: impl Into<Option<SocialMediaPostingCopyrightNotice<S>>>,
     ) -> Self {
         self._fields.36 = value.into();
         self
@@ -6396,7 +7759,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `copyrightNotice` field to an Option value (optional)
     pub fn maybe_copyright_notice(
         mut self,
-        value: Option<SocialMediaPostingCopyrightNotice<'a>>,
+        value: Option<SocialMediaPostingCopyrightNotice<S>>,
     ) -> Self {
         self._fields.36 = value;
         self
@@ -6407,7 +7770,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `copyrightYear` field (optional)
     pub fn copyright_year(
         mut self,
-        value: impl Into<Option<SocialMediaPostingCopyrightYear<'a>>>,
+        value: impl Into<Option<SocialMediaPostingCopyrightYear<S>>>,
     ) -> Self {
         self._fields.37 = value.into();
         self
@@ -6415,7 +7778,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `copyrightYear` field to an Option value (optional)
     pub fn maybe_copyright_year(
         mut self,
-        value: Option<SocialMediaPostingCopyrightYear<'a>>,
+        value: Option<SocialMediaPostingCopyrightYear<S>>,
     ) -> Self {
         self._fields.37 = value;
         self
@@ -6426,7 +7789,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `correction` field (optional)
     pub fn correction(
         mut self,
-        value: impl Into<Option<SocialMediaPostingCorrection<'a>>>,
+        value: impl Into<Option<SocialMediaPostingCorrection<S>>>,
     ) -> Self {
         self._fields.38 = value.into();
         self
@@ -6434,7 +7797,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `correction` field to an Option value (optional)
     pub fn maybe_correction(
         mut self,
-        value: Option<SocialMediaPostingCorrection<'a>>,
+        value: Option<SocialMediaPostingCorrection<S>>,
     ) -> Self {
         self._fields.38 = value;
         self
@@ -6445,7 +7808,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `countryOfOrigin` field (optional)
     pub fn country_of_origin(
         mut self,
-        value: impl Into<Option<SocialMediaPostingCountryOfOrigin<'a>>>,
+        value: impl Into<Option<SocialMediaPostingCountryOfOrigin<S>>>,
     ) -> Self {
         self._fields.39 = value.into();
         self
@@ -6453,7 +7816,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `countryOfOrigin` field to an Option value (optional)
     pub fn maybe_country_of_origin(
         mut self,
-        value: Option<SocialMediaPostingCountryOfOrigin<'a>>,
+        value: Option<SocialMediaPostingCountryOfOrigin<S>>,
     ) -> Self {
         self._fields.39 = value;
         self
@@ -6464,7 +7827,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `creativeWorkStatus` field (optional)
     pub fn creative_work_status(
         mut self,
-        value: impl Into<Option<SocialMediaPostingCreativeWorkStatus<'a>>>,
+        value: impl Into<Option<SocialMediaPostingCreativeWorkStatus<S>>>,
     ) -> Self {
         self._fields.40 = value.into();
         self
@@ -6472,7 +7835,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `creativeWorkStatus` field to an Option value (optional)
     pub fn maybe_creative_work_status(
         mut self,
-        value: Option<SocialMediaPostingCreativeWorkStatus<'a>>,
+        value: Option<SocialMediaPostingCreativeWorkStatus<S>>,
     ) -> Self {
         self._fields.40 = value;
         self
@@ -6483,16 +7846,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `creator` field (optional)
     pub fn creator(
         mut self,
-        value: impl Into<Option<SocialMediaPostingCreator<'a>>>,
+        value: impl Into<Option<SocialMediaPostingCreator<S>>>,
     ) -> Self {
         self._fields.41 = value.into();
         self
     }
     /// Set the `creator` field to an Option value (optional)
-    pub fn maybe_creator(
-        mut self,
-        value: Option<SocialMediaPostingCreator<'a>>,
-    ) -> Self {
+    pub fn maybe_creator(mut self, value: Option<SocialMediaPostingCreator<S>>) -> Self {
         self._fields.41 = value;
         self
     }
@@ -6502,7 +7862,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `creditText` field (optional)
     pub fn credit_text(
         mut self,
-        value: impl Into<Option<SocialMediaPostingCreditText<'a>>>,
+        value: impl Into<Option<SocialMediaPostingCreditText<S>>>,
     ) -> Self {
         self._fields.42 = value.into();
         self
@@ -6510,7 +7870,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `creditText` field to an Option value (optional)
     pub fn maybe_credit_text(
         mut self,
-        value: Option<SocialMediaPostingCreditText<'a>>,
+        value: Option<SocialMediaPostingCreditText<S>>,
     ) -> Self {
         self._fields.42 = value;
         self
@@ -6521,7 +7881,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `dateCreated` field (optional)
     pub fn date_created(
         mut self,
-        value: impl Into<Option<SocialMediaPostingDateCreated<'a>>>,
+        value: impl Into<Option<SocialMediaPostingDateCreated<S>>>,
     ) -> Self {
         self._fields.43 = value.into();
         self
@@ -6529,7 +7889,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `dateCreated` field to an Option value (optional)
     pub fn maybe_date_created(
         mut self,
-        value: Option<SocialMediaPostingDateCreated<'a>>,
+        value: Option<SocialMediaPostingDateCreated<S>>,
     ) -> Self {
         self._fields.43 = value;
         self
@@ -6540,7 +7900,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `dateModified` field (optional)
     pub fn date_modified(
         mut self,
-        value: impl Into<Option<SocialMediaPostingDateModified<'a>>>,
+        value: impl Into<Option<SocialMediaPostingDateModified<S>>>,
     ) -> Self {
         self._fields.44 = value.into();
         self
@@ -6548,7 +7908,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `dateModified` field to an Option value (optional)
     pub fn maybe_date_modified(
         mut self,
-        value: Option<SocialMediaPostingDateModified<'a>>,
+        value: Option<SocialMediaPostingDateModified<S>>,
     ) -> Self {
         self._fields.44 = value;
         self
@@ -6559,7 +7919,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `datePublished` field (optional)
     pub fn date_published(
         mut self,
-        value: impl Into<Option<SocialMediaPostingDatePublished<'a>>>,
+        value: impl Into<Option<SocialMediaPostingDatePublished<S>>>,
     ) -> Self {
         self._fields.45 = value.into();
         self
@@ -6567,7 +7927,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `datePublished` field to an Option value (optional)
     pub fn maybe_date_published(
         mut self,
-        value: Option<SocialMediaPostingDatePublished<'a>>,
+        value: Option<SocialMediaPostingDatePublished<S>>,
     ) -> Self {
         self._fields.45 = value;
         self
@@ -6578,7 +7938,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
-        value: impl Into<Option<SocialMediaPostingDescription<'a>>>,
+        value: impl Into<Option<SocialMediaPostingDescription<S>>>,
     ) -> Self {
         self._fields.46 = value.into();
         self
@@ -6586,7 +7946,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(
         mut self,
-        value: Option<SocialMediaPostingDescription<'a>>,
+        value: Option<SocialMediaPostingDescription<S>>,
     ) -> Self {
         self._fields.46 = value;
         self
@@ -6597,7 +7957,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `digitalSourceType` field (optional)
     pub fn digital_source_type(
         mut self,
-        value: impl Into<Option<SocialMediaPostingDigitalSourceType<'a>>>,
+        value: impl Into<Option<SocialMediaPostingDigitalSourceType<S>>>,
     ) -> Self {
         self._fields.47 = value.into();
         self
@@ -6605,7 +7965,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `digitalSourceType` field to an Option value (optional)
     pub fn maybe_digital_source_type(
         mut self,
-        value: Option<SocialMediaPostingDigitalSourceType<'a>>,
+        value: Option<SocialMediaPostingDigitalSourceType<S>>,
     ) -> Self {
         self._fields.47 = value;
         self
@@ -6616,7 +7976,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
-        value: impl Into<Option<SocialMediaPostingDisambiguatingDescription<'a>>>,
+        value: impl Into<Option<SocialMediaPostingDisambiguatingDescription<S>>>,
     ) -> Self {
         self._fields.48 = value.into();
         self
@@ -6624,7 +7984,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `disambiguatingDescription` field to an Option value (optional)
     pub fn maybe_disambiguating_description(
         mut self,
-        value: Option<SocialMediaPostingDisambiguatingDescription<'a>>,
+        value: Option<SocialMediaPostingDisambiguatingDescription<S>>,
     ) -> Self {
         self._fields.48 = value;
         self
@@ -6635,7 +7995,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `discussionUrl` field (optional)
     pub fn discussion_url(
         mut self,
-        value: impl Into<Option<SocialMediaPostingDiscussionUrl<'a>>>,
+        value: impl Into<Option<SocialMediaPostingDiscussionUrl<S>>>,
     ) -> Self {
         self._fields.49 = value.into();
         self
@@ -6643,7 +8003,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `discussionUrl` field to an Option value (optional)
     pub fn maybe_discussion_url(
         mut self,
-        value: Option<SocialMediaPostingDiscussionUrl<'a>>,
+        value: Option<SocialMediaPostingDiscussionUrl<S>>,
     ) -> Self {
         self._fields.49 = value;
         self
@@ -6654,7 +8014,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `editEIDR` field (optional)
     pub fn edit_eidr(
         mut self,
-        value: impl Into<Option<SocialMediaPostingEditEidr<'a>>>,
+        value: impl Into<Option<SocialMediaPostingEditEidr<S>>>,
     ) -> Self {
         self._fields.50 = value.into();
         self
@@ -6662,7 +8022,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `editEIDR` field to an Option value (optional)
     pub fn maybe_edit_eidr(
         mut self,
-        value: Option<SocialMediaPostingEditEidr<'a>>,
+        value: Option<SocialMediaPostingEditEidr<S>>,
     ) -> Self {
         self._fields.50 = value;
         self
@@ -6673,13 +8033,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `editor` field (optional)
     pub fn editor(
         mut self,
-        value: impl Into<Option<SocialMediaPostingEditor<'a>>>,
+        value: impl Into<Option<SocialMediaPostingEditor<S>>>,
     ) -> Self {
         self._fields.51 = value.into();
         self
     }
     /// Set the `editor` field to an Option value (optional)
-    pub fn maybe_editor(mut self, value: Option<SocialMediaPostingEditor<'a>>) -> Self {
+    pub fn maybe_editor(mut self, value: Option<SocialMediaPostingEditor<S>>) -> Self {
         self._fields.51 = value;
         self
     }
@@ -6689,7 +8049,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `educationalAlignment` field (optional)
     pub fn educational_alignment(
         mut self,
-        value: impl Into<Option<SocialMediaPostingEducationalAlignment<'a>>>,
+        value: impl Into<Option<SocialMediaPostingEducationalAlignment<S>>>,
     ) -> Self {
         self._fields.52 = value.into();
         self
@@ -6697,7 +8057,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `educationalAlignment` field to an Option value (optional)
     pub fn maybe_educational_alignment(
         mut self,
-        value: Option<SocialMediaPostingEducationalAlignment<'a>>,
+        value: Option<SocialMediaPostingEducationalAlignment<S>>,
     ) -> Self {
         self._fields.52 = value;
         self
@@ -6708,7 +8068,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `educationalLevel` field (optional)
     pub fn educational_level(
         mut self,
-        value: impl Into<Option<SocialMediaPostingEducationalLevel<'a>>>,
+        value: impl Into<Option<SocialMediaPostingEducationalLevel<S>>>,
     ) -> Self {
         self._fields.53 = value.into();
         self
@@ -6716,7 +8076,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `educationalLevel` field to an Option value (optional)
     pub fn maybe_educational_level(
         mut self,
-        value: Option<SocialMediaPostingEducationalLevel<'a>>,
+        value: Option<SocialMediaPostingEducationalLevel<S>>,
     ) -> Self {
         self._fields.53 = value;
         self
@@ -6727,7 +8087,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `educationalUse` field (optional)
     pub fn educational_use(
         mut self,
-        value: impl Into<Option<SocialMediaPostingEducationalUse<'a>>>,
+        value: impl Into<Option<SocialMediaPostingEducationalUse<S>>>,
     ) -> Self {
         self._fields.54 = value.into();
         self
@@ -6735,7 +8095,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `educationalUse` field to an Option value (optional)
     pub fn maybe_educational_use(
         mut self,
-        value: Option<SocialMediaPostingEducationalUse<'a>>,
+        value: Option<SocialMediaPostingEducationalUse<S>>,
     ) -> Self {
         self._fields.54 = value;
         self
@@ -6746,7 +8106,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `encoding` field (optional)
     pub fn encoding(
         mut self,
-        value: impl Into<Option<SocialMediaPostingEncoding<'a>>>,
+        value: impl Into<Option<SocialMediaPostingEncoding<S>>>,
     ) -> Self {
         self._fields.55 = value.into();
         self
@@ -6754,7 +8114,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `encoding` field to an Option value (optional)
     pub fn maybe_encoding(
         mut self,
-        value: Option<SocialMediaPostingEncoding<'a>>,
+        value: Option<SocialMediaPostingEncoding<S>>,
     ) -> Self {
         self._fields.55 = value;
         self
@@ -6765,7 +8125,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `encodingFormat` field (optional)
     pub fn encoding_format(
         mut self,
-        value: impl Into<Option<SocialMediaPostingEncodingFormat<'a>>>,
+        value: impl Into<Option<SocialMediaPostingEncodingFormat<S>>>,
     ) -> Self {
         self._fields.56 = value.into();
         self
@@ -6773,7 +8133,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `encodingFormat` field to an Option value (optional)
     pub fn maybe_encoding_format(
         mut self,
-        value: Option<SocialMediaPostingEncodingFormat<'a>>,
+        value: Option<SocialMediaPostingEncodingFormat<S>>,
     ) -> Self {
         self._fields.56 = value;
         self
@@ -6784,7 +8144,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `encodings` field (optional)
     pub fn encodings(
         mut self,
-        value: impl Into<Option<SocialMediaPostingEncodings<'a>>>,
+        value: impl Into<Option<SocialMediaPostingEncodings<S>>>,
     ) -> Self {
         self._fields.57 = value.into();
         self
@@ -6792,7 +8152,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `encodings` field to an Option value (optional)
     pub fn maybe_encodings(
         mut self,
-        value: Option<SocialMediaPostingEncodings<'a>>,
+        value: Option<SocialMediaPostingEncodings<S>>,
     ) -> Self {
         self._fields.57 = value;
         self
@@ -6803,7 +8163,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `exampleOfWork` field (optional)
     pub fn example_of_work(
         mut self,
-        value: impl Into<Option<SocialMediaPostingExampleOfWork<'a>>>,
+        value: impl Into<Option<SocialMediaPostingExampleOfWork<S>>>,
     ) -> Self {
         self._fields.58 = value.into();
         self
@@ -6811,7 +8171,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `exampleOfWork` field to an Option value (optional)
     pub fn maybe_example_of_work(
         mut self,
-        value: Option<SocialMediaPostingExampleOfWork<'a>>,
+        value: Option<SocialMediaPostingExampleOfWork<S>>,
     ) -> Self {
         self._fields.58 = value;
         self
@@ -6822,16 +8182,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `expires` field (optional)
     pub fn expires(
         mut self,
-        value: impl Into<Option<SocialMediaPostingExpires<'a>>>,
+        value: impl Into<Option<SocialMediaPostingExpires<S>>>,
     ) -> Self {
         self._fields.59 = value.into();
         self
     }
     /// Set the `expires` field to an Option value (optional)
-    pub fn maybe_expires(
-        mut self,
-        value: Option<SocialMediaPostingExpires<'a>>,
-    ) -> Self {
+    pub fn maybe_expires(mut self, value: Option<SocialMediaPostingExpires<S>>) -> Self {
         self._fields.59 = value;
         self
     }
@@ -6841,7 +8198,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `fileFormat` field (optional)
     pub fn file_format(
         mut self,
-        value: impl Into<Option<SocialMediaPostingFileFormat<'a>>>,
+        value: impl Into<Option<SocialMediaPostingFileFormat<S>>>,
     ) -> Self {
         self._fields.60 = value.into();
         self
@@ -6849,7 +8206,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `fileFormat` field to an Option value (optional)
     pub fn maybe_file_format(
         mut self,
-        value: Option<SocialMediaPostingFileFormat<'a>>,
+        value: Option<SocialMediaPostingFileFormat<S>>,
     ) -> Self {
         self._fields.60 = value;
         self
@@ -6860,13 +8217,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `funder` field (optional)
     pub fn funder(
         mut self,
-        value: impl Into<Option<SocialMediaPostingFunder<'a>>>,
+        value: impl Into<Option<SocialMediaPostingFunder<S>>>,
     ) -> Self {
         self._fields.61 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
-    pub fn maybe_funder(mut self, value: Option<SocialMediaPostingFunder<'a>>) -> Self {
+    pub fn maybe_funder(mut self, value: Option<SocialMediaPostingFunder<S>>) -> Self {
         self._fields.61 = value;
         self
     }
@@ -6876,16 +8233,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `funding` field (optional)
     pub fn funding(
         mut self,
-        value: impl Into<Option<SocialMediaPostingFunding<'a>>>,
+        value: impl Into<Option<SocialMediaPostingFunding<S>>>,
     ) -> Self {
         self._fields.62 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
-    pub fn maybe_funding(
-        mut self,
-        value: Option<SocialMediaPostingFunding<'a>>,
-    ) -> Self {
+    pub fn maybe_funding(mut self, value: Option<SocialMediaPostingFunding<S>>) -> Self {
         self._fields.62 = value;
         self
     }
@@ -6895,13 +8249,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `genre` field (optional)
     pub fn genre(
         mut self,
-        value: impl Into<Option<SocialMediaPostingGenre<'a>>>,
+        value: impl Into<Option<SocialMediaPostingGenre<S>>>,
     ) -> Self {
         self._fields.63 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<SocialMediaPostingGenre<'a>>) -> Self {
+    pub fn maybe_genre(mut self, value: Option<SocialMediaPostingGenre<S>>) -> Self {
         self._fields.63 = value;
         self
     }
@@ -6911,7 +8265,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `hasPart` field (optional)
     pub fn has_part(
         mut self,
-        value: impl Into<Option<SocialMediaPostingHasPart<'a>>>,
+        value: impl Into<Option<SocialMediaPostingHasPart<S>>>,
     ) -> Self {
         self._fields.64 = value.into();
         self
@@ -6919,7 +8273,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `hasPart` field to an Option value (optional)
     pub fn maybe_has_part(
         mut self,
-        value: Option<SocialMediaPostingHasPart<'a>>,
+        value: Option<SocialMediaPostingHasPart<S>>,
     ) -> Self {
         self._fields.64 = value;
         self
@@ -6930,7 +8284,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `headline` field (optional)
     pub fn headline(
         mut self,
-        value: impl Into<Option<SocialMediaPostingHeadline<'a>>>,
+        value: impl Into<Option<SocialMediaPostingHeadline<S>>>,
     ) -> Self {
         self._fields.65 = value.into();
         self
@@ -6938,7 +8292,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `headline` field to an Option value (optional)
     pub fn maybe_headline(
         mut self,
-        value: Option<SocialMediaPostingHeadline<'a>>,
+        value: Option<SocialMediaPostingHeadline<S>>,
     ) -> Self {
         self._fields.65 = value;
         self
@@ -6949,7 +8303,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `identifier` field (optional)
     pub fn identifier(
         mut self,
-        value: impl Into<Option<SocialMediaPostingIdentifier<'a>>>,
+        value: impl Into<Option<SocialMediaPostingIdentifier<S>>>,
     ) -> Self {
         self._fields.66 = value.into();
         self
@@ -6957,7 +8311,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(
         mut self,
-        value: Option<SocialMediaPostingIdentifier<'a>>,
+        value: Option<SocialMediaPostingIdentifier<S>>,
     ) -> Self {
         self._fields.66 = value;
         self
@@ -6968,13 +8322,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `image` field (optional)
     pub fn image(
         mut self,
-        value: impl Into<Option<SocialMediaPostingImage<'a>>>,
+        value: impl Into<Option<SocialMediaPostingImage<S>>>,
     ) -> Self {
         self._fields.67 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<SocialMediaPostingImage<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<SocialMediaPostingImage<S>>) -> Self {
         self._fields.67 = value;
         self
     }
@@ -6984,7 +8338,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `inLanguage` field (optional)
     pub fn in_language(
         mut self,
-        value: impl Into<Option<SocialMediaPostingInLanguage<'a>>>,
+        value: impl Into<Option<SocialMediaPostingInLanguage<S>>>,
     ) -> Self {
         self._fields.68 = value.into();
         self
@@ -6992,7 +8346,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `inLanguage` field to an Option value (optional)
     pub fn maybe_in_language(
         mut self,
-        value: Option<SocialMediaPostingInLanguage<'a>>,
+        value: Option<SocialMediaPostingInLanguage<S>>,
     ) -> Self {
         self._fields.68 = value;
         self
@@ -7003,7 +8357,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `interactionStatistic` field (optional)
     pub fn interaction_statistic(
         mut self,
-        value: impl Into<Option<SocialMediaPostingInteractionStatistic<'a>>>,
+        value: impl Into<Option<SocialMediaPostingInteractionStatistic<S>>>,
     ) -> Self {
         self._fields.69 = value.into();
         self
@@ -7011,7 +8365,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `interactionStatistic` field to an Option value (optional)
     pub fn maybe_interaction_statistic(
         mut self,
-        value: Option<SocialMediaPostingInteractionStatistic<'a>>,
+        value: Option<SocialMediaPostingInteractionStatistic<S>>,
     ) -> Self {
         self._fields.69 = value;
         self
@@ -7022,7 +8376,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `interactivityType` field (optional)
     pub fn interactivity_type(
         mut self,
-        value: impl Into<Option<SocialMediaPostingInteractivityType<'a>>>,
+        value: impl Into<Option<SocialMediaPostingInteractivityType<S>>>,
     ) -> Self {
         self._fields.70 = value.into();
         self
@@ -7030,7 +8384,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `interactivityType` field to an Option value (optional)
     pub fn maybe_interactivity_type(
         mut self,
-        value: Option<SocialMediaPostingInteractivityType<'a>>,
+        value: Option<SocialMediaPostingInteractivityType<S>>,
     ) -> Self {
         self._fields.70 = value;
         self
@@ -7041,7 +8395,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `interpretedAsClaim` field (optional)
     pub fn interpreted_as_claim(
         mut self,
-        value: impl Into<Option<SocialMediaPostingInterpretedAsClaim<'a>>>,
+        value: impl Into<Option<SocialMediaPostingInterpretedAsClaim<S>>>,
     ) -> Self {
         self._fields.71 = value.into();
         self
@@ -7049,7 +8403,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `interpretedAsClaim` field to an Option value (optional)
     pub fn maybe_interpreted_as_claim(
         mut self,
-        value: Option<SocialMediaPostingInterpretedAsClaim<'a>>,
+        value: Option<SocialMediaPostingInterpretedAsClaim<S>>,
     ) -> Self {
         self._fields.71 = value;
         self
@@ -7060,7 +8414,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `isAccessibleForFree` field (optional)
     pub fn is_accessible_for_free(
         mut self,
-        value: impl Into<Option<SocialMediaPostingIsAccessibleForFree<'a>>>,
+        value: impl Into<Option<SocialMediaPostingIsAccessibleForFree<S>>>,
     ) -> Self {
         self._fields.72 = value.into();
         self
@@ -7068,7 +8422,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `isAccessibleForFree` field to an Option value (optional)
     pub fn maybe_is_accessible_for_free(
         mut self,
-        value: Option<SocialMediaPostingIsAccessibleForFree<'a>>,
+        value: Option<SocialMediaPostingIsAccessibleForFree<S>>,
     ) -> Self {
         self._fields.72 = value;
         self
@@ -7079,7 +8433,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `isBasedOn` field (optional)
     pub fn is_based_on(
         mut self,
-        value: impl Into<Option<SocialMediaPostingIsBasedOn<'a>>>,
+        value: impl Into<Option<SocialMediaPostingIsBasedOn<S>>>,
     ) -> Self {
         self._fields.73 = value.into();
         self
@@ -7087,7 +8441,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `isBasedOn` field to an Option value (optional)
     pub fn maybe_is_based_on(
         mut self,
-        value: Option<SocialMediaPostingIsBasedOn<'a>>,
+        value: Option<SocialMediaPostingIsBasedOn<S>>,
     ) -> Self {
         self._fields.73 = value;
         self
@@ -7098,7 +8452,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `isBasedOnUrl` field (optional)
     pub fn is_based_on_url(
         mut self,
-        value: impl Into<Option<SocialMediaPostingIsBasedOnUrl<'a>>>,
+        value: impl Into<Option<SocialMediaPostingIsBasedOnUrl<S>>>,
     ) -> Self {
         self._fields.74 = value.into();
         self
@@ -7106,7 +8460,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `isBasedOnUrl` field to an Option value (optional)
     pub fn maybe_is_based_on_url(
         mut self,
-        value: Option<SocialMediaPostingIsBasedOnUrl<'a>>,
+        value: Option<SocialMediaPostingIsBasedOnUrl<S>>,
     ) -> Self {
         self._fields.74 = value;
         self
@@ -7117,7 +8471,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `isFamilyFriendly` field (optional)
     pub fn is_family_friendly(
         mut self,
-        value: impl Into<Option<SocialMediaPostingIsFamilyFriendly<'a>>>,
+        value: impl Into<Option<SocialMediaPostingIsFamilyFriendly<S>>>,
     ) -> Self {
         self._fields.75 = value.into();
         self
@@ -7125,7 +8479,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `isFamilyFriendly` field to an Option value (optional)
     pub fn maybe_is_family_friendly(
         mut self,
-        value: Option<SocialMediaPostingIsFamilyFriendly<'a>>,
+        value: Option<SocialMediaPostingIsFamilyFriendly<S>>,
     ) -> Self {
         self._fields.75 = value;
         self
@@ -7136,7 +8490,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `isPartOf` field (optional)
     pub fn is_part_of(
         mut self,
-        value: impl Into<Option<SocialMediaPostingIsPartOf<'a>>>,
+        value: impl Into<Option<SocialMediaPostingIsPartOf<S>>>,
     ) -> Self {
         self._fields.76 = value.into();
         self
@@ -7144,7 +8498,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `isPartOf` field to an Option value (optional)
     pub fn maybe_is_part_of(
         mut self,
-        value: Option<SocialMediaPostingIsPartOf<'a>>,
+        value: Option<SocialMediaPostingIsPartOf<S>>,
     ) -> Self {
         self._fields.76 = value;
         self
@@ -7155,7 +8509,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `keywords` field (optional)
     pub fn keywords(
         mut self,
-        value: impl Into<Option<SocialMediaPostingKeywords<'a>>>,
+        value: impl Into<Option<SocialMediaPostingKeywords<S>>>,
     ) -> Self {
         self._fields.77 = value.into();
         self
@@ -7163,7 +8517,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(
         mut self,
-        value: Option<SocialMediaPostingKeywords<'a>>,
+        value: Option<SocialMediaPostingKeywords<S>>,
     ) -> Self {
         self._fields.77 = value;
         self
@@ -7174,7 +8528,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `learningResourceType` field (optional)
     pub fn learning_resource_type(
         mut self,
-        value: impl Into<Option<SocialMediaPostingLearningResourceType<'a>>>,
+        value: impl Into<Option<SocialMediaPostingLearningResourceType<S>>>,
     ) -> Self {
         self._fields.78 = value.into();
         self
@@ -7182,7 +8536,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `learningResourceType` field to an Option value (optional)
     pub fn maybe_learning_resource_type(
         mut self,
-        value: Option<SocialMediaPostingLearningResourceType<'a>>,
+        value: Option<SocialMediaPostingLearningResourceType<S>>,
     ) -> Self {
         self._fields.78 = value;
         self
@@ -7193,16 +8547,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `license` field (optional)
     pub fn license(
         mut self,
-        value: impl Into<Option<SocialMediaPostingLicense<'a>>>,
+        value: impl Into<Option<SocialMediaPostingLicense<S>>>,
     ) -> Self {
         self._fields.79 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
-    pub fn maybe_license(
-        mut self,
-        value: Option<SocialMediaPostingLicense<'a>>,
-    ) -> Self {
+    pub fn maybe_license(mut self, value: Option<SocialMediaPostingLicense<S>>) -> Self {
         self._fields.79 = value;
         self
     }
@@ -7212,7 +8563,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `locationCreated` field (optional)
     pub fn location_created(
         mut self,
-        value: impl Into<Option<SocialMediaPostingLocationCreated<'a>>>,
+        value: impl Into<Option<SocialMediaPostingLocationCreated<S>>>,
     ) -> Self {
         self._fields.80 = value.into();
         self
@@ -7220,7 +8571,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `locationCreated` field to an Option value (optional)
     pub fn maybe_location_created(
         mut self,
-        value: Option<SocialMediaPostingLocationCreated<'a>>,
+        value: Option<SocialMediaPostingLocationCreated<S>>,
     ) -> Self {
         self._fields.80 = value;
         self
@@ -7231,7 +8582,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `mainEntity` field (optional)
     pub fn main_entity(
         mut self,
-        value: impl Into<Option<SocialMediaPostingMainEntity<'a>>>,
+        value: impl Into<Option<SocialMediaPostingMainEntity<S>>>,
     ) -> Self {
         self._fields.81 = value.into();
         self
@@ -7239,7 +8590,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `mainEntity` field to an Option value (optional)
     pub fn maybe_main_entity(
         mut self,
-        value: Option<SocialMediaPostingMainEntity<'a>>,
+        value: Option<SocialMediaPostingMainEntity<S>>,
     ) -> Self {
         self._fields.81 = value;
         self
@@ -7250,7 +8601,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
-        value: impl Into<Option<SocialMediaPostingMainEntityOfPage<'a>>>,
+        value: impl Into<Option<SocialMediaPostingMainEntityOfPage<S>>>,
     ) -> Self {
         self._fields.82 = value.into();
         self
@@ -7258,7 +8609,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `mainEntityOfPage` field to an Option value (optional)
     pub fn maybe_main_entity_of_page(
         mut self,
-        value: Option<SocialMediaPostingMainEntityOfPage<'a>>,
+        value: Option<SocialMediaPostingMainEntityOfPage<S>>,
     ) -> Self {
         self._fields.82 = value;
         self
@@ -7269,7 +8620,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `maintainer` field (optional)
     pub fn maintainer(
         mut self,
-        value: impl Into<Option<SocialMediaPostingMaintainer<'a>>>,
+        value: impl Into<Option<SocialMediaPostingMaintainer<S>>>,
     ) -> Self {
         self._fields.83 = value.into();
         self
@@ -7277,7 +8628,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `maintainer` field to an Option value (optional)
     pub fn maybe_maintainer(
         mut self,
-        value: Option<SocialMediaPostingMaintainer<'a>>,
+        value: Option<SocialMediaPostingMaintainer<S>>,
     ) -> Self {
         self._fields.83 = value;
         self
@@ -7288,7 +8639,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `material` field (optional)
     pub fn material(
         mut self,
-        value: impl Into<Option<SocialMediaPostingMaterial<'a>>>,
+        value: impl Into<Option<SocialMediaPostingMaterial<S>>>,
     ) -> Self {
         self._fields.84 = value.into();
         self
@@ -7296,7 +8647,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `material` field to an Option value (optional)
     pub fn maybe_material(
         mut self,
-        value: Option<SocialMediaPostingMaterial<'a>>,
+        value: Option<SocialMediaPostingMaterial<S>>,
     ) -> Self {
         self._fields.84 = value;
         self
@@ -7307,7 +8658,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `materialExtent` field (optional)
     pub fn material_extent(
         mut self,
-        value: impl Into<Option<SocialMediaPostingMaterialExtent<'a>>>,
+        value: impl Into<Option<SocialMediaPostingMaterialExtent<S>>>,
     ) -> Self {
         self._fields.85 = value.into();
         self
@@ -7315,7 +8666,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `materialExtent` field to an Option value (optional)
     pub fn maybe_material_extent(
         mut self,
-        value: Option<SocialMediaPostingMaterialExtent<'a>>,
+        value: Option<SocialMediaPostingMaterialExtent<S>>,
     ) -> Self {
         self._fields.85 = value;
         self
@@ -7326,7 +8677,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `mentions` field (optional)
     pub fn mentions(
         mut self,
-        value: impl Into<Option<SocialMediaPostingMentions<'a>>>,
+        value: impl Into<Option<SocialMediaPostingMentions<S>>>,
     ) -> Self {
         self._fields.86 = value.into();
         self
@@ -7334,7 +8685,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `mentions` field to an Option value (optional)
     pub fn maybe_mentions(
         mut self,
-        value: Option<SocialMediaPostingMentions<'a>>,
+        value: Option<SocialMediaPostingMentions<S>>,
     ) -> Self {
         self._fields.86 = value;
         self
@@ -7343,12 +8694,12 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
 
 impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<SocialMediaPostingName<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<SocialMediaPostingName<S>>>) -> Self {
         self._fields.87 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<SocialMediaPostingName<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<SocialMediaPostingName<S>>) -> Self {
         self._fields.87 = value;
         self
     }
@@ -7358,13 +8709,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `offers` field (optional)
     pub fn offers(
         mut self,
-        value: impl Into<Option<SocialMediaPostingOffers<'a>>>,
+        value: impl Into<Option<SocialMediaPostingOffers<S>>>,
     ) -> Self {
         self._fields.88 = value.into();
         self
     }
     /// Set the `offers` field to an Option value (optional)
-    pub fn maybe_offers(mut self, value: Option<SocialMediaPostingOffers<'a>>) -> Self {
+    pub fn maybe_offers(mut self, value: Option<SocialMediaPostingOffers<S>>) -> Self {
         self._fields.88 = value;
         self
     }
@@ -7374,7 +8725,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `pageEnd` field (optional)
     pub fn page_end(
         mut self,
-        value: impl Into<Option<SocialMediaPostingPageEnd<'a>>>,
+        value: impl Into<Option<SocialMediaPostingPageEnd<S>>>,
     ) -> Self {
         self._fields.89 = value.into();
         self
@@ -7382,7 +8733,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `pageEnd` field to an Option value (optional)
     pub fn maybe_page_end(
         mut self,
-        value: Option<SocialMediaPostingPageEnd<'a>>,
+        value: Option<SocialMediaPostingPageEnd<S>>,
     ) -> Self {
         self._fields.89 = value;
         self
@@ -7393,7 +8744,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `pageStart` field (optional)
     pub fn page_start(
         mut self,
-        value: impl Into<Option<SocialMediaPostingPageStart<'a>>>,
+        value: impl Into<Option<SocialMediaPostingPageStart<S>>>,
     ) -> Self {
         self._fields.90 = value.into();
         self
@@ -7401,7 +8752,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `pageStart` field to an Option value (optional)
     pub fn maybe_page_start(
         mut self,
-        value: Option<SocialMediaPostingPageStart<'a>>,
+        value: Option<SocialMediaPostingPageStart<S>>,
     ) -> Self {
         self._fields.90 = value;
         self
@@ -7412,7 +8763,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `pagination` field (optional)
     pub fn pagination(
         mut self,
-        value: impl Into<Option<SocialMediaPostingPagination<'a>>>,
+        value: impl Into<Option<SocialMediaPostingPagination<S>>>,
     ) -> Self {
         self._fields.91 = value.into();
         self
@@ -7420,7 +8771,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `pagination` field to an Option value (optional)
     pub fn maybe_pagination(
         mut self,
-        value: Option<SocialMediaPostingPagination<'a>>,
+        value: Option<SocialMediaPostingPagination<S>>,
     ) -> Self {
         self._fields.91 = value;
         self
@@ -7431,16 +8782,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `pattern` field (optional)
     pub fn pattern(
         mut self,
-        value: impl Into<Option<SocialMediaPostingPattern<'a>>>,
+        value: impl Into<Option<SocialMediaPostingPattern<S>>>,
     ) -> Self {
         self._fields.92 = value.into();
         self
     }
     /// Set the `pattern` field to an Option value (optional)
-    pub fn maybe_pattern(
-        mut self,
-        value: Option<SocialMediaPostingPattern<'a>>,
-    ) -> Self {
+    pub fn maybe_pattern(mut self, value: Option<SocialMediaPostingPattern<S>>) -> Self {
         self._fields.92 = value;
         self
     }
@@ -7450,7 +8798,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `position` field (optional)
     pub fn position(
         mut self,
-        value: impl Into<Option<SocialMediaPostingPosition<'a>>>,
+        value: impl Into<Option<SocialMediaPostingPosition<S>>>,
     ) -> Self {
         self._fields.93 = value.into();
         self
@@ -7458,7 +8806,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `position` field to an Option value (optional)
     pub fn maybe_position(
         mut self,
-        value: Option<SocialMediaPostingPosition<'a>>,
+        value: Option<SocialMediaPostingPosition<S>>,
     ) -> Self {
         self._fields.93 = value;
         self
@@ -7469,7 +8817,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `potentialAction` field (optional)
     pub fn potential_action(
         mut self,
-        value: impl Into<Option<SocialMediaPostingPotentialAction<'a>>>,
+        value: impl Into<Option<SocialMediaPostingPotentialAction<S>>>,
     ) -> Self {
         self._fields.94 = value.into();
         self
@@ -7477,7 +8825,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `potentialAction` field to an Option value (optional)
     pub fn maybe_potential_action(
         mut self,
-        value: Option<SocialMediaPostingPotentialAction<'a>>,
+        value: Option<SocialMediaPostingPotentialAction<S>>,
     ) -> Self {
         self._fields.94 = value;
         self
@@ -7488,7 +8836,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `producer` field (optional)
     pub fn producer(
         mut self,
-        value: impl Into<Option<SocialMediaPostingProducer<'a>>>,
+        value: impl Into<Option<SocialMediaPostingProducer<S>>>,
     ) -> Self {
         self._fields.95 = value.into();
         self
@@ -7496,7 +8844,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `producer` field to an Option value (optional)
     pub fn maybe_producer(
         mut self,
-        value: Option<SocialMediaPostingProducer<'a>>,
+        value: Option<SocialMediaPostingProducer<S>>,
     ) -> Self {
         self._fields.95 = value;
         self
@@ -7507,7 +8855,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `provider` field (optional)
     pub fn provider(
         mut self,
-        value: impl Into<Option<SocialMediaPostingProvider<'a>>>,
+        value: impl Into<Option<SocialMediaPostingProvider<S>>>,
     ) -> Self {
         self._fields.96 = value.into();
         self
@@ -7515,7 +8863,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `provider` field to an Option value (optional)
     pub fn maybe_provider(
         mut self,
-        value: Option<SocialMediaPostingProvider<'a>>,
+        value: Option<SocialMediaPostingProvider<S>>,
     ) -> Self {
         self._fields.96 = value;
         self
@@ -7526,7 +8874,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `publication` field (optional)
     pub fn publication(
         mut self,
-        value: impl Into<Option<SocialMediaPostingPublication<'a>>>,
+        value: impl Into<Option<SocialMediaPostingPublication<S>>>,
     ) -> Self {
         self._fields.97 = value.into();
         self
@@ -7534,7 +8882,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `publication` field to an Option value (optional)
     pub fn maybe_publication(
         mut self,
-        value: Option<SocialMediaPostingPublication<'a>>,
+        value: Option<SocialMediaPostingPublication<S>>,
     ) -> Self {
         self._fields.97 = value;
         self
@@ -7545,7 +8893,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `publisher` field (optional)
     pub fn publisher(
         mut self,
-        value: impl Into<Option<SocialMediaPostingPublisher<'a>>>,
+        value: impl Into<Option<SocialMediaPostingPublisher<S>>>,
     ) -> Self {
         self._fields.98 = value.into();
         self
@@ -7553,7 +8901,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `publisher` field to an Option value (optional)
     pub fn maybe_publisher(
         mut self,
-        value: Option<SocialMediaPostingPublisher<'a>>,
+        value: Option<SocialMediaPostingPublisher<S>>,
     ) -> Self {
         self._fields.98 = value;
         self
@@ -7564,7 +8912,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `publisherImprint` field (optional)
     pub fn publisher_imprint(
         mut self,
-        value: impl Into<Option<SocialMediaPostingPublisherImprint<'a>>>,
+        value: impl Into<Option<SocialMediaPostingPublisherImprint<S>>>,
     ) -> Self {
         self._fields.99 = value.into();
         self
@@ -7572,7 +8920,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `publisherImprint` field to an Option value (optional)
     pub fn maybe_publisher_imprint(
         mut self,
-        value: Option<SocialMediaPostingPublisherImprint<'a>>,
+        value: Option<SocialMediaPostingPublisherImprint<S>>,
     ) -> Self {
         self._fields.99 = value;
         self
@@ -7583,7 +8931,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `publishingPrinciples` field (optional)
     pub fn publishing_principles(
         mut self,
-        value: impl Into<Option<SocialMediaPostingPublishingPrinciples<'a>>>,
+        value: impl Into<Option<SocialMediaPostingPublishingPrinciples<S>>>,
     ) -> Self {
         self._fields.100 = value.into();
         self
@@ -7591,7 +8939,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `publishingPrinciples` field to an Option value (optional)
     pub fn maybe_publishing_principles(
         mut self,
-        value: Option<SocialMediaPostingPublishingPrinciples<'a>>,
+        value: Option<SocialMediaPostingPublishingPrinciples<S>>,
     ) -> Self {
         self._fields.100 = value;
         self
@@ -7602,7 +8950,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `recordedAt` field (optional)
     pub fn recorded_at(
         mut self,
-        value: impl Into<Option<SocialMediaPostingRecordedAt<'a>>>,
+        value: impl Into<Option<SocialMediaPostingRecordedAt<S>>>,
     ) -> Self {
         self._fields.101 = value.into();
         self
@@ -7610,7 +8958,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `recordedAt` field to an Option value (optional)
     pub fn maybe_recorded_at(
         mut self,
-        value: Option<SocialMediaPostingRecordedAt<'a>>,
+        value: Option<SocialMediaPostingRecordedAt<S>>,
     ) -> Self {
         self._fields.101 = value;
         self
@@ -7621,7 +8969,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `releasedEvent` field (optional)
     pub fn released_event(
         mut self,
-        value: impl Into<Option<SocialMediaPostingReleasedEvent<'a>>>,
+        value: impl Into<Option<SocialMediaPostingReleasedEvent<S>>>,
     ) -> Self {
         self._fields.102 = value.into();
         self
@@ -7629,7 +8977,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `releasedEvent` field to an Option value (optional)
     pub fn maybe_released_event(
         mut self,
-        value: Option<SocialMediaPostingReleasedEvent<'a>>,
+        value: Option<SocialMediaPostingReleasedEvent<S>>,
     ) -> Self {
         self._fields.102 = value;
         self
@@ -7640,13 +8988,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `review` field (optional)
     pub fn review(
         mut self,
-        value: impl Into<Option<SocialMediaPostingReview<'a>>>,
+        value: impl Into<Option<SocialMediaPostingReview<S>>>,
     ) -> Self {
         self._fields.103 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
-    pub fn maybe_review(mut self, value: Option<SocialMediaPostingReview<'a>>) -> Self {
+    pub fn maybe_review(mut self, value: Option<SocialMediaPostingReview<S>>) -> Self {
         self._fields.103 = value;
         self
     }
@@ -7656,16 +9004,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `reviews` field (optional)
     pub fn reviews(
         mut self,
-        value: impl Into<Option<SocialMediaPostingReviews<'a>>>,
+        value: impl Into<Option<SocialMediaPostingReviews<S>>>,
     ) -> Self {
         self._fields.104 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
-    pub fn maybe_reviews(
-        mut self,
-        value: Option<SocialMediaPostingReviews<'a>>,
-    ) -> Self {
+    pub fn maybe_reviews(mut self, value: Option<SocialMediaPostingReviews<S>>) -> Self {
         self._fields.104 = value;
         self
     }
@@ -7675,13 +9020,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `sameAs` field (optional)
     pub fn same_as(
         mut self,
-        value: impl Into<Option<SocialMediaPostingSameAs<'a>>>,
+        value: impl Into<Option<SocialMediaPostingSameAs<S>>>,
     ) -> Self {
         self._fields.105 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
-    pub fn maybe_same_as(mut self, value: Option<SocialMediaPostingSameAs<'a>>) -> Self {
+    pub fn maybe_same_as(mut self, value: Option<SocialMediaPostingSameAs<S>>) -> Self {
         self._fields.105 = value;
         self
     }
@@ -7691,7 +9036,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `schemaVersion` field (optional)
     pub fn schema_version(
         mut self,
-        value: impl Into<Option<SocialMediaPostingSchemaVersion<'a>>>,
+        value: impl Into<Option<SocialMediaPostingSchemaVersion<S>>>,
     ) -> Self {
         self._fields.106 = value.into();
         self
@@ -7699,7 +9044,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `schemaVersion` field to an Option value (optional)
     pub fn maybe_schema_version(
         mut self,
-        value: Option<SocialMediaPostingSchemaVersion<'a>>,
+        value: Option<SocialMediaPostingSchemaVersion<S>>,
     ) -> Self {
         self._fields.106 = value;
         self
@@ -7710,7 +9055,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `sdDatePublished` field (optional)
     pub fn sd_date_published(
         mut self,
-        value: impl Into<Option<SocialMediaPostingSdDatePublished<'a>>>,
+        value: impl Into<Option<SocialMediaPostingSdDatePublished<S>>>,
     ) -> Self {
         self._fields.107 = value.into();
         self
@@ -7718,7 +9063,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `sdDatePublished` field to an Option value (optional)
     pub fn maybe_sd_date_published(
         mut self,
-        value: Option<SocialMediaPostingSdDatePublished<'a>>,
+        value: Option<SocialMediaPostingSdDatePublished<S>>,
     ) -> Self {
         self._fields.107 = value;
         self
@@ -7729,7 +9074,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `sdLicense` field (optional)
     pub fn sd_license(
         mut self,
-        value: impl Into<Option<SocialMediaPostingSdLicense<'a>>>,
+        value: impl Into<Option<SocialMediaPostingSdLicense<S>>>,
     ) -> Self {
         self._fields.108 = value.into();
         self
@@ -7737,7 +9082,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `sdLicense` field to an Option value (optional)
     pub fn maybe_sd_license(
         mut self,
-        value: Option<SocialMediaPostingSdLicense<'a>>,
+        value: Option<SocialMediaPostingSdLicense<S>>,
     ) -> Self {
         self._fields.108 = value;
         self
@@ -7748,7 +9093,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `sdPublisher` field (optional)
     pub fn sd_publisher(
         mut self,
-        value: impl Into<Option<SocialMediaPostingSdPublisher<'a>>>,
+        value: impl Into<Option<SocialMediaPostingSdPublisher<S>>>,
     ) -> Self {
         self._fields.109 = value.into();
         self
@@ -7756,7 +9101,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `sdPublisher` field to an Option value (optional)
     pub fn maybe_sd_publisher(
         mut self,
-        value: Option<SocialMediaPostingSdPublisher<'a>>,
+        value: Option<SocialMediaPostingSdPublisher<S>>,
     ) -> Self {
         self._fields.109 = value;
         self
@@ -7767,7 +9112,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `sharedContent` field (optional)
     pub fn shared_content(
         mut self,
-        value: impl Into<Option<SocialMediaPostingSharedContent<'a>>>,
+        value: impl Into<Option<SocialMediaPostingSharedContent<S>>>,
     ) -> Self {
         self._fields.110 = value.into();
         self
@@ -7775,7 +9120,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `sharedContent` field to an Option value (optional)
     pub fn maybe_shared_content(
         mut self,
-        value: Option<SocialMediaPostingSharedContent<'a>>,
+        value: Option<SocialMediaPostingSharedContent<S>>,
     ) -> Self {
         self._fields.110 = value;
         self
@@ -7784,12 +9129,12 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
 
 impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> {
     /// Set the `size` field (optional)
-    pub fn size(mut self, value: impl Into<Option<SocialMediaPostingSize<'a>>>) -> Self {
+    pub fn size(mut self, value: impl Into<Option<SocialMediaPostingSize<S>>>) -> Self {
         self._fields.111 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
-    pub fn maybe_size(mut self, value: Option<SocialMediaPostingSize<'a>>) -> Self {
+    pub fn maybe_size(mut self, value: Option<SocialMediaPostingSize<S>>) -> Self {
         self._fields.111 = value;
         self
     }
@@ -7799,7 +9144,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `sourceOrganization` field (optional)
     pub fn source_organization(
         mut self,
-        value: impl Into<Option<SocialMediaPostingSourceOrganization<'a>>>,
+        value: impl Into<Option<SocialMediaPostingSourceOrganization<S>>>,
     ) -> Self {
         self._fields.112 = value.into();
         self
@@ -7807,7 +9152,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `sourceOrganization` field to an Option value (optional)
     pub fn maybe_source_organization(
         mut self,
-        value: Option<SocialMediaPostingSourceOrganization<'a>>,
+        value: Option<SocialMediaPostingSourceOrganization<S>>,
     ) -> Self {
         self._fields.112 = value;
         self
@@ -7818,16 +9163,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `spatial` field (optional)
     pub fn spatial(
         mut self,
-        value: impl Into<Option<SocialMediaPostingSpatial<'a>>>,
+        value: impl Into<Option<SocialMediaPostingSpatial<S>>>,
     ) -> Self {
         self._fields.113 = value.into();
         self
     }
     /// Set the `spatial` field to an Option value (optional)
-    pub fn maybe_spatial(
-        mut self,
-        value: Option<SocialMediaPostingSpatial<'a>>,
-    ) -> Self {
+    pub fn maybe_spatial(mut self, value: Option<SocialMediaPostingSpatial<S>>) -> Self {
         self._fields.113 = value;
         self
     }
@@ -7837,7 +9179,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `spatialCoverage` field (optional)
     pub fn spatial_coverage(
         mut self,
-        value: impl Into<Option<SocialMediaPostingSpatialCoverage<'a>>>,
+        value: impl Into<Option<SocialMediaPostingSpatialCoverage<S>>>,
     ) -> Self {
         self._fields.114 = value.into();
         self
@@ -7845,7 +9187,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `spatialCoverage` field to an Option value (optional)
     pub fn maybe_spatial_coverage(
         mut self,
-        value: Option<SocialMediaPostingSpatialCoverage<'a>>,
+        value: Option<SocialMediaPostingSpatialCoverage<S>>,
     ) -> Self {
         self._fields.114 = value;
         self
@@ -7856,7 +9198,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `speakable` field (optional)
     pub fn speakable(
         mut self,
-        value: impl Into<Option<SocialMediaPostingSpeakable<'a>>>,
+        value: impl Into<Option<SocialMediaPostingSpeakable<S>>>,
     ) -> Self {
         self._fields.115 = value.into();
         self
@@ -7864,7 +9206,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `speakable` field to an Option value (optional)
     pub fn maybe_speakable(
         mut self,
-        value: Option<SocialMediaPostingSpeakable<'a>>,
+        value: Option<SocialMediaPostingSpeakable<S>>,
     ) -> Self {
         self._fields.115 = value;
         self
@@ -7875,16 +9217,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `sponsor` field (optional)
     pub fn sponsor(
         mut self,
-        value: impl Into<Option<SocialMediaPostingSponsor<'a>>>,
+        value: impl Into<Option<SocialMediaPostingSponsor<S>>>,
     ) -> Self {
         self._fields.116 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
-    pub fn maybe_sponsor(
-        mut self,
-        value: Option<SocialMediaPostingSponsor<'a>>,
-    ) -> Self {
+    pub fn maybe_sponsor(mut self, value: Option<SocialMediaPostingSponsor<S>>) -> Self {
         self._fields.116 = value;
         self
     }
@@ -7894,7 +9233,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(
         mut self,
-        value: impl Into<Option<SocialMediaPostingSubjectOf<'a>>>,
+        value: impl Into<Option<SocialMediaPostingSubjectOf<S>>>,
     ) -> Self {
         self._fields.117 = value.into();
         self
@@ -7902,7 +9241,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(
         mut self,
-        value: Option<SocialMediaPostingSubjectOf<'a>>,
+        value: Option<SocialMediaPostingSubjectOf<S>>,
     ) -> Self {
         self._fields.117 = value;
         self
@@ -7913,16 +9252,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `teaches` field (optional)
     pub fn teaches(
         mut self,
-        value: impl Into<Option<SocialMediaPostingTeaches<'a>>>,
+        value: impl Into<Option<SocialMediaPostingTeaches<S>>>,
     ) -> Self {
         self._fields.118 = value.into();
         self
     }
     /// Set the `teaches` field to an Option value (optional)
-    pub fn maybe_teaches(
-        mut self,
-        value: Option<SocialMediaPostingTeaches<'a>>,
-    ) -> Self {
+    pub fn maybe_teaches(mut self, value: Option<SocialMediaPostingTeaches<S>>) -> Self {
         self._fields.118 = value;
         self
     }
@@ -7932,7 +9268,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `temporal` field (optional)
     pub fn temporal(
         mut self,
-        value: impl Into<Option<SocialMediaPostingTemporal<'a>>>,
+        value: impl Into<Option<SocialMediaPostingTemporal<S>>>,
     ) -> Self {
         self._fields.119 = value.into();
         self
@@ -7940,7 +9276,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `temporal` field to an Option value (optional)
     pub fn maybe_temporal(
         mut self,
-        value: Option<SocialMediaPostingTemporal<'a>>,
+        value: Option<SocialMediaPostingTemporal<S>>,
     ) -> Self {
         self._fields.119 = value;
         self
@@ -7951,7 +9287,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `temporalCoverage` field (optional)
     pub fn temporal_coverage(
         mut self,
-        value: impl Into<Option<SocialMediaPostingTemporalCoverage<'a>>>,
+        value: impl Into<Option<SocialMediaPostingTemporalCoverage<S>>>,
     ) -> Self {
         self._fields.120 = value.into();
         self
@@ -7959,7 +9295,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `temporalCoverage` field to an Option value (optional)
     pub fn maybe_temporal_coverage(
         mut self,
-        value: Option<SocialMediaPostingTemporalCoverage<'a>>,
+        value: Option<SocialMediaPostingTemporalCoverage<S>>,
     ) -> Self {
         self._fields.120 = value;
         self
@@ -7968,12 +9304,12 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
 
 impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> {
     /// Set the `text` field (optional)
-    pub fn text(mut self, value: impl Into<Option<SocialMediaPostingText<'a>>>) -> Self {
+    pub fn text(mut self, value: impl Into<Option<SocialMediaPostingText<S>>>) -> Self {
         self._fields.121 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
-    pub fn maybe_text(mut self, value: Option<SocialMediaPostingText<'a>>) -> Self {
+    pub fn maybe_text(mut self, value: Option<SocialMediaPostingText<S>>) -> Self {
         self._fields.121 = value;
         self
     }
@@ -7983,7 +9319,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(
         mut self,
-        value: impl Into<Option<SocialMediaPostingThumbnail<'a>>>,
+        value: impl Into<Option<SocialMediaPostingThumbnail<S>>>,
     ) -> Self {
         self._fields.122 = value.into();
         self
@@ -7991,7 +9327,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `thumbnail` field to an Option value (optional)
     pub fn maybe_thumbnail(
         mut self,
-        value: Option<SocialMediaPostingThumbnail<'a>>,
+        value: Option<SocialMediaPostingThumbnail<S>>,
     ) -> Self {
         self._fields.122 = value;
         self
@@ -8002,7 +9338,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `thumbnailUrl` field (optional)
     pub fn thumbnail_url(
         mut self,
-        value: impl Into<Option<SocialMediaPostingThumbnailUrl<'a>>>,
+        value: impl Into<Option<SocialMediaPostingThumbnailUrl<S>>>,
     ) -> Self {
         self._fields.123 = value.into();
         self
@@ -8010,7 +9346,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `thumbnailUrl` field to an Option value (optional)
     pub fn maybe_thumbnail_url(
         mut self,
-        value: Option<SocialMediaPostingThumbnailUrl<'a>>,
+        value: Option<SocialMediaPostingThumbnailUrl<S>>,
     ) -> Self {
         self._fields.123 = value;
         self
@@ -8021,7 +9357,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `timeRequired` field (optional)
     pub fn time_required(
         mut self,
-        value: impl Into<Option<SocialMediaPostingTimeRequired<'a>>>,
+        value: impl Into<Option<SocialMediaPostingTimeRequired<S>>>,
     ) -> Self {
         self._fields.124 = value.into();
         self
@@ -8029,7 +9365,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `timeRequired` field to an Option value (optional)
     pub fn maybe_time_required(
         mut self,
-        value: Option<SocialMediaPostingTimeRequired<'a>>,
+        value: Option<SocialMediaPostingTimeRequired<S>>,
     ) -> Self {
         self._fields.124 = value;
         self
@@ -8040,7 +9376,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `translationOfWork` field (optional)
     pub fn translation_of_work(
         mut self,
-        value: impl Into<Option<SocialMediaPostingTranslationOfWork<'a>>>,
+        value: impl Into<Option<SocialMediaPostingTranslationOfWork<S>>>,
     ) -> Self {
         self._fields.125 = value.into();
         self
@@ -8048,7 +9384,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `translationOfWork` field to an Option value (optional)
     pub fn maybe_translation_of_work(
         mut self,
-        value: Option<SocialMediaPostingTranslationOfWork<'a>>,
+        value: Option<SocialMediaPostingTranslationOfWork<S>>,
     ) -> Self {
         self._fields.125 = value;
         self
@@ -8059,7 +9395,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `translator` field (optional)
     pub fn translator(
         mut self,
-        value: impl Into<Option<SocialMediaPostingTranslator<'a>>>,
+        value: impl Into<Option<SocialMediaPostingTranslator<S>>>,
     ) -> Self {
         self._fields.126 = value.into();
         self
@@ -8067,7 +9403,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `translator` field to an Option value (optional)
     pub fn maybe_translator(
         mut self,
-        value: Option<SocialMediaPostingTranslator<'a>>,
+        value: Option<SocialMediaPostingTranslator<S>>,
     ) -> Self {
         self._fields.126 = value;
         self
@@ -8078,7 +9414,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `typicalAgeRange` field (optional)
     pub fn typical_age_range(
         mut self,
-        value: impl Into<Option<SocialMediaPostingTypicalAgeRange<'a>>>,
+        value: impl Into<Option<SocialMediaPostingTypicalAgeRange<S>>>,
     ) -> Self {
         self._fields.127 = value.into();
         self
@@ -8086,7 +9422,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `typicalAgeRange` field to an Option value (optional)
     pub fn maybe_typical_age_range(
         mut self,
-        value: Option<SocialMediaPostingTypicalAgeRange<'a>>,
+        value: Option<SocialMediaPostingTypicalAgeRange<S>>,
     ) -> Self {
         self._fields.127 = value;
         self
@@ -8095,12 +9431,12 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
 
 impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<SocialMediaPostingUrl<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<SocialMediaPostingUrl<S>>>) -> Self {
         self._fields.128 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<SocialMediaPostingUrl<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<SocialMediaPostingUrl<S>>) -> Self {
         self._fields.128 = value;
         self
     }
@@ -8110,7 +9446,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `usageInfo` field (optional)
     pub fn usage_info(
         mut self,
-        value: impl Into<Option<SocialMediaPostingUsageInfo<'a>>>,
+        value: impl Into<Option<SocialMediaPostingUsageInfo<S>>>,
     ) -> Self {
         self._fields.129 = value.into();
         self
@@ -8118,7 +9454,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `usageInfo` field to an Option value (optional)
     pub fn maybe_usage_info(
         mut self,
-        value: Option<SocialMediaPostingUsageInfo<'a>>,
+        value: Option<SocialMediaPostingUsageInfo<S>>,
     ) -> Self {
         self._fields.129 = value;
         self
@@ -8129,16 +9465,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `version` field (optional)
     pub fn version(
         mut self,
-        value: impl Into<Option<SocialMediaPostingVersion<'a>>>,
+        value: impl Into<Option<SocialMediaPostingVersion<S>>>,
     ) -> Self {
         self._fields.130 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
-    pub fn maybe_version(
-        mut self,
-        value: Option<SocialMediaPostingVersion<'a>>,
-    ) -> Self {
+    pub fn maybe_version(mut self, value: Option<SocialMediaPostingVersion<S>>) -> Self {
         self._fields.130 = value;
         self
     }
@@ -8148,13 +9481,13 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `video` field (optional)
     pub fn video(
         mut self,
-        value: impl Into<Option<SocialMediaPostingVideo<'a>>>,
+        value: impl Into<Option<SocialMediaPostingVideo<S>>>,
     ) -> Self {
         self._fields.131 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
-    pub fn maybe_video(mut self, value: Option<SocialMediaPostingVideo<'a>>) -> Self {
+    pub fn maybe_video(mut self, value: Option<SocialMediaPostingVideo<S>>) -> Self {
         self._fields.131 = value;
         self
     }
@@ -8164,7 +9497,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `wordCount` field (optional)
     pub fn word_count(
         mut self,
-        value: impl Into<Option<SocialMediaPostingWordCount<'a>>>,
+        value: impl Into<Option<SocialMediaPostingWordCount<S>>>,
     ) -> Self {
         self._fields.132 = value.into();
         self
@@ -8172,7 +9505,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `wordCount` field to an Option value (optional)
     pub fn maybe_word_count(
         mut self,
-        value: Option<SocialMediaPostingWordCount<'a>>,
+        value: Option<SocialMediaPostingWordCount<S>>,
     ) -> Self {
         self._fields.132 = value;
         self
@@ -8183,7 +9516,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `workExample` field (optional)
     pub fn work_example(
         mut self,
-        value: impl Into<Option<SocialMediaPostingWorkExample<'a>>>,
+        value: impl Into<Option<SocialMediaPostingWorkExample<S>>>,
     ) -> Self {
         self._fields.133 = value.into();
         self
@@ -8191,7 +9524,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `workExample` field to an Option value (optional)
     pub fn maybe_work_example(
         mut self,
-        value: Option<SocialMediaPostingWorkExample<'a>>,
+        value: Option<SocialMediaPostingWorkExample<S>>,
     ) -> Self {
         self._fields.133 = value;
         self
@@ -8202,7 +9535,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `workTranslation` field (optional)
     pub fn work_translation(
         mut self,
-        value: impl Into<Option<SocialMediaPostingWorkTranslation<'a>>>,
+        value: impl Into<Option<SocialMediaPostingWorkTranslation<S>>>,
     ) -> Self {
         self._fields.134 = value.into();
         self
@@ -8210,7 +9543,7 @@ impl<'a, S: social_media_posting_state::State> SocialMediaPostingBuilder<'a, S> 
     /// Set the `workTranslation` field to an Option value (optional)
     pub fn maybe_work_translation(
         mut self,
-        value: Option<SocialMediaPostingWorkTranslation<'a>>,
+        value: Option<SocialMediaPostingWorkTranslation<S>>,
     ) -> Self {
         self._fields.134 = value;
         self
@@ -8365,7 +9698,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SocialMediaPosting<'a> {
         SocialMediaPosting {
             about: self._fields.0,

@@ -10,37 +10,54 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{RecordKey, Rkey};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::place_stream::multistream::TargetView;
 use crate::place_stream::multistream::target::Target;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct PutTarget<'a> {
-    #[serde(borrow)]
-    pub multistream_target: Target<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PutTarget<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub multistream_target: Target<S>,
     ///The Record Key.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rkey: Option<RecordKey<Rkey<'a>>>,
+    pub rkey: Option<RecordKey<Rkey<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct PutTargetOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PutTargetOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: TargetView<'a>,
+    pub value: TargetView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -49,19 +66,20 @@ pub struct PutTargetOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PutTargetError<'a> {
+pub enum PutTargetError {
     /// The provided target URL is invalid or unreachable.
     #[serde(rename = "InvalidTargetUrl")]
-    InvalidTargetUrl(Option<CowStr<'a>>),
+    InvalidTargetUrl(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for PutTargetError<'_> {
+impl core::fmt::Display for PutTargetError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidTargetUrl(msg) => {
@@ -71,7 +89,13 @@ impl core::fmt::Display for PutTargetError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -81,11 +105,12 @@ pub struct PutTargetResponse;
 impl jacquard_common::xrpc::XrpcResp for PutTargetResponse {
     const NSID: &'static str = "place.stream.multistream.putTarget";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PutTargetOutput<'de>;
-    type Err<'de> = PutTargetError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PutTargetOutput<S>;
+    type Err = PutTargetError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for PutTarget<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for PutTarget<S> {
     const NSID: &'static str = "place.stream.multistream.putTarget";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -100,7 +125,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for PutTargetRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = PutTarget<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = PutTarget<S>;
     type Response = PutTargetResponse;
 }
 
@@ -139,7 +164,7 @@ pub mod put_target_state {
 /// Builder for constructing an instance of this type
 pub struct PutTargetBuilder<'a, S: put_target_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Target<'a>>, Option<RecordKey<Rkey<'a>>>),
+    _fields: (Option<Target<S>>, Option<RecordKey<Rkey<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -169,7 +194,7 @@ where
     /// Set the `multistreamTarget` field (required)
     pub fn multistream_target(
         mut self,
-        value: impl Into<Target<'a>>,
+        value: impl Into<Target<S>>,
     ) -> PutTargetBuilder<'a, put_target_state::SetMultistreamTarget<S>> {
         self._fields.0 = Option::Some(value.into());
         PutTargetBuilder {
@@ -182,12 +207,12 @@ where
 
 impl<'a, S: put_target_state::State> PutTargetBuilder<'a, S> {
     /// Set the `rkey` field (optional)
-    pub fn rkey(mut self, value: impl Into<Option<RecordKey<Rkey<'a>>>>) -> Self {
+    pub fn rkey(mut self, value: impl Into<Option<RecordKey<Rkey<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `rkey` field to an Option value (optional)
-    pub fn maybe_rkey(mut self, value: Option<RecordKey<Rkey<'a>>>) -> Self {
+    pub fn maybe_rkey(mut self, value: Option<RecordKey<Rkey<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -209,10 +234,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PutTarget<'a> {
         PutTarget {
             multistream_target: self._fields.0.unwrap(),

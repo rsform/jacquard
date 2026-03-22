@@ -10,29 +10,45 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::actor::ProfileViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchActorsTypeahead<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchActorsTypeahead<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 25.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(borrow)]
-    pub q: CowStr<'a>,
+    pub q: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchActorsTypeaheadOutput<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<ProfileViewBasic<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchActorsTypeaheadOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub actors: Vec<ProfileViewBasic<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.actor.searchActorsTypeahead
@@ -40,11 +56,12 @@ pub struct SearchActorsTypeaheadResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchActorsTypeaheadResponse {
     const NSID: &'static str = "sh.weaver.actor.searchActorsTypeahead";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchActorsTypeaheadOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SearchActorsTypeaheadOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActorsTypeahead<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SearchActorsTypeahead<S> {
     const NSID: &'static str = "sh.weaver.actor.searchActorsTypeahead";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchActorsTypeaheadResponse;
@@ -55,7 +72,7 @@ pub struct SearchActorsTypeaheadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsTypeaheadRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.actor.searchActorsTypeahead";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchActorsTypeahead<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SearchActorsTypeahead<S>;
     type Response = SearchActorsTypeaheadResponse;
 }
 
@@ -98,7 +115,7 @@ pub mod search_actors_typeahead_state {
 /// Builder for constructing an instance of this type
 pub struct SearchActorsTypeaheadBuilder<'a, S: search_actors_typeahead_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -144,7 +161,7 @@ where
     /// Set the `q` field (required)
     pub fn q(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SearchActorsTypeaheadBuilder<'a, search_actors_typeahead_state::SetQ<S>> {
         self._fields.1 = Option::Some(value.into());
         SearchActorsTypeaheadBuilder {

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,44 +29,50 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// An instrument or procedure that produces observations.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "dev.sensorthings.sensor", tag = "$type")]
-pub struct Sensor<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "dev.sensorthings.sensor",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Sensor<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///IANA media type of the metadata field, e.g. application/pdf, application/sensorML+xml
-    #[serde(borrow)]
-    pub encoding_type: CowStr<'a>,
+    pub encoding_type: S,
     ///URL or inline content describing the sensor (SensorML, datasheet URL, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub metadata: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub metadata: Option<S>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SensorGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SensorGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Sensor<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Sensor<S>,
 }
 
-impl<'a> Sensor<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SensorRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Sensor<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SensorRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -75,18 +83,17 @@ pub struct SensorRecord;
 impl XrpcResp for SensorRecord {
     const NSID: &'static str = "dev.sensorthings.sensor";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SensorGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SensorGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SensorGetRecordOutput<'_>> for Sensor<'_> {
-    fn from(output: SensorGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SensorGetRecordOutput<S>> for Sensor<S> {
+    fn from(output: SensorGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Sensor<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Sensor<S> {
     const NSID: &'static str = "dev.sensorthings.sensor";
     type Record = SensorRecord;
 }
@@ -96,7 +103,7 @@ impl Collection for SensorRecord {
     type Record = SensorRecord;
 }
 
-impl<'a> LexiconSchema for Sensor<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Sensor<S> {
     fn nsid() -> &'static str {
         "dev.sensorthings.sensor"
     }
@@ -214,13 +221,7 @@ pub mod sensor_state {
 /// Builder for constructing an instance of this type
 pub struct SensorBuilder<'a, S: sensor_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<S>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -263,12 +264,12 @@ where
 
 impl<'a, S: sensor_state::State> SensorBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -282,7 +283,7 @@ where
     /// Set the `encodingType` field (required)
     pub fn encoding_type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SensorBuilder<'a, sensor_state::SetEncodingType<S>> {
         self._fields.2 = Option::Some(value.into());
         SensorBuilder {
@@ -295,12 +296,12 @@ where
 
 impl<'a, S: sensor_state::State> SensorBuilder<'a, S> {
     /// Set the `metadata` field (optional)
-    pub fn metadata(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn metadata(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
-    pub fn maybe_metadata(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_metadata(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -314,7 +315,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SensorBuilder<'a, sensor_state::SetName<S>> {
         self._fields.4 = Option::Some(value.into());
         SensorBuilder {
@@ -344,13 +345,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Sensor<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Sensor<'a> {
         Sensor {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

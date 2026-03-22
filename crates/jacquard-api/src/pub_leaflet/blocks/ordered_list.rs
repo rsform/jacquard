@@ -10,10 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,48 +29,64 @@ use crate::pub_leaflet::blocks::text::Text;
 use crate::pub_leaflet::blocks::unordered_list::UnorderedList;
 use crate::pub_leaflet::blocks::ordered_list;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ListItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Nested ordered list items. Mutually exclusive with unorderedListChildren; if both are present, children takes precedence.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub children: Option<Vec<ordered_list::ListItem<'a>>>,
-    #[serde(borrow)]
-    pub content: ListItemContent<'a>,
+    pub children: Option<Vec<ordered_list::ListItem<S>>>,
+    pub content: ListItemContent<S>,
     ///A nested unordered list. Mutually exclusive with children; if both are present, children takes precedence.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub unordered_list_children: Option<UnorderedList<'a>>,
+    pub unordered_list_children: Option<UnorderedList<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ListItemContent<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ListItemContent<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "pub.leaflet.blocks.text")]
-    Text(Box<Text<'a>>),
+    Text(Box<Text<S>>),
     #[serde(rename = "pub.leaflet.blocks.header")]
-    Header(Box<Header<'a>>),
+    Header(Box<Header<S>>),
     #[serde(rename = "pub.leaflet.blocks.image")]
-    Image(Box<Image<'a>>),
+    Image(Box<Image<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct OrderedList<'a> {
-    #[serde(borrow)]
-    pub children: Vec<ordered_list::ListItem<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct OrderedList<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub children: Vec<ordered_list::ListItem<S>>,
     ///The starting number for this ordered list. Defaults to 1 if not specified.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub start_index: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for ListItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListItem<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.orderedList"
     }
@@ -82,7 +101,7 @@ impl<'a> LexiconSchema for ListItem<'a> {
     }
 }
 
-impl<'a> LexiconSchema for OrderedList<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for OrderedList<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.orderedList"
     }
@@ -133,9 +152,9 @@ pub mod list_item_state {
 pub struct ListItemBuilder<'a, S: list_item_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<ordered_list::ListItem<'a>>>,
-        Option<ListItemContent<'a>>,
-        Option<UnorderedList<'a>>,
+        Option<Vec<ordered_list::ListItem<S>>>,
+        Option<ListItemContent<S>>,
+        Option<UnorderedList<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -162,7 +181,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
     /// Set the `children` field (optional)
     pub fn children(
         mut self,
-        value: impl Into<Option<Vec<ordered_list::ListItem<'a>>>>,
+        value: impl Into<Option<Vec<ordered_list::ListItem<S>>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
@@ -170,7 +189,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
     /// Set the `children` field to an Option value (optional)
     pub fn maybe_children(
         mut self,
-        value: Option<Vec<ordered_list::ListItem<'a>>>,
+        value: Option<Vec<ordered_list::ListItem<S>>>,
     ) -> Self {
         self._fields.0 = value;
         self
@@ -185,7 +204,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<ListItemContent<'a>>,
+        value: impl Into<ListItemContent<S>>,
     ) -> ListItemBuilder<'a, list_item_state::SetContent<S>> {
         self._fields.1 = Option::Some(value.into());
         ListItemBuilder {
@@ -200,7 +219,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
     /// Set the `unorderedListChildren` field (optional)
     pub fn unordered_list_children(
         mut self,
-        value: impl Into<Option<UnorderedList<'a>>>,
+        value: impl Into<Option<UnorderedList<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -208,7 +227,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
     /// Set the `unorderedListChildren` field to an Option value (optional)
     pub fn maybe_unordered_list_children(
         mut self,
-        value: Option<UnorderedList<'a>>,
+        value: Option<UnorderedList<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -232,10 +251,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ListItem<'a> {
         ListItem {
             children: self._fields.0,
@@ -372,7 +388,7 @@ pub mod ordered_list_state {
 /// Builder for constructing an instance of this type
 pub struct OrderedListBuilder<'a, S: ordered_list_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<ordered_list::ListItem<'a>>>, Option<i64>),
+    _fields: (Option<Vec<ordered_list::ListItem<S>>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -402,7 +418,7 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<Vec<ordered_list::ListItem<'a>>>,
+        value: impl Into<Vec<ordered_list::ListItem<S>>>,
     ) -> OrderedListBuilder<'a, ordered_list_state::SetChildren<S>> {
         self._fields.0 = Option::Some(value.into());
         OrderedListBuilder {
@@ -442,10 +458,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> OrderedList<'a> {
         OrderedList {
             children: self._fields.0.unwrap(),

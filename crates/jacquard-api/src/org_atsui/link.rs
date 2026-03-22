@@ -10,36 +10,43 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Link<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Link<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub children: Option<Data<'a>>,
+    pub children: Option<Data<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub decoration: Option<LinkDecoration<'a>>,
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+    pub decoration: Option<LinkDecoration<S>>,
+    pub uri: UriValue<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LinkDecoration<'a> {
+pub enum LinkDecoration<S: Bos<str> + AsRef<str> = DefaultStr> {
     None,
     Underline,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> LinkDecoration<'a> {
+impl<S: Bos<str> + AsRef<str>> LinkDecoration<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -47,70 +54,56 @@ impl<'a> LinkDecoration<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for LinkDecoration<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "none" => Self::None,
             "underline" => Self::Underline,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for LinkDecoration<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "underline" => Self::Underline,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for LinkDecoration<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for LinkDecoration<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for LinkDecoration<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for LinkDecoration<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for LinkDecoration<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for LinkDecoration<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for LinkDecoration<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for LinkDecoration<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for LinkDecoration<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for LinkDecoration<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for LinkDecoration<'_> {
-    type Output = LinkDecoration<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for LinkDecoration<S> {
+    type Output = LinkDecoration<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             LinkDecoration::None => LinkDecoration::None,
@@ -121,13 +114,22 @@ impl jacquard_common::IntoStatic for LinkDecoration<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct LinkOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LinkOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Response<'a>,
+    pub value: Response<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for org.atsui.Link
@@ -135,11 +137,12 @@ pub struct LinkResponse;
 impl jacquard_common::xrpc::XrpcResp for LinkResponse {
     const NSID: &'static str = "org.atsui.Link";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LinkOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LinkOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Link<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Link<S> {
     const NSID: &'static str = "org.atsui.Link";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -154,7 +157,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for LinkRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Link<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Link<S>;
     type Response = LinkResponse;
 }
 
@@ -193,7 +196,7 @@ pub mod link_state {
 /// Builder for constructing an instance of this type
 pub struct LinkBuilder<'a, S: link_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Data<'a>>, Option<LinkDecoration<'a>>, Option<UriValue<'a>>),
+    _fields: (Option<Data<S>>, Option<LinkDecoration<S>>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -217,12 +220,12 @@ impl<'a> LinkBuilder<'a, link_state::Empty> {
 
 impl<'a, S: link_state::State> LinkBuilder<'a, S> {
     /// Set the `children` field (optional)
-    pub fn children(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn children(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `children` field to an Option value (optional)
-    pub fn maybe_children(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_children(mut self, value: Option<Data<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -230,12 +233,12 @@ impl<'a, S: link_state::State> LinkBuilder<'a, S> {
 
 impl<'a, S: link_state::State> LinkBuilder<'a, S> {
     /// Set the `decoration` field (optional)
-    pub fn decoration(mut self, value: impl Into<Option<LinkDecoration<'a>>>) -> Self {
+    pub fn decoration(mut self, value: impl Into<Option<LinkDecoration<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `decoration` field to an Option value (optional)
-    pub fn maybe_decoration(mut self, value: Option<LinkDecoration<'a>>) -> Self {
+    pub fn maybe_decoration(mut self, value: Option<LinkDecoration<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -249,7 +252,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> LinkBuilder<'a, link_state::SetUri<S>> {
         self._fields.2 = Option::Some(value.into());
         LinkBuilder {
@@ -275,10 +278,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Link<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Link<'a> {
         Link {
             children: self._fields.0,
             decoration: self._fields.1,

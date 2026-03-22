@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,68 +29,64 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A single site section for spores.garden. Each section is a record in a collection.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "coop.hypha.spores.site.section",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Section<'a> {
+pub struct Section<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Collection NSID to display (for type=collection)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub collection: Option<CowStr<'a>>,
+    pub collection: Option<S>,
     ///Content for block sections
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content: Option<CowStr<'a>>,
+    pub content: Option<S>,
     ///Content format
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub format: Option<SectionFormat<'a>>,
+    pub format: Option<SectionFormat<S>>,
     ///If true, hides the section header in display mode
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hide_header: Option<bool>,
     ///Layout to use for rendering
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub layout: Option<SectionLayout<'a>>,
+    pub layout: Option<SectionLayout<S>>,
     ///Maximum records to display
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     ///Specific record URIs to display (for type=records)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub records: Option<Vec<AtUri<'a>>>,
+    pub records: Option<Vec<AtUri<S>>>,
     ///AT-URI of the referenced record (for content/profile sections)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#ref: Option<AtUri<'a>>,
+    pub r#ref: Option<AtUri<S>>,
     ///Record key within the collection to display (e.g. 'self' for profile)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rkey: Option<CowStr<'a>>,
+    pub rkey: Option<S>,
     ///Section title
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     ///Section type
-    #[serde(borrow)]
-    pub r#type: SectionType<'a>,
+    pub r#type: SectionType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Content format
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SectionFormat<'a> {
+pub enum SectionFormat<S: Bos<str> + AsRef<str> = DefaultStr> {
     Markdown,
     Html,
     Text,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SectionFormat<'a> {
+impl<S: Bos<str> + AsRef<str>> SectionFormat<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Markdown => "markdown",
@@ -97,72 +95,57 @@ impl<'a> SectionFormat<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SectionFormat<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "markdown" => Self::Markdown,
             "html" => Self::Html,
             "text" => Self::Text,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SectionFormat<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "markdown" => Self::Markdown,
-            "html" => Self::Html,
-            "text" => Self::Text,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SectionFormat<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SectionFormat<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for SectionFormat<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SectionFormat<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for SectionFormat<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SectionFormat<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SectionFormat<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for SectionFormat<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for SectionFormat<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for SectionFormat<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for SectionFormat<'_> {
-    type Output = SectionFormat<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SectionFormat<S> {
+    type Output = SectionFormat<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SectionFormat::Markdown => SectionFormat::Markdown,
@@ -176,7 +159,7 @@ impl jacquard_common::IntoStatic for SectionFormat<'_> {
 /// Layout to use for rendering
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SectionLayout<'a> {
+pub enum SectionLayout<S: Bos<str> + AsRef<str> = DefaultStr> {
     Post,
     Card,
     Image,
@@ -185,10 +168,10 @@ pub enum SectionLayout<'a> {
     List,
     Profile,
     Raw,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SectionLayout<'a> {
+impl<S: Bos<str> + AsRef<str>> SectionLayout<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Post => "post",
@@ -202,11 +185,9 @@ impl<'a> SectionLayout<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SectionLayout<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "post" => Self::Post,
             "card" => Self::Card,
             "image" => Self::Image,
@@ -215,69 +196,51 @@ impl<'a> From<&'a str> for SectionLayout<'a> {
             "list" => Self::List,
             "profile" => Self::Profile,
             "raw" => Self::Raw,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SectionLayout<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "post" => Self::Post,
-            "card" => Self::Card,
-            "image" => Self::Image,
-            "link" => Self::Link,
-            "links" => Self::Links,
-            "list" => Self::List,
-            "profile" => Self::Profile,
-            "raw" => Self::Raw,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SectionLayout<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SectionLayout<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for SectionLayout<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SectionLayout<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for SectionLayout<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SectionLayout<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SectionLayout<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for SectionLayout<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for SectionLayout<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for SectionLayout<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for SectionLayout<'_> {
-    type Output = SectionLayout<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SectionLayout<S> {
+    type Output = SectionLayout<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SectionLayout::Post => SectionLayout::Post,
@@ -296,7 +259,7 @@ impl jacquard_common::IntoStatic for SectionLayout<'_> {
 /// Section type
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SectionType<'a> {
+pub enum SectionType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Collection,
     Records,
     Content,
@@ -304,10 +267,10 @@ pub enum SectionType<'a> {
     Profile,
     ShareToBluesky,
     CollectedFlowers,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SectionType<'a> {
+impl<S: Bos<str> + AsRef<str>> SectionType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Collection => "collection",
@@ -320,11 +283,9 @@ impl<'a> SectionType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SectionType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "collection" => Self::Collection,
             "records" => Self::Records,
             "content" => Self::Content,
@@ -332,68 +293,51 @@ impl<'a> From<&'a str> for SectionType<'a> {
             "profile" => Self::Profile,
             "share-to-bluesky" => Self::ShareToBluesky,
             "collected-flowers" => Self::CollectedFlowers,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SectionType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "collection" => Self::Collection,
-            "records" => Self::Records,
-            "content" => Self::Content,
-            "block" => Self::Block,
-            "profile" => Self::Profile,
-            "share-to-bluesky" => Self::ShareToBluesky,
-            "collected-flowers" => Self::CollectedFlowers,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SectionType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SectionType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for SectionType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SectionType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for SectionType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SectionType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SectionType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for SectionType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for SectionType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for SectionType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for SectionType<'_> {
-    type Output = SectionType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SectionType<S> {
+    type Output = SectionType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SectionType::Collection => SectionType::Collection,
@@ -411,22 +355,23 @@ impl jacquard_common::IntoStatic for SectionType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SectionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SectionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Section<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Section<S>,
 }
 
-impl<'a> Section<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SectionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Section<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SectionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -437,18 +382,17 @@ pub struct SectionRecord;
 impl XrpcResp for SectionRecord {
     const NSID: &'static str = "coop.hypha.spores.site.section";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SectionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SectionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SectionGetRecordOutput<'_>> for Section<'_> {
-    fn from(output: SectionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SectionGetRecordOutput<S>> for Section<S> {
+    fn from(output: SectionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Section<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Section<S> {
     const NSID: &'static str = "coop.hypha.spores.site.section";
     type Record = SectionRecord;
 }
@@ -458,7 +402,7 @@ impl Collection for SectionRecord {
     type Record = SectionRecord;
 }
 
-impl<'a> LexiconSchema for Section<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Section<S> {
     fn nsid() -> &'static str {
         "coop.hypha.spores.site.section"
     }
@@ -571,17 +515,17 @@ pub mod section_state {
 pub struct SectionBuilder<'a, S: section_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<SectionFormat<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<SectionFormat<S>>,
         Option<bool>,
-        Option<SectionLayout<'a>>,
+        Option<SectionLayout<S>>,
         Option<i64>,
-        Option<Vec<AtUri<'a>>>,
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<SectionType<'a>>,
+        Option<Vec<AtUri<S>>>,
+        Option<AtUri<S>>,
+        Option<S>,
+        Option<S>,
+        Option<SectionType<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -606,12 +550,12 @@ impl<'a> SectionBuilder<'a, section_state::Empty> {
 
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `collection` field (optional)
-    pub fn collection(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn collection(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `collection` field to an Option value (optional)
-    pub fn maybe_collection(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_collection(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -619,12 +563,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `content` field (optional)
-    pub fn content(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn content(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
-    pub fn maybe_content(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_content(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -632,12 +576,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `format` field (optional)
-    pub fn format(mut self, value: impl Into<Option<SectionFormat<'a>>>) -> Self {
+    pub fn format(mut self, value: impl Into<Option<SectionFormat<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `format` field to an Option value (optional)
-    pub fn maybe_format(mut self, value: Option<SectionFormat<'a>>) -> Self {
+    pub fn maybe_format(mut self, value: Option<SectionFormat<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -658,12 +602,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `layout` field (optional)
-    pub fn layout(mut self, value: impl Into<Option<SectionLayout<'a>>>) -> Self {
+    pub fn layout(mut self, value: impl Into<Option<SectionLayout<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `layout` field to an Option value (optional)
-    pub fn maybe_layout(mut self, value: Option<SectionLayout<'a>>) -> Self {
+    pub fn maybe_layout(mut self, value: Option<SectionLayout<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -684,12 +628,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `records` field (optional)
-    pub fn records(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn records(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `records` field to an Option value (optional)
-    pub fn maybe_records(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_records(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -697,12 +641,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `ref` field (optional)
-    pub fn r#ref(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn r#ref(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
-    pub fn maybe_ref(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_ref(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -710,12 +654,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `rkey` field (optional)
-    pub fn rkey(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn rkey(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `rkey` field to an Option value (optional)
-    pub fn maybe_rkey(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_rkey(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -723,12 +667,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -742,7 +686,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<SectionType<'a>>,
+        value: impl Into<SectionType<S>>,
     ) -> SectionBuilder<'a, section_state::SetType<S>> {
         self._fields.10 = Option::Some(value.into());
         SectionBuilder {
@@ -778,10 +722,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Section<'a> {
         Section {
             collection: self._fields.0,

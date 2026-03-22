@@ -10,10 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -29,55 +32,77 @@ use crate::sh_weaver::embed::images;
 use crate::sh_weaver::embed::records;
 use crate::sh_weaver::embed::video;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordWithMedia<'a> {
-    #[serde(borrow)]
-    pub media: RecordWithMediaMedia<'a>,
-    #[serde(borrow)]
-    pub records: Records<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RecordWithMedia<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub media: RecordWithMediaMedia<S>,
+    pub records: Records<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RecordWithMediaMedia<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RecordWithMediaMedia<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "sh.weaver.embed.images")]
-    Images(Box<Images<'a>>),
+    Images(Box<Images<S>>),
     #[serde(rename = "sh.weaver.embed.external")]
-    External(Box<External<'a>>),
+    External(Box<External<S>>),
     #[serde(rename = "sh.weaver.embed.video")]
-    Video(Box<VideoRecord<'a>>),
+    Video(Box<VideoRecord<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct View<'a> {
-    #[serde(borrow)]
-    pub media: ViewMedia<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct View<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub media: ViewMedia<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub records: Option<records::View<'a>>,
+    pub records: Option<records::View<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ViewMedia<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ViewMedia<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "sh.weaver.embed.images#view")]
-    ImagesView(Box<images::View<'a>>),
+    ImagesView(Box<images::View<S>>),
     #[serde(rename = "sh.weaver.embed.external#view")]
-    ExternalView(Box<external::View<'a>>),
+    ExternalView(Box<external::View<S>>),
     #[serde(rename = "sh.weaver.embed.video#view")]
-    VideoView(Box<video::View<'a>>),
+    VideoView(Box<video::View<S>>),
 }
 
-impl<'a> LexiconSchema for RecordWithMedia<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RecordWithMedia<S> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.recordWithMedia"
     }
@@ -92,7 +117,7 @@ impl<'a> LexiconSchema for RecordWithMedia<'a> {
     }
 }
 
-impl<'a> LexiconSchema for View<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for View<S> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.recordWithMedia"
     }
@@ -154,7 +179,7 @@ pub mod record_with_media_state {
 /// Builder for constructing an instance of this type
 pub struct RecordWithMediaBuilder<'a, S: record_with_media_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<RecordWithMediaMedia<'a>>, Option<Records<'a>>),
+    _fields: (Option<RecordWithMediaMedia<S>>, Option<Records<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -184,7 +209,7 @@ where
     /// Set the `media` field (required)
     pub fn media(
         mut self,
-        value: impl Into<RecordWithMediaMedia<'a>>,
+        value: impl Into<RecordWithMediaMedia<S>>,
     ) -> RecordWithMediaBuilder<'a, record_with_media_state::SetMedia<S>> {
         self._fields.0 = Option::Some(value.into());
         RecordWithMediaBuilder {
@@ -203,7 +228,7 @@ where
     /// Set the `records` field (required)
     pub fn records(
         mut self,
-        value: impl Into<Records<'a>>,
+        value: impl Into<Records<S>>,
     ) -> RecordWithMediaBuilder<'a, record_with_media_state::SetRecords<S>> {
         self._fields.1 = Option::Some(value.into());
         RecordWithMediaBuilder {
@@ -231,10 +256,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RecordWithMedia<'a> {
         RecordWithMedia {
             media: self._fields.0.unwrap(),
@@ -373,7 +395,7 @@ pub mod view_state {
 /// Builder for constructing an instance of this type
 pub struct ViewBuilder<'a, S: view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<ViewMedia<'a>>, Option<records::View<'a>>),
+    _fields: (Option<ViewMedia<S>>, Option<records::View<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -403,7 +425,7 @@ where
     /// Set the `media` field (required)
     pub fn media(
         mut self,
-        value: impl Into<ViewMedia<'a>>,
+        value: impl Into<ViewMedia<S>>,
     ) -> ViewBuilder<'a, view_state::SetMedia<S>> {
         self._fields.0 = Option::Some(value.into());
         ViewBuilder {
@@ -416,12 +438,12 @@ where
 
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `records` field (optional)
-    pub fn records(mut self, value: impl Into<Option<records::View<'a>>>) -> Self {
+    pub fn records(mut self, value: impl Into<Option<records::View<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `records` field to an Option value (optional)
-    pub fn maybe_records(mut self, value: Option<records::View<'a>>) -> Self {
+    pub fn maybe_records(mut self, value: Option<records::View<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -442,13 +464,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> View<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> View<'a> {
         View {
             media: self._fields.0.unwrap(),
             records: self._fields.1,

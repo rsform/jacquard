@@ -10,44 +10,59 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::safelink::Event;
 use crate::tools_ozone::safelink::PatternType;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct RemoveRule<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RemoveRule<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional comment about why the rule is being removed
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<CowStr<'a>>,
+    pub comment: Option<S>,
     ///Optional DID of the user. Only respected when using admin auth.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub created_by: Option<Did<'a>>,
-    #[serde(borrow)]
-    pub pattern: PatternType<'a>,
+    pub created_by: Option<Did<S>>,
+    pub pattern: PatternType<S>,
     ///The URL or domain to remove the rule for
-    #[serde(borrow)]
-    pub url: CowStr<'a>,
+    pub url: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct RemoveRuleOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RemoveRuleOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Event<'a>,
+    pub value: Event<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -56,19 +71,20 @@ pub struct RemoveRuleOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum RemoveRuleError<'a> {
+pub enum RemoveRuleError {
     /// No active rule found for this URL/domain
     #[serde(rename = "RuleNotFound")]
-    RuleNotFound(Option<CowStr<'a>>),
+    RuleNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for RemoveRuleError<'_> {
+impl core::fmt::Display for RemoveRuleError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RuleNotFound(msg) => {
@@ -78,7 +94,13 @@ impl core::fmt::Display for RemoveRuleError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -88,11 +110,12 @@ pub struct RemoveRuleResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveRuleResponse {
     const NSID: &'static str = "tools.ozone.safelink.removeRule";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RemoveRuleOutput<'de>;
-    type Err<'de> = RemoveRuleError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RemoveRuleOutput<S>;
+    type Err = RemoveRuleError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveRule<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for RemoveRule<S> {
     const NSID: &'static str = "tools.ozone.safelink.removeRule";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -107,7 +130,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for RemoveRuleRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = RemoveRule<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = RemoveRule<S>;
     type Response = RemoveRuleResponse;
 }
 
@@ -158,12 +181,7 @@ pub mod remove_rule_state {
 /// Builder for constructing an instance of this type
 pub struct RemoveRuleBuilder<'a, S: remove_rule_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<PatternType<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<Did<S>>, Option<PatternType<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -187,12 +205,12 @@ impl<'a> RemoveRuleBuilder<'a, remove_rule_state::Empty> {
 
 impl<'a, S: remove_rule_state::State> RemoveRuleBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_comment(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -200,12 +218,12 @@ impl<'a, S: remove_rule_state::State> RemoveRuleBuilder<'a, S> {
 
 impl<'a, S: remove_rule_state::State> RemoveRuleBuilder<'a, S> {
     /// Set the `createdBy` field (optional)
-    pub fn created_by(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn created_by(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `createdBy` field to an Option value (optional)
-    pub fn maybe_created_by(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_created_by(mut self, value: Option<Did<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -219,7 +237,7 @@ where
     /// Set the `pattern` field (required)
     pub fn pattern(
         mut self,
-        value: impl Into<PatternType<'a>>,
+        value: impl Into<PatternType<S>>,
     ) -> RemoveRuleBuilder<'a, remove_rule_state::SetPattern<S>> {
         self._fields.2 = Option::Some(value.into());
         RemoveRuleBuilder {
@@ -238,7 +256,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RemoveRuleBuilder<'a, remove_rule_state::SetUrl<S>> {
         self._fields.3 = Option::Some(value.into());
         RemoveRuleBuilder {
@@ -268,10 +286,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RemoveRule<'a> {
         RemoveRule {
             comment: self._fields.0,

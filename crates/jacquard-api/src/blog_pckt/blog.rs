@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,88 +30,98 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::blog_pckt::blog;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blog.pckt.blog", tag = "$type")]
-pub struct Blog<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "blog.pckt.blog",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Blog<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub icon: Option<BlobRef<'a>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub icon: Option<BlobRef<S>>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rss: Option<UriValue<'a>>,
+    pub rss: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub theme: Option<blog::Theme<'a>>,
+    pub theme: Option<blog::Theme<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<UriValue<'a>>,
+    pub url: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BlogGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BlogGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Blog<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Blog<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Palette<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Palette<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accent: Option<CowStr<'a>>,
+    pub accent: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub background: Option<CowStr<'a>>,
+    pub background: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub link: Option<CowStr<'a>>,
+    pub link: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub surface_hover: Option<CowStr<'a>>,
+    pub surface_hover: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<CowStr<'a>>,
+    pub text: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Theme<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Theme<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub dark: Option<blog::Palette<'a>>,
+    pub dark: Option<blog::Palette<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub font: Option<CowStr<'a>>,
+    pub font: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub light: Option<blog::Palette<'a>>,
+    pub light: Option<blog::Palette<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Blog<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, BlogRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Blog<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, BlogRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -120,18 +132,17 @@ pub struct BlogRecord;
 impl XrpcResp for BlogRecord {
     const NSID: &'static str = "blog.pckt.blog";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BlogGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BlogGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<BlogGetRecordOutput<'_>> for Blog<'_> {
-    fn from(output: BlogGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<BlogGetRecordOutput<S>> for Blog<S> {
+    fn from(output: BlogGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Blog<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Blog<S> {
     const NSID: &'static str = "blog.pckt.blog";
     type Record = BlogRecord;
 }
@@ -141,7 +152,7 @@ impl Collection for BlogRecord {
     type Record = BlogRecord;
 }
 
-impl<'a> LexiconSchema for Blog<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Blog<S> {
     fn nsid() -> &'static str {
         "blog.pckt.blog"
     }
@@ -182,7 +193,7 @@ impl<'a> LexiconSchema for Blog<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Palette<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Palette<S> {
     fn nsid() -> &'static str {
         "blog.pckt.blog"
     }
@@ -197,7 +208,7 @@ impl<'a> LexiconSchema for Palette<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Theme<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Theme<S> {
     fn nsid() -> &'static str {
         "blog.pckt.blog"
     }
@@ -248,13 +259,13 @@ pub mod blog_state {
 pub struct BlogBuilder<'a, S: blog_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<blog::Theme<'a>>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<blog::Theme<S>>,
         Option<Datetime>,
-        Option<UriValue<'a>>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -279,12 +290,12 @@ impl<'a> BlogBuilder<'a, blog_state::Empty> {
 
 impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -292,12 +303,12 @@ impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
 
 impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
     /// Set the `icon` field (optional)
-    pub fn icon(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `icon` field to an Option value (optional)
-    pub fn maybe_icon(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_icon(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -311,7 +322,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BlogBuilder<'a, blog_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         BlogBuilder {
@@ -324,12 +335,12 @@ where
 
 impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
     /// Set the `rss` field (optional)
-    pub fn rss(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn rss(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `rss` field to an Option value (optional)
-    pub fn maybe_rss(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_rss(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -337,12 +348,12 @@ impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
 
 impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
     /// Set the `theme` field (optional)
-    pub fn theme(mut self, value: impl Into<Option<blog::Theme<'a>>>) -> Self {
+    pub fn theme(mut self, value: impl Into<Option<blog::Theme<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
-    pub fn maybe_theme(mut self, value: Option<blog::Theme<'a>>) -> Self {
+    pub fn maybe_theme(mut self, value: Option<blog::Theme<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -363,12 +374,12 @@ impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
 
 impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -393,13 +404,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Blog<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Blog<'a> {
         Blog {
             description: self._fields.0,
             icon: self._fields.1,

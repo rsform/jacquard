@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,61 +30,72 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::app_bsky::graph::starterpack;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct FeedItem<'a> {
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FeedItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Record defining a starter pack of actors and feeds for new users.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.bsky.graph.starterpack", tag = "$type")]
-pub struct Starterpack<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.bsky.graph.starterpack",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Starterpack<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description_facets: Option<Vec<Facet<'a>>>,
+    pub description_facets: Option<Vec<Facet<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub feeds: Option<Vec<starterpack::FeedItem<'a>>>,
+    pub feeds: Option<Vec<starterpack::FeedItem<S>>>,
     ///Reference (AT-URI) to the list record.
-    #[serde(borrow)]
-    pub list: AtUri<'a>,
+    pub list: AtUri<S>,
     ///Display name for starter pack; can not be empty.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StarterpackGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StarterpackGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Starterpack<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Starterpack<S>,
 }
 
-impl<'a> Starterpack<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, StarterpackRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Starterpack<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, StarterpackRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for FeedItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedItem<S> {
     fn nsid() -> &'static str {
         "app.bsky.graph.starterpack"
     }
@@ -104,18 +117,17 @@ pub struct StarterpackRecord;
 impl XrpcResp for StarterpackRecord {
     const NSID: &'static str = "app.bsky.graph.starterpack";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StarterpackGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StarterpackGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<StarterpackGetRecordOutput<'_>> for Starterpack<'_> {
-    fn from(output: StarterpackGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<StarterpackGetRecordOutput<S>> for Starterpack<S> {
+    fn from(output: StarterpackGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Starterpack<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Starterpack<S> {
     const NSID: &'static str = "app.bsky.graph.starterpack";
     type Record = StarterpackRecord;
 }
@@ -125,7 +137,7 @@ impl Collection for StarterpackRecord {
     type Record = StarterpackRecord;
 }
 
-impl<'a> LexiconSchema for Starterpack<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Starterpack<S> {
     fn nsid() -> &'static str {
         "app.bsky.graph.starterpack"
     }
@@ -242,7 +254,7 @@ pub mod feed_item_state {
 /// Builder for constructing an instance of this type
 pub struct FeedItemBuilder<'a, S: feed_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -272,7 +284,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> FeedItemBuilder<'a, feed_item_state::SetUri<S>> {
         self._fields.0 = Option::Some(value.into());
         FeedItemBuilder {
@@ -298,10 +310,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> FeedItem<'a> {
         FeedItem {
             uri: self._fields.0.unwrap(),
@@ -441,51 +450,51 @@ pub mod starterpack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Name;
         type List;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Name = Unset;
         type List = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type List = S::List;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
-        type Name = S::Name;
-        type List = Set<members::list>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
         type List = S::List;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+        type List = S::List;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type List = Set<members::list>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `list` field
         pub struct list(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -494,11 +503,11 @@ pub struct StarterpackBuilder<'a, S: starterpack_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<Vec<starterpack::FeedItem<'a>>>,
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<Vec<starterpack::FeedItem<S>>>,
+        Option<AtUri<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -542,12 +551,12 @@ where
 
 impl<'a, S: starterpack_state::State> StarterpackBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -557,13 +566,13 @@ impl<'a, S: starterpack_state::State> StarterpackBuilder<'a, S> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
-        value: impl Into<Option<Vec<Facet<'a>>>>,
+        value: impl Into<Option<Vec<Facet<S>>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
-    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -573,13 +582,13 @@ impl<'a, S: starterpack_state::State> StarterpackBuilder<'a, S> {
     /// Set the `feeds` field (optional)
     pub fn feeds(
         mut self,
-        value: impl Into<Option<Vec<starterpack::FeedItem<'a>>>>,
+        value: impl Into<Option<Vec<starterpack::FeedItem<S>>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `feeds` field to an Option value (optional)
-    pub fn maybe_feeds(mut self, value: Option<Vec<starterpack::FeedItem<'a>>>) -> Self {
+    pub fn maybe_feeds(mut self, value: Option<Vec<starterpack::FeedItem<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -593,7 +602,7 @@ where
     /// Set the `list` field (required)
     pub fn list(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> StarterpackBuilder<'a, starterpack_state::SetList<S>> {
         self._fields.4 = Option::Some(value.into());
         StarterpackBuilder {
@@ -612,7 +621,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> StarterpackBuilder<'a, starterpack_state::SetName<S>> {
         self._fields.5 = Option::Some(value.into());
         StarterpackBuilder {
@@ -626,9 +635,9 @@ where
 impl<'a, S> StarterpackBuilder<'a, S>
 where
     S: starterpack_state::State,
+    S::CreatedAt: starterpack_state::IsSet,
     S::Name: starterpack_state::IsSet,
     S::List: starterpack_state::IsSet,
-    S::CreatedAt: starterpack_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Starterpack<'a> {
@@ -645,10 +654,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Starterpack<'a> {
         Starterpack {
             created_at: self._fields.0.unwrap(),

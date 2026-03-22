@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, RecordKey, Rkey};
@@ -31,142 +32,170 @@ use crate::dev_tsunagite::types::Indexable;
 use crate::dev_tsunagite::game;
 /// A closed set of indexable named values.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Enum<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Enum<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The internal ID of this component, limited to the RecordKey characterset.
-    #[serde(borrow)]
-    pub id: RecordKey<Rkey<'a>>,
+    pub id: RecordKey<Rkey<S>>,
     ///The human-readable name of this component in UI.
-    #[serde(borrow)]
-    pub name: Data<'a>,
+    pub name: Data<S>,
     ///The allowed values for this enum to take.
-    #[serde(borrow)]
-    pub values: Vec<Indexable<'a>>,
+    pub values: Vec<Indexable<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A record describing a game hosting leaderboards via Tsunagite.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "dev.tsunagite.game", tag = "$type")]
-pub struct Game<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "dev.tsunagite.game",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Game<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The default component for leaderboard sorting.
-    #[serde(borrow)]
-    pub default_component: RecordKey<Rkey<'a>>,
+    pub default_component: RecordKey<Rkey<S>>,
     ///An array of usable input methods for the game. Optional if the game only has one input method or doesn't separate leaderboards by method.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub input_methods: Option<Vec<CowStr<'a>>>,
+    pub input_methods: Option<Vec<S>>,
     ///The obtainable judgments during gameplay.
-    #[serde(borrow)]
-    pub judgments: Vec<Indexable<'a>>,
+    pub judgments: Vec<Indexable<S>>,
     ///The logo of the game, for display in UI.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub logo: Option<BlobRef<'a>>,
+    pub logo: Option<BlobRef<S>>,
     ///An array of playable game modes with different gameplay configurations. Optional if the game only has one mode.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub modes: Option<Vec<CowStr<'a>>>,
+    pub modes: Option<Vec<S>>,
     ///The human-readable name of the game, for display in UI.
-    #[serde(borrow)]
-    pub name: Data<'a>,
+    pub name: Data<S>,
     ///All the components of a score in the game, including grades, lamps, EX score, and whatever other constructs are used.
-    #[serde(borrow)]
-    pub score_components: Vec<GameScoreComponentsItem<'a>>,
+    pub score_components: Vec<GameScoreComponentsItem<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum GameScoreComponentsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum GameScoreComponentsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "dev.tsunagite.game#enum")]
-    Enum(Box<game::Enum<'a>>),
+    Enum(Box<game::Enum<S>>),
     #[serde(rename = "dev.tsunagite.game#points")]
-    Points(Box<game::Points<'a>>),
+    Points(Box<game::Points<S>>),
     #[serde(rename = "dev.tsunagite.game#percentage")]
-    Percentage(Box<game::Percentage<'a>>),
+    Percentage(Box<game::Percentage<S>>),
     #[serde(rename = "dev.tsunagite.game#text")]
-    Text(Box<game::Text<'a>>),
+    Text(Box<game::Text<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GameGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GameGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Game<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Game<S>,
 }
 
 /// A percentage score with customizable precision.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Percentage<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Percentage<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The internal ID of this component, limited to the RecordKey characterset.
-    #[serde(borrow)]
-    pub id: RecordKey<Rkey<'a>>,
+    pub id: RecordKey<Rkey<S>>,
     ///The maximum allowed percentage for this score.  Defaults to `100`.
     #[serde(default = "_default_percentage_maximum")]
     pub maximum: i64,
     ///The human-readable name of this component in UI.
-    #[serde(borrow)]
-    pub name: Data<'a>,
+    pub name: Data<S>,
     ///The number of decimal places to include in the percentage.  Defaults to `2`.
     #[serde(default = "_default_percentage_precision")]
     pub precision: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// An integer point score, with or without a cap.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Points<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Points<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The internal ID of this component, limited to the RecordKey characterset.
-    #[serde(borrow)]
-    pub id: RecordKey<Rkey<'a>>,
+    pub id: RecordKey<Rkey<S>>,
     ///The maximum allowed value for this score.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum: Option<i64>,
     ///The human-readable name of this component in UI.
-    #[serde(borrow)]
-    pub name: Data<'a>,
+    pub name: Data<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A fallback component for displaying arbitrary text.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Text<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Text<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The internal ID of this component, limited to the RecordKey characterset.
-    #[serde(borrow)]
-    pub id: RecordKey<Rkey<'a>>,
+    pub id: RecordKey<Rkey<S>>,
     ///The human-readable name of this component in UI.
-    #[serde(borrow)]
-    pub name: Data<'a>,
+    pub name: Data<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Game<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, GameRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Game<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, GameRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Enum<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Enum<S> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
@@ -210,18 +239,17 @@ pub struct GameRecord;
 impl XrpcResp for GameRecord {
     const NSID: &'static str = "dev.tsunagite.game";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GameGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GameGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<GameGetRecordOutput<'_>> for Game<'_> {
-    fn from(output: GameGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<GameGetRecordOutput<S>> for Game<S> {
+    fn from(output: GameGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Game<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Game<S> {
     const NSID: &'static str = "dev.tsunagite.game";
     type Record = GameRecord;
 }
@@ -231,7 +259,7 @@ impl Collection for GameRecord {
     type Record = GameRecord;
 }
 
-impl<'a> LexiconSchema for Game<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Game<S> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
@@ -292,7 +320,7 @@ impl<'a> LexiconSchema for Game<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Percentage<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Percentage<S> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
@@ -329,7 +357,7 @@ impl<'a> LexiconSchema for Percentage<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Points<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Points<S> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
@@ -366,7 +394,7 @@ impl<'a> LexiconSchema for Points<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Text<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Text<S> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
@@ -414,57 +442,57 @@ pub mod enum_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Id;
         type Values;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Id = Unset;
         type Values = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type Values = S::Values;
         type Id = S::Id;
-        type Values = S::Values;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Name = S::Name;
-        type Id = Set<members::id>;
-        type Values = S::Values;
     }
     ///State transition - sets the `values` field to Set
     pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValues<S> {}
     impl<S: State> State for SetValues<S> {
         type Name = S::Name;
-        type Id = S::Id;
         type Values = Set<members::values>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Values = S::Values;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `values` field
         pub struct values(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EnumBuilder<'a, S: enum_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<RecordKey<Rkey<'a>>>, Option<Data<'a>>, Option<Vec<Indexable<'a>>>),
+    _fields: (Option<RecordKey<Rkey<S>>>, Option<Data<S>>, Option<Vec<Indexable<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -494,7 +522,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<RecordKey<Rkey<'a>>>,
+        value: impl Into<RecordKey<Rkey<S>>>,
     ) -> EnumBuilder<'a, enum_state::SetId<S>> {
         self._fields.0 = Option::Some(value.into());
         EnumBuilder {
@@ -513,7 +541,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> EnumBuilder<'a, enum_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         EnumBuilder {
@@ -532,7 +560,7 @@ where
     /// Set the `values` field (required)
     pub fn values(
         mut self,
-        value: impl Into<Vec<Indexable<'a>>>,
+        value: impl Into<Vec<Indexable<S>>>,
     ) -> EnumBuilder<'a, enum_state::SetValues<S>> {
         self._fields.2 = Option::Some(value.into());
         EnumBuilder {
@@ -547,8 +575,8 @@ impl<'a, S> EnumBuilder<'a, S>
 where
     S: enum_state::State,
     S::Name: enum_state::IsSet,
-    S::Id: enum_state::IsSet,
     S::Values: enum_state::IsSet,
+    S::Id: enum_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Enum<'a> {
@@ -560,10 +588,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Enum<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Enum<'a> {
         Enum {
             id: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -916,67 +941,67 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ScoreComponents;
-        type Name;
         type Judgments;
+        type ScoreComponents;
         type DefaultComponent;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ScoreComponents = Unset;
-        type Name = Unset;
         type Judgments = Unset;
+        type ScoreComponents = Unset;
         type DefaultComponent = Unset;
-    }
-    ///State transition - sets the `score_components` field to Set
-    pub struct SetScoreComponents<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScoreComponents<S> {}
-    impl<S: State> State for SetScoreComponents<S> {
-        type ScoreComponents = Set<members::score_components>;
-        type Name = S::Name;
-        type Judgments = S::Judgments;
-        type DefaultComponent = S::DefaultComponent;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type ScoreComponents = S::ScoreComponents;
-        type Name = Set<members::name>;
-        type Judgments = S::Judgments;
-        type DefaultComponent = S::DefaultComponent;
+        type Name = Unset;
     }
     ///State transition - sets the `judgments` field to Set
     pub struct SetJudgments<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetJudgments<S> {}
     impl<S: State> State for SetJudgments<S> {
-        type ScoreComponents = S::ScoreComponents;
-        type Name = S::Name;
         type Judgments = Set<members::judgments>;
+        type ScoreComponents = S::ScoreComponents;
         type DefaultComponent = S::DefaultComponent;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `score_components` field to Set
+    pub struct SetScoreComponents<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScoreComponents<S> {}
+    impl<S: State> State for SetScoreComponents<S> {
+        type Judgments = S::Judgments;
+        type ScoreComponents = Set<members::score_components>;
+        type DefaultComponent = S::DefaultComponent;
+        type Name = S::Name;
     }
     ///State transition - sets the `default_component` field to Set
     pub struct SetDefaultComponent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDefaultComponent<S> {}
     impl<S: State> State for SetDefaultComponent<S> {
-        type ScoreComponents = S::ScoreComponents;
-        type Name = S::Name;
         type Judgments = S::Judgments;
+        type ScoreComponents = S::ScoreComponents;
         type DefaultComponent = Set<members::default_component>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Judgments = S::Judgments;
+        type ScoreComponents = S::ScoreComponents;
+        type DefaultComponent = S::DefaultComponent;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `score_components` field
-        pub struct score_components(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `judgments` field
         pub struct judgments(());
+        ///Marker type for the `score_components` field
+        pub struct score_components(());
         ///Marker type for the `default_component` field
         pub struct default_component(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -984,13 +1009,13 @@ pub mod game_state {
 pub struct GameBuilder<'a, S: game_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<RecordKey<Rkey<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<Indexable<'a>>>,
-        Option<BlobRef<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Data<'a>>,
-        Option<Vec<GameScoreComponentsItem<'a>>>,
+        Option<RecordKey<Rkey<S>>>,
+        Option<Vec<S>>,
+        Option<Vec<Indexable<S>>>,
+        Option<BlobRef<S>>,
+        Option<Vec<S>>,
+        Option<Data<S>>,
+        Option<Vec<GameScoreComponentsItem<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1021,7 +1046,7 @@ where
     /// Set the `defaultComponent` field (required)
     pub fn default_component(
         mut self,
-        value: impl Into<RecordKey<Rkey<'a>>>,
+        value: impl Into<RecordKey<Rkey<S>>>,
     ) -> GameBuilder<'a, game_state::SetDefaultComponent<S>> {
         self._fields.0 = Option::Some(value.into());
         GameBuilder {
@@ -1034,12 +1059,12 @@ where
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `inputMethods` field (optional)
-    pub fn input_methods(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn input_methods(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `inputMethods` field to an Option value (optional)
-    pub fn maybe_input_methods(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_input_methods(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1053,7 +1078,7 @@ where
     /// Set the `judgments` field (required)
     pub fn judgments(
         mut self,
-        value: impl Into<Vec<Indexable<'a>>>,
+        value: impl Into<Vec<Indexable<S>>>,
     ) -> GameBuilder<'a, game_state::SetJudgments<S>> {
         self._fields.2 = Option::Some(value.into());
         GameBuilder {
@@ -1066,12 +1091,12 @@ where
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `logo` field (optional)
-    pub fn logo(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn logo(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `logo` field to an Option value (optional)
-    pub fn maybe_logo(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_logo(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1079,12 +1104,12 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 
 impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `modes` field (optional)
-    pub fn modes(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn modes(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `modes` field to an Option value (optional)
-    pub fn maybe_modes(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_modes(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1098,7 +1123,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> GameBuilder<'a, game_state::SetName<S>> {
         self._fields.5 = Option::Some(value.into());
         GameBuilder {
@@ -1117,7 +1142,7 @@ where
     /// Set the `scoreComponents` field (required)
     pub fn score_components(
         mut self,
-        value: impl Into<Vec<GameScoreComponentsItem<'a>>>,
+        value: impl Into<Vec<GameScoreComponentsItem<S>>>,
     ) -> GameBuilder<'a, game_state::SetScoreComponents<S>> {
         self._fields.6 = Option::Some(value.into());
         GameBuilder {
@@ -1131,10 +1156,10 @@ where
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::ScoreComponents: game_state::IsSet,
-    S::Name: game_state::IsSet,
     S::Judgments: game_state::IsSet,
+    S::ScoreComponents: game_state::IsSet,
     S::DefaultComponent: game_state::IsSet,
+    S::Name: game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Game<'a> {
@@ -1150,10 +1175,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Game<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Game<'a> {
         Game {
             default_component: self._fields.0.unwrap(),
             input_methods: self._fields.1,
@@ -1185,74 +1207,74 @@ pub mod percentage_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Maximum;
-        type Name;
         type Precision;
+        type Name;
+        type Maximum;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Maximum = Unset;
-        type Name = Unset;
         type Precision = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Maximum = S::Maximum;
-        type Name = S::Name;
-        type Precision = S::Precision;
-    }
-    ///State transition - sets the `maximum` field to Set
-    pub struct SetMaximum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMaximum<S> {}
-    impl<S: State> State for SetMaximum<S> {
-        type Id = S::Id;
-        type Maximum = Set<members::maximum>;
-        type Name = S::Name;
-        type Precision = S::Precision;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Id = S::Id;
-        type Maximum = S::Maximum;
-        type Name = Set<members::name>;
-        type Precision = S::Precision;
+        type Name = Unset;
+        type Maximum = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `precision` field to Set
     pub struct SetPrecision<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPrecision<S> {}
     impl<S: State> State for SetPrecision<S> {
-        type Id = S::Id;
-        type Maximum = S::Maximum;
-        type Name = S::Name;
         type Precision = Set<members::precision>;
+        type Name = S::Name;
+        type Maximum = S::Maximum;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Precision = S::Precision;
+        type Name = Set<members::name>;
+        type Maximum = S::Maximum;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `maximum` field to Set
+    pub struct SetMaximum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMaximum<S> {}
+    impl<S: State> State for SetMaximum<S> {
+        type Precision = S::Precision;
+        type Name = S::Name;
+        type Maximum = Set<members::maximum>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Precision = S::Precision;
+        type Name = S::Name;
+        type Maximum = S::Maximum;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `maximum` field
-        pub struct maximum(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `precision` field
         pub struct precision(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `maximum` field
+        pub struct maximum(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PercentageBuilder<'a, S: percentage_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<RecordKey<Rkey<'a>>>, Option<i64>, Option<Data<'a>>, Option<i64>),
+    _fields: (Option<RecordKey<Rkey<S>>>, Option<i64>, Option<Data<S>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1282,7 +1304,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<RecordKey<Rkey<'a>>>,
+        value: impl Into<RecordKey<Rkey<S>>>,
     ) -> PercentageBuilder<'a, percentage_state::SetId<S>> {
         self._fields.0 = Option::Some(value.into());
         PercentageBuilder {
@@ -1320,7 +1342,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> PercentageBuilder<'a, percentage_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         PercentageBuilder {
@@ -1353,10 +1375,10 @@ where
 impl<'a, S> PercentageBuilder<'a, S>
 where
     S: percentage_state::State,
-    S::Id: percentage_state::IsSet,
-    S::Maximum: percentage_state::IsSet,
-    S::Name: percentage_state::IsSet,
     S::Precision: percentage_state::IsSet,
+    S::Name: percentage_state::IsSet,
+    S::Maximum: percentage_state::IsSet,
+    S::Id: percentage_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Percentage<'a> {
@@ -1371,7 +1393,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Percentage<'a> {
         Percentage {
             id: self._fields.0.unwrap(),
@@ -1393,44 +1415,44 @@ pub mod points_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Name;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Name = S::Name;
+        type Id = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Id = S::Id;
         type Name = Set<members::name>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PointsBuilder<'a, S: points_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<RecordKey<Rkey<'a>>>, Option<i64>, Option<Data<'a>>),
+    _fields: (Option<RecordKey<Rkey<S>>>, Option<i64>, Option<Data<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1460,7 +1482,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<RecordKey<Rkey<'a>>>,
+        value: impl Into<RecordKey<Rkey<S>>>,
     ) -> PointsBuilder<'a, points_state::SetId<S>> {
         self._fields.0 = Option::Some(value.into());
         PointsBuilder {
@@ -1492,7 +1514,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> PointsBuilder<'a, points_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         PointsBuilder {
@@ -1506,8 +1528,8 @@ where
 impl<'a, S> PointsBuilder<'a, S>
 where
     S: points_state::State,
-    S::Id: points_state::IsSet,
     S::Name: points_state::IsSet,
+    S::Id: points_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Points<'a> {
@@ -1519,10 +1541,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Points<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Points<'a> {
         Points {
             id: self._fields.0.unwrap(),
             maximum: self._fields.1,
@@ -1542,44 +1561,44 @@ pub mod text_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Name;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Name = S::Name;
+        type Id = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Id = S::Id;
         type Name = Set<members::name>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TextBuilder<'a, S: text_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<RecordKey<Rkey<'a>>>, Option<Data<'a>>),
+    _fields: (Option<RecordKey<Rkey<S>>>, Option<Data<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1609,7 +1628,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<RecordKey<Rkey<'a>>>,
+        value: impl Into<RecordKey<Rkey<S>>>,
     ) -> TextBuilder<'a, text_state::SetId<S>> {
         self._fields.0 = Option::Some(value.into());
         TextBuilder {
@@ -1628,7 +1647,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> TextBuilder<'a, text_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         TextBuilder {
@@ -1642,8 +1661,8 @@ where
 impl<'a, S> TextBuilder<'a, S>
 where
     S: text_state::State,
-    S::Id: text_state::IsSet,
     S::Name: text_state::IsSet,
+    S::Id: text_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Text<'a> {
@@ -1654,10 +1673,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Text<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Text<'a> {
         Text {
             id: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

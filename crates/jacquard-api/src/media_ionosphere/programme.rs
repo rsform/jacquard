@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Language};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -33,73 +35,79 @@ use crate::media_ionosphere::Membership;
 use crate::media_ionosphere::Recording;
 /// A programme represents an individual piece of media. It does not represent a long-running show.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "media.ionosphere.programme", tag = "$type")]
-pub struct Programme<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "media.ionosphere.programme",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Programme<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub credits: Option<Vec<Credit<'a>>>,
+    pub credits: Option<Vec<Credit<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub delivery: Option<Vec<ProgrammeDeliveryItem<'a>>>,
+    pub delivery: Option<Vec<ProgrammeDeliveryItem<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genres: Option<Vec<Genre<'a>>>,
+    pub genres: Option<Vec<Genre<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub icon: Option<BlobRef<'a>>,
+    pub icon: Option<BlobRef<S>>,
     ///Version identifier
-    #[serde(borrow)]
-    pub ionosphere: CowStr<'a>,
+    pub ionosphere: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<Vec<CowStr<'a>>>,
+    pub keywords: Option<Vec<S>>,
     ///The language of the string values in this record. NOT the language of the content
     pub language: Language,
     ///A list of groups this record is a member of
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub member_of: Option<Vec<Membership<'a>>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub member_of: Option<Vec<Membership<S>>>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub presentation_language: Option<Language>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ProgrammeDeliveryItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ProgrammeDeliveryItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "media.ionosphere.defs#broadcast")]
-    Broadcast(Box<Broadcast<'a>>),
+    Broadcast(Box<Broadcast<S>>),
     #[serde(rename = "media.ionosphere.defs#recording")]
-    Recording(Box<Recording<'a>>),
+    Recording(Box<Recording<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ProgrammeGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProgrammeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Programme<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Programme<S>,
 }
 
-impl<'a> Programme<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ProgrammeRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Programme<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ProgrammeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -110,18 +118,17 @@ pub struct ProgrammeRecord;
 impl XrpcResp for ProgrammeRecord {
     const NSID: &'static str = "media.ionosphere.programme";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProgrammeGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ProgrammeGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ProgrammeGetRecordOutput<'_>> for Programme<'_> {
-    fn from(output: ProgrammeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ProgrammeGetRecordOutput<S>> for Programme<S> {
+    fn from(output: ProgrammeGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Programme<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Programme<S> {
     const NSID: &'static str = "media.ionosphere.programme";
     type Record = ProgrammeRecord;
 }
@@ -131,7 +138,7 @@ impl Collection for ProgrammeRecord {
     type Record = ProgrammeRecord;
 }
 
-impl<'a> LexiconSchema for Programme<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Programme<S> {
     fn nsid() -> &'static str {
         "media.ionosphere.programme"
     }
@@ -268,16 +275,16 @@ pub mod programme_state {
 pub struct ProgrammeBuilder<'a, S: programme_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<Credit<'a>>>,
-        Option<Vec<ProgrammeDeliveryItem<'a>>>,
-        Option<CowStr<'a>>,
-        Option<Vec<Genre<'a>>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<CowStr<'a>>>,
+        Option<Vec<Credit<S>>>,
+        Option<Vec<ProgrammeDeliveryItem<S>>>,
+        Option<S>,
+        Option<Vec<Genre<S>>>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<Vec<S>>,
         Option<Language>,
-        Option<Vec<Membership<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<Membership<S>>>,
+        Option<S>,
         Option<Language>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -303,12 +310,12 @@ impl<'a> ProgrammeBuilder<'a, programme_state::Empty> {
 
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `credits` field (optional)
-    pub fn credits(mut self, value: impl Into<Option<Vec<Credit<'a>>>>) -> Self {
+    pub fn credits(mut self, value: impl Into<Option<Vec<Credit<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `credits` field to an Option value (optional)
-    pub fn maybe_credits(mut self, value: Option<Vec<Credit<'a>>>) -> Self {
+    pub fn maybe_credits(mut self, value: Option<Vec<Credit<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -318,7 +325,7 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `delivery` field (optional)
     pub fn delivery(
         mut self,
-        value: impl Into<Option<Vec<ProgrammeDeliveryItem<'a>>>>,
+        value: impl Into<Option<Vec<ProgrammeDeliveryItem<S>>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -326,7 +333,7 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `delivery` field to an Option value (optional)
     pub fn maybe_delivery(
         mut self,
-        value: Option<Vec<ProgrammeDeliveryItem<'a>>>,
+        value: Option<Vec<ProgrammeDeliveryItem<S>>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -335,12 +342,12 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
 
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -348,12 +355,12 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
 
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `genres` field (optional)
-    pub fn genres(mut self, value: impl Into<Option<Vec<Genre<'a>>>>) -> Self {
+    pub fn genres(mut self, value: impl Into<Option<Vec<Genre<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `genres` field to an Option value (optional)
-    pub fn maybe_genres(mut self, value: Option<Vec<Genre<'a>>>) -> Self {
+    pub fn maybe_genres(mut self, value: Option<Vec<Genre<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -361,12 +368,12 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
 
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `icon` field (optional)
-    pub fn icon(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `icon` field to an Option value (optional)
-    pub fn maybe_icon(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_icon(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -380,7 +387,7 @@ where
     /// Set the `ionosphere` field (required)
     pub fn ionosphere(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProgrammeBuilder<'a, programme_state::SetIonosphere<S>> {
         self._fields.5 = Option::Some(value.into());
         ProgrammeBuilder {
@@ -393,12 +400,12 @@ where
 
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_keywords(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -425,12 +432,12 @@ where
 
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `memberOf` field (optional)
-    pub fn member_of(mut self, value: impl Into<Option<Vec<Membership<'a>>>>) -> Self {
+    pub fn member_of(mut self, value: impl Into<Option<Vec<Membership<S>>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `memberOf` field to an Option value (optional)
-    pub fn maybe_member_of(mut self, value: Option<Vec<Membership<'a>>>) -> Self {
+    pub fn maybe_member_of(mut self, value: Option<Vec<Membership<S>>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -444,7 +451,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProgrammeBuilder<'a, programme_state::SetName<S>> {
         self._fields.9 = Option::Some(value.into());
         ProgrammeBuilder {
@@ -495,10 +502,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Programme<'a> {
         Programme {
             credits: self._fields.0,

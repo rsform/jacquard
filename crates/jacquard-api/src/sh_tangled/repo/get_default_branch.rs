@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,39 +28,48 @@ use crate::sh_tangled::repo::get_default_branch;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetDefaultBranch<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetDefaultBranch<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub repo: CowStr<'a>,
+    pub repo: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetDefaultBranchOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetDefaultBranchOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<get_default_branch::Signature<'a>>,
+    pub author: Option<get_default_branch::Signature<S>>,
     ///Latest commit hash on default branch
-    #[serde(borrow)]
-    pub hash: CowStr<'a>,
+    pub hash: S,
     ///Latest commit message
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     ///Default branch name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Short commit hash
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub short_hash: Option<CowStr<'a>>,
+    pub short_hash: Option<S>,
     ///Timestamp of latest commit
     pub when: Datetime,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -67,22 +78,23 @@ pub struct GetDefaultBranchOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetDefaultBranchError<'a> {
+pub enum GetDefaultBranchError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetDefaultBranchError<'_> {
+impl core::fmt::Display for GetDefaultBranchError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -99,24 +111,35 @@ impl core::fmt::Display for GetDefaultBranchError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Signature<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Signature<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Author email
-    #[serde(borrow)]
-    pub email: CowStr<'a>,
+    pub email: S,
     ///Author name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Author timestamp
     pub when: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.tangled.repo.getDefaultBranch
@@ -124,11 +147,12 @@ pub struct GetDefaultBranchResponse;
 impl jacquard_common::xrpc::XrpcResp for GetDefaultBranchResponse {
     const NSID: &'static str = "sh.tangled.repo.getDefaultBranch";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetDefaultBranchOutput<'de>;
-    type Err<'de> = GetDefaultBranchError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetDefaultBranchOutput<S>;
+    type Err = GetDefaultBranchError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetDefaultBranch<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetDefaultBranch<S> {
     const NSID: &'static str = "sh.tangled.repo.getDefaultBranch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetDefaultBranchResponse;
@@ -139,11 +163,11 @@ pub struct GetDefaultBranchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetDefaultBranchRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.getDefaultBranch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetDefaultBranch<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetDefaultBranch<S>;
     type Response = GetDefaultBranchResponse;
 }
 
-impl<'a> LexiconSchema for Signature<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Signature<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.getDefaultBranch"
     }
@@ -193,7 +217,7 @@ pub mod get_default_branch_state {
 /// Builder for constructing an instance of this type
 pub struct GetDefaultBranchBuilder<'a, S: get_default_branch_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -223,7 +247,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetDefaultBranchBuilder<'a, get_default_branch_state::SetRepo<S>> {
         self._fields.0 = Option::Some(value.into());
         GetDefaultBranchBuilder {
@@ -308,7 +332,7 @@ pub mod signature_state {
 /// Builder for constructing an instance of this type
 pub struct SignatureBuilder<'a, S: signature_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _fields: (Option<S>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -338,7 +362,7 @@ where
     /// Set the `email` field (required)
     pub fn email(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SignatureBuilder<'a, signature_state::SetEmail<S>> {
         self._fields.0 = Option::Some(value.into());
         SignatureBuilder {
@@ -357,7 +381,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SignatureBuilder<'a, signature_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         SignatureBuilder {
@@ -406,10 +430,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Signature<'a> {
         Signature {
             email: self._fields.0.unwrap(),

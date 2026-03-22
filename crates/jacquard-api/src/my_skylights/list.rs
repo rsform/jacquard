@@ -5,12 +5,16 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::CowStr;
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -18,31 +22,35 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct List<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct List<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sort_by: Option<ListSortBy<'a>>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub sort_by: Option<ListSortBy<S>>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ListSortBy<'a> {
+pub enum ListSortBy<S: Bos<str> + AsRef<str> = DefaultStr> {
     Position,
     Date,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ListSortBy<'a> {
+impl<S: Bos<str> + AsRef<str>> ListSortBy<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Position => "position",
@@ -50,70 +58,56 @@ impl<'a> ListSortBy<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ListSortBy<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "position" => Self::Position,
             "date" => Self::Date,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ListSortBy<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "position" => Self::Position,
-            "date" => Self::Date,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ListSortBy<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ListSortBy<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ListSortBy<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ListSortBy<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ListSortBy<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ListSortBy<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ListSortBy<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ListSortBy<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ListSortBy<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ListSortBy<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ListSortBy<'_> {
-    type Output = ListSortBy<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ListSortBy<S> {
+    type Output = ListSortBy<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ListSortBy::Position => ListSortBy::Position,
@@ -123,7 +117,7 @@ impl jacquard_common::IntoStatic for ListSortBy<'_> {
     }
 }
 
-impl<'a> LexiconSchema for List<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for List<S> {
     fn nsid() -> &'static str {
         "my.skylights.list"
     }

@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,51 +30,51 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// An initial post that starts a discussion
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "dev.fudgeu.experimental.atforumv1.feed.post",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Post<'a> {
-    #[serde(borrow)]
-    pub category: AtUri<'a>,
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
+pub struct Post<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub category: AtUri<S>,
+    pub content: S,
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub forum: AtIdentifier<'a>,
+    pub forum: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub solution: Option<AtUri<'a>>,
-    #[serde(borrow)]
-    pub tags: Vec<CowStr<'a>>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub solution: Option<AtUri<S>>,
+    pub tags: Vec<S>,
+    pub title: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PostGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PostGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Post<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Post<S>,
 }
 
-impl<'a> Post<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PostRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Post<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PostRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -83,18 +85,17 @@ pub struct PostRecord;
 impl XrpcResp for PostRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.feed.post";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PostGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PostGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PostGetRecordOutput<'_>> for Post<'_> {
-    fn from(output: PostGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PostGetRecordOutput<S>> for Post<S> {
+    fn from(output: PostGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Post<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Post<S> {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.feed.post";
     type Record = PostRecord;
 }
@@ -104,7 +105,7 @@ impl Collection for PostRecord {
     type Record = PostRecord;
 }
 
-impl<'a> LexiconSchema for Post<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Post<S> {
     fn nsid() -> &'static str {
         "dev.fudgeu.experimental.atforumv1.feed.post"
     }
@@ -184,105 +185,105 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
+        type Tags;
         type CreatedAt;
         type Category;
-        type Forum;
+        type Title;
         type Content;
-        type Tags;
+        type Forum;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
+        type Tags = Unset;
         type CreatedAt = Unset;
         type Category = Unset;
-        type Forum = Unset;
+        type Title = Unset;
         type Content = Unset;
-        type Tags = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Category = S::Category;
-        type Forum = S::Forum;
-        type Content = S::Content;
-        type Tags = S::Tags;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type Category = S::Category;
-        type Forum = S::Forum;
-        type Content = S::Content;
-        type Tags = S::Tags;
-    }
-    ///State transition - sets the `category` field to Set
-    pub struct SetCategory<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCategory<S> {}
-    impl<S: State> State for SetCategory<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Category = Set<members::category>;
-        type Forum = S::Forum;
-        type Content = S::Content;
-        type Tags = S::Tags;
-    }
-    ///State transition - sets the `forum` field to Set
-    pub struct SetForum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetForum<S> {}
-    impl<S: State> State for SetForum<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Category = S::Category;
-        type Forum = Set<members::forum>;
-        type Content = S::Content;
-        type Tags = S::Tags;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Category = S::Category;
-        type Forum = S::Forum;
-        type Content = Set<members::content>;
-        type Tags = S::Tags;
+        type Forum = Unset;
     }
     ///State transition - sets the `tags` field to Set
     pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTags<S> {}
     impl<S: State> State for SetTags<S> {
-        type Title = S::Title;
+        type Tags = Set<members::tags>;
         type CreatedAt = S::CreatedAt;
         type Category = S::Category;
-        type Forum = S::Forum;
+        type Title = S::Title;
         type Content = S::Content;
-        type Tags = Set<members::tags>;
+        type Forum = S::Forum;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Tags = S::Tags;
+        type CreatedAt = Set<members::created_at>;
+        type Category = S::Category;
+        type Title = S::Title;
+        type Content = S::Content;
+        type Forum = S::Forum;
+    }
+    ///State transition - sets the `category` field to Set
+    pub struct SetCategory<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCategory<S> {}
+    impl<S: State> State for SetCategory<S> {
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Category = Set<members::category>;
+        type Title = S::Title;
+        type Content = S::Content;
+        type Forum = S::Forum;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Category = S::Category;
+        type Title = Set<members::title>;
+        type Content = S::Content;
+        type Forum = S::Forum;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Category = S::Category;
+        type Title = S::Title;
+        type Content = Set<members::content>;
+        type Forum = S::Forum;
+    }
+    ///State transition - sets the `forum` field to Set
+    pub struct SetForum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetForum<S> {}
+    impl<S: State> State for SetForum<S> {
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+        type Category = S::Category;
+        type Title = S::Title;
+        type Content = S::Content;
+        type Forum = Set<members::forum>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `category` field
         pub struct category(());
-        ///Marker type for the `forum` field
-        pub struct forum(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
+        ///Marker type for the `forum` field
+        pub struct forum(());
     }
 }
 
@@ -290,13 +291,13 @@ pub mod post_state {
 pub struct PostBuilder<'a, S: post_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
+        Option<AtUri<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<AtIdentifier<'a>>,
-        Option<AtUri<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<AtIdentifier<S>>,
+        Option<AtUri<S>>,
+        Option<Vec<S>>,
+        Option<S>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -328,7 +329,7 @@ where
     /// Set the `category` field (required)
     pub fn category(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> PostBuilder<'a, post_state::SetCategory<S>> {
         self._fields.0 = Option::Some(value.into());
         PostBuilder {
@@ -347,7 +348,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PostBuilder<'a, post_state::SetContent<S>> {
         self._fields.1 = Option::Some(value.into());
         PostBuilder {
@@ -385,7 +386,7 @@ where
     /// Set the `forum` field (required)
     pub fn forum(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> PostBuilder<'a, post_state::SetForum<S>> {
         self._fields.3 = Option::Some(value.into());
         PostBuilder {
@@ -398,12 +399,12 @@ where
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `solution` field (optional)
-    pub fn solution(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn solution(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `solution` field to an Option value (optional)
-    pub fn maybe_solution(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_solution(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -417,7 +418,7 @@ where
     /// Set the `tags` field (required)
     pub fn tags(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> PostBuilder<'a, post_state::SetTags<S>> {
         self._fields.5 = Option::Some(value.into());
         PostBuilder {
@@ -436,7 +437,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PostBuilder<'a, post_state::SetTitle<S>> {
         self._fields.6 = Option::Some(value.into());
         PostBuilder {
@@ -463,12 +464,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::Title: post_state::IsSet,
+    S::Tags: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
     S::Category: post_state::IsSet,
-    S::Forum: post_state::IsSet,
+    S::Title: post_state::IsSet,
     S::Content: post_state::IsSet,
-    S::Tags: post_state::IsSet,
+    S::Forum: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
@@ -485,13 +486,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Post<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Post<'a> {
         Post {
             category: self._fields.0.unwrap(),
             content: self._fields.1.unwrap(),

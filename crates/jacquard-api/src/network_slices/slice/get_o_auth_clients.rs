@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Datetime, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,69 +28,78 @@ use crate::network_slices::slice::get_o_auth_clients;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetOAuthClients<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetOAuthClients<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub slice: CowStr<'a>,
+    pub slice: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetOAuthClientsOutput<'a> {
-    #[serde(borrow)]
-    pub clients: Vec<get_o_auth_clients::OauthClientDetails<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetOAuthClientsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub clients: Vec<get_o_auth_clients::OauthClientDetails<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct OauthClientDetails<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct OauthClientDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///OAuth client ID
-    #[serde(borrow)]
-    pub client_id: CowStr<'a>,
+    pub client_id: S,
     ///Human-readable name of the OAuth client
-    #[serde(borrow)]
-    pub client_name: CowStr<'a>,
+    pub client_name: S,
     ///OAuth client secret (only returned on creation)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub client_secret: Option<CowStr<'a>>,
+    pub client_secret: Option<S>,
     ///URI of the client application
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub client_uri: Option<UriValue<'a>>,
+    pub client_uri: Option<UriValue<S>>,
     ///When the OAuth client was created
     pub created_at: Datetime,
     ///DID of the user who created this client
-    #[serde(borrow)]
-    pub created_by_did: Did<'a>,
+    pub created_by_did: Did<S>,
     ///Allowed OAuth grant types
-    #[serde(borrow)]
-    pub grant_types: Vec<CowStr<'a>>,
+    pub grant_types: Vec<S>,
     ///URI of the client logo
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub logo_uri: Option<UriValue<'a>>,
+    pub logo_uri: Option<UriValue<S>>,
     ///URI of the privacy policy
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub policy_uri: Option<UriValue<'a>>,
+    pub policy_uri: Option<UriValue<S>>,
     ///Allowed redirect URIs for OAuth flow
-    #[serde(borrow)]
-    pub redirect_uris: Vec<UriValue<'a>>,
+    pub redirect_uris: Vec<UriValue<S>>,
     ///Allowed OAuth response types
-    #[serde(borrow)]
-    pub response_types: Vec<CowStr<'a>>,
+    pub response_types: Vec<S>,
     ///OAuth scope
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub scope: Option<CowStr<'a>>,
+    pub scope: Option<S>,
     ///URI of the terms of service
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tos_uri: Option<UriValue<'a>>,
+    pub tos_uri: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for network.slices.slice.getOAuthClients
@@ -96,11 +107,12 @@ pub struct GetOAuthClientsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetOAuthClientsResponse {
     const NSID: &'static str = "network.slices.slice.getOAuthClients";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetOAuthClientsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetOAuthClientsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetOAuthClients<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetOAuthClients<S> {
     const NSID: &'static str = "network.slices.slice.getOAuthClients";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetOAuthClientsResponse;
@@ -111,11 +123,11 @@ pub struct GetOAuthClientsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetOAuthClientsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getOAuthClients";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetOAuthClients<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetOAuthClients<S>;
     type Response = GetOAuthClientsResponse;
 }
 
-impl<'a> LexiconSchema for OauthClientDetails<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for OauthClientDetails<S> {
     fn nsid() -> &'static str {
         "network.slices.slice.getOAuthClients"
     }
@@ -165,7 +177,7 @@ pub mod get_o_auth_clients_state {
 /// Builder for constructing an instance of this type
 pub struct GetOAuthClientsBuilder<'a, S: get_o_auth_clients_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -195,7 +207,7 @@ where
     /// Set the `slice` field (required)
     pub fn slice(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetOAuthClientsBuilder<'a, get_o_auth_clients_state::SetSlice<S>> {
         self._fields.0 = Option::Some(value.into());
         GetOAuthClientsBuilder {
@@ -229,127 +241,127 @@ pub mod oauth_client_details_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedByDid;
-        type ClientId;
-        type CreatedAt;
-        type GrantTypes;
-        type RedirectUris;
         type ClientName;
         type ResponseTypes;
+        type GrantTypes;
+        type CreatedAt;
+        type CreatedByDid;
+        type RedirectUris;
+        type ClientId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedByDid = Unset;
-        type ClientId = Unset;
-        type CreatedAt = Unset;
-        type GrantTypes = Unset;
-        type RedirectUris = Unset;
         type ClientName = Unset;
         type ResponseTypes = Unset;
-    }
-    ///State transition - sets the `created_by_did` field to Set
-    pub struct SetCreatedByDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedByDid<S> {}
-    impl<S: State> State for SetCreatedByDid<S> {
-        type CreatedByDid = Set<members::created_by_did>;
-        type ClientId = S::ClientId;
-        type CreatedAt = S::CreatedAt;
-        type GrantTypes = S::GrantTypes;
-        type RedirectUris = S::RedirectUris;
-        type ClientName = S::ClientName;
-        type ResponseTypes = S::ResponseTypes;
-    }
-    ///State transition - sets the `client_id` field to Set
-    pub struct SetClientId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClientId<S> {}
-    impl<S: State> State for SetClientId<S> {
-        type CreatedByDid = S::CreatedByDid;
-        type ClientId = Set<members::client_id>;
-        type CreatedAt = S::CreatedAt;
-        type GrantTypes = S::GrantTypes;
-        type RedirectUris = S::RedirectUris;
-        type ClientName = S::ClientName;
-        type ResponseTypes = S::ResponseTypes;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedByDid = S::CreatedByDid;
-        type ClientId = S::ClientId;
-        type CreatedAt = Set<members::created_at>;
-        type GrantTypes = S::GrantTypes;
-        type RedirectUris = S::RedirectUris;
-        type ClientName = S::ClientName;
-        type ResponseTypes = S::ResponseTypes;
-    }
-    ///State transition - sets the `grant_types` field to Set
-    pub struct SetGrantTypes<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGrantTypes<S> {}
-    impl<S: State> State for SetGrantTypes<S> {
-        type CreatedByDid = S::CreatedByDid;
-        type ClientId = S::ClientId;
-        type CreatedAt = S::CreatedAt;
-        type GrantTypes = Set<members::grant_types>;
-        type RedirectUris = S::RedirectUris;
-        type ClientName = S::ClientName;
-        type ResponseTypes = S::ResponseTypes;
-    }
-    ///State transition - sets the `redirect_uris` field to Set
-    pub struct SetRedirectUris<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRedirectUris<S> {}
-    impl<S: State> State for SetRedirectUris<S> {
-        type CreatedByDid = S::CreatedByDid;
-        type ClientId = S::ClientId;
-        type CreatedAt = S::CreatedAt;
-        type GrantTypes = S::GrantTypes;
-        type RedirectUris = Set<members::redirect_uris>;
-        type ClientName = S::ClientName;
-        type ResponseTypes = S::ResponseTypes;
+        type GrantTypes = Unset;
+        type CreatedAt = Unset;
+        type CreatedByDid = Unset;
+        type RedirectUris = Unset;
+        type ClientId = Unset;
     }
     ///State transition - sets the `client_name` field to Set
     pub struct SetClientName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClientName<S> {}
     impl<S: State> State for SetClientName<S> {
-        type CreatedByDid = S::CreatedByDid;
-        type ClientId = S::ClientId;
-        type CreatedAt = S::CreatedAt;
-        type GrantTypes = S::GrantTypes;
-        type RedirectUris = S::RedirectUris;
         type ClientName = Set<members::client_name>;
         type ResponseTypes = S::ResponseTypes;
+        type GrantTypes = S::GrantTypes;
+        type CreatedAt = S::CreatedAt;
+        type CreatedByDid = S::CreatedByDid;
+        type RedirectUris = S::RedirectUris;
+        type ClientId = S::ClientId;
     }
     ///State transition - sets the `response_types` field to Set
     pub struct SetResponseTypes<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResponseTypes<S> {}
     impl<S: State> State for SetResponseTypes<S> {
-        type CreatedByDid = S::CreatedByDid;
-        type ClientId = S::ClientId;
-        type CreatedAt = S::CreatedAt;
-        type GrantTypes = S::GrantTypes;
-        type RedirectUris = S::RedirectUris;
         type ClientName = S::ClientName;
         type ResponseTypes = Set<members::response_types>;
+        type GrantTypes = S::GrantTypes;
+        type CreatedAt = S::CreatedAt;
+        type CreatedByDid = S::CreatedByDid;
+        type RedirectUris = S::RedirectUris;
+        type ClientId = S::ClientId;
+    }
+    ///State transition - sets the `grant_types` field to Set
+    pub struct SetGrantTypes<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGrantTypes<S> {}
+    impl<S: State> State for SetGrantTypes<S> {
+        type ClientName = S::ClientName;
+        type ResponseTypes = S::ResponseTypes;
+        type GrantTypes = Set<members::grant_types>;
+        type CreatedAt = S::CreatedAt;
+        type CreatedByDid = S::CreatedByDid;
+        type RedirectUris = S::RedirectUris;
+        type ClientId = S::ClientId;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ClientName = S::ClientName;
+        type ResponseTypes = S::ResponseTypes;
+        type GrantTypes = S::GrantTypes;
+        type CreatedAt = Set<members::created_at>;
+        type CreatedByDid = S::CreatedByDid;
+        type RedirectUris = S::RedirectUris;
+        type ClientId = S::ClientId;
+    }
+    ///State transition - sets the `created_by_did` field to Set
+    pub struct SetCreatedByDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedByDid<S> {}
+    impl<S: State> State for SetCreatedByDid<S> {
+        type ClientName = S::ClientName;
+        type ResponseTypes = S::ResponseTypes;
+        type GrantTypes = S::GrantTypes;
+        type CreatedAt = S::CreatedAt;
+        type CreatedByDid = Set<members::created_by_did>;
+        type RedirectUris = S::RedirectUris;
+        type ClientId = S::ClientId;
+    }
+    ///State transition - sets the `redirect_uris` field to Set
+    pub struct SetRedirectUris<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRedirectUris<S> {}
+    impl<S: State> State for SetRedirectUris<S> {
+        type ClientName = S::ClientName;
+        type ResponseTypes = S::ResponseTypes;
+        type GrantTypes = S::GrantTypes;
+        type CreatedAt = S::CreatedAt;
+        type CreatedByDid = S::CreatedByDid;
+        type RedirectUris = Set<members::redirect_uris>;
+        type ClientId = S::ClientId;
+    }
+    ///State transition - sets the `client_id` field to Set
+    pub struct SetClientId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClientId<S> {}
+    impl<S: State> State for SetClientId<S> {
+        type ClientName = S::ClientName;
+        type ResponseTypes = S::ResponseTypes;
+        type GrantTypes = S::GrantTypes;
+        type CreatedAt = S::CreatedAt;
+        type CreatedByDid = S::CreatedByDid;
+        type RedirectUris = S::RedirectUris;
+        type ClientId = Set<members::client_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_by_did` field
-        pub struct created_by_did(());
-        ///Marker type for the `client_id` field
-        pub struct client_id(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `grant_types` field
-        pub struct grant_types(());
-        ///Marker type for the `redirect_uris` field
-        pub struct redirect_uris(());
         ///Marker type for the `client_name` field
         pub struct client_name(());
         ///Marker type for the `response_types` field
         pub struct response_types(());
+        ///Marker type for the `grant_types` field
+        pub struct grant_types(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `created_by_did` field
+        pub struct created_by_did(());
+        ///Marker type for the `redirect_uris` field
+        pub struct redirect_uris(());
+        ///Marker type for the `client_id` field
+        pub struct client_id(());
     }
 }
 
@@ -357,19 +369,19 @@ pub mod oauth_client_details_state {
 pub struct OauthClientDetailsBuilder<'a, S: oauth_client_details_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<UriValue<S>>,
         Option<Datetime>,
-        Option<Did<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<UriValue<'a>>,
-        Option<UriValue<'a>>,
-        Option<Vec<UriValue<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
+        Option<Did<S>>,
+        Option<Vec<S>>,
+        Option<UriValue<S>>,
+        Option<UriValue<S>>,
+        Option<Vec<UriValue<S>>>,
+        Option<Vec<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -414,7 +426,7 @@ where
     /// Set the `clientId` field (required)
     pub fn client_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> OauthClientDetailsBuilder<'a, oauth_client_details_state::SetClientId<S>> {
         self._fields.0 = Option::Some(value.into());
         OauthClientDetailsBuilder {
@@ -433,7 +445,7 @@ where
     /// Set the `clientName` field (required)
     pub fn client_name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> OauthClientDetailsBuilder<'a, oauth_client_details_state::SetClientName<S>> {
         self._fields.1 = Option::Some(value.into());
         OauthClientDetailsBuilder {
@@ -446,12 +458,12 @@ where
 
 impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> {
     /// Set the `clientSecret` field (optional)
-    pub fn client_secret(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn client_secret(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `clientSecret` field to an Option value (optional)
-    pub fn maybe_client_secret(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_client_secret(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -459,12 +471,12 @@ impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> 
 
 impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> {
     /// Set the `clientUri` field (optional)
-    pub fn client_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn client_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `clientUri` field to an Option value (optional)
-    pub fn maybe_client_uri(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_client_uri(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -497,7 +509,7 @@ where
     /// Set the `createdByDid` field (required)
     pub fn created_by_did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> OauthClientDetailsBuilder<'a, oauth_client_details_state::SetCreatedByDid<S>> {
         self._fields.5 = Option::Some(value.into());
         OauthClientDetailsBuilder {
@@ -516,7 +528,7 @@ where
     /// Set the `grantTypes` field (required)
     pub fn grant_types(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> OauthClientDetailsBuilder<'a, oauth_client_details_state::SetGrantTypes<S>> {
         self._fields.6 = Option::Some(value.into());
         OauthClientDetailsBuilder {
@@ -529,12 +541,12 @@ where
 
 impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> {
     /// Set the `logoUri` field (optional)
-    pub fn logo_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn logo_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `logoUri` field to an Option value (optional)
-    pub fn maybe_logo_uri(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_logo_uri(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -542,12 +554,12 @@ impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> 
 
 impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> {
     /// Set the `policyUri` field (optional)
-    pub fn policy_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn policy_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `policyUri` field to an Option value (optional)
-    pub fn maybe_policy_uri(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_policy_uri(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -561,7 +573,7 @@ where
     /// Set the `redirectUris` field (required)
     pub fn redirect_uris(
         mut self,
-        value: impl Into<Vec<UriValue<'a>>>,
+        value: impl Into<Vec<UriValue<S>>>,
     ) -> OauthClientDetailsBuilder<'a, oauth_client_details_state::SetRedirectUris<S>> {
         self._fields.9 = Option::Some(value.into());
         OauthClientDetailsBuilder {
@@ -580,7 +592,7 @@ where
     /// Set the `responseTypes` field (required)
     pub fn response_types(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> OauthClientDetailsBuilder<'a, oauth_client_details_state::SetResponseTypes<S>> {
         self._fields.10 = Option::Some(value.into());
         OauthClientDetailsBuilder {
@@ -593,12 +605,12 @@ where
 
 impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> {
     /// Set the `scope` field (optional)
-    pub fn scope(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn scope(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `scope` field to an Option value (optional)
-    pub fn maybe_scope(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_scope(mut self, value: Option<S>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -606,12 +618,12 @@ impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> 
 
 impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> {
     /// Set the `tosUri` field (optional)
-    pub fn tos_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn tos_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `tosUri` field to an Option value (optional)
-    pub fn maybe_tos_uri(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_tos_uri(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -620,13 +632,13 @@ impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> 
 impl<'a, S> OauthClientDetailsBuilder<'a, S>
 where
     S: oauth_client_details_state::State,
-    S::CreatedByDid: oauth_client_details_state::IsSet,
-    S::ClientId: oauth_client_details_state::IsSet,
-    S::CreatedAt: oauth_client_details_state::IsSet,
-    S::GrantTypes: oauth_client_details_state::IsSet,
-    S::RedirectUris: oauth_client_details_state::IsSet,
     S::ClientName: oauth_client_details_state::IsSet,
     S::ResponseTypes: oauth_client_details_state::IsSet,
+    S::GrantTypes: oauth_client_details_state::IsSet,
+    S::CreatedAt: oauth_client_details_state::IsSet,
+    S::CreatedByDid: oauth_client_details_state::IsSet,
+    S::RedirectUris: oauth_client_details_state::IsSet,
+    S::ClientId: oauth_client_details_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> OauthClientDetails<'a> {
@@ -650,10 +662,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> OauthClientDetails<'a> {
         OauthClientDetails {
             client_id: self._fields.0.unwrap(),

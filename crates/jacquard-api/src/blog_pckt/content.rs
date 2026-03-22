@@ -6,10 +6,15 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{Bos, DefaultStr};
+
+#[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -18,25 +23,29 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Hybrid content storage: inline for small content (≤20KB), blob for large content (>20KB)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Content<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Content<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reference to external JSON blob containing content (extended mode, used when content > 20KB)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub blob: Option<BlobRef<'a>>,
+    pub blob: Option<BlobRef<S>>,
     ///Array of content blocks (inline mode, used when content ≤ 20KB)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub items: Option<Vec<Data<'a>>>,
+    pub items: Option<Vec<Data<S>>>,
     ///Array of blob references (full objects) used in the content (required in extended mode to prevent garbage collection)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub references: Option<Vec<BlobRef<'a>>>,
+    pub references: Option<Vec<BlobRef<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Content<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Content<S> {
     fn nsid() -> &'static str {
         "blog.pckt.content"
     }

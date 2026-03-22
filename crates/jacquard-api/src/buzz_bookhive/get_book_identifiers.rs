@@ -10,35 +10,51 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::buzz_bookhive::BookIdentifiers;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetBookIdentifiers<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetBookIdentifiers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub goodreads_id: Option<CowStr<'a>>,
+    pub goodreads_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub hive_id: Option<CowStr<'a>>,
+    pub hive_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub isbn: Option<CowStr<'a>>,
+    pub isbn: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub isbn13: Option<CowStr<'a>>,
+    pub isbn13: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetBookIdentifiersOutput<'a> {
-    #[serde(borrow)]
-    pub book_identifiers: BookIdentifiers<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetBookIdentifiersOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub book_identifiers: BookIdentifiers<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for buzz.bookhive.getBookIdentifiers
@@ -46,11 +62,12 @@ pub struct GetBookIdentifiersResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBookIdentifiersResponse {
     const NSID: &'static str = "buzz.bookhive.getBookIdentifiers";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetBookIdentifiersOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetBookIdentifiersOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetBookIdentifiers<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetBookIdentifiers<S> {
     const NSID: &'static str = "buzz.bookhive.getBookIdentifiers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBookIdentifiersResponse;
@@ -61,7 +78,7 @@ pub struct GetBookIdentifiersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBookIdentifiersRequest {
     const PATH: &'static str = "/xrpc/buzz.bookhive.getBookIdentifiers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBookIdentifiers<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetBookIdentifiers<S>;
     type Response = GetBookIdentifiersResponse;
 }
 
@@ -87,12 +104,7 @@ pub mod get_book_identifiers_state {
 /// Builder for constructing an instance of this type
 pub struct GetBookIdentifiersBuilder<'a, S: get_book_identifiers_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -116,12 +128,12 @@ impl<'a> GetBookIdentifiersBuilder<'a, get_book_identifiers_state::Empty> {
 
 impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> {
     /// Set the `goodreadsId` field (optional)
-    pub fn goodreads_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn goodreads_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `goodreadsId` field to an Option value (optional)
-    pub fn maybe_goodreads_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_goodreads_id(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -129,12 +141,12 @@ impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> 
 
 impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> {
     /// Set the `hiveId` field (optional)
-    pub fn hive_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn hive_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `hiveId` field to an Option value (optional)
-    pub fn maybe_hive_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_hive_id(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -142,12 +154,12 @@ impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> 
 
 impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> {
     /// Set the `isbn` field (optional)
-    pub fn isbn(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn isbn(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `isbn` field to an Option value (optional)
-    pub fn maybe_isbn(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_isbn(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -155,12 +167,12 @@ impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> 
 
 impl<'a, S: get_book_identifiers_state::State> GetBookIdentifiersBuilder<'a, S> {
     /// Set the `isbn13` field (optional)
-    pub fn isbn13(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn isbn13(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `isbn13` field to an Option value (optional)
-    pub fn maybe_isbn13(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_isbn13(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }

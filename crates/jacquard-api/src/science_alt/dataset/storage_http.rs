@@ -10,11 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,30 +28,41 @@ use crate::science_alt::dataset::entry::ShardChecksum;
 use crate::science_alt::dataset::storage_http;
 /// HTTP/HTTPS storage for WebDataset tar archives. Each shard is listed individually with a checksum for integrity verification. Consumers build brace-expansion patterns on the fly when needed.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StorageHttp<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StorageHttp<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of shard entries with URL and integrity checksum
-    #[serde(borrow)]
-    pub shards: Vec<storage_http::ShardEntry<'a>>,
+    pub shards: Vec<storage_http::ShardEntry<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A single HTTP-accessible shard with integrity checksum
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ShardEntry<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ShardEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Content hash for integrity verification
-    #[serde(borrow)]
-    pub checksum: ShardChecksum<'a>,
+    pub checksum: ShardChecksum<S>,
     ///HTTP/HTTPS URL for this WebDataset tar shard
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for StorageHttp<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for StorageHttp<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageHttp"
     }
@@ -74,7 +88,7 @@ impl<'a> LexiconSchema for StorageHttp<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ShardEntry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ShardEntry<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageHttp"
     }
@@ -135,7 +149,7 @@ pub mod storage_http_state {
 /// Builder for constructing an instance of this type
 pub struct StorageHttpBuilder<'a, S: storage_http_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<storage_http::ShardEntry<'a>>>,),
+    _fields: (Option<Vec<storage_http::ShardEntry<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -165,7 +179,7 @@ where
     /// Set the `shards` field (required)
     pub fn shards(
         mut self,
-        value: impl Into<Vec<storage_http::ShardEntry<'a>>>,
+        value: impl Into<Vec<storage_http::ShardEntry<S>>>,
     ) -> StorageHttpBuilder<'a, storage_http_state::SetShards<S>> {
         self._fields.0 = Option::Some(value.into());
         StorageHttpBuilder {
@@ -191,10 +205,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> StorageHttp<'a> {
         StorageHttp {
             shards: self._fields.0.unwrap(),
@@ -303,44 +314,44 @@ pub mod shard_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Checksum;
         type Url;
+        type Checksum;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Checksum = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `checksum` field to Set
-    pub struct SetChecksum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChecksum<S> {}
-    impl<S: State> State for SetChecksum<S> {
-        type Checksum = Set<members::checksum>;
-        type Url = S::Url;
+        type Checksum = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type Checksum = S::Checksum;
         type Url = Set<members::url>;
+        type Checksum = S::Checksum;
+    }
+    ///State transition - sets the `checksum` field to Set
+    pub struct SetChecksum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChecksum<S> {}
+    impl<S: State> State for SetChecksum<S> {
+        type Url = S::Url;
+        type Checksum = Set<members::checksum>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `checksum` field
-        pub struct checksum(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `checksum` field
+        pub struct checksum(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ShardEntryBuilder<'a, S: shard_entry_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<ShardChecksum<'a>>, Option<UriValue<'a>>),
+    _fields: (Option<ShardChecksum<S>>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -370,7 +381,7 @@ where
     /// Set the `checksum` field (required)
     pub fn checksum(
         mut self,
-        value: impl Into<ShardChecksum<'a>>,
+        value: impl Into<ShardChecksum<S>>,
     ) -> ShardEntryBuilder<'a, shard_entry_state::SetChecksum<S>> {
         self._fields.0 = Option::Some(value.into());
         ShardEntryBuilder {
@@ -389,7 +400,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ShardEntryBuilder<'a, shard_entry_state::SetUrl<S>> {
         self._fields.1 = Option::Some(value.into());
         ShardEntryBuilder {
@@ -403,8 +414,8 @@ where
 impl<'a, S> ShardEntryBuilder<'a, S>
 where
     S: shard_entry_state::State,
-    S::Checksum: shard_entry_state::IsSet,
     S::Url: shard_entry_state::IsSet,
+    S::Checksum: shard_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ShardEntry<'a> {
@@ -417,10 +428,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ShardEntry<'a> {
         ShardEntry {
             checksum: self._fields.0.unwrap(),

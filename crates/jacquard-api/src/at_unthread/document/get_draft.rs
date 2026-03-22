@@ -7,30 +7,49 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::at_unthread::document::put_draft::DraftView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetDraft<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetDraft<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub tid: CowStr<'a>,
+    pub tid: S,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetDraftOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetDraftOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: DraftView<'a>,
+    pub value: DraftView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -39,18 +58,22 @@ pub struct GetDraftOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetDraftError<'a> {
+pub enum GetDraftError {
     #[serde(rename = "DraftNotFound")]
-    DraftNotFound(Option<CowStr<'a>>),
+    DraftNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for GetDraftError<'_> {
+impl core::fmt::Display for GetDraftError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::DraftNotFound(msg) => {
@@ -60,7 +83,13 @@ impl core::fmt::Display for GetDraftError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -70,11 +99,12 @@ pub struct GetDraftResponse;
 impl jacquard_common::xrpc::XrpcResp for GetDraftResponse {
     const NSID: &'static str = "at.unthread.document.getDraft";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetDraftOutput<'de>;
-    type Err<'de> = GetDraftError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetDraftOutput<S>;
+    type Err = GetDraftError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetDraft<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetDraft<S> {
     const NSID: &'static str = "at.unthread.document.getDraft";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetDraftResponse;
@@ -85,7 +115,7 @@ pub struct GetDraftRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetDraftRequest {
     const PATH: &'static str = "/xrpc/at.unthread.document.getDraft";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetDraft<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetDraft<S>;
     type Response = GetDraftResponse;
 }
 
@@ -124,7 +154,7 @@ pub mod get_draft_state {
 /// Builder for constructing an instance of this type
 pub struct GetDraftBuilder<'a, S: get_draft_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -154,7 +184,7 @@ where
     /// Set the `tid` field (required)
     pub fn tid(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetDraftBuilder<'a, get_draft_state::SetTid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetDraftBuilder {

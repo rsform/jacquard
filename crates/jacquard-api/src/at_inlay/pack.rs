@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Nsid, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,57 +29,70 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::at_inlay::pack;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Export<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Export<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///AT-URI of the component record
-    #[serde(borrow)]
-    pub component: AtUri<'a>,
+    pub component: AtUri<S>,
     ///NSID of the type being exported
-    #[serde(borrow)]
-    pub r#type: Nsid<'a>,
+    pub r#type: Nsid<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A list of type to component exports
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "at.inlay.pack", tag = "$type")]
-pub struct Pack<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "at.inlay.pack",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Pack<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///Type to component mappings
-    #[serde(borrow)]
-    pub exports: Vec<pack::Export<'a>>,
+    pub exports: Vec<pack::Export<S>>,
     ///Short slug for the pack (e.g. "core", "ui")
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PackGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PackGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Pack<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Pack<S>,
 }
 
-impl<'a> Pack<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PackRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Pack<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PackRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Export<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Export<S> {
     fn nsid() -> &'static str {
         "at.inlay.pack"
     }
@@ -99,18 +114,17 @@ pub struct PackRecord;
 impl XrpcResp for PackRecord {
     const NSID: &'static str = "at.inlay.pack";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PackGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PackGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PackGetRecordOutput<'_>> for Pack<'_> {
-    fn from(output: PackGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PackGetRecordOutput<S>> for Pack<S> {
+    fn from(output: PackGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Pack<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Pack<S> {
     const NSID: &'static str = "at.inlay.pack";
     type Record = PackRecord;
 }
@@ -120,7 +134,7 @@ impl Collection for PackRecord {
     type Record = PackRecord;
 }
 
-impl<'a> LexiconSchema for Pack<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Pack<S> {
     fn nsid() -> &'static str {
         "at.inlay.pack"
     }
@@ -193,7 +207,7 @@ pub mod export_state {
 /// Builder for constructing an instance of this type
 pub struct ExportBuilder<'a, S: export_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<Nsid<'a>>),
+    _fields: (Option<AtUri<S>>, Option<Nsid<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -223,7 +237,7 @@ where
     /// Set the `component` field (required)
     pub fn component(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ExportBuilder<'a, export_state::SetComponent<S>> {
         self._fields.0 = Option::Some(value.into());
         ExportBuilder {
@@ -242,7 +256,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<Nsid<'a>>,
+        value: impl Into<Nsid<S>>,
     ) -> ExportBuilder<'a, export_state::SetType<S>> {
         self._fields.1 = Option::Some(value.into());
         ExportBuilder {
@@ -268,13 +282,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Export<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Export<'a> {
         Export {
             component: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),
@@ -437,7 +445,7 @@ pub mod pack_state {
 /// Builder for constructing an instance of this type
 pub struct PackBuilder<'a, S: pack_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Vec<pack::Export<'a>>>, Option<CowStr<'a>>),
+    _fields: (Option<Datetime>, Option<Vec<pack::Export<S>>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -480,7 +488,7 @@ where
     /// Set the `exports` field (required)
     pub fn exports(
         mut self,
-        value: impl Into<Vec<pack::Export<'a>>>,
+        value: impl Into<Vec<pack::Export<S>>>,
     ) -> PackBuilder<'a, pack_state::SetExports<S>> {
         self._fields.1 = Option::Some(value.into());
         PackBuilder {
@@ -499,7 +507,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PackBuilder<'a, pack_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         PackBuilder {
@@ -526,13 +534,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Pack<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Pack<'a> {
         Pack {
             created_at: self._fields.0,
             exports: self._fields.1.unwrap(),

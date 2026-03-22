@@ -10,41 +10,54 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::set::SetView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetValues<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetValues<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `100`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetValuesOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetValuesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub set: SetView<'a>,
-    #[serde(borrow)]
-    pub values: Vec<CowStr<'a>>,
+    pub cursor: Option<S>,
+    pub set: SetView<S>,
+    pub values: Vec<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -53,19 +66,20 @@ pub struct GetValuesOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetValuesError<'a> {
+pub enum GetValuesError {
     /// set with the given name does not exist
     #[serde(rename = "SetNotFound")]
-    SetNotFound(Option<CowStr<'a>>),
+    SetNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetValuesError<'_> {
+impl core::fmt::Display for GetValuesError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::SetNotFound(msg) => {
@@ -75,7 +89,13 @@ impl core::fmt::Display for GetValuesError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -85,11 +105,12 @@ pub struct GetValuesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetValuesResponse {
     const NSID: &'static str = "tools.ozone.set.getValues";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetValuesOutput<'de>;
-    type Err<'de> = GetValuesError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetValuesOutput<S>;
+    type Err = GetValuesError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetValues<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetValues<S> {
     const NSID: &'static str = "tools.ozone.set.getValues";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetValuesResponse;
@@ -100,7 +121,7 @@ pub struct GetValuesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetValuesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.set.getValues";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetValues<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetValues<S>;
     type Response = GetValuesResponse;
 }
 
@@ -143,7 +164,7 @@ pub mod get_values_state {
 /// Builder for constructing an instance of this type
 pub struct GetValuesBuilder<'a, S: get_values_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -167,12 +188,12 @@ impl<'a> GetValuesBuilder<'a, get_values_state::Empty> {
 
 impl<'a, S: get_values_state::State> GetValuesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -199,7 +220,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetValuesBuilder<'a, get_values_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         GetValuesBuilder {

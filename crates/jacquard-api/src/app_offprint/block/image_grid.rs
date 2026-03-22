@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,43 +27,51 @@ use serde::{Serialize, Deserialize};
 use crate::app_offprint::block::image::AspectRatio;
 use crate::app_offprint::block::image_grid;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct GridImage<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GridImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alt: Option<CowStr<'a>>,
+    pub alt: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<AspectRatio<'a>>,
+    pub aspect_ratio: Option<AspectRatio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub blob: Option<BlobRef<'a>>,
+    pub blob: Option<BlobRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageGrid<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImageGrid<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Aspect ratio mode
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<CowStr<'a>>,
+    pub aspect_ratio: Option<S>,
     ///Grid caption
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub caption: Option<CowStr<'a>>,
+    pub caption: Option<S>,
     ///Number of rows in the grid
     #[serde(skip_serializing_if = "Option::is_none")]
     pub grid_rows: Option<i64>,
     ///Array of images in the grid (2-6)
-    #[serde(borrow)]
-    pub images: Vec<image_grid::GridImage<'a>>,
+    pub images: Vec<image_grid::GridImage<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for GridImage<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for GridImage<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.imageGrid"
     }
@@ -126,7 +136,7 @@ impl<'a> LexiconSchema for GridImage<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ImageGrid<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageGrid<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.imageGrid"
     }
@@ -312,12 +322,7 @@ pub mod image_grid_state {
 /// Builder for constructing an instance of this type
 pub struct ImageGridBuilder<'a, S: image_grid_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<Vec<image_grid::GridImage<'a>>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<i64>, Option<Vec<image_grid::GridImage<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -341,12 +346,12 @@ impl<'a> ImageGridBuilder<'a, image_grid_state::Empty> {
 
 impl<'a, S: image_grid_state::State> ImageGridBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -354,12 +359,12 @@ impl<'a, S: image_grid_state::State> ImageGridBuilder<'a, S> {
 
 impl<'a, S: image_grid_state::State> ImageGridBuilder<'a, S> {
     /// Set the `caption` field (optional)
-    pub fn caption(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn caption(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `caption` field to an Option value (optional)
-    pub fn maybe_caption(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_caption(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -386,7 +391,7 @@ where
     /// Set the `images` field (required)
     pub fn images(
         mut self,
-        value: impl Into<Vec<image_grid::GridImage<'a>>>,
+        value: impl Into<Vec<image_grid::GridImage<S>>>,
     ) -> ImageGridBuilder<'a, image_grid_state::SetImages<S>> {
         self._fields.3 = Option::Some(value.into());
         ImageGridBuilder {
@@ -415,10 +420,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ImageGrid<'a> {
         ImageGrid {
             aspect_ratio: self._fields.0,

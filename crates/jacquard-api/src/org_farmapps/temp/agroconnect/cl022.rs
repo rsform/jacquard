@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,30 +30,30 @@ use serde::{Serialize, Deserialize};
 use crate::org_farmapps::temp::ecrop::CodeType;
 /// Fertilizer codelist
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.farmapps.temp.agroconnect.cl022",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Cl022<'a> {
+pub struct Cl022<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Date when added to the list
     #[serde(skip_serializing_if = "Option::is_none")]
     pub added: Option<Datetime>,
     ///Comment
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<CowStr<'a>>,
+    pub comment: Option<S>,
     ///Denominator used for all fertilizer content properties
     #[serde(skip_serializing_if = "Option::is_none")]
     pub denominator: Option<i64>,
     ///Description / name of the fertilizer
-    #[serde(borrow)]
-    pub description: CowStr<'a>,
+    pub description: S,
     ///Id off the fertilizer
-    #[serde(borrow)]
-    pub id: CodeType<'a>,
+    pub id: CodeType<S>,
     ///<unit> Potassium oxide content of this fertilizer
     #[serde(skip_serializing_if = "Option::is_none")]
     pub k2o: Option<i64>,
@@ -63,36 +65,37 @@ pub struct Cl022<'a> {
     pub p2o5: Option<i64>,
     ///Fertlizer type
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<CowStr<'a>>,
+    pub r#type: Option<S>,
     ///Unit
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub unit: Option<CowStr<'a>>,
+    pub unit: Option<S>,
     ///Date when updated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Cl022GetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Cl022GetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Cl022<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Cl022<S>,
 }
 
-impl<'a> Cl022<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, Cl022Record>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Cl022<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, Cl022Record>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -103,18 +106,17 @@ pub struct Cl022Record;
 impl XrpcResp for Cl022Record {
     const NSID: &'static str = "org.farmapps.temp.agroconnect.cl022";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = Cl022GetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = Cl022GetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<Cl022GetRecordOutput<'_>> for Cl022<'_> {
-    fn from(output: Cl022GetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<Cl022GetRecordOutput<S>> for Cl022<S> {
+    fn from(output: Cl022GetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Cl022<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Cl022<S> {
     const NSID: &'static str = "org.farmapps.temp.agroconnect.cl022";
     type Record = Cl022Record;
 }
@@ -124,7 +126,7 @@ impl Collection for Cl022Record {
     type Record = Cl022Record;
 }
 
-impl<'a> LexiconSchema for Cl022<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Cl022<S> {
     fn nsid() -> &'static str {
         "org.farmapps.temp.agroconnect.cl022"
     }
@@ -224,15 +226,15 @@ pub struct Cl022Builder<'a, S: cl022_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CodeType<'a>>,
+        Option<S>,
+        Option<CodeType<S>>,
         Option<i64>,
         Option<i64>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -271,12 +273,12 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_comment(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -303,7 +305,7 @@ where
     /// Set the `description` field (required)
     pub fn description(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> Cl022Builder<'a, cl022_state::SetDescription<S>> {
         self._fields.3 = Option::Some(value.into());
         Cl022Builder {
@@ -322,7 +324,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<CodeType<'a>>,
+        value: impl Into<CodeType<S>>,
     ) -> Cl022Builder<'a, cl022_state::SetId<S>> {
         self._fields.4 = Option::Some(value.into());
         Cl022Builder {
@@ -374,12 +376,12 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
-    pub fn maybe_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_type(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -387,12 +389,12 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `unit` field (optional)
-    pub fn unit(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn unit(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `unit` field to an Option value (optional)
-    pub fn maybe_unit(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_unit(mut self, value: Option<S>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -435,13 +437,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Cl022<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Cl022<'a> {
         Cl022 {
             added: self._fields.0,
             comment: self._fields.1,

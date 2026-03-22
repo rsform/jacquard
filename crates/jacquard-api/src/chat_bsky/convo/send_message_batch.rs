@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,35 +27,56 @@ use crate::chat_bsky::convo::MessageInput;
 use crate::chat_bsky::convo::MessageView;
 use crate::chat_bsky::convo::send_message_batch;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BatchItem<'a> {
-    #[serde(borrow)]
-    pub convo_id: CowStr<'a>,
-    #[serde(borrow)]
-    pub message: MessageInput<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BatchItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub convo_id: S,
+    pub message: MessageInput<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SendMessageBatch<'a> {
-    #[serde(borrow)]
-    pub items: Vec<send_message_batch::BatchItem<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SendMessageBatch<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub items: Vec<send_message_batch::BatchItem<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SendMessageBatchOutput<'a> {
-    #[serde(borrow)]
-    pub items: Vec<MessageView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SendMessageBatchOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub items: Vec<MessageView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for BatchItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BatchItem<S> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.sendMessageBatch"
     }
@@ -73,11 +96,12 @@ pub struct SendMessageBatchResponse;
 impl jacquard_common::xrpc::XrpcResp for SendMessageBatchResponse {
     const NSID: &'static str = "chat.bsky.convo.sendMessageBatch";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SendMessageBatchOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SendMessageBatchOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SendMessageBatch<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SendMessageBatch<S> {
     const NSID: &'static str = "chat.bsky.convo.sendMessageBatch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -92,7 +116,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SendMessageBatchRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = SendMessageBatch<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SendMessageBatch<S>;
     type Response = SendMessageBatchResponse;
 }
 
@@ -143,7 +167,7 @@ pub mod batch_item_state {
 /// Builder for constructing an instance of this type
 pub struct BatchItemBuilder<'a, S: batch_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<MessageInput<'a>>),
+    _fields: (Option<S>, Option<MessageInput<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -173,7 +197,7 @@ where
     /// Set the `convoId` field (required)
     pub fn convo_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BatchItemBuilder<'a, batch_item_state::SetConvoId<S>> {
         self._fields.0 = Option::Some(value.into());
         BatchItemBuilder {
@@ -192,7 +216,7 @@ where
     /// Set the `message` field (required)
     pub fn message(
         mut self,
-        value: impl Into<MessageInput<'a>>,
+        value: impl Into<MessageInput<S>>,
     ) -> BatchItemBuilder<'a, batch_item_state::SetMessage<S>> {
         self._fields.1 = Option::Some(value.into());
         BatchItemBuilder {
@@ -220,10 +244,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BatchItem<'a> {
         BatchItem {
             convo_id: self._fields.0.unwrap(),
@@ -346,7 +367,7 @@ pub mod send_message_batch_state {
 /// Builder for constructing an instance of this type
 pub struct SendMessageBatchBuilder<'a, S: send_message_batch_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<send_message_batch::BatchItem<'a>>>,),
+    _fields: (Option<Vec<send_message_batch::BatchItem<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -376,7 +397,7 @@ where
     /// Set the `items` field (required)
     pub fn items(
         mut self,
-        value: impl Into<Vec<send_message_batch::BatchItem<'a>>>,
+        value: impl Into<Vec<send_message_batch::BatchItem<S>>>,
     ) -> SendMessageBatchBuilder<'a, send_message_batch_state::SetItems<S>> {
         self._fields.0 = Option::Some(value.into());
         SendMessageBatchBuilder {
@@ -402,10 +423,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SendMessageBatch<'a> {
         SendMessageBatch {
             items: self._fields.0.unwrap(),

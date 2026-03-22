@@ -10,21 +10,30 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 /// The session data
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct WhoamiOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct WhoamiOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The user's DID
-    #[serde(borrow)]
-    pub did: CowStr<'a>,
+    pub did: S,
     ///The user's ID
-    #[serde(borrow)]
-    pub handle: CowStr<'a>,
+    pub handle: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// XRPC request marker type.
@@ -36,8 +45,8 @@ pub struct WhoamiResponse;
 impl jacquard_common::xrpc::XrpcResp for WhoamiResponse {
     const NSID: &'static str = "app.ocho.auth.whoami";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = WhoamiOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = WhoamiOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for Whoami {
@@ -51,6 +60,6 @@ pub struct WhoamiRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for WhoamiRequest {
     const PATH: &'static str = "/xrpc/app.ocho.auth.whoami";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Whoami;
+    type Request<S: Bos<str> + AsRef<str>> = Whoami;
     type Response = WhoamiResponse;
 }

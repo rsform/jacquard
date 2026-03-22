@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,40 +29,45 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Ephemeral challenge-response auth record. Client writes this to prove PDS write access during login, server verifies the nonce, then client deletes it immediately.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.protoimsg.chat.authVerify",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct AuthVerify<'a> {
+pub struct AuthVerify<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When this verification record was created.
     pub created_at: Datetime,
     ///Server-issued challenge nonce to prove write access.
-    #[serde(borrow)]
-    pub nonce: CowStr<'a>,
+    pub nonce: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AuthVerifyGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AuthVerifyGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: AuthVerify<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: AuthVerify<S>,
 }
 
-impl<'a> AuthVerify<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AuthVerifyRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> AuthVerify<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AuthVerifyRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -71,18 +78,17 @@ pub struct AuthVerifyRecord;
 impl XrpcResp for AuthVerifyRecord {
     const NSID: &'static str = "app.protoimsg.chat.authVerify";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AuthVerifyGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AuthVerifyGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AuthVerifyGetRecordOutput<'_>> for AuthVerify<'_> {
-    fn from(output: AuthVerifyGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AuthVerifyGetRecordOutput<S>> for AuthVerify<S> {
+    fn from(output: AuthVerifyGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for AuthVerify<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for AuthVerify<S> {
     const NSID: &'static str = "app.protoimsg.chat.authVerify";
     type Record = AuthVerifyRecord;
 }
@@ -92,7 +98,7 @@ impl Collection for AuthVerifyRecord {
     type Record = AuthVerifyRecord;
 }
 
-impl<'a> LexiconSchema for AuthVerify<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AuthVerify<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.authVerify"
     }
@@ -154,7 +160,7 @@ pub mod auth_verify_state {
 /// Builder for constructing an instance of this type
 pub struct AuthVerifyBuilder<'a, S: auth_verify_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<CowStr<'a>>),
+    _fields: (Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -203,7 +209,7 @@ where
     /// Set the `nonce` field (required)
     pub fn nonce(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AuthVerifyBuilder<'a, auth_verify_state::SetNonce<S>> {
         self._fields.1 = Option::Some(value.into());
         AuthVerifyBuilder {
@@ -231,10 +237,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> AuthVerify<'a> {
         AuthVerify {
             created_at: self._fields.0.unwrap(),

@@ -10,10 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -22,22 +25,28 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::blog_pckt::block::text::Text;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TableCell<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TableCell<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Number of columns this cell spans
     #[serde(skip_serializing_if = "Option::is_none")]
     pub colspan: Option<i64>,
     ///Array of block content (typically text)
-    #[serde(borrow)]
-    pub content: Vec<Text<'a>>,
+    pub content: Vec<Text<S>>,
     ///Number of rows this cell spans
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rowspan: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for TableCell<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TableCell<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.tableCell"
     }
@@ -105,7 +114,7 @@ pub mod table_cell_state {
 /// Builder for constructing an instance of this type
 pub struct TableCellBuilder<'a, S: table_cell_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<Vec<Text<'a>>>, Option<i64>),
+    _fields: (Option<i64>, Option<Vec<Text<S>>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -148,7 +157,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<Vec<Text<'a>>>,
+        value: impl Into<Vec<Text<S>>>,
     ) -> TableCellBuilder<'a, table_cell_state::SetContent<S>> {
         self._fields.1 = Option::Some(value.into());
         TableCellBuilder {
@@ -189,10 +198,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TableCell<'a> {
         TableCell {
             colspan: self._fields.0,

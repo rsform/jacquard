@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -34,1162 +35,1835 @@ use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
 /// An offer to transfer some rights to an item or to provide a service — for example, an offer to sell tickets to an event, to rent the DVD of a movie, to stream a TV show over the internet, to repair a motorcycle, or to loan a book.\n\nNote: As the [[businessFunction]] property, which identifies the form of offer (e.g. sell, lease, repair, dispose), defaults to http://purl.org/goodrelations/v1#Sell; an Offer without a defined businessFunction value can be assumed to be an offer to sell.\n\nFor [GTIN](http://www.gs1.org/barcodes/technical/idkeys/gtin)-related fields, see [Check Digit calculator](http://www.gs1.org/barcodes/support/check_digit_calculator) and [validation guide](http://www.gs1us.org/resources/standards/gtin-validation-guide) from [GS1](http://www.gs1.org/).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Embedded<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accepted_payment_method: Option<EmbeddedAcceptedPaymentMethod<'a>>,
+    pub accepted_payment_method: Option<EmbeddedAcceptedPaymentMethod<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub add_on: Option<EmbeddedAddOn<'a>>,
+    pub add_on: Option<EmbeddedAddOn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_property: Option<EmbeddedAdditionalProperty<'a>>,
+    pub additional_property: Option<EmbeddedAdditionalProperty<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<EmbeddedAdditionalType<'a>>,
+    pub additional_type: Option<EmbeddedAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub advance_booking_requirement: Option<EmbeddedAdvanceBookingRequirement<'a>>,
+    pub advance_booking_requirement: Option<EmbeddedAdvanceBookingRequirement<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<EmbeddedAggregateRating<'a>>,
+    pub aggregate_rating: Option<EmbeddedAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<EmbeddedAlternateName<'a>>,
+    pub alternate_name: Option<EmbeddedAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub area_served: Option<EmbeddedAreaServed<'a>>,
+    pub area_served: Option<EmbeddedAreaServed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub asin: Option<EmbeddedAsin<'a>>,
+    pub asin: Option<EmbeddedAsin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub availability: Option<EmbeddedAvailability<'a>>,
+    pub availability: Option<EmbeddedAvailability<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub availability_ends: Option<EmbeddedAvailabilityEnds<'a>>,
+    pub availability_ends: Option<EmbeddedAvailabilityEnds<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub availability_starts: Option<EmbeddedAvailabilityStarts<'a>>,
+    pub availability_starts: Option<EmbeddedAvailabilityStarts<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub available_at_or_from: Option<EmbeddedAvailableAtOrFrom<'a>>,
+    pub available_at_or_from: Option<EmbeddedAvailableAtOrFrom<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub available_delivery_method: Option<EmbeddedAvailableDeliveryMethod<'a>>,
+    pub available_delivery_method: Option<EmbeddedAvailableDeliveryMethod<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub business_function: Option<EmbeddedBusinessFunction<'a>>,
+    pub business_function: Option<EmbeddedBusinessFunction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category: Option<EmbeddedCategory<'a>>,
+    pub category: Option<EmbeddedCategory<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub checkout_page_url_template: Option<EmbeddedCheckoutPageUrlTemplate<'a>>,
+    pub checkout_page_url_template: Option<EmbeddedCheckoutPageUrlTemplate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub delivery_lead_time: Option<EmbeddedDeliveryLeadTime<'a>>,
+    pub delivery_lead_time: Option<EmbeddedDeliveryLeadTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<EmbeddedDescription<'a>>,
+    pub description: Option<EmbeddedDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub eligible_customer_type: Option<EmbeddedEligibleCustomerType<'a>>,
+    pub eligible_customer_type: Option<EmbeddedEligibleCustomerType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub eligible_duration: Option<EmbeddedEligibleDuration<'a>>,
+    pub eligible_duration: Option<EmbeddedEligibleDuration<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub eligible_quantity: Option<EmbeddedEligibleQuantity<'a>>,
+    pub eligible_quantity: Option<EmbeddedEligibleQuantity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub eligible_region: Option<EmbeddedEligibleRegion<'a>>,
+    pub eligible_region: Option<EmbeddedEligibleRegion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub eligible_transaction_volume: Option<EmbeddedEligibleTransactionVolume<'a>>,
+    pub eligible_transaction_volume: Option<EmbeddedEligibleTransactionVolume<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin: Option<EmbeddedGtin<'a>>,
+    pub gtin: Option<EmbeddedGtin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin12: Option<EmbeddedGtin12<'a>>,
+    pub gtin12: Option<EmbeddedGtin12<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin13: Option<EmbeddedGtin13<'a>>,
+    pub gtin13: Option<EmbeddedGtin13<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin14: Option<EmbeddedGtin14<'a>>,
+    pub gtin14: Option<EmbeddedGtin14<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin8: Option<EmbeddedGtin8<'a>>,
+    pub gtin8: Option<EmbeddedGtin8<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_adult_consideration: Option<EmbeddedHasAdultConsideration<'a>>,
+    pub has_adult_consideration: Option<EmbeddedHasAdultConsideration<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_gs1_digital_link: Option<EmbeddedHasGs1DigitalLink<'a>>,
+    pub has_gs1_digital_link: Option<EmbeddedHasGs1DigitalLink<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_measurement: Option<EmbeddedHasMeasurement<'a>>,
+    pub has_measurement: Option<EmbeddedHasMeasurement<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_merchant_return_policy: Option<EmbeddedHasMerchantReturnPolicy<'a>>,
+    pub has_merchant_return_policy: Option<EmbeddedHasMerchantReturnPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<EmbeddedIdentifier<'a>>,
+    pub identifier: Option<EmbeddedIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<EmbeddedImage<'a>>,
+    pub image: Option<EmbeddedImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub includes_object: Option<EmbeddedIncludesObject<'a>>,
+    pub includes_object: Option<EmbeddedIncludesObject<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ineligible_region: Option<EmbeddedIneligibleRegion<'a>>,
+    pub ineligible_region: Option<EmbeddedIneligibleRegion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub inventory_level: Option<EmbeddedInventoryLevel<'a>>,
+    pub inventory_level: Option<EmbeddedInventoryLevel<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_family_friendly: Option<EmbeddedIsFamilyFriendly<'a>>,
+    pub is_family_friendly: Option<EmbeddedIsFamilyFriendly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub item_condition: Option<EmbeddedItemCondition<'a>>,
+    pub item_condition: Option<EmbeddedItemCondition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub item_offered: Option<EmbeddedItemOffered<'a>>,
+    pub item_offered: Option<EmbeddedItemOffered<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lease_length: Option<EmbeddedLeaseLength<'a>>,
+    pub lease_length: Option<EmbeddedLeaseLength<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mobile_url: Option<EmbeddedMobileUrl<'a>>,
+    pub mobile_url: Option<EmbeddedMobileUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mpn: Option<EmbeddedMpn<'a>>,
+    pub mpn: Option<EmbeddedMpn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<EmbeddedName<'a>>,
+    pub name: Option<EmbeddedName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub offered_by: Option<EmbeddedOfferedBy<'a>>,
+    pub offered_by: Option<EmbeddedOfferedBy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<EmbeddedPotentialAction<'a>>,
+    pub potential_action: Option<EmbeddedPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub price: Option<EmbeddedPrice<'a>>,
+    pub price: Option<EmbeddedPrice<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub price_currency: Option<EmbeddedPriceCurrency<'a>>,
+    pub price_currency: Option<EmbeddedPriceCurrency<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub price_specification: Option<EmbeddedPriceSpecification<'a>>,
+    pub price_specification: Option<EmbeddedPriceSpecification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub price_valid_until: Option<EmbeddedPriceValidUntil<'a>>,
+    pub price_valid_until: Option<EmbeddedPriceValidUntil<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<EmbeddedReview<'a>>,
+    pub review: Option<EmbeddedReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<EmbeddedReviews<'a>>,
+    pub reviews: Option<EmbeddedReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<EmbeddedSameAs<'a>>,
+    pub same_as: Option<EmbeddedSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub seller: Option<EmbeddedSeller<'a>>,
+    pub seller: Option<EmbeddedSeller<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub serial_number: Option<EmbeddedSerialNumber<'a>>,
+    pub serial_number: Option<EmbeddedSerialNumber<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub shipping_details: Option<EmbeddedShippingDetails<'a>>,
+    pub shipping_details: Option<EmbeddedShippingDetails<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sku: Option<EmbeddedSku<'a>>,
+    pub sku: Option<EmbeddedSku<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<EmbeddedSubjectOf<'a>>,
+    pub subject_of: Option<EmbeddedSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<EmbeddedUrl<'a>>,
+    pub url: Option<EmbeddedUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub valid_for_member_tier: Option<EmbeddedValidForMemberTier<'a>>,
+    pub valid_for_member_tier: Option<EmbeddedValidForMemberTier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub valid_from: Option<EmbeddedValidFrom<'a>>,
+    pub valid_from: Option<EmbeddedValidFrom<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub valid_through: Option<EmbeddedValidThrough<'a>>,
+    pub valid_through: Option<EmbeddedValidThrough<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub warranty: Option<EmbeddedWarranty<'a>>,
+    pub warranty: Option<EmbeddedWarranty<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAcceptedPaymentMethod<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAcceptedPaymentMethod<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAddOn<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAddOn<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    Embedded(Box<offer::Embedded<'a>>),
+    Embedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAdditionalProperty<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAdditionalProperty<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAdvanceBookingRequirement<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAdvanceBookingRequirement<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAreaServed<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAreaServed<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAsin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAsin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAvailability<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAvailability<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAvailabilityEnds<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAvailabilityEnds<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAvailabilityStarts<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAvailabilityStarts<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAvailableAtOrFrom<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAvailableAtOrFrom<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAvailableDeliveryMethod<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAvailableDeliveryMethod<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedBusinessFunction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedBusinessFunction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCategory<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCategory<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCheckoutPageUrlTemplate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCheckoutPageUrlTemplate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDeliveryLeadTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDeliveryLeadTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEligibleCustomerType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEligibleCustomerType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEligibleDuration<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEligibleDuration<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEligibleQuantity<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEligibleQuantity<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEligibleRegion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEligibleRegion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEligibleTransactionVolume<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEligibleTransactionVolume<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGtin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGtin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGtin12<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGtin12<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGtin13<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGtin13<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGtin14<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGtin14<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGtin8<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGtin8<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasAdultConsideration<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasAdultConsideration<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasGs1DigitalLink<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasGs1DigitalLink<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasMeasurement<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasMeasurement<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasMerchantReturnPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasMerchantReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIncludesObject<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIncludesObject<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIneligibleRegion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIneligibleRegion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInventoryLevel<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInventoryLevel<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsFamilyFriendly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedItemCondition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedItemCondition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedItemOffered<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedItemOffered<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLeaseLength<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLeaseLength<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMobileUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMobileUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMpn<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMpn<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedOfferedBy<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedOfferedBy<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPrice<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPrice<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPriceCurrency<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPriceCurrency<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPriceSpecification<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPriceSpecification<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPriceValidUntil<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPriceValidUntil<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSeller<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSeller<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSerialNumber<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSerialNumber<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedShippingDetails<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedShippingDetails<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSku<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSku<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedValidForMemberTier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedValidForMemberTier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedValidFrom<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedValidFrom<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedValidThrough<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedValidThrough<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWarranty<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWarranty<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "social.flockfeeds.lexical.type.Offer",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Offer<'a> {
+pub struct Offer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accepted_payment_method: Option<OfferAcceptedPaymentMethod<'a>>,
+    pub accepted_payment_method: Option<OfferAcceptedPaymentMethod<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub add_on: Option<OfferAddOn<'a>>,
+    pub add_on: Option<OfferAddOn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_property: Option<OfferAdditionalProperty<'a>>,
+    pub additional_property: Option<OfferAdditionalProperty<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<OfferAdditionalType<'a>>,
+    pub additional_type: Option<OfferAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub advance_booking_requirement: Option<OfferAdvanceBookingRequirement<'a>>,
+    pub advance_booking_requirement: Option<OfferAdvanceBookingRequirement<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<OfferAggregateRating<'a>>,
+    pub aggregate_rating: Option<OfferAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<OfferAlternateName<'a>>,
+    pub alternate_name: Option<OfferAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub area_served: Option<OfferAreaServed<'a>>,
+    pub area_served: Option<OfferAreaServed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub asin: Option<OfferAsin<'a>>,
+    pub asin: Option<OfferAsin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub availability: Option<OfferAvailability<'a>>,
+    pub availability: Option<OfferAvailability<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub availability_ends: Option<OfferAvailabilityEnds<'a>>,
+    pub availability_ends: Option<OfferAvailabilityEnds<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub availability_starts: Option<OfferAvailabilityStarts<'a>>,
+    pub availability_starts: Option<OfferAvailabilityStarts<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub available_at_or_from: Option<OfferAvailableAtOrFrom<'a>>,
+    pub available_at_or_from: Option<OfferAvailableAtOrFrom<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub available_delivery_method: Option<OfferAvailableDeliveryMethod<'a>>,
+    pub available_delivery_method: Option<OfferAvailableDeliveryMethod<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub business_function: Option<OfferBusinessFunction<'a>>,
+    pub business_function: Option<OfferBusinessFunction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category: Option<OfferCategory<'a>>,
+    pub category: Option<OfferCategory<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub checkout_page_url_template: Option<OfferCheckoutPageUrlTemplate<'a>>,
+    pub checkout_page_url_template: Option<OfferCheckoutPageUrlTemplate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub delivery_lead_time: Option<OfferDeliveryLeadTime<'a>>,
+    pub delivery_lead_time: Option<OfferDeliveryLeadTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<OfferDescription<'a>>,
+    pub description: Option<OfferDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<OfferDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<OfferDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub eligible_customer_type: Option<OfferEligibleCustomerType<'a>>,
+    pub eligible_customer_type: Option<OfferEligibleCustomerType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub eligible_duration: Option<OfferEligibleDuration<'a>>,
+    pub eligible_duration: Option<OfferEligibleDuration<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub eligible_quantity: Option<OfferEligibleQuantity<'a>>,
+    pub eligible_quantity: Option<OfferEligibleQuantity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub eligible_region: Option<OfferEligibleRegion<'a>>,
+    pub eligible_region: Option<OfferEligibleRegion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub eligible_transaction_volume: Option<OfferEligibleTransactionVolume<'a>>,
+    pub eligible_transaction_volume: Option<OfferEligibleTransactionVolume<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin: Option<OfferGtin<'a>>,
+    pub gtin: Option<OfferGtin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin12: Option<OfferGtin12<'a>>,
+    pub gtin12: Option<OfferGtin12<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin13: Option<OfferGtin13<'a>>,
+    pub gtin13: Option<OfferGtin13<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin14: Option<OfferGtin14<'a>>,
+    pub gtin14: Option<OfferGtin14<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin8: Option<OfferGtin8<'a>>,
+    pub gtin8: Option<OfferGtin8<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_adult_consideration: Option<OfferHasAdultConsideration<'a>>,
+    pub has_adult_consideration: Option<OfferHasAdultConsideration<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_gs1_digital_link: Option<OfferHasGs1DigitalLink<'a>>,
+    pub has_gs1_digital_link: Option<OfferHasGs1DigitalLink<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_measurement: Option<OfferHasMeasurement<'a>>,
+    pub has_measurement: Option<OfferHasMeasurement<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_merchant_return_policy: Option<OfferHasMerchantReturnPolicy<'a>>,
+    pub has_merchant_return_policy: Option<OfferHasMerchantReturnPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<OfferIdentifier<'a>>,
+    pub identifier: Option<OfferIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<OfferImage<'a>>,
+    pub image: Option<OfferImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub includes_object: Option<OfferIncludesObject<'a>>,
+    pub includes_object: Option<OfferIncludesObject<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ineligible_region: Option<OfferIneligibleRegion<'a>>,
+    pub ineligible_region: Option<OfferIneligibleRegion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub inventory_level: Option<OfferInventoryLevel<'a>>,
+    pub inventory_level: Option<OfferInventoryLevel<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_family_friendly: Option<OfferIsFamilyFriendly<'a>>,
+    pub is_family_friendly: Option<OfferIsFamilyFriendly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub item_condition: Option<OfferItemCondition<'a>>,
+    pub item_condition: Option<OfferItemCondition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub item_offered: Option<OfferItemOffered<'a>>,
+    pub item_offered: Option<OfferItemOffered<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lease_length: Option<OfferLeaseLength<'a>>,
+    pub lease_length: Option<OfferLeaseLength<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<OfferMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<OfferMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mobile_url: Option<OfferMobileUrl<'a>>,
+    pub mobile_url: Option<OfferMobileUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mpn: Option<OfferMpn<'a>>,
+    pub mpn: Option<OfferMpn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<OfferName<'a>>,
+    pub name: Option<OfferName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub offered_by: Option<OfferOfferedBy<'a>>,
+    pub offered_by: Option<OfferOfferedBy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<OfferPotentialAction<'a>>,
+    pub potential_action: Option<OfferPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub price: Option<OfferPrice<'a>>,
+    pub price: Option<OfferPrice<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub price_currency: Option<OfferPriceCurrency<'a>>,
+    pub price_currency: Option<OfferPriceCurrency<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub price_specification: Option<OfferPriceSpecification<'a>>,
+    pub price_specification: Option<OfferPriceSpecification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub price_valid_until: Option<OfferPriceValidUntil<'a>>,
+    pub price_valid_until: Option<OfferPriceValidUntil<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<OfferReview<'a>>,
+    pub review: Option<OfferReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<OfferReviews<'a>>,
+    pub reviews: Option<OfferReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<OfferSameAs<'a>>,
+    pub same_as: Option<OfferSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub seller: Option<OfferSeller<'a>>,
+    pub seller: Option<OfferSeller<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub serial_number: Option<OfferSerialNumber<'a>>,
+    pub serial_number: Option<OfferSerialNumber<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub shipping_details: Option<OfferShippingDetails<'a>>,
+    pub shipping_details: Option<OfferShippingDetails<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sku: Option<OfferSku<'a>>,
+    pub sku: Option<OfferSku<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<OfferSubjectOf<'a>>,
+    pub subject_of: Option<OfferSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<OfferUrl<'a>>,
+    pub url: Option<OfferUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub valid_for_member_tier: Option<OfferValidForMemberTier<'a>>,
+    pub valid_for_member_tier: Option<OfferValidForMemberTier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub valid_from: Option<OfferValidFrom<'a>>,
+    pub valid_from: Option<OfferValidFrom<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub valid_through: Option<OfferValidThrough<'a>>,
+    pub valid_through: Option<OfferValidThrough<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub warranty: Option<OfferWarranty<'a>>,
+    pub warranty: Option<OfferWarranty<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAcceptedPaymentMethod<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAcceptedPaymentMethod<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAddOn<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAddOn<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    Embedded(Box<offer::Embedded<'a>>),
+    Embedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAdditionalProperty<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAdditionalProperty<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAdvanceBookingRequirement<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAdvanceBookingRequirement<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAreaServed<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAreaServed<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAsin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAsin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAvailability<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAvailability<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAvailabilityEnds<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAvailabilityEnds<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAvailabilityStarts<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAvailabilityStarts<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAvailableAtOrFrom<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAvailableAtOrFrom<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferAvailableDeliveryMethod<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferAvailableDeliveryMethod<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferBusinessFunction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferBusinessFunction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferCategory<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferCategory<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferCheckoutPageUrlTemplate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferCheckoutPageUrlTemplate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferDeliveryLeadTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferDeliveryLeadTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferEligibleCustomerType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferEligibleCustomerType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferEligibleDuration<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferEligibleDuration<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferEligibleQuantity<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferEligibleQuantity<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferEligibleRegion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferEligibleRegion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferEligibleTransactionVolume<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferEligibleTransactionVolume<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferGtin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferGtin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferGtin12<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferGtin12<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferGtin13<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferGtin13<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferGtin14<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferGtin14<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferGtin8<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferGtin8<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferHasAdultConsideration<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferHasAdultConsideration<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferHasGs1DigitalLink<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferHasGs1DigitalLink<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferHasMeasurement<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferHasMeasurement<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferHasMerchantReturnPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferHasMerchantReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferIncludesObject<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferIncludesObject<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferIneligibleRegion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferIneligibleRegion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferInventoryLevel<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferInventoryLevel<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferIsFamilyFriendly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferItemCondition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferItemCondition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferItemOffered<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferItemOffered<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferLeaseLength<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferLeaseLength<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferMobileUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferMobileUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferMpn<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferMpn<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferOfferedBy<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferOfferedBy<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferPrice<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferPrice<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferPriceCurrency<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferPriceCurrency<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferPriceSpecification<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferPriceSpecification<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferPriceValidUntil<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferPriceValidUntil<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferSeller<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferSeller<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferSerialNumber<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferSerialNumber<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferShippingDetails<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferShippingDetails<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferSku<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferSku<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferValidForMemberTier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferValidForMemberTier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferValidFrom<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferValidFrom<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferValidThrough<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferValidThrough<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum OfferWarranty<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum OfferWarranty<S: Bos<str> + AsRef<str> = DefaultStr> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct OfferGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct OfferGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Offer<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Offer<S>,
 }
 
-impl<'a> Offer<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, OfferRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Offer<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, OfferRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Embedded<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Embedded<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Offer"
     }
@@ -1211,18 +1885,17 @@ pub struct OfferRecord;
 impl XrpcResp for OfferRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Offer";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = OfferGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = OfferGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<OfferGetRecordOutput<'_>> for Offer<'_> {
-    fn from(output: OfferGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<OfferGetRecordOutput<S>> for Offer<S> {
+    fn from(output: OfferGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Offer<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Offer<S> {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Offer";
     type Record = OfferRecord;
 }
@@ -1232,7 +1905,7 @@ impl Collection for OfferRecord {
     type Record = OfferRecord;
 }
 
-impl<'a> LexiconSchema for Offer<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Offer<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Offer"
     }
@@ -2706,72 +3379,72 @@ pub mod offer_state {
 pub struct OfferBuilder<'a, S: offer_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<OfferAcceptedPaymentMethod<'a>>,
-        Option<OfferAddOn<'a>>,
-        Option<OfferAdditionalProperty<'a>>,
-        Option<OfferAdditionalType<'a>>,
-        Option<OfferAdvanceBookingRequirement<'a>>,
-        Option<OfferAggregateRating<'a>>,
-        Option<OfferAlternateName<'a>>,
-        Option<OfferAreaServed<'a>>,
-        Option<OfferAsin<'a>>,
-        Option<OfferAvailability<'a>>,
-        Option<OfferAvailabilityEnds<'a>>,
-        Option<OfferAvailabilityStarts<'a>>,
-        Option<OfferAvailableAtOrFrom<'a>>,
-        Option<OfferAvailableDeliveryMethod<'a>>,
-        Option<OfferBusinessFunction<'a>>,
-        Option<OfferCategory<'a>>,
-        Option<OfferCheckoutPageUrlTemplate<'a>>,
-        Option<OfferDeliveryLeadTime<'a>>,
-        Option<OfferDescription<'a>>,
-        Option<OfferDisambiguatingDescription<'a>>,
-        Option<OfferEligibleCustomerType<'a>>,
-        Option<OfferEligibleDuration<'a>>,
-        Option<OfferEligibleQuantity<'a>>,
-        Option<OfferEligibleRegion<'a>>,
-        Option<OfferEligibleTransactionVolume<'a>>,
-        Option<OfferGtin<'a>>,
-        Option<OfferGtin12<'a>>,
-        Option<OfferGtin13<'a>>,
-        Option<OfferGtin14<'a>>,
-        Option<OfferGtin8<'a>>,
-        Option<OfferHasAdultConsideration<'a>>,
-        Option<OfferHasGs1DigitalLink<'a>>,
-        Option<OfferHasMeasurement<'a>>,
-        Option<OfferHasMerchantReturnPolicy<'a>>,
-        Option<OfferIdentifier<'a>>,
-        Option<OfferImage<'a>>,
-        Option<OfferIncludesObject<'a>>,
-        Option<OfferIneligibleRegion<'a>>,
-        Option<OfferInventoryLevel<'a>>,
-        Option<OfferIsFamilyFriendly<'a>>,
-        Option<OfferItemCondition<'a>>,
-        Option<OfferItemOffered<'a>>,
-        Option<OfferLeaseLength<'a>>,
-        Option<OfferMainEntityOfPage<'a>>,
-        Option<OfferMobileUrl<'a>>,
-        Option<OfferMpn<'a>>,
-        Option<OfferName<'a>>,
-        Option<OfferOfferedBy<'a>>,
-        Option<OfferPotentialAction<'a>>,
-        Option<OfferPrice<'a>>,
-        Option<OfferPriceCurrency<'a>>,
-        Option<OfferPriceSpecification<'a>>,
-        Option<OfferPriceValidUntil<'a>>,
-        Option<OfferReview<'a>>,
-        Option<OfferReviews<'a>>,
-        Option<OfferSameAs<'a>>,
-        Option<OfferSeller<'a>>,
-        Option<OfferSerialNumber<'a>>,
-        Option<OfferShippingDetails<'a>>,
-        Option<OfferSku<'a>>,
-        Option<OfferSubjectOf<'a>>,
-        Option<OfferUrl<'a>>,
-        Option<OfferValidForMemberTier<'a>>,
-        Option<OfferValidFrom<'a>>,
-        Option<OfferValidThrough<'a>>,
-        Option<OfferWarranty<'a>>,
+        Option<OfferAcceptedPaymentMethod<S>>,
+        Option<OfferAddOn<S>>,
+        Option<OfferAdditionalProperty<S>>,
+        Option<OfferAdditionalType<S>>,
+        Option<OfferAdvanceBookingRequirement<S>>,
+        Option<OfferAggregateRating<S>>,
+        Option<OfferAlternateName<S>>,
+        Option<OfferAreaServed<S>>,
+        Option<OfferAsin<S>>,
+        Option<OfferAvailability<S>>,
+        Option<OfferAvailabilityEnds<S>>,
+        Option<OfferAvailabilityStarts<S>>,
+        Option<OfferAvailableAtOrFrom<S>>,
+        Option<OfferAvailableDeliveryMethod<S>>,
+        Option<OfferBusinessFunction<S>>,
+        Option<OfferCategory<S>>,
+        Option<OfferCheckoutPageUrlTemplate<S>>,
+        Option<OfferDeliveryLeadTime<S>>,
+        Option<OfferDescription<S>>,
+        Option<OfferDisambiguatingDescription<S>>,
+        Option<OfferEligibleCustomerType<S>>,
+        Option<OfferEligibleDuration<S>>,
+        Option<OfferEligibleQuantity<S>>,
+        Option<OfferEligibleRegion<S>>,
+        Option<OfferEligibleTransactionVolume<S>>,
+        Option<OfferGtin<S>>,
+        Option<OfferGtin12<S>>,
+        Option<OfferGtin13<S>>,
+        Option<OfferGtin14<S>>,
+        Option<OfferGtin8<S>>,
+        Option<OfferHasAdultConsideration<S>>,
+        Option<OfferHasGs1DigitalLink<S>>,
+        Option<OfferHasMeasurement<S>>,
+        Option<OfferHasMerchantReturnPolicy<S>>,
+        Option<OfferIdentifier<S>>,
+        Option<OfferImage<S>>,
+        Option<OfferIncludesObject<S>>,
+        Option<OfferIneligibleRegion<S>>,
+        Option<OfferInventoryLevel<S>>,
+        Option<OfferIsFamilyFriendly<S>>,
+        Option<OfferItemCondition<S>>,
+        Option<OfferItemOffered<S>>,
+        Option<OfferLeaseLength<S>>,
+        Option<OfferMainEntityOfPage<S>>,
+        Option<OfferMobileUrl<S>>,
+        Option<OfferMpn<S>>,
+        Option<OfferName<S>>,
+        Option<OfferOfferedBy<S>>,
+        Option<OfferPotentialAction<S>>,
+        Option<OfferPrice<S>>,
+        Option<OfferPriceCurrency<S>>,
+        Option<OfferPriceSpecification<S>>,
+        Option<OfferPriceValidUntil<S>>,
+        Option<OfferReview<S>>,
+        Option<OfferReviews<S>>,
+        Option<OfferSameAs<S>>,
+        Option<OfferSeller<S>>,
+        Option<OfferSerialNumber<S>>,
+        Option<OfferShippingDetails<S>>,
+        Option<OfferSku<S>>,
+        Option<OfferSubjectOf<S>>,
+        Option<OfferUrl<S>>,
+        Option<OfferValidForMemberTier<S>>,
+        Option<OfferValidFrom<S>>,
+        Option<OfferValidThrough<S>>,
+        Option<OfferWarranty<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -2865,7 +3538,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `acceptedPaymentMethod` field (optional)
     pub fn accepted_payment_method(
         mut self,
-        value: impl Into<Option<OfferAcceptedPaymentMethod<'a>>>,
+        value: impl Into<Option<OfferAcceptedPaymentMethod<S>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
@@ -2873,7 +3546,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `acceptedPaymentMethod` field to an Option value (optional)
     pub fn maybe_accepted_payment_method(
         mut self,
-        value: Option<OfferAcceptedPaymentMethod<'a>>,
+        value: Option<OfferAcceptedPaymentMethod<S>>,
     ) -> Self {
         self._fields.0 = value;
         self
@@ -2882,12 +3555,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `addOn` field (optional)
-    pub fn add_on(mut self, value: impl Into<Option<OfferAddOn<'a>>>) -> Self {
+    pub fn add_on(mut self, value: impl Into<Option<OfferAddOn<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `addOn` field to an Option value (optional)
-    pub fn maybe_add_on(mut self, value: Option<OfferAddOn<'a>>) -> Self {
+    pub fn maybe_add_on(mut self, value: Option<OfferAddOn<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -2897,7 +3570,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `additionalProperty` field (optional)
     pub fn additional_property(
         mut self,
-        value: impl Into<Option<OfferAdditionalProperty<'a>>>,
+        value: impl Into<Option<OfferAdditionalProperty<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -2905,7 +3578,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `additionalProperty` field to an Option value (optional)
     pub fn maybe_additional_property(
         mut self,
-        value: Option<OfferAdditionalProperty<'a>>,
+        value: Option<OfferAdditionalProperty<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -2916,7 +3589,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `additionalType` field (optional)
     pub fn additional_type(
         mut self,
-        value: impl Into<Option<OfferAdditionalType<'a>>>,
+        value: impl Into<Option<OfferAdditionalType<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -2924,7 +3597,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `additionalType` field to an Option value (optional)
     pub fn maybe_additional_type(
         mut self,
-        value: Option<OfferAdditionalType<'a>>,
+        value: Option<OfferAdditionalType<S>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -2935,7 +3608,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `advanceBookingRequirement` field (optional)
     pub fn advance_booking_requirement(
         mut self,
-        value: impl Into<Option<OfferAdvanceBookingRequirement<'a>>>,
+        value: impl Into<Option<OfferAdvanceBookingRequirement<S>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
@@ -2943,7 +3616,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `advanceBookingRequirement` field to an Option value (optional)
     pub fn maybe_advance_booking_requirement(
         mut self,
-        value: Option<OfferAdvanceBookingRequirement<'a>>,
+        value: Option<OfferAdvanceBookingRequirement<S>>,
     ) -> Self {
         self._fields.4 = value;
         self
@@ -2954,7 +3627,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `aggregateRating` field (optional)
     pub fn aggregate_rating(
         mut self,
-        value: impl Into<Option<OfferAggregateRating<'a>>>,
+        value: impl Into<Option<OfferAggregateRating<S>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
@@ -2962,7 +3635,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `aggregateRating` field to an Option value (optional)
     pub fn maybe_aggregate_rating(
         mut self,
-        value: Option<OfferAggregateRating<'a>>,
+        value: Option<OfferAggregateRating<S>>,
     ) -> Self {
         self._fields.5 = value;
         self
@@ -2973,16 +3646,13 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `alternateName` field (optional)
     pub fn alternate_name(
         mut self,
-        value: impl Into<Option<OfferAlternateName<'a>>>,
+        value: impl Into<Option<OfferAlternateName<S>>>,
     ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(
-        mut self,
-        value: Option<OfferAlternateName<'a>>,
-    ) -> Self {
+    pub fn maybe_alternate_name(mut self, value: Option<OfferAlternateName<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -2990,12 +3660,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `areaServed` field (optional)
-    pub fn area_served(mut self, value: impl Into<Option<OfferAreaServed<'a>>>) -> Self {
+    pub fn area_served(mut self, value: impl Into<Option<OfferAreaServed<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `areaServed` field to an Option value (optional)
-    pub fn maybe_area_served(mut self, value: Option<OfferAreaServed<'a>>) -> Self {
+    pub fn maybe_area_served(mut self, value: Option<OfferAreaServed<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -3003,12 +3673,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `asin` field (optional)
-    pub fn asin(mut self, value: impl Into<Option<OfferAsin<'a>>>) -> Self {
+    pub fn asin(mut self, value: impl Into<Option<OfferAsin<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `asin` field to an Option value (optional)
-    pub fn maybe_asin(mut self, value: Option<OfferAsin<'a>>) -> Self {
+    pub fn maybe_asin(mut self, value: Option<OfferAsin<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -3018,13 +3688,13 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `availability` field (optional)
     pub fn availability(
         mut self,
-        value: impl Into<Option<OfferAvailability<'a>>>,
+        value: impl Into<Option<OfferAvailability<S>>>,
     ) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `availability` field to an Option value (optional)
-    pub fn maybe_availability(mut self, value: Option<OfferAvailability<'a>>) -> Self {
+    pub fn maybe_availability(mut self, value: Option<OfferAvailability<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -3034,7 +3704,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `availabilityEnds` field (optional)
     pub fn availability_ends(
         mut self,
-        value: impl Into<Option<OfferAvailabilityEnds<'a>>>,
+        value: impl Into<Option<OfferAvailabilityEnds<S>>>,
     ) -> Self {
         self._fields.10 = value.into();
         self
@@ -3042,7 +3712,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `availabilityEnds` field to an Option value (optional)
     pub fn maybe_availability_ends(
         mut self,
-        value: Option<OfferAvailabilityEnds<'a>>,
+        value: Option<OfferAvailabilityEnds<S>>,
     ) -> Self {
         self._fields.10 = value;
         self
@@ -3053,7 +3723,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `availabilityStarts` field (optional)
     pub fn availability_starts(
         mut self,
-        value: impl Into<Option<OfferAvailabilityStarts<'a>>>,
+        value: impl Into<Option<OfferAvailabilityStarts<S>>>,
     ) -> Self {
         self._fields.11 = value.into();
         self
@@ -3061,7 +3731,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `availabilityStarts` field to an Option value (optional)
     pub fn maybe_availability_starts(
         mut self,
-        value: Option<OfferAvailabilityStarts<'a>>,
+        value: Option<OfferAvailabilityStarts<S>>,
     ) -> Self {
         self._fields.11 = value;
         self
@@ -3072,7 +3742,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `availableAtOrFrom` field (optional)
     pub fn available_at_or_from(
         mut self,
-        value: impl Into<Option<OfferAvailableAtOrFrom<'a>>>,
+        value: impl Into<Option<OfferAvailableAtOrFrom<S>>>,
     ) -> Self {
         self._fields.12 = value.into();
         self
@@ -3080,7 +3750,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `availableAtOrFrom` field to an Option value (optional)
     pub fn maybe_available_at_or_from(
         mut self,
-        value: Option<OfferAvailableAtOrFrom<'a>>,
+        value: Option<OfferAvailableAtOrFrom<S>>,
     ) -> Self {
         self._fields.12 = value;
         self
@@ -3091,7 +3761,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `availableDeliveryMethod` field (optional)
     pub fn available_delivery_method(
         mut self,
-        value: impl Into<Option<OfferAvailableDeliveryMethod<'a>>>,
+        value: impl Into<Option<OfferAvailableDeliveryMethod<S>>>,
     ) -> Self {
         self._fields.13 = value.into();
         self
@@ -3099,7 +3769,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `availableDeliveryMethod` field to an Option value (optional)
     pub fn maybe_available_delivery_method(
         mut self,
-        value: Option<OfferAvailableDeliveryMethod<'a>>,
+        value: Option<OfferAvailableDeliveryMethod<S>>,
     ) -> Self {
         self._fields.13 = value;
         self
@@ -3110,7 +3780,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `businessFunction` field (optional)
     pub fn business_function(
         mut self,
-        value: impl Into<Option<OfferBusinessFunction<'a>>>,
+        value: impl Into<Option<OfferBusinessFunction<S>>>,
     ) -> Self {
         self._fields.14 = value.into();
         self
@@ -3118,7 +3788,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `businessFunction` field to an Option value (optional)
     pub fn maybe_business_function(
         mut self,
-        value: Option<OfferBusinessFunction<'a>>,
+        value: Option<OfferBusinessFunction<S>>,
     ) -> Self {
         self._fields.14 = value;
         self
@@ -3127,12 +3797,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(mut self, value: impl Into<Option<OfferCategory<'a>>>) -> Self {
+    pub fn category(mut self, value: impl Into<Option<OfferCategory<S>>>) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<OfferCategory<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<OfferCategory<S>>) -> Self {
         self._fields.15 = value;
         self
     }
@@ -3142,7 +3812,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `checkoutPageURLTemplate` field (optional)
     pub fn checkout_page_url_template(
         mut self,
-        value: impl Into<Option<OfferCheckoutPageUrlTemplate<'a>>>,
+        value: impl Into<Option<OfferCheckoutPageUrlTemplate<S>>>,
     ) -> Self {
         self._fields.16 = value.into();
         self
@@ -3150,7 +3820,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `checkoutPageURLTemplate` field to an Option value (optional)
     pub fn maybe_checkout_page_url_template(
         mut self,
-        value: Option<OfferCheckoutPageUrlTemplate<'a>>,
+        value: Option<OfferCheckoutPageUrlTemplate<S>>,
     ) -> Self {
         self._fields.16 = value;
         self
@@ -3161,7 +3831,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `deliveryLeadTime` field (optional)
     pub fn delivery_lead_time(
         mut self,
-        value: impl Into<Option<OfferDeliveryLeadTime<'a>>>,
+        value: impl Into<Option<OfferDeliveryLeadTime<S>>>,
     ) -> Self {
         self._fields.17 = value.into();
         self
@@ -3169,7 +3839,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `deliveryLeadTime` field to an Option value (optional)
     pub fn maybe_delivery_lead_time(
         mut self,
-        value: Option<OfferDeliveryLeadTime<'a>>,
+        value: Option<OfferDeliveryLeadTime<S>>,
     ) -> Self {
         self._fields.17 = value;
         self
@@ -3178,15 +3848,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<OfferDescription<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<OfferDescription<S>>>) -> Self {
         self._fields.18 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<OfferDescription<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<OfferDescription<S>>) -> Self {
         self._fields.18 = value;
         self
     }
@@ -3196,7 +3863,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
-        value: impl Into<Option<OfferDisambiguatingDescription<'a>>>,
+        value: impl Into<Option<OfferDisambiguatingDescription<S>>>,
     ) -> Self {
         self._fields.19 = value.into();
         self
@@ -3204,7 +3871,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field to an Option value (optional)
     pub fn maybe_disambiguating_description(
         mut self,
-        value: Option<OfferDisambiguatingDescription<'a>>,
+        value: Option<OfferDisambiguatingDescription<S>>,
     ) -> Self {
         self._fields.19 = value;
         self
@@ -3215,7 +3882,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `eligibleCustomerType` field (optional)
     pub fn eligible_customer_type(
         mut self,
-        value: impl Into<Option<OfferEligibleCustomerType<'a>>>,
+        value: impl Into<Option<OfferEligibleCustomerType<S>>>,
     ) -> Self {
         self._fields.20 = value.into();
         self
@@ -3223,7 +3890,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `eligibleCustomerType` field to an Option value (optional)
     pub fn maybe_eligible_customer_type(
         mut self,
-        value: Option<OfferEligibleCustomerType<'a>>,
+        value: Option<OfferEligibleCustomerType<S>>,
     ) -> Self {
         self._fields.20 = value;
         self
@@ -3234,7 +3901,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `eligibleDuration` field (optional)
     pub fn eligible_duration(
         mut self,
-        value: impl Into<Option<OfferEligibleDuration<'a>>>,
+        value: impl Into<Option<OfferEligibleDuration<S>>>,
     ) -> Self {
         self._fields.21 = value.into();
         self
@@ -3242,7 +3909,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `eligibleDuration` field to an Option value (optional)
     pub fn maybe_eligible_duration(
         mut self,
-        value: Option<OfferEligibleDuration<'a>>,
+        value: Option<OfferEligibleDuration<S>>,
     ) -> Self {
         self._fields.21 = value;
         self
@@ -3253,7 +3920,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `eligibleQuantity` field (optional)
     pub fn eligible_quantity(
         mut self,
-        value: impl Into<Option<OfferEligibleQuantity<'a>>>,
+        value: impl Into<Option<OfferEligibleQuantity<S>>>,
     ) -> Self {
         self._fields.22 = value.into();
         self
@@ -3261,7 +3928,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `eligibleQuantity` field to an Option value (optional)
     pub fn maybe_eligible_quantity(
         mut self,
-        value: Option<OfferEligibleQuantity<'a>>,
+        value: Option<OfferEligibleQuantity<S>>,
     ) -> Self {
         self._fields.22 = value;
         self
@@ -3272,7 +3939,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `eligibleRegion` field (optional)
     pub fn eligible_region(
         mut self,
-        value: impl Into<Option<OfferEligibleRegion<'a>>>,
+        value: impl Into<Option<OfferEligibleRegion<S>>>,
     ) -> Self {
         self._fields.23 = value.into();
         self
@@ -3280,7 +3947,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `eligibleRegion` field to an Option value (optional)
     pub fn maybe_eligible_region(
         mut self,
-        value: Option<OfferEligibleRegion<'a>>,
+        value: Option<OfferEligibleRegion<S>>,
     ) -> Self {
         self._fields.23 = value;
         self
@@ -3291,7 +3958,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `eligibleTransactionVolume` field (optional)
     pub fn eligible_transaction_volume(
         mut self,
-        value: impl Into<Option<OfferEligibleTransactionVolume<'a>>>,
+        value: impl Into<Option<OfferEligibleTransactionVolume<S>>>,
     ) -> Self {
         self._fields.24 = value.into();
         self
@@ -3299,7 +3966,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `eligibleTransactionVolume` field to an Option value (optional)
     pub fn maybe_eligible_transaction_volume(
         mut self,
-        value: Option<OfferEligibleTransactionVolume<'a>>,
+        value: Option<OfferEligibleTransactionVolume<S>>,
     ) -> Self {
         self._fields.24 = value;
         self
@@ -3308,12 +3975,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `gtin` field (optional)
-    pub fn gtin(mut self, value: impl Into<Option<OfferGtin<'a>>>) -> Self {
+    pub fn gtin(mut self, value: impl Into<Option<OfferGtin<S>>>) -> Self {
         self._fields.25 = value.into();
         self
     }
     /// Set the `gtin` field to an Option value (optional)
-    pub fn maybe_gtin(mut self, value: Option<OfferGtin<'a>>) -> Self {
+    pub fn maybe_gtin(mut self, value: Option<OfferGtin<S>>) -> Self {
         self._fields.25 = value;
         self
     }
@@ -3321,12 +3988,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `gtin12` field (optional)
-    pub fn gtin12(mut self, value: impl Into<Option<OfferGtin12<'a>>>) -> Self {
+    pub fn gtin12(mut self, value: impl Into<Option<OfferGtin12<S>>>) -> Self {
         self._fields.26 = value.into();
         self
     }
     /// Set the `gtin12` field to an Option value (optional)
-    pub fn maybe_gtin12(mut self, value: Option<OfferGtin12<'a>>) -> Self {
+    pub fn maybe_gtin12(mut self, value: Option<OfferGtin12<S>>) -> Self {
         self._fields.26 = value;
         self
     }
@@ -3334,12 +4001,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `gtin13` field (optional)
-    pub fn gtin13(mut self, value: impl Into<Option<OfferGtin13<'a>>>) -> Self {
+    pub fn gtin13(mut self, value: impl Into<Option<OfferGtin13<S>>>) -> Self {
         self._fields.27 = value.into();
         self
     }
     /// Set the `gtin13` field to an Option value (optional)
-    pub fn maybe_gtin13(mut self, value: Option<OfferGtin13<'a>>) -> Self {
+    pub fn maybe_gtin13(mut self, value: Option<OfferGtin13<S>>) -> Self {
         self._fields.27 = value;
         self
     }
@@ -3347,12 +4014,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `gtin14` field (optional)
-    pub fn gtin14(mut self, value: impl Into<Option<OfferGtin14<'a>>>) -> Self {
+    pub fn gtin14(mut self, value: impl Into<Option<OfferGtin14<S>>>) -> Self {
         self._fields.28 = value.into();
         self
     }
     /// Set the `gtin14` field to an Option value (optional)
-    pub fn maybe_gtin14(mut self, value: Option<OfferGtin14<'a>>) -> Self {
+    pub fn maybe_gtin14(mut self, value: Option<OfferGtin14<S>>) -> Self {
         self._fields.28 = value;
         self
     }
@@ -3360,12 +4027,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `gtin8` field (optional)
-    pub fn gtin8(mut self, value: impl Into<Option<OfferGtin8<'a>>>) -> Self {
+    pub fn gtin8(mut self, value: impl Into<Option<OfferGtin8<S>>>) -> Self {
         self._fields.29 = value.into();
         self
     }
     /// Set the `gtin8` field to an Option value (optional)
-    pub fn maybe_gtin8(mut self, value: Option<OfferGtin8<'a>>) -> Self {
+    pub fn maybe_gtin8(mut self, value: Option<OfferGtin8<S>>) -> Self {
         self._fields.29 = value;
         self
     }
@@ -3375,7 +4042,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `hasAdultConsideration` field (optional)
     pub fn has_adult_consideration(
         mut self,
-        value: impl Into<Option<OfferHasAdultConsideration<'a>>>,
+        value: impl Into<Option<OfferHasAdultConsideration<S>>>,
     ) -> Self {
         self._fields.30 = value.into();
         self
@@ -3383,7 +4050,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `hasAdultConsideration` field to an Option value (optional)
     pub fn maybe_has_adult_consideration(
         mut self,
-        value: Option<OfferHasAdultConsideration<'a>>,
+        value: Option<OfferHasAdultConsideration<S>>,
     ) -> Self {
         self._fields.30 = value;
         self
@@ -3394,7 +4061,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `hasGS1DigitalLink` field (optional)
     pub fn has_gs1_digital_link(
         mut self,
-        value: impl Into<Option<OfferHasGs1DigitalLink<'a>>>,
+        value: impl Into<Option<OfferHasGs1DigitalLink<S>>>,
     ) -> Self {
         self._fields.31 = value.into();
         self
@@ -3402,7 +4069,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `hasGS1DigitalLink` field to an Option value (optional)
     pub fn maybe_has_gs1_digital_link(
         mut self,
-        value: Option<OfferHasGs1DigitalLink<'a>>,
+        value: Option<OfferHasGs1DigitalLink<S>>,
     ) -> Self {
         self._fields.31 = value;
         self
@@ -3413,7 +4080,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `hasMeasurement` field (optional)
     pub fn has_measurement(
         mut self,
-        value: impl Into<Option<OfferHasMeasurement<'a>>>,
+        value: impl Into<Option<OfferHasMeasurement<S>>>,
     ) -> Self {
         self._fields.32 = value.into();
         self
@@ -3421,7 +4088,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `hasMeasurement` field to an Option value (optional)
     pub fn maybe_has_measurement(
         mut self,
-        value: Option<OfferHasMeasurement<'a>>,
+        value: Option<OfferHasMeasurement<S>>,
     ) -> Self {
         self._fields.32 = value;
         self
@@ -3432,7 +4099,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `hasMerchantReturnPolicy` field (optional)
     pub fn has_merchant_return_policy(
         mut self,
-        value: impl Into<Option<OfferHasMerchantReturnPolicy<'a>>>,
+        value: impl Into<Option<OfferHasMerchantReturnPolicy<S>>>,
     ) -> Self {
         self._fields.33 = value.into();
         self
@@ -3440,7 +4107,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `hasMerchantReturnPolicy` field to an Option value (optional)
     pub fn maybe_has_merchant_return_policy(
         mut self,
-        value: Option<OfferHasMerchantReturnPolicy<'a>>,
+        value: Option<OfferHasMerchantReturnPolicy<S>>,
     ) -> Self {
         self._fields.33 = value;
         self
@@ -3449,12 +4116,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(mut self, value: impl Into<Option<OfferIdentifier<'a>>>) -> Self {
+    pub fn identifier(mut self, value: impl Into<Option<OfferIdentifier<S>>>) -> Self {
         self._fields.34 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
-    pub fn maybe_identifier(mut self, value: Option<OfferIdentifier<'a>>) -> Self {
+    pub fn maybe_identifier(mut self, value: Option<OfferIdentifier<S>>) -> Self {
         self._fields.34 = value;
         self
     }
@@ -3462,12 +4129,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<OfferImage<'a>>>) -> Self {
+    pub fn image(mut self, value: impl Into<Option<OfferImage<S>>>) -> Self {
         self._fields.35 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<OfferImage<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<OfferImage<S>>) -> Self {
         self._fields.35 = value;
         self
     }
@@ -3477,7 +4144,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `includesObject` field (optional)
     pub fn includes_object(
         mut self,
-        value: impl Into<Option<OfferIncludesObject<'a>>>,
+        value: impl Into<Option<OfferIncludesObject<S>>>,
     ) -> Self {
         self._fields.36 = value.into();
         self
@@ -3485,7 +4152,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `includesObject` field to an Option value (optional)
     pub fn maybe_includes_object(
         mut self,
-        value: Option<OfferIncludesObject<'a>>,
+        value: Option<OfferIncludesObject<S>>,
     ) -> Self {
         self._fields.36 = value;
         self
@@ -3496,7 +4163,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `ineligibleRegion` field (optional)
     pub fn ineligible_region(
         mut self,
-        value: impl Into<Option<OfferIneligibleRegion<'a>>>,
+        value: impl Into<Option<OfferIneligibleRegion<S>>>,
     ) -> Self {
         self._fields.37 = value.into();
         self
@@ -3504,7 +4171,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `ineligibleRegion` field to an Option value (optional)
     pub fn maybe_ineligible_region(
         mut self,
-        value: Option<OfferIneligibleRegion<'a>>,
+        value: Option<OfferIneligibleRegion<S>>,
     ) -> Self {
         self._fields.37 = value;
         self
@@ -3515,7 +4182,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `inventoryLevel` field (optional)
     pub fn inventory_level(
         mut self,
-        value: impl Into<Option<OfferInventoryLevel<'a>>>,
+        value: impl Into<Option<OfferInventoryLevel<S>>>,
     ) -> Self {
         self._fields.38 = value.into();
         self
@@ -3523,7 +4190,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `inventoryLevel` field to an Option value (optional)
     pub fn maybe_inventory_level(
         mut self,
-        value: Option<OfferInventoryLevel<'a>>,
+        value: Option<OfferInventoryLevel<S>>,
     ) -> Self {
         self._fields.38 = value;
         self
@@ -3534,7 +4201,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `isFamilyFriendly` field (optional)
     pub fn is_family_friendly(
         mut self,
-        value: impl Into<Option<OfferIsFamilyFriendly<'a>>>,
+        value: impl Into<Option<OfferIsFamilyFriendly<S>>>,
     ) -> Self {
         self._fields.39 = value.into();
         self
@@ -3542,7 +4209,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `isFamilyFriendly` field to an Option value (optional)
     pub fn maybe_is_family_friendly(
         mut self,
-        value: Option<OfferIsFamilyFriendly<'a>>,
+        value: Option<OfferIsFamilyFriendly<S>>,
     ) -> Self {
         self._fields.39 = value;
         self
@@ -3553,16 +4220,13 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `itemCondition` field (optional)
     pub fn item_condition(
         mut self,
-        value: impl Into<Option<OfferItemCondition<'a>>>,
+        value: impl Into<Option<OfferItemCondition<S>>>,
     ) -> Self {
         self._fields.40 = value.into();
         self
     }
     /// Set the `itemCondition` field to an Option value (optional)
-    pub fn maybe_item_condition(
-        mut self,
-        value: Option<OfferItemCondition<'a>>,
-    ) -> Self {
+    pub fn maybe_item_condition(mut self, value: Option<OfferItemCondition<S>>) -> Self {
         self._fields.40 = value;
         self
     }
@@ -3572,13 +4236,13 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `itemOffered` field (optional)
     pub fn item_offered(
         mut self,
-        value: impl Into<Option<OfferItemOffered<'a>>>,
+        value: impl Into<Option<OfferItemOffered<S>>>,
     ) -> Self {
         self._fields.41 = value.into();
         self
     }
     /// Set the `itemOffered` field to an Option value (optional)
-    pub fn maybe_item_offered(mut self, value: Option<OfferItemOffered<'a>>) -> Self {
+    pub fn maybe_item_offered(mut self, value: Option<OfferItemOffered<S>>) -> Self {
         self._fields.41 = value;
         self
     }
@@ -3588,13 +4252,13 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `leaseLength` field (optional)
     pub fn lease_length(
         mut self,
-        value: impl Into<Option<OfferLeaseLength<'a>>>,
+        value: impl Into<Option<OfferLeaseLength<S>>>,
     ) -> Self {
         self._fields.42 = value.into();
         self
     }
     /// Set the `leaseLength` field to an Option value (optional)
-    pub fn maybe_lease_length(mut self, value: Option<OfferLeaseLength<'a>>) -> Self {
+    pub fn maybe_lease_length(mut self, value: Option<OfferLeaseLength<S>>) -> Self {
         self._fields.42 = value;
         self
     }
@@ -3604,7 +4268,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
-        value: impl Into<Option<OfferMainEntityOfPage<'a>>>,
+        value: impl Into<Option<OfferMainEntityOfPage<S>>>,
     ) -> Self {
         self._fields.43 = value.into();
         self
@@ -3612,7 +4276,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field to an Option value (optional)
     pub fn maybe_main_entity_of_page(
         mut self,
-        value: Option<OfferMainEntityOfPage<'a>>,
+        value: Option<OfferMainEntityOfPage<S>>,
     ) -> Self {
         self._fields.43 = value;
         self
@@ -3621,12 +4285,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `mobileUrl` field (optional)
-    pub fn mobile_url(mut self, value: impl Into<Option<OfferMobileUrl<'a>>>) -> Self {
+    pub fn mobile_url(mut self, value: impl Into<Option<OfferMobileUrl<S>>>) -> Self {
         self._fields.44 = value.into();
         self
     }
     /// Set the `mobileUrl` field to an Option value (optional)
-    pub fn maybe_mobile_url(mut self, value: Option<OfferMobileUrl<'a>>) -> Self {
+    pub fn maybe_mobile_url(mut self, value: Option<OfferMobileUrl<S>>) -> Self {
         self._fields.44 = value;
         self
     }
@@ -3634,12 +4298,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `mpn` field (optional)
-    pub fn mpn(mut self, value: impl Into<Option<OfferMpn<'a>>>) -> Self {
+    pub fn mpn(mut self, value: impl Into<Option<OfferMpn<S>>>) -> Self {
         self._fields.45 = value.into();
         self
     }
     /// Set the `mpn` field to an Option value (optional)
-    pub fn maybe_mpn(mut self, value: Option<OfferMpn<'a>>) -> Self {
+    pub fn maybe_mpn(mut self, value: Option<OfferMpn<S>>) -> Self {
         self._fields.45 = value;
         self
     }
@@ -3647,12 +4311,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<OfferName<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<OfferName<S>>>) -> Self {
         self._fields.46 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<OfferName<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<OfferName<S>>) -> Self {
         self._fields.46 = value;
         self
     }
@@ -3660,12 +4324,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `offeredBy` field (optional)
-    pub fn offered_by(mut self, value: impl Into<Option<OfferOfferedBy<'a>>>) -> Self {
+    pub fn offered_by(mut self, value: impl Into<Option<OfferOfferedBy<S>>>) -> Self {
         self._fields.47 = value.into();
         self
     }
     /// Set the `offeredBy` field to an Option value (optional)
-    pub fn maybe_offered_by(mut self, value: Option<OfferOfferedBy<'a>>) -> Self {
+    pub fn maybe_offered_by(mut self, value: Option<OfferOfferedBy<S>>) -> Self {
         self._fields.47 = value;
         self
     }
@@ -3675,7 +4339,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `potentialAction` field (optional)
     pub fn potential_action(
         mut self,
-        value: impl Into<Option<OfferPotentialAction<'a>>>,
+        value: impl Into<Option<OfferPotentialAction<S>>>,
     ) -> Self {
         self._fields.48 = value.into();
         self
@@ -3683,7 +4347,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `potentialAction` field to an Option value (optional)
     pub fn maybe_potential_action(
         mut self,
-        value: Option<OfferPotentialAction<'a>>,
+        value: Option<OfferPotentialAction<S>>,
     ) -> Self {
         self._fields.48 = value;
         self
@@ -3692,12 +4356,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `price` field (optional)
-    pub fn price(mut self, value: impl Into<Option<OfferPrice<'a>>>) -> Self {
+    pub fn price(mut self, value: impl Into<Option<OfferPrice<S>>>) -> Self {
         self._fields.49 = value.into();
         self
     }
     /// Set the `price` field to an Option value (optional)
-    pub fn maybe_price(mut self, value: Option<OfferPrice<'a>>) -> Self {
+    pub fn maybe_price(mut self, value: Option<OfferPrice<S>>) -> Self {
         self._fields.49 = value;
         self
     }
@@ -3707,16 +4371,13 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `priceCurrency` field (optional)
     pub fn price_currency(
         mut self,
-        value: impl Into<Option<OfferPriceCurrency<'a>>>,
+        value: impl Into<Option<OfferPriceCurrency<S>>>,
     ) -> Self {
         self._fields.50 = value.into();
         self
     }
     /// Set the `priceCurrency` field to an Option value (optional)
-    pub fn maybe_price_currency(
-        mut self,
-        value: Option<OfferPriceCurrency<'a>>,
-    ) -> Self {
+    pub fn maybe_price_currency(mut self, value: Option<OfferPriceCurrency<S>>) -> Self {
         self._fields.50 = value;
         self
     }
@@ -3726,7 +4387,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `priceSpecification` field (optional)
     pub fn price_specification(
         mut self,
-        value: impl Into<Option<OfferPriceSpecification<'a>>>,
+        value: impl Into<Option<OfferPriceSpecification<S>>>,
     ) -> Self {
         self._fields.51 = value.into();
         self
@@ -3734,7 +4395,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `priceSpecification` field to an Option value (optional)
     pub fn maybe_price_specification(
         mut self,
-        value: Option<OfferPriceSpecification<'a>>,
+        value: Option<OfferPriceSpecification<S>>,
     ) -> Self {
         self._fields.51 = value;
         self
@@ -3745,7 +4406,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `priceValidUntil` field (optional)
     pub fn price_valid_until(
         mut self,
-        value: impl Into<Option<OfferPriceValidUntil<'a>>>,
+        value: impl Into<Option<OfferPriceValidUntil<S>>>,
     ) -> Self {
         self._fields.52 = value.into();
         self
@@ -3753,7 +4414,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `priceValidUntil` field to an Option value (optional)
     pub fn maybe_price_valid_until(
         mut self,
-        value: Option<OfferPriceValidUntil<'a>>,
+        value: Option<OfferPriceValidUntil<S>>,
     ) -> Self {
         self._fields.52 = value;
         self
@@ -3762,12 +4423,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `review` field (optional)
-    pub fn review(mut self, value: impl Into<Option<OfferReview<'a>>>) -> Self {
+    pub fn review(mut self, value: impl Into<Option<OfferReview<S>>>) -> Self {
         self._fields.53 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
-    pub fn maybe_review(mut self, value: Option<OfferReview<'a>>) -> Self {
+    pub fn maybe_review(mut self, value: Option<OfferReview<S>>) -> Self {
         self._fields.53 = value;
         self
     }
@@ -3775,12 +4436,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `reviews` field (optional)
-    pub fn reviews(mut self, value: impl Into<Option<OfferReviews<'a>>>) -> Self {
+    pub fn reviews(mut self, value: impl Into<Option<OfferReviews<S>>>) -> Self {
         self._fields.54 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
-    pub fn maybe_reviews(mut self, value: Option<OfferReviews<'a>>) -> Self {
+    pub fn maybe_reviews(mut self, value: Option<OfferReviews<S>>) -> Self {
         self._fields.54 = value;
         self
     }
@@ -3788,12 +4449,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
-    pub fn same_as(mut self, value: impl Into<Option<OfferSameAs<'a>>>) -> Self {
+    pub fn same_as(mut self, value: impl Into<Option<OfferSameAs<S>>>) -> Self {
         self._fields.55 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
-    pub fn maybe_same_as(mut self, value: Option<OfferSameAs<'a>>) -> Self {
+    pub fn maybe_same_as(mut self, value: Option<OfferSameAs<S>>) -> Self {
         self._fields.55 = value;
         self
     }
@@ -3801,12 +4462,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `seller` field (optional)
-    pub fn seller(mut self, value: impl Into<Option<OfferSeller<'a>>>) -> Self {
+    pub fn seller(mut self, value: impl Into<Option<OfferSeller<S>>>) -> Self {
         self._fields.56 = value.into();
         self
     }
     /// Set the `seller` field to an Option value (optional)
-    pub fn maybe_seller(mut self, value: Option<OfferSeller<'a>>) -> Self {
+    pub fn maybe_seller(mut self, value: Option<OfferSeller<S>>) -> Self {
         self._fields.56 = value;
         self
     }
@@ -3816,13 +4477,13 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `serialNumber` field (optional)
     pub fn serial_number(
         mut self,
-        value: impl Into<Option<OfferSerialNumber<'a>>>,
+        value: impl Into<Option<OfferSerialNumber<S>>>,
     ) -> Self {
         self._fields.57 = value.into();
         self
     }
     /// Set the `serialNumber` field to an Option value (optional)
-    pub fn maybe_serial_number(mut self, value: Option<OfferSerialNumber<'a>>) -> Self {
+    pub fn maybe_serial_number(mut self, value: Option<OfferSerialNumber<S>>) -> Self {
         self._fields.57 = value;
         self
     }
@@ -3832,7 +4493,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `shippingDetails` field (optional)
     pub fn shipping_details(
         mut self,
-        value: impl Into<Option<OfferShippingDetails<'a>>>,
+        value: impl Into<Option<OfferShippingDetails<S>>>,
     ) -> Self {
         self._fields.58 = value.into();
         self
@@ -3840,7 +4501,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `shippingDetails` field to an Option value (optional)
     pub fn maybe_shipping_details(
         mut self,
-        value: Option<OfferShippingDetails<'a>>,
+        value: Option<OfferShippingDetails<S>>,
     ) -> Self {
         self._fields.58 = value;
         self
@@ -3849,12 +4510,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `sku` field (optional)
-    pub fn sku(mut self, value: impl Into<Option<OfferSku<'a>>>) -> Self {
+    pub fn sku(mut self, value: impl Into<Option<OfferSku<S>>>) -> Self {
         self._fields.59 = value.into();
         self
     }
     /// Set the `sku` field to an Option value (optional)
-    pub fn maybe_sku(mut self, value: Option<OfferSku<'a>>) -> Self {
+    pub fn maybe_sku(mut self, value: Option<OfferSku<S>>) -> Self {
         self._fields.59 = value;
         self
     }
@@ -3862,12 +4523,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(mut self, value: impl Into<Option<OfferSubjectOf<'a>>>) -> Self {
+    pub fn subject_of(mut self, value: impl Into<Option<OfferSubjectOf<S>>>) -> Self {
         self._fields.60 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
-    pub fn maybe_subject_of(mut self, value: Option<OfferSubjectOf<'a>>) -> Self {
+    pub fn maybe_subject_of(mut self, value: Option<OfferSubjectOf<S>>) -> Self {
         self._fields.60 = value;
         self
     }
@@ -3875,12 +4536,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<OfferUrl<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<OfferUrl<S>>>) -> Self {
         self._fields.61 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<OfferUrl<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<OfferUrl<S>>) -> Self {
         self._fields.61 = value;
         self
     }
@@ -3890,7 +4551,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `validForMemberTier` field (optional)
     pub fn valid_for_member_tier(
         mut self,
-        value: impl Into<Option<OfferValidForMemberTier<'a>>>,
+        value: impl Into<Option<OfferValidForMemberTier<S>>>,
     ) -> Self {
         self._fields.62 = value.into();
         self
@@ -3898,7 +4559,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `validForMemberTier` field to an Option value (optional)
     pub fn maybe_valid_for_member_tier(
         mut self,
-        value: Option<OfferValidForMemberTier<'a>>,
+        value: Option<OfferValidForMemberTier<S>>,
     ) -> Self {
         self._fields.62 = value;
         self
@@ -3907,12 +4568,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `validFrom` field (optional)
-    pub fn valid_from(mut self, value: impl Into<Option<OfferValidFrom<'a>>>) -> Self {
+    pub fn valid_from(mut self, value: impl Into<Option<OfferValidFrom<S>>>) -> Self {
         self._fields.63 = value.into();
         self
     }
     /// Set the `validFrom` field to an Option value (optional)
-    pub fn maybe_valid_from(mut self, value: Option<OfferValidFrom<'a>>) -> Self {
+    pub fn maybe_valid_from(mut self, value: Option<OfferValidFrom<S>>) -> Self {
         self._fields.63 = value;
         self
     }
@@ -3922,13 +4583,13 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `validThrough` field (optional)
     pub fn valid_through(
         mut self,
-        value: impl Into<Option<OfferValidThrough<'a>>>,
+        value: impl Into<Option<OfferValidThrough<S>>>,
     ) -> Self {
         self._fields.64 = value.into();
         self
     }
     /// Set the `validThrough` field to an Option value (optional)
-    pub fn maybe_valid_through(mut self, value: Option<OfferValidThrough<'a>>) -> Self {
+    pub fn maybe_valid_through(mut self, value: Option<OfferValidThrough<S>>) -> Self {
         self._fields.64 = value;
         self
     }
@@ -3936,12 +4597,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `warranty` field (optional)
-    pub fn warranty(mut self, value: impl Into<Option<OfferWarranty<'a>>>) -> Self {
+    pub fn warranty(mut self, value: impl Into<Option<OfferWarranty<S>>>) -> Self {
         self._fields.65 = value.into();
         self
     }
     /// Set the `warranty` field to an Option value (optional)
-    pub fn maybe_warranty(mut self, value: Option<OfferWarranty<'a>>) -> Self {
+    pub fn maybe_warranty(mut self, value: Option<OfferWarranty<S>>) -> Self {
         self._fields.65 = value;
         self
     }
@@ -4024,10 +4685,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Offer<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Offer<'a> {
         Offer {
             accepted_payment_method: self._fields.0,
             add_on: self._fields.1,

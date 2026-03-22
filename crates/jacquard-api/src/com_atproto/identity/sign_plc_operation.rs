@@ -10,41 +10,54 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct SignPlcOperation<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SignPlcOperation<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub also_known_as: Option<Vec<CowStr<'a>>>,
+    pub also_known_as: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rotation_keys: Option<Vec<CowStr<'a>>>,
+    pub rotation_keys: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub services: Option<Data<'a>>,
+    pub services: Option<Data<S>>,
     ///A token received through com.atproto.identity.requestPlcOperationSignature
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub token: Option<CowStr<'a>>,
+    pub token: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub verification_methods: Option<Data<'a>>,
+    pub verification_methods: Option<Data<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SignPlcOperationOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SignPlcOperationOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///A signed DID PLC operation.
-    #[serde(borrow)]
-    pub operation: Data<'a>,
+    pub operation: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.atproto.identity.signPlcOperation
@@ -52,11 +65,12 @@ pub struct SignPlcOperationResponse;
 impl jacquard_common::xrpc::XrpcResp for SignPlcOperationResponse {
     const NSID: &'static str = "com.atproto.identity.signPlcOperation";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SignPlcOperationOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SignPlcOperationOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SignPlcOperation<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SignPlcOperation<S> {
     const NSID: &'static str = "com.atproto.identity.signPlcOperation";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -71,6 +85,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for SignPlcOperationRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = SignPlcOperation<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SignPlcOperation<S>;
     type Response = SignPlcOperationResponse;
 }

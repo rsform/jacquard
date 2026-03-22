@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
@@ -29,60 +30,62 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A song included in a game hosting leaderboards via Tsunagite.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "dev.tsunagite.song", tag = "$type")]
-pub struct Song<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "dev.tsunagite.song",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Song<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The name of the composer of this song. Translations will typically be listed alongside the default.
-    #[serde(borrow)]
-    pub composer: Data<'a>,
+    pub composer: Data<S>,
     ///The game(s) this song is included in.
-    #[serde(borrow)]
-    pub game: Vec<AtUri<'a>>,
+    pub game: Vec<AtUri<S>>,
     ///The genre this song belongs to.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genre: Option<Data<'a>>,
+    pub genre: Option<Data<S>>,
     ///The jacket or banner art of this song, for display in UI.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub jacket: Option<BlobRef<'a>>,
+    pub jacket: Option<BlobRef<S>>,
     ///The name of the jacket artist for this song.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub jacket_artist: Option<Data<'a>>,
+    pub jacket_artist: Option<Data<S>>,
     ///The source this song is from - an album, competition, other game, etc.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source: Option<Data<'a>>,
+    pub source: Option<Data<S>>,
     ///The human-readable subtitle of this song.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subtitle: Option<Data<'a>>,
+    pub subtitle: Option<Data<S>>,
     ///The human-readable title of this song in UI. Translations will typically be listed alongside the default.
-    #[serde(borrow)]
-    pub title: Data<'a>,
+    pub title: Data<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SongGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SongGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Song<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Song<S>,
 }
 
-impl<'a> Song<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SongRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Song<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SongRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -93,18 +96,17 @@ pub struct SongRecord;
 impl XrpcResp for SongRecord {
     const NSID: &'static str = "dev.tsunagite.song";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SongGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SongGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SongGetRecordOutput<'_>> for Song<'_> {
-    fn from(output: SongGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SongGetRecordOutput<S>> for Song<S> {
+    fn from(output: SongGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Song<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Song<S> {
     const NSID: &'static str = "dev.tsunagite.song";
     type Record = SongRecord;
 }
@@ -114,7 +116,7 @@ impl Collection for SongRecord {
     type Record = SongRecord;
 }
 
-impl<'a> LexiconSchema for Song<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Song<S> {
     fn nsid() -> &'static str {
         "dev.tsunagite.song"
     }
@@ -185,49 +187,49 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Composer;
+        type Title;
         type Game;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Composer = Unset;
+        type Title = Unset;
         type Game = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Composer = S::Composer;
-        type Game = S::Game;
     }
     ///State transition - sets the `composer` field to Set
     pub struct SetComposer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetComposer<S> {}
     impl<S: State> State for SetComposer<S> {
-        type Title = S::Title;
         type Composer = Set<members::composer>;
+        type Title = S::Title;
+        type Game = S::Game;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Composer = S::Composer;
+        type Title = Set<members::title>;
         type Game = S::Game;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
-        type Title = S::Title;
         type Composer = S::Composer;
+        type Title = S::Title;
         type Game = Set<members::game>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `composer` field
         pub struct composer(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `game` field
         pub struct game(());
     }
@@ -237,14 +239,14 @@ pub mod song_state {
 pub struct SongBuilder<'a, S: song_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Data<'a>>,
-        Option<Vec<AtUri<'a>>>,
-        Option<Data<'a>>,
-        Option<BlobRef<'a>>,
-        Option<Data<'a>>,
-        Option<Data<'a>>,
-        Option<Data<'a>>,
-        Option<Data<'a>>,
+        Option<Data<S>>,
+        Option<Vec<AtUri<S>>>,
+        Option<Data<S>>,
+        Option<BlobRef<S>>,
+        Option<Data<S>>,
+        Option<Data<S>>,
+        Option<Data<S>>,
+        Option<Data<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -275,7 +277,7 @@ where
     /// Set the `composer` field (required)
     pub fn composer(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> SongBuilder<'a, song_state::SetComposer<S>> {
         self._fields.0 = Option::Some(value.into());
         SongBuilder {
@@ -294,7 +296,7 @@ where
     /// Set the `game` field (required)
     pub fn game(
         mut self,
-        value: impl Into<Vec<AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<S>>>,
     ) -> SongBuilder<'a, song_state::SetGame<S>> {
         self._fields.1 = Option::Some(value.into());
         SongBuilder {
@@ -307,12 +309,12 @@ where
 
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_genre(mut self, value: Option<Data<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -320,12 +322,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `jacket` field (optional)
-    pub fn jacket(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn jacket(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `jacket` field to an Option value (optional)
-    pub fn maybe_jacket(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_jacket(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -333,12 +335,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `jacketArtist` field (optional)
-    pub fn jacket_artist(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn jacket_artist(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `jacketArtist` field to an Option value (optional)
-    pub fn maybe_jacket_artist(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_jacket_artist(mut self, value: Option<Data<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -346,12 +348,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn source(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
-    pub fn maybe_source(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_source(mut self, value: Option<Data<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -359,12 +361,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `subtitle` field (optional)
-    pub fn subtitle(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn subtitle(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `subtitle` field to an Option value (optional)
-    pub fn maybe_subtitle(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_subtitle(mut self, value: Option<Data<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -378,7 +380,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> SongBuilder<'a, song_state::SetTitle<S>> {
         self._fields.7 = Option::Some(value.into());
         SongBuilder {
@@ -392,8 +394,8 @@ where
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
-    S::Title: song_state::IsSet,
     S::Composer: song_state::IsSet,
+    S::Title: song_state::IsSet,
     S::Game: song_state::IsSet,
 {
     /// Build the final struct
@@ -411,10 +413,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Song<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Song<'a> {
         Song {
             composer: self._fields.0.unwrap(),
             game: self._fields.1.unwrap(),

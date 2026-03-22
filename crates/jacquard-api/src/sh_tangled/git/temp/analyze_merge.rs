@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,44 +26,63 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::sh_tangled::git::temp::analyze_merge;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ConflictInfo<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ConflictInfo<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Name of the conflicted file
-    #[serde(borrow)]
-    pub filename: CowStr<'a>,
+    pub filename: S,
     ///Reason for the conflict
-    #[serde(borrow)]
-    pub reason: CowStr<'a>,
+    pub reason: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct AnalyzeMerge<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AnalyzeMerge<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub branch: CowStr<'a>,
+    pub branch: S,
     #[serde(borrow)]
-    pub patch: CowStr<'a>,
+    pub patch: S,
     #[serde(borrow)]
-    pub repo: AtUri<'a>,
+    pub repo: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct AnalyzeMergeOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AnalyzeMergeOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of files with merge conflicts
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub conflicts: Option<Vec<analyze_merge::ConflictInfo<'a>>>,
+    pub conflicts: Option<Vec<analyze_merge::ConflictInfo<S>>>,
     ///Whether the merge has conflicts
     pub is_conflicted: bool,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for ConflictInfo<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConflictInfo<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.analyzeMerge"
     }
@@ -81,11 +102,12 @@ pub struct AnalyzeMergeResponse;
 impl jacquard_common::xrpc::XrpcResp for AnalyzeMergeResponse {
     const NSID: &'static str = "sh.tangled.git.temp.analyzeMerge";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AnalyzeMergeOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AnalyzeMergeOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for AnalyzeMerge<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for AnalyzeMerge<S> {
     const NSID: &'static str = "sh.tangled.git.temp.analyzeMerge";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = AnalyzeMergeResponse;
@@ -96,7 +118,7 @@ pub struct AnalyzeMergeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AnalyzeMergeRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.analyzeMerge";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = AnalyzeMerge<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = AnalyzeMerge<S>;
     type Response = AnalyzeMergeResponse;
 }
 
@@ -264,7 +286,7 @@ pub mod analyze_merge_state {
 /// Builder for constructing an instance of this type
 pub struct AnalyzeMergeBuilder<'a, S: analyze_merge_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -294,7 +316,7 @@ where
     /// Set the `branch` field (required)
     pub fn branch(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AnalyzeMergeBuilder<'a, analyze_merge_state::SetBranch<S>> {
         self._fields.0 = Option::Some(value.into());
         AnalyzeMergeBuilder {
@@ -313,7 +335,7 @@ where
     /// Set the `patch` field (required)
     pub fn patch(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AnalyzeMergeBuilder<'a, analyze_merge_state::SetPatch<S>> {
         self._fields.1 = Option::Some(value.into());
         AnalyzeMergeBuilder {
@@ -332,7 +354,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> AnalyzeMergeBuilder<'a, analyze_merge_state::SetRepo<S>> {
         self._fields.2 = Option::Some(value.into());
         AnalyzeMergeBuilder {

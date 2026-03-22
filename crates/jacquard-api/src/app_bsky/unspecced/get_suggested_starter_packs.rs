@@ -10,7 +10,10 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::graph::StarterPackView;
 
@@ -24,12 +27,20 @@ pub struct GetSuggestedStarterPacks {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSuggestedStarterPacksOutput<'a> {
-    #[serde(borrow)]
-    pub starter_packs: Vec<StarterPackView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSuggestedStarterPacksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub starter_packs: Vec<StarterPackView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.unspecced.getSuggestedStarterPacks
@@ -37,8 +48,8 @@ pub struct GetSuggestedStarterPacksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedStarterPacksResponse {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedStarterPacks";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestedStarterPacksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetSuggestedStarterPacksOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetSuggestedStarterPacks {
@@ -52,7 +63,7 @@ pub struct GetSuggestedStarterPacksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedStarterPacksRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedStarterPacks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSuggestedStarterPacks;
+    type Request<S: Bos<str> + AsRef<str>> = GetSuggestedStarterPacks;
     type Response = GetSuggestedStarterPacksResponse;
 }
 

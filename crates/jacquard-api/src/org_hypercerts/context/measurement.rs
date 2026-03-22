@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,22 +32,23 @@ use crate::app_certified::Did;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Measurement data related to one or more records (e.g. activities, projects, etc.).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.hypercerts.context.measurement",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Measurement<'a> {
+pub struct Measurement<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Short comment of this measurement, suitable for previews and list views. Rich text annotations may be provided via `commentFacets`.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<CowStr<'a>>,
+    pub comment: Option<S>,
     ///Rich text annotations for `comment` (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment_facets: Option<Vec<Facet<'a>>>,
+    pub comment_facets: Option<Vec<Facet<S>>>,
     ///Client-declared timestamp when this record was originally created
     pub created_at: Datetime,
     ///The end date and time when the measurement ended. For one-time measurements, this should equal the start date.
@@ -53,61 +56,55 @@ pub struct Measurement<'a> {
     pub end_date: Option<Datetime>,
     ///URIs to related evidence or underlying data (e.g. org.hypercerts.claim.evidence records or raw datasets)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub evidence_uri: Option<Vec<UriValue<'a>>>,
+    pub evidence_uri: Option<Vec<UriValue<S>>>,
     ///Optional geographic references related to where the measurement was taken. Each referenced record must conform with the app.certified.location lexicon.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub locations: Option<Vec<StrongRef<'a>>>,
+    pub locations: Option<Vec<StrongRef<S>>>,
     ///DIDs of the entities that performed this measurement
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub measurers: Option<Vec<Did<'a>>>,
+    pub measurers: Option<Vec<Did<S>>>,
     ///Short identifier for the measurement methodology
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub method_type: Option<CowStr<'a>>,
+    pub method_type: Option<S>,
     ///URI to methodology documentation, standard protocol, or measurement procedure
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub method_uri: Option<UriValue<'a>>,
+    pub method_uri: Option<UriValue<S>>,
     ///The metric being measured, e.g. forest area restored, number of users, etc.
-    #[serde(borrow)]
-    pub metric: CowStr<'a>,
+    pub metric: S,
     ///The start date and time when the measurement began.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub start_date: Option<Datetime>,
     ///Strong references to the records this measurement refers to (e.g. activities, projects, or claims).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subjects: Option<Vec<StrongRef<'a>>>,
+    pub subjects: Option<Vec<StrongRef<S>>>,
     ///The unit of the measured value (e.g. kg CO₂e, hectares, %, index score).
-    #[serde(borrow)]
-    pub unit: CowStr<'a>,
+    pub unit: S,
     ///The measured value as a numeric string (e.g. '1234.56')
-    #[serde(borrow)]
-    pub value: CowStr<'a>,
+    pub value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MeasurementGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MeasurementGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Measurement<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Measurement<S>,
 }
 
-impl<'a> Measurement<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, MeasurementRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Measurement<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, MeasurementRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -118,18 +115,17 @@ pub struct MeasurementRecord;
 impl XrpcResp for MeasurementRecord {
     const NSID: &'static str = "org.hypercerts.context.measurement";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MeasurementGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MeasurementGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<MeasurementGetRecordOutput<'_>> for Measurement<'_> {
-    fn from(output: MeasurementGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<MeasurementGetRecordOutput<S>> for Measurement<S> {
+    fn from(output: MeasurementGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Measurement<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Measurement<S> {
     const NSID: &'static str = "org.hypercerts.context.measurement";
     type Record = MeasurementRecord;
 }
@@ -139,7 +135,7 @@ impl Collection for MeasurementRecord {
     type Record = MeasurementRecord;
 }
 
-impl<'a> LexiconSchema for Measurement<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Measurement<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.context.measurement"
     }
@@ -270,66 +266,66 @@ pub mod measurement_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Metric;
-        type Value;
         type CreatedAt;
         type Unit;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Metric = Unset;
-        type Value = Unset;
         type CreatedAt = Unset;
         type Unit = Unset;
+        type Value = Unset;
     }
     ///State transition - sets the `metric` field to Set
     pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMetric<S> {}
     impl<S: State> State for SetMetric<S> {
         type Metric = Set<members::metric>;
+        type CreatedAt = S::CreatedAt;
+        type Unit = S::Unit;
         type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
-        type Unit = S::Unit;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Metric = S::Metric;
-        type Value = Set<members::value>;
-        type CreatedAt = S::CreatedAt;
-        type Unit = S::Unit;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Metric = S::Metric;
-        type Value = S::Value;
         type CreatedAt = Set<members::created_at>;
         type Unit = S::Unit;
+        type Value = S::Value;
     }
     ///State transition - sets the `unit` field to Set
     pub struct SetUnit<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUnit<S> {}
     impl<S: State> State for SetUnit<S> {
         type Metric = S::Metric;
-        type Value = S::Value;
         type CreatedAt = S::CreatedAt;
         type Unit = Set<members::unit>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Metric = S::Metric;
+        type CreatedAt = S::CreatedAt;
+        type Unit = S::Unit;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `metric` field
         pub struct metric(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `unit` field
         pub struct unit(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -337,20 +333,20 @@ pub mod measurement_state {
 pub struct MeasurementBuilder<'a, S: measurement_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
         Option<Datetime>,
         Option<Datetime>,
-        Option<Vec<UriValue<'a>>>,
-        Option<Vec<StrongRef<'a>>>,
-        Option<Vec<Did<'a>>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
+        Option<Vec<UriValue<S>>>,
+        Option<Vec<StrongRef<S>>>,
+        Option<Vec<Did<S>>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<Vec<StrongRef<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<Vec<StrongRef<S>>>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -390,12 +386,12 @@ impl<'a> MeasurementBuilder<'a, measurement_state::Empty> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_comment(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -403,12 +399,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `commentFacets` field (optional)
-    pub fn comment_facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
+    pub fn comment_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `commentFacets` field to an Option value (optional)
-    pub fn maybe_comment_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_comment_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -448,12 +444,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `evidenceURI` field (optional)
-    pub fn evidence_uri(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
+    pub fn evidence_uri(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `evidenceURI` field to an Option value (optional)
-    pub fn maybe_evidence_uri(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
+    pub fn maybe_evidence_uri(mut self, value: Option<Vec<UriValue<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -461,12 +457,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `locations` field (optional)
-    pub fn locations(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
+    pub fn locations(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `locations` field to an Option value (optional)
-    pub fn maybe_locations(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
+    pub fn maybe_locations(mut self, value: Option<Vec<StrongRef<S>>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -474,12 +470,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `measurers` field (optional)
-    pub fn measurers(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
+    pub fn measurers(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `measurers` field to an Option value (optional)
-    pub fn maybe_measurers(mut self, value: Option<Vec<Did<'a>>>) -> Self {
+    pub fn maybe_measurers(mut self, value: Option<Vec<Did<S>>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -487,12 +483,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `methodType` field (optional)
-    pub fn method_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn method_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `methodType` field to an Option value (optional)
-    pub fn maybe_method_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_method_type(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -500,12 +496,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `methodURI` field (optional)
-    pub fn method_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn method_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `methodURI` field to an Option value (optional)
-    pub fn maybe_method_uri(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_method_uri(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -519,7 +515,7 @@ where
     /// Set the `metric` field (required)
     pub fn metric(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MeasurementBuilder<'a, measurement_state::SetMetric<S>> {
         self._fields.9 = Option::Some(value.into());
         MeasurementBuilder {
@@ -545,12 +541,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `subjects` field (optional)
-    pub fn subjects(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
+    pub fn subjects(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `subjects` field to an Option value (optional)
-    pub fn maybe_subjects(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
+    pub fn maybe_subjects(mut self, value: Option<Vec<StrongRef<S>>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -564,7 +560,7 @@ where
     /// Set the `unit` field (required)
     pub fn unit(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MeasurementBuilder<'a, measurement_state::SetUnit<S>> {
         self._fields.12 = Option::Some(value.into());
         MeasurementBuilder {
@@ -583,7 +579,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MeasurementBuilder<'a, measurement_state::SetValue<S>> {
         self._fields.13 = Option::Some(value.into());
         MeasurementBuilder {
@@ -598,9 +594,9 @@ impl<'a, S> MeasurementBuilder<'a, S>
 where
     S: measurement_state::State,
     S::Metric: measurement_state::IsSet,
-    S::Value: measurement_state::IsSet,
     S::CreatedAt: measurement_state::IsSet,
     S::Unit: measurement_state::IsSet,
+    S::Value: measurement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Measurement<'a> {
@@ -625,10 +621,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Measurement<'a> {
         Measurement {
             comment: self._fields.0,

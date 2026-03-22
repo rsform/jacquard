@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
@@ -30,93 +31,94 @@ use serde::{Serialize, Deserialize};
 use crate::io_atcr::manifest;
 /// Reference to a blob stored in S3 or external storage
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BlobReference<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BlobReference<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional OCI annotation metadata. Map of string keys to string values.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub annotations: Option<Data<'a>>,
+    pub annotations: Option<Data<S>>,
     ///Content digest (e.g., 'sha256:...')
-    #[serde(borrow)]
-    pub digest: CowStr<'a>,
+    pub digest: S,
     ///MIME type of the blob
-    #[serde(borrow)]
-    pub media_type: CowStr<'a>,
+    pub media_type: S,
     ///Size in bytes
     pub size: i64,
     ///Optional direct URLs to blob (for BYOS)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub urls: Option<Vec<UriValue<'a>>>,
+    pub urls: Option<Vec<UriValue<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A container image manifest following OCI specification, stored in ATProto
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "io.atcr.manifest", tag = "$type")]
-pub struct Manifest<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "io.atcr.manifest",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Manifest<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional OCI annotation metadata. Map of string keys to string values (e.g., org.opencontainers.image.title → 'My App').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub annotations: Option<Data<'a>>,
+    pub annotations: Option<Data<S>>,
     ///Reference to image configuration blob
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub config: Option<manifest::BlobReference<'a>>,
+    pub config: Option<manifest::BlobReference<S>>,
     ///Record creation timestamp
     pub created_at: Datetime,
     ///Content digest (e.g., 'sha256:abc123...')
-    #[serde(borrow)]
-    pub digest: CowStr<'a>,
+    pub digest: S,
     ///DID of the hold service where blobs are stored (e.g., 'did:web:hold01.atcr.io'). Primary reference for hold resolution.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub hold_did: Option<Did<'a>>,
+    pub hold_did: Option<Did<S>>,
     ///Hold service endpoint URL where blobs are stored. DEPRECATED: Use holdDid instead. Kept for backward compatibility.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub hold_endpoint: Option<UriValue<'a>>,
+    pub hold_endpoint: Option<UriValue<S>>,
     ///Filesystem layers (for image manifests)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub layers: Option<Vec<manifest::BlobReference<'a>>>,
+    pub layers: Option<Vec<manifest::BlobReference<S>>>,
     ///The full OCI manifest stored as a blob in ATProto.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub manifest_blob: Option<BlobRef<'a>>,
+    pub manifest_blob: Option<BlobRef<S>>,
     ///Referenced manifests (for manifest lists/indexes)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub manifests: Option<Vec<manifest::ManifestReference<'a>>>,
+    pub manifests: Option<Vec<manifest::ManifestReference<S>>>,
     ///OCI media type
-    #[serde(borrow)]
-    pub media_type: ManifestMediaType<'a>,
+    pub media_type: ManifestMediaType<S>,
     ///Repository name (e.g., 'myapp'). Scoped to user's DID.
-    #[serde(borrow)]
-    pub repository: CowStr<'a>,
+    pub repository: S,
     ///OCI schema version (typically 2)
     pub schema_version: i64,
     ///Optional reference to another manifest (for attestations, signatures)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject: Option<manifest::BlobReference<'a>>,
+    pub subject: Option<manifest::BlobReference<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// OCI media type
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ManifestMediaType<'a> {
+pub enum ManifestMediaType<S: Bos<str> + AsRef<str> = DefaultStr> {
     ApplicationVndOciImageManifestV1Json,
     ApplicationVndDockerDistributionManifestV2Json,
     ApplicationVndOciImageIndexV1Json,
     ApplicationVndDockerDistributionManifestListV2Json,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ManifestMediaType<'a> {
+impl<S: Bos<str> + AsRef<str>> ManifestMediaType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ApplicationVndOciImageManifestV1Json => {
@@ -134,11 +136,9 @@ impl<'a> ManifestMediaType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ManifestMediaType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "application/vnd.oci.image.manifest.v1+json" => {
                 Self::ApplicationVndOciImageManifestV1Json
             }
@@ -151,73 +151,51 @@ impl<'a> From<&'a str> for ManifestMediaType<'a> {
             "application/vnd.docker.distribution.manifest.list.v2+json" => {
                 Self::ApplicationVndDockerDistributionManifestListV2Json
             }
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ManifestMediaType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "application/vnd.oci.image.manifest.v1+json" => {
-                Self::ApplicationVndOciImageManifestV1Json
-            }
-            "application/vnd.docker.distribution.manifest.v2+json" => {
-                Self::ApplicationVndDockerDistributionManifestV2Json
-            }
-            "application/vnd.oci.image.index.v1+json" => {
-                Self::ApplicationVndOciImageIndexV1Json
-            }
-            "application/vnd.docker.distribution.manifest.list.v2+json" => {
-                Self::ApplicationVndDockerDistributionManifestListV2Json
-            }
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ManifestMediaType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ManifestMediaType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ManifestMediaType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ManifestMediaType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ManifestMediaType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ManifestMediaType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ManifestMediaType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ManifestMediaType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ManifestMediaType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ManifestMediaType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ManifestMediaType<'_> {
-    type Output = ManifestMediaType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ManifestMediaType<S> {
+    type Output = ManifestMediaType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ManifestMediaType::ApplicationVndOciImageManifestV1Json => {
@@ -240,76 +218,82 @@ impl jacquard_common::IntoStatic for ManifestMediaType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ManifestGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ManifestGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Manifest<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Manifest<S>,
 }
 
 /// Reference to a manifest in a manifest list/index
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ManifestReference<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ManifestReference<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional OCI annotation metadata. Map of string keys to string values.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub annotations: Option<Data<'a>>,
+    pub annotations: Option<Data<S>>,
     ///Content digest (e.g., 'sha256:...')
-    #[serde(borrow)]
-    pub digest: CowStr<'a>,
+    pub digest: S,
     ///Media type of the referenced manifest
-    #[serde(borrow)]
-    pub media_type: CowStr<'a>,
+    pub media_type: S,
     ///Platform information for this manifest
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub platform: Option<manifest::Platform<'a>>,
+    pub platform: Option<manifest::Platform<S>>,
     ///Size in bytes
     pub size: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Platform information describing OS and architecture
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Platform<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Platform<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///CPU architecture (e.g., 'amd64', 'arm64', 'arm')
-    #[serde(borrow)]
-    pub architecture: CowStr<'a>,
+    pub architecture: S,
     ///Operating system (e.g., 'linux', 'windows', 'darwin')
-    #[serde(borrow)]
-    pub os: CowStr<'a>,
+    pub os: S,
     ///Optional OS features
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub os_features: Option<Vec<CowStr<'a>>>,
+    pub os_features: Option<Vec<S>>,
     ///Optional OS version
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub os_version: Option<CowStr<'a>>,
+    pub os_version: Option<S>,
     ///Optional CPU variant (e.g., 'v7' for ARM)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub variant: Option<CowStr<'a>>,
+    pub variant: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Manifest<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ManifestRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Manifest<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ManifestRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for BlobReference<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BlobReference<S> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
@@ -353,18 +337,17 @@ pub struct ManifestRecord;
 impl XrpcResp for ManifestRecord {
     const NSID: &'static str = "io.atcr.manifest";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ManifestGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ManifestGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ManifestGetRecordOutput<'_>> for Manifest<'_> {
-    fn from(output: ManifestGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ManifestGetRecordOutput<S>> for Manifest<S> {
+    fn from(output: ManifestGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Manifest<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Manifest<S> {
     const NSID: &'static str = "io.atcr.manifest";
     type Record = ManifestRecord;
 }
@@ -374,7 +357,7 @@ impl Collection for ManifestRecord {
     type Record = ManifestRecord;
 }
 
-impl<'a> LexiconSchema for Manifest<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Manifest<S> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
@@ -422,7 +405,7 @@ impl<'a> LexiconSchema for Manifest<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ManifestReference<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ManifestReference<S> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
@@ -459,7 +442,7 @@ impl<'a> LexiconSchema for ManifestReference<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Platform<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Platform<S> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
@@ -578,11 +561,11 @@ pub mod blob_reference_state {
 pub struct BlobReferenceBuilder<'a, S: blob_reference_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Data<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<Data<S>>,
+        Option<S>,
+        Option<S>,
         Option<i64>,
-        Option<Vec<UriValue<'a>>>,
+        Option<Vec<UriValue<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -607,12 +590,12 @@ impl<'a> BlobReferenceBuilder<'a, blob_reference_state::Empty> {
 
 impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
     /// Set the `annotations` field (optional)
-    pub fn annotations(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn annotations(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `annotations` field to an Option value (optional)
-    pub fn maybe_annotations(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_annotations(mut self, value: Option<Data<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -626,7 +609,7 @@ where
     /// Set the `digest` field (required)
     pub fn digest(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BlobReferenceBuilder<'a, blob_reference_state::SetDigest<S>> {
         self._fields.1 = Option::Some(value.into());
         BlobReferenceBuilder {
@@ -645,7 +628,7 @@ where
     /// Set the `mediaType` field (required)
     pub fn media_type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BlobReferenceBuilder<'a, blob_reference_state::SetMediaType<S>> {
         self._fields.2 = Option::Some(value.into());
         BlobReferenceBuilder {
@@ -677,12 +660,12 @@ where
 
 impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
     /// Set the `urls` field (optional)
-    pub fn urls(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
+    pub fn urls(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `urls` field to an Option value (optional)
-    pub fn maybe_urls(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
+    pub fn maybe_urls(mut self, value: Option<Vec<UriValue<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -709,7 +692,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BlobReference<'a> {
         BlobReference {
             annotations: self._fields.0,
@@ -1114,85 +1097,85 @@ pub mod manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Digest;
-        type SchemaVersion;
-        type Repository;
         type MediaType;
+        type Repository;
+        type SchemaVersion;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Digest = Unset;
-        type SchemaVersion = Unset;
-        type Repository = Unset;
         type MediaType = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Digest = S::Digest;
-        type SchemaVersion = S::SchemaVersion;
-        type Repository = S::Repository;
-        type MediaType = S::MediaType;
+        type Repository = Unset;
+        type SchemaVersion = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `digest` field to Set
     pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDigest<S> {}
     impl<S: State> State for SetDigest<S> {
-        type CreatedAt = S::CreatedAt;
         type Digest = Set<members::digest>;
-        type SchemaVersion = S::SchemaVersion;
+        type MediaType = S::MediaType;
         type Repository = S::Repository;
-        type MediaType = S::MediaType;
-    }
-    ///State transition - sets the `schema_version` field to Set
-    pub struct SetSchemaVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSchemaVersion<S> {}
-    impl<S: State> State for SetSchemaVersion<S> {
-        type CreatedAt = S::CreatedAt;
-        type Digest = S::Digest;
-        type SchemaVersion = Set<members::schema_version>;
-        type Repository = S::Repository;
-        type MediaType = S::MediaType;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type CreatedAt = S::CreatedAt;
-        type Digest = S::Digest;
         type SchemaVersion = S::SchemaVersion;
-        type Repository = Set<members::repository>;
-        type MediaType = S::MediaType;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
-        type CreatedAt = S::CreatedAt;
         type Digest = S::Digest;
-        type SchemaVersion = S::SchemaVersion;
-        type Repository = S::Repository;
         type MediaType = Set<members::media_type>;
+        type Repository = S::Repository;
+        type SchemaVersion = S::SchemaVersion;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type Digest = S::Digest;
+        type MediaType = S::MediaType;
+        type Repository = Set<members::repository>;
+        type SchemaVersion = S::SchemaVersion;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `schema_version` field to Set
+    pub struct SetSchemaVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSchemaVersion<S> {}
+    impl<S: State> State for SetSchemaVersion<S> {
+        type Digest = S::Digest;
+        type MediaType = S::MediaType;
+        type Repository = S::Repository;
+        type SchemaVersion = Set<members::schema_version>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Digest = S::Digest;
+        type MediaType = S::MediaType;
+        type Repository = S::Repository;
+        type SchemaVersion = S::SchemaVersion;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `digest` field
         pub struct digest(());
-        ///Marker type for the `schema_version` field
-        pub struct schema_version(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `media_type` field
         pub struct media_type(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
+        ///Marker type for the `schema_version` field
+        pub struct schema_version(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1200,19 +1183,19 @@ pub mod manifest_state {
 pub struct ManifestBuilder<'a, S: manifest_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Data<'a>>,
-        Option<manifest::BlobReference<'a>>,
+        Option<Data<S>>,
+        Option<manifest::BlobReference<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<UriValue<'a>>,
-        Option<Vec<manifest::BlobReference<'a>>>,
-        Option<BlobRef<'a>>,
-        Option<Vec<manifest::ManifestReference<'a>>>,
-        Option<ManifestMediaType<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<UriValue<S>>,
+        Option<Vec<manifest::BlobReference<S>>>,
+        Option<BlobRef<S>>,
+        Option<Vec<manifest::ManifestReference<S>>>,
+        Option<ManifestMediaType<S>>,
+        Option<S>,
         Option<i64>,
-        Option<manifest::BlobReference<'a>>,
+        Option<manifest::BlobReference<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1251,12 +1234,12 @@ impl<'a> ManifestBuilder<'a, manifest_state::Empty> {
 
 impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `annotations` field (optional)
-    pub fn annotations(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn annotations(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `annotations` field to an Option value (optional)
-    pub fn maybe_annotations(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_annotations(mut self, value: Option<Data<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1266,13 +1249,13 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `config` field (optional)
     pub fn config(
         mut self,
-        value: impl Into<Option<manifest::BlobReference<'a>>>,
+        value: impl Into<Option<manifest::BlobReference<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `config` field to an Option value (optional)
-    pub fn maybe_config(mut self, value: Option<manifest::BlobReference<'a>>) -> Self {
+    pub fn maybe_config(mut self, value: Option<manifest::BlobReference<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1305,7 +1288,7 @@ where
     /// Set the `digest` field (required)
     pub fn digest(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ManifestBuilder<'a, manifest_state::SetDigest<S>> {
         self._fields.3 = Option::Some(value.into());
         ManifestBuilder {
@@ -1318,12 +1301,12 @@ where
 
 impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `holdDid` field (optional)
-    pub fn hold_did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn hold_did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `holdDid` field to an Option value (optional)
-    pub fn maybe_hold_did(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_hold_did(mut self, value: Option<Did<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1331,12 +1314,12 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
 
 impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `holdEndpoint` field (optional)
-    pub fn hold_endpoint(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn hold_endpoint(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `holdEndpoint` field to an Option value (optional)
-    pub fn maybe_hold_endpoint(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_hold_endpoint(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -1346,7 +1329,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `layers` field (optional)
     pub fn layers(
         mut self,
-        value: impl Into<Option<Vec<manifest::BlobReference<'a>>>>,
+        value: impl Into<Option<Vec<manifest::BlobReference<S>>>>,
     ) -> Self {
         self._fields.6 = value.into();
         self
@@ -1354,7 +1337,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `layers` field to an Option value (optional)
     pub fn maybe_layers(
         mut self,
-        value: Option<Vec<manifest::BlobReference<'a>>>,
+        value: Option<Vec<manifest::BlobReference<S>>>,
     ) -> Self {
         self._fields.6 = value;
         self
@@ -1363,12 +1346,12 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
 
 impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `manifestBlob` field (optional)
-    pub fn manifest_blob(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn manifest_blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `manifestBlob` field to an Option value (optional)
-    pub fn maybe_manifest_blob(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_manifest_blob(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -1378,7 +1361,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `manifests` field (optional)
     pub fn manifests(
         mut self,
-        value: impl Into<Option<Vec<manifest::ManifestReference<'a>>>>,
+        value: impl Into<Option<Vec<manifest::ManifestReference<S>>>>,
     ) -> Self {
         self._fields.8 = value.into();
         self
@@ -1386,7 +1369,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `manifests` field to an Option value (optional)
     pub fn maybe_manifests(
         mut self,
-        value: Option<Vec<manifest::ManifestReference<'a>>>,
+        value: Option<Vec<manifest::ManifestReference<S>>>,
     ) -> Self {
         self._fields.8 = value;
         self
@@ -1401,7 +1384,7 @@ where
     /// Set the `mediaType` field (required)
     pub fn media_type(
         mut self,
-        value: impl Into<ManifestMediaType<'a>>,
+        value: impl Into<ManifestMediaType<S>>,
     ) -> ManifestBuilder<'a, manifest_state::SetMediaType<S>> {
         self._fields.9 = Option::Some(value.into());
         ManifestBuilder {
@@ -1420,7 +1403,7 @@ where
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ManifestBuilder<'a, manifest_state::SetRepository<S>> {
         self._fields.10 = Option::Some(value.into());
         ManifestBuilder {
@@ -1454,13 +1437,13 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `subject` field (optional)
     pub fn subject(
         mut self,
-        value: impl Into<Option<manifest::BlobReference<'a>>>,
+        value: impl Into<Option<manifest::BlobReference<S>>>,
     ) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
-    pub fn maybe_subject(mut self, value: Option<manifest::BlobReference<'a>>) -> Self {
+    pub fn maybe_subject(mut self, value: Option<manifest::BlobReference<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -1469,11 +1452,11 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
 impl<'a, S> ManifestBuilder<'a, S>
 where
     S: manifest_state::State,
-    S::CreatedAt: manifest_state::IsSet,
     S::Digest: manifest_state::IsSet,
-    S::SchemaVersion: manifest_state::IsSet,
-    S::Repository: manifest_state::IsSet,
     S::MediaType: manifest_state::IsSet,
+    S::Repository: manifest_state::IsSet,
+    S::SchemaVersion: manifest_state::IsSet,
+    S::CreatedAt: manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Manifest<'a> {
@@ -1497,7 +1480,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Manifest<'a> {
         Manifest {
             annotations: self._fields.0,
@@ -1580,10 +1563,10 @@ pub mod manifest_reference_state {
 pub struct ManifestReferenceBuilder<'a, S: manifest_reference_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Data<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<manifest::Platform<'a>>,
+        Option<Data<S>>,
+        Option<S>,
+        Option<S>,
+        Option<manifest::Platform<S>>,
         Option<i64>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -1609,12 +1592,12 @@ impl<'a> ManifestReferenceBuilder<'a, manifest_reference_state::Empty> {
 
 impl<'a, S: manifest_reference_state::State> ManifestReferenceBuilder<'a, S> {
     /// Set the `annotations` field (optional)
-    pub fn annotations(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn annotations(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `annotations` field to an Option value (optional)
-    pub fn maybe_annotations(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_annotations(mut self, value: Option<Data<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1628,7 +1611,7 @@ where
     /// Set the `digest` field (required)
     pub fn digest(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ManifestReferenceBuilder<'a, manifest_reference_state::SetDigest<S>> {
         self._fields.1 = Option::Some(value.into());
         ManifestReferenceBuilder {
@@ -1647,7 +1630,7 @@ where
     /// Set the `mediaType` field (required)
     pub fn media_type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ManifestReferenceBuilder<'a, manifest_reference_state::SetMediaType<S>> {
         self._fields.2 = Option::Some(value.into());
         ManifestReferenceBuilder {
@@ -1660,12 +1643,12 @@ where
 
 impl<'a, S: manifest_reference_state::State> ManifestReferenceBuilder<'a, S> {
     /// Set the `platform` field (optional)
-    pub fn platform(mut self, value: impl Into<Option<manifest::Platform<'a>>>) -> Self {
+    pub fn platform(mut self, value: impl Into<Option<manifest::Platform<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `platform` field to an Option value (optional)
-    pub fn maybe_platform(mut self, value: Option<manifest::Platform<'a>>) -> Self {
+    pub fn maybe_platform(mut self, value: Option<manifest::Platform<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1711,7 +1694,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ManifestReference<'a> {
         ManifestReference {
             annotations: self._fields.0,

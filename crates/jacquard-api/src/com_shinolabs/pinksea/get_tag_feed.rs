@@ -10,15 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTagFeed<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTagFeed<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `50`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -26,16 +34,24 @@ pub struct GetTagFeed<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub since: Option<Datetime>,
     #[serde(borrow)]
-    pub tag: CowStr<'a>,
+    pub tag: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTagFeedOutput<'a> {
-    #[serde(borrow)]
-    pub oekaki: Vec<HydratedOekaki<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTagFeedOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub oekaki: Vec<HydratedOekaki<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.shinolabs.pinksea.getTagFeed
@@ -43,11 +59,12 @@ pub struct GetTagFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTagFeedResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getTagFeed";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTagFeedOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetTagFeedOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTagFeed<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetTagFeed<S> {
     const NSID: &'static str = "com.shinolabs.pinksea.getTagFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTagFeedResponse;
@@ -58,7 +75,7 @@ pub struct GetTagFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTagFeedRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getTagFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTagFeed<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetTagFeed<S>;
     type Response = GetTagFeedResponse;
 }
 
@@ -101,7 +118,7 @@ pub mod get_tag_feed_state {
 /// Builder for constructing an instance of this type
 pub struct GetTagFeedBuilder<'a, S: get_tag_feed_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<Datetime>, Option<CowStr<'a>>),
+    _fields: (Option<i64>, Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -157,7 +174,7 @@ where
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetTagFeedBuilder<'a, get_tag_feed_state::SetTag<S>> {
         self._fields.2 = Option::Some(value.into());
         GetTagFeedBuilder {

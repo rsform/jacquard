@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,282 +31,408 @@ use serde::{Serialize, Deserialize};
 use crate::app_protoimsg::chat::message;
 /// Width and height for layout before media loads.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AspectRatio<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub height: i64,
     pub width: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Facet feature for a block quotation.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Blockquote<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Blockquote<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Facet feature for bold text.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Bold<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Bold<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ByteSlice<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ByteSlice<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub byte_end: i64,
     pub byte_start: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Facet feature for a code block. The text contains the code content.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CodeBlock<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CodeBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Programming language for syntax highlighting.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lang: Option<CowStr<'a>>,
+    pub lang: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Facet feature for inline code.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CodeInline<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CodeInline<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// External link card.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ExternalEmbed<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExternalEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Description or summary.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Thumbnail image for the link card.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumb: Option<BlobRef<'a>>,
+    pub thumb: Option<BlobRef<S>>,
     ///Title of the external content.
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
     ///URL of the external content.
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+    pub uri: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Embedded images.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageEmbed<'a> {
-    #[serde(borrow)]
-    pub images: Vec<message::ImageItem<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImageEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub images: Vec<message::ImageItem<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A single embedded image.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImageItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text for accessibility.
-    #[serde(borrow)]
-    pub alt: CowStr<'a>,
+    pub alt: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<message::AspectRatio<'a>>,
+    pub aspect_ratio: Option<message::AspectRatio<S>>,
     ///Image blob reference.
-    #[serde(borrow)]
-    pub image: BlobRef<'a>,
+    pub image: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Facet feature for italic text.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Italic<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Italic<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Facet feature for a URL. The text URL may have been simplified or truncated, but the facet reference should be a complete URL.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Link<'a> {
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Link<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub uri: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A chat message. Lives in the sender's repo, points to a channel.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.protoimsg.chat.message", tag = "$type")]
-pub struct Message<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.protoimsg.chat.message",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Message<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///AT-URI of the channel record this message belongs to.
-    #[serde(borrow)]
-    pub channel: AtUri<'a>,
+    pub channel: AtUri<S>,
     ///Timestamp of message creation.
     pub created_at: Datetime,
     ///Embedded media or link card.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub embed: Option<MessageEmbed<'a>>,
+    pub embed: Option<MessageEmbed<S>>,
     ///Rich text annotations (mentions, links, tags, formatting). Extends the Bluesky facet convention with additional formatting features.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<message::RichTextFacet<'a>>>,
+    pub facets: Option<Vec<message::RichTextFacet<S>>>,
     ///Structured reply reference for threading.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reply: Option<message::ReplyRef<'a>>,
+    pub reply: Option<message::ReplyRef<S>>,
     ///Message text content.
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum MessageEmbed<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum MessageEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.protoimsg.chat.message#imageEmbed")]
-    ImageEmbed(Box<message::ImageEmbed<'a>>),
+    ImageEmbed(Box<message::ImageEmbed<S>>),
     #[serde(rename = "app.protoimsg.chat.message#videoEmbed")]
-    VideoEmbed(Box<message::VideoEmbed<'a>>),
+    VideoEmbed(Box<message::VideoEmbed<S>>),
     #[serde(rename = "app.protoimsg.chat.message#externalEmbed")]
-    ExternalEmbed(Box<message::ExternalEmbed<'a>>),
+    ExternalEmbed(Box<message::ExternalEmbed<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MessageGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MessageGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Message<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Message<S>,
 }
 
 /// Facet feature for mention of another account. The text is usually a handle, including a '@' prefix, but the facet reference is a DID.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Mention<'a> {
-    #[serde(borrow)]
-    pub did: Did<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Mention<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub did: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Thread reply reference with root and parent for efficient deep thread traversal.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReplyRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReplyRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///AT-URI of the direct parent message being replied to.
-    #[serde(borrow)]
-    pub parent: AtUri<'a>,
+    pub parent: AtUri<S>,
     ///AT-URI of the root message in the thread.
-    #[serde(borrow)]
-    pub root: AtUri<'a>,
+    pub root: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Annotation of a sub-string within rich text.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RichTextFacet<'a> {
-    #[serde(borrow)]
-    pub features: Vec<RichTextFacetFeaturesItem<'a>>,
-    #[serde(borrow)]
-    pub index: message::ByteSlice<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RichTextFacet<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub features: Vec<RichTextFacetFeaturesItem<S>>,
+    pub index: message::ByteSlice<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RichTextFacetFeaturesItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RichTextFacetFeaturesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.protoimsg.chat.message#mention")]
-    Mention(Box<message::Mention<'a>>),
+    Mention(Box<message::Mention<S>>),
     #[serde(rename = "app.protoimsg.chat.message#link")]
-    Link(Box<message::Link<'a>>),
+    Link(Box<message::Link<S>>),
     #[serde(rename = "app.protoimsg.chat.message#tag")]
-    Tag(Box<message::Tag<'a>>),
+    Tag(Box<message::Tag<S>>),
     #[serde(rename = "app.protoimsg.chat.message#bold")]
-    Bold(Box<message::Bold<'a>>),
+    Bold(Box<message::Bold<S>>),
     #[serde(rename = "app.protoimsg.chat.message#italic")]
-    Italic(Box<message::Italic<'a>>),
+    Italic(Box<message::Italic<S>>),
     #[serde(rename = "app.protoimsg.chat.message#strikethrough")]
-    Strikethrough(Box<message::Strikethrough<'a>>),
+    Strikethrough(Box<message::Strikethrough<S>>),
     #[serde(rename = "app.protoimsg.chat.message#codeInline")]
-    CodeInline(Box<message::CodeInline<'a>>),
+    CodeInline(Box<message::CodeInline<S>>),
     #[serde(rename = "app.protoimsg.chat.message#codeBlock")]
-    CodeBlock(Box<message::CodeBlock<'a>>),
+    CodeBlock(Box<message::CodeBlock<S>>),
     #[serde(rename = "app.protoimsg.chat.message#blockquote")]
-    Blockquote(Box<message::Blockquote<'a>>),
+    Blockquote(Box<message::Blockquote<S>>),
 }
 
 /// Facet feature for strikethrough text.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Strikethrough<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Strikethrough<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Facet feature for a hashtag. The text usually includes a '#' prefix, but the facet reference should not.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Tag<'a> {
-    #[serde(borrow)]
-    pub tag: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub tag: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Embedded video.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct VideoEmbed<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct VideoEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alt: Option<CowStr<'a>>,
+    pub alt: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<message::AspectRatio<'a>>,
+    pub aspect_ratio: Option<message::AspectRatio<S>>,
     ///Video thumbnail image.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail: Option<BlobRef<'a>>,
+    pub thumbnail: Option<BlobRef<S>>,
     ///Video blob reference.
-    #[serde(borrow)]
-    pub video: BlobRef<'a>,
+    pub video: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Message<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, MessageRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Message<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, MessageRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for AspectRatio<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AspectRatio<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -339,7 +467,7 @@ impl<'a> LexiconSchema for AspectRatio<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Blockquote<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Blockquote<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -354,7 +482,7 @@ impl<'a> LexiconSchema for Blockquote<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Bold<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bold<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -369,7 +497,7 @@ impl<'a> LexiconSchema for Bold<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ByteSlice<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ByteSlice<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -404,7 +532,7 @@ impl<'a> LexiconSchema for ByteSlice<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CodeBlock<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeBlock<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -429,7 +557,7 @@ impl<'a> LexiconSchema for CodeBlock<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CodeInline<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeInline<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -444,7 +572,7 @@ impl<'a> LexiconSchema for CodeInline<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ExternalEmbed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExternalEmbed<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -520,7 +648,7 @@ impl<'a> LexiconSchema for ExternalEmbed<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ImageEmbed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageEmbed<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -546,7 +674,7 @@ impl<'a> LexiconSchema for ImageEmbed<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ImageItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageItem<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -620,7 +748,7 @@ impl<'a> LexiconSchema for ImageItem<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Italic<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Italic<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -635,7 +763,7 @@ impl<'a> LexiconSchema for Italic<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Link<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Link<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -657,18 +785,17 @@ pub struct MessageRecord;
 impl XrpcResp for MessageRecord {
     const NSID: &'static str = "app.protoimsg.chat.message";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MessageGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MessageGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<MessageGetRecordOutput<'_>> for Message<'_> {
-    fn from(output: MessageGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<MessageGetRecordOutput<S>> for Message<S> {
+    fn from(output: MessageGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Message<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Message<S> {
     const NSID: &'static str = "app.protoimsg.chat.message";
     type Record = MessageRecord;
 }
@@ -678,7 +805,7 @@ impl Collection for MessageRecord {
     type Record = MessageRecord;
 }
 
-impl<'a> LexiconSchema for Message<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Message<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -717,7 +844,7 @@ impl<'a> LexiconSchema for Message<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Mention<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Mention<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -732,7 +859,7 @@ impl<'a> LexiconSchema for Mention<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ReplyRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReplyRef<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -747,7 +874,7 @@ impl<'a> LexiconSchema for ReplyRef<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RichTextFacet<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RichTextFacet<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -762,7 +889,7 @@ impl<'a> LexiconSchema for RichTextFacet<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Strikethrough<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Strikethrough<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -777,7 +904,7 @@ impl<'a> LexiconSchema for Strikethrough<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Tag<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tag<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -816,7 +943,7 @@ impl<'a> LexiconSchema for Tag<'a> {
     }
 }
 
-impl<'a> LexiconSchema for VideoEmbed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for VideoEmbed<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -933,37 +1060,37 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Height;
         type Width;
+        type Height;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Height = Unset;
         type Width = Unset;
-    }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeight<S> {}
-    impl<S: State> State for SetHeight<S> {
-        type Height = Set<members::height>;
-        type Width = S::Width;
+        type Height = Unset;
     }
     ///State transition - sets the `width` field to Set
     pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWidth<S> {}
     impl<S: State> State for SetWidth<S> {
-        type Height = S::Height;
         type Width = Set<members::width>;
+        type Height = S::Height;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHeight<S> {}
+    impl<S: State> State for SetHeight<S> {
+        type Width = S::Width;
+        type Height = Set<members::height>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `height` field
-        pub struct height(());
         ///Marker type for the `width` field
         pub struct width(());
+        ///Marker type for the `height` field
+        pub struct height(());
     }
 }
 
@@ -1033,8 +1160,8 @@ where
 impl<'a, S> AspectRatioBuilder<'a, S>
 where
     S: aspect_ratio_state::State,
-    S::Height: aspect_ratio_state::IsSet,
     S::Width: aspect_ratio_state::IsSet,
+    S::Height: aspect_ratio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AspectRatio<'a> {
@@ -1047,10 +1174,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> AspectRatio<'a> {
         AspectRatio {
             height: self._fields.0.unwrap(),
@@ -1771,10 +1895,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ByteSlice<'a> {
         ByteSlice {
             byte_end: self._fields.0.unwrap(),
@@ -1794,49 +1915,44 @@ pub mod external_embed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Uri;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Uri = S::Uri;
+        type Title = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Title = S::Title;
         type Uri = Set<members::uri>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Uri = S::Uri;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ExternalEmbedBuilder<'a, S: external_embed_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-    ),
+    _fields: (Option<S>, Option<BlobRef<S>>, Option<S>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1860,12 +1976,12 @@ impl<'a> ExternalEmbedBuilder<'a, external_embed_state::Empty> {
 
 impl<'a, S: external_embed_state::State> ExternalEmbedBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1873,12 +1989,12 @@ impl<'a, S: external_embed_state::State> ExternalEmbedBuilder<'a, S> {
 
 impl<'a, S: external_embed_state::State> ExternalEmbedBuilder<'a, S> {
     /// Set the `thumb` field (optional)
-    pub fn thumb(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn thumb(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `thumb` field to an Option value (optional)
-    pub fn maybe_thumb(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_thumb(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1892,7 +2008,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ExternalEmbedBuilder<'a, external_embed_state::SetTitle<S>> {
         self._fields.2 = Option::Some(value.into());
         ExternalEmbedBuilder {
@@ -1911,7 +2027,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ExternalEmbedBuilder<'a, external_embed_state::SetUri<S>> {
         self._fields.3 = Option::Some(value.into());
         ExternalEmbedBuilder {
@@ -1925,8 +2041,8 @@ where
 impl<'a, S> ExternalEmbedBuilder<'a, S>
 where
     S: external_embed_state::State,
-    S::Title: external_embed_state::IsSet,
     S::Uri: external_embed_state::IsSet,
+    S::Title: external_embed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ExternalEmbed<'a> {
@@ -1941,10 +2057,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ExternalEmbed<'a> {
         ExternalEmbed {
             description: self._fields.0,
@@ -1991,7 +2104,7 @@ pub mod image_embed_state {
 /// Builder for constructing an instance of this type
 pub struct ImageEmbedBuilder<'a, S: image_embed_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<message::ImageItem<'a>>>,),
+    _fields: (Option<Vec<message::ImageItem<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -2021,7 +2134,7 @@ where
     /// Set the `images` field (required)
     pub fn images(
         mut self,
-        value: impl Into<Vec<message::ImageItem<'a>>>,
+        value: impl Into<Vec<message::ImageItem<S>>>,
     ) -> ImageEmbedBuilder<'a, image_embed_state::SetImages<S>> {
         self._fields.0 = Option::Some(value.into());
         ImageEmbedBuilder {
@@ -2047,10 +2160,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ImageEmbed<'a> {
         ImageEmbed {
             images: self._fields.0.unwrap(),
@@ -2106,7 +2216,7 @@ pub mod image_item_state {
 /// Builder for constructing an instance of this type
 pub struct ImageItemBuilder<'a, S: image_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<message::AspectRatio<'a>>, Option<BlobRef<'a>>),
+    _fields: (Option<S>, Option<message::AspectRatio<S>>, Option<BlobRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -2136,7 +2246,7 @@ where
     /// Set the `alt` field (required)
     pub fn alt(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ImageItemBuilder<'a, image_item_state::SetAlt<S>> {
         self._fields.0 = Option::Some(value.into());
         ImageItemBuilder {
@@ -2151,16 +2261,13 @@ impl<'a, S: image_item_state::State> ImageItemBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(
         mut self,
-        value: impl Into<Option<message::AspectRatio<'a>>>,
+        value: impl Into<Option<message::AspectRatio<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(
-        mut self,
-        value: Option<message::AspectRatio<'a>>,
-    ) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<message::AspectRatio<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -2174,7 +2281,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> ImageItemBuilder<'a, image_item_state::SetImage<S>> {
         self._fields.2 = Option::Some(value.into());
         ImageItemBuilder {
@@ -2203,10 +2310,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ImageItem<'a> {
         ImageItem {
             alt: self._fields.0.unwrap(),
@@ -2252,7 +2356,7 @@ pub mod link_state {
 /// Builder for constructing an instance of this type
 pub struct LinkBuilder<'a, S: link_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<UriValue<'a>>,),
+    _fields: (Option<UriValue<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -2282,7 +2386,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> LinkBuilder<'a, link_state::SetUri<S>> {
         self._fields.0 = Option::Some(value.into());
         LinkBuilder {
@@ -2306,13 +2410,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Link<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Link<'a> {
         Link {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -2382,12 +2480,12 @@ pub mod message_state {
 pub struct MessageBuilder<'a, S: message_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtUri<'a>>,
+        Option<AtUri<S>>,
         Option<Datetime>,
-        Option<MessageEmbed<'a>>,
-        Option<Vec<message::RichTextFacet<'a>>>,
-        Option<message::ReplyRef<'a>>,
-        Option<CowStr<'a>>,
+        Option<MessageEmbed<S>>,
+        Option<Vec<message::RichTextFacet<S>>>,
+        Option<message::ReplyRef<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -2418,7 +2516,7 @@ where
     /// Set the `channel` field (required)
     pub fn channel(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> MessageBuilder<'a, message_state::SetChannel<S>> {
         self._fields.0 = Option::Some(value.into());
         MessageBuilder {
@@ -2450,12 +2548,12 @@ where
 
 impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     /// Set the `embed` field (optional)
-    pub fn embed(mut self, value: impl Into<Option<MessageEmbed<'a>>>) -> Self {
+    pub fn embed(mut self, value: impl Into<Option<MessageEmbed<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `embed` field to an Option value (optional)
-    pub fn maybe_embed(mut self, value: Option<MessageEmbed<'a>>) -> Self {
+    pub fn maybe_embed(mut self, value: Option<MessageEmbed<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -2465,7 +2563,7 @@ impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(
         mut self,
-        value: impl Into<Option<Vec<message::RichTextFacet<'a>>>>,
+        value: impl Into<Option<Vec<message::RichTextFacet<S>>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -2473,7 +2571,7 @@ impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     /// Set the `facets` field to an Option value (optional)
     pub fn maybe_facets(
         mut self,
-        value: Option<Vec<message::RichTextFacet<'a>>>,
+        value: Option<Vec<message::RichTextFacet<S>>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -2482,12 +2580,12 @@ impl<'a, S: message_state::State> MessageBuilder<'a, S> {
 
 impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     /// Set the `reply` field (optional)
-    pub fn reply(mut self, value: impl Into<Option<message::ReplyRef<'a>>>) -> Self {
+    pub fn reply(mut self, value: impl Into<Option<message::ReplyRef<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `reply` field to an Option value (optional)
-    pub fn maybe_reply(mut self, value: Option<message::ReplyRef<'a>>) -> Self {
+    pub fn maybe_reply(mut self, value: Option<message::ReplyRef<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -2501,7 +2599,7 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MessageBuilder<'a, message_state::SetText<S>> {
         self._fields.5 = Option::Some(value.into());
         MessageBuilder {
@@ -2534,10 +2632,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Message<'a> {
         Message {
             channel: self._fields.0.unwrap(),
@@ -2586,7 +2681,7 @@ pub mod mention_state {
 /// Builder for constructing an instance of this type
 pub struct MentionBuilder<'a, S: mention_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -2616,7 +2711,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> MentionBuilder<'a, mention_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         MentionBuilder {
@@ -2642,10 +2737,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Mention<'a> {
         Mention {
             did: self._fields.0.unwrap(),
@@ -2664,44 +2756,44 @@ pub mod reply_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Parent;
         type Root;
+        type Parent;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Parent = Unset;
         type Root = Unset;
-    }
-    ///State transition - sets the `parent` field to Set
-    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParent<S> {}
-    impl<S: State> State for SetParent<S> {
-        type Parent = Set<members::parent>;
-        type Root = S::Root;
+        type Parent = Unset;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoot<S> {}
     impl<S: State> State for SetRoot<S> {
-        type Parent = S::Parent;
         type Root = Set<members::root>;
+        type Parent = S::Parent;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParent<S> {}
+    impl<S: State> State for SetParent<S> {
+        type Root = S::Root;
+        type Parent = Set<members::parent>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `parent` field
-        pub struct parent(());
         ///Marker type for the `root` field
         pub struct root(());
+        ///Marker type for the `parent` field
+        pub struct parent(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReplyRefBuilder<'a, S: reply_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<AtUri<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -2731,7 +2823,7 @@ where
     /// Set the `parent` field (required)
     pub fn parent(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetParent<S>> {
         self._fields.0 = Option::Some(value.into());
         ReplyRefBuilder {
@@ -2750,7 +2842,7 @@ where
     /// Set the `root` field (required)
     pub fn root(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetRoot<S>> {
         self._fields.1 = Option::Some(value.into());
         ReplyRefBuilder {
@@ -2764,8 +2856,8 @@ where
 impl<'a, S> ReplyRefBuilder<'a, S>
 where
     S: reply_ref_state::State,
-    S::Parent: reply_ref_state::IsSet,
     S::Root: reply_ref_state::IsSet,
+    S::Parent: reply_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReplyRef<'a> {
@@ -2778,10 +2870,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ReplyRef<'a> {
         ReplyRef {
             parent: self._fields.0.unwrap(),
@@ -2838,10 +2927,7 @@ pub mod rich_text_facet_state {
 /// Builder for constructing an instance of this type
 pub struct RichTextFacetBuilder<'a, S: rich_text_facet_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Vec<RichTextFacetFeaturesItem<'a>>>,
-        Option<message::ByteSlice<'a>>,
-    ),
+    _fields: (Option<Vec<RichTextFacetFeaturesItem<S>>>, Option<message::ByteSlice<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -2871,7 +2957,7 @@ where
     /// Set the `features` field (required)
     pub fn features(
         mut self,
-        value: impl Into<Vec<RichTextFacetFeaturesItem<'a>>>,
+        value: impl Into<Vec<RichTextFacetFeaturesItem<S>>>,
     ) -> RichTextFacetBuilder<'a, rich_text_facet_state::SetFeatures<S>> {
         self._fields.0 = Option::Some(value.into());
         RichTextFacetBuilder {
@@ -2890,7 +2976,7 @@ where
     /// Set the `index` field (required)
     pub fn index(
         mut self,
-        value: impl Into<message::ByteSlice<'a>>,
+        value: impl Into<message::ByteSlice<S>>,
     ) -> RichTextFacetBuilder<'a, rich_text_facet_state::SetIndex<S>> {
         self._fields.1 = Option::Some(value.into());
         RichTextFacetBuilder {
@@ -2918,10 +3004,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RichTextFacet<'a> {
         RichTextFacet {
             features: self._fields.0.unwrap(),
@@ -2967,10 +3050,10 @@ pub mod video_embed_state {
 pub struct VideoEmbedBuilder<'a, S: video_embed_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<message::AspectRatio<'a>>,
-        Option<BlobRef<'a>>,
-        Option<BlobRef<'a>>,
+        Option<S>,
+        Option<message::AspectRatio<S>>,
+        Option<BlobRef<S>>,
+        Option<BlobRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -2995,12 +3078,12 @@ impl<'a> VideoEmbedBuilder<'a, video_embed_state::Empty> {
 
 impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
     /// Set the `alt` field (optional)
-    pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
-    pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_alt(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -3010,16 +3093,13 @@ impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(
         mut self,
-        value: impl Into<Option<message::AspectRatio<'a>>>,
+        value: impl Into<Option<message::AspectRatio<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(
-        mut self,
-        value: Option<message::AspectRatio<'a>>,
-    ) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<message::AspectRatio<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -3027,12 +3107,12 @@ impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
 
 impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
-    pub fn thumbnail(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn thumbnail(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
-    pub fn maybe_thumbnail(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_thumbnail(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -3046,7 +3126,7 @@ where
     /// Set the `video` field (required)
     pub fn video(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> VideoEmbedBuilder<'a, video_embed_state::SetVideo<S>> {
         self._fields.3 = Option::Some(value.into());
         VideoEmbedBuilder {
@@ -3075,10 +3155,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> VideoEmbed<'a> {
         VideoEmbed {
             alt: self._fields.0,

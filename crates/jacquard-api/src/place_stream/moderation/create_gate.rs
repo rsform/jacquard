@@ -10,38 +10,53 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Cid};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateGate<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateGate<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The AT-URI of the chat message to hide.
-    #[serde(borrow)]
-    pub message_uri: AtUri<'a>,
+    pub message_uri: AtUri<S>,
     ///The DID of the streamer.
-    #[serde(borrow)]
-    pub streamer: Did<'a>,
+    pub streamer: Did<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateGateOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateGateOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The CID of the created gate record.
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///The AT-URI of the created gate record.
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -50,25 +65,26 @@ pub struct CreateGateOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateGateError<'a> {
+pub enum CreateGateError {
     /// The request lacks valid authentication credentials.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(Option<CowStr<'a>>),
+    Unauthorized(Option<SmolStr>),
     /// The caller does not have permission to hide messages for this streamer.
     #[serde(rename = "Forbidden")]
-    Forbidden(Option<CowStr<'a>>),
+    Forbidden(Option<SmolStr>),
     /// The streamer's OAuth session could not be found or is invalid.
     #[serde(rename = "SessionNotFound")]
-    SessionNotFound(Option<CowStr<'a>>),
+    SessionNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for CreateGateError<'_> {
+impl core::fmt::Display for CreateGateError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Unauthorized(msg) => {
@@ -92,7 +108,13 @@ impl core::fmt::Display for CreateGateError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -102,11 +124,12 @@ pub struct CreateGateResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateGateResponse {
     const NSID: &'static str = "place.stream.moderation.createGate";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateGateOutput<'de>;
-    type Err<'de> = CreateGateError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CreateGateOutput<S>;
+    type Err = CreateGateError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateGate<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CreateGate<S> {
     const NSID: &'static str = "place.stream.moderation.createGate";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -121,7 +144,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateGateRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CreateGate<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CreateGate<S>;
     type Response = CreateGateResponse;
 }
 
@@ -135,44 +158,44 @@ pub mod create_gate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MessageUri;
         type Streamer;
+        type MessageUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MessageUri = Unset;
         type Streamer = Unset;
-    }
-    ///State transition - sets the `message_uri` field to Set
-    pub struct SetMessageUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessageUri<S> {}
-    impl<S: State> State for SetMessageUri<S> {
-        type MessageUri = Set<members::message_uri>;
-        type Streamer = S::Streamer;
+        type MessageUri = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
-        type MessageUri = S::MessageUri;
         type Streamer = Set<members::streamer>;
+        type MessageUri = S::MessageUri;
+    }
+    ///State transition - sets the `message_uri` field to Set
+    pub struct SetMessageUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessageUri<S> {}
+    impl<S: State> State for SetMessageUri<S> {
+        type Streamer = S::Streamer;
+        type MessageUri = Set<members::message_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message_uri` field
-        pub struct message_uri(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `message_uri` field
+        pub struct message_uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CreateGateBuilder<'a, S: create_gate_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<Did<'a>>),
+    _fields: (Option<AtUri<S>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -202,7 +225,7 @@ where
     /// Set the `messageUri` field (required)
     pub fn message_uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> CreateGateBuilder<'a, create_gate_state::SetMessageUri<S>> {
         self._fields.0 = Option::Some(value.into());
         CreateGateBuilder {
@@ -221,7 +244,7 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> CreateGateBuilder<'a, create_gate_state::SetStreamer<S>> {
         self._fields.1 = Option::Some(value.into());
         CreateGateBuilder {
@@ -235,8 +258,8 @@ where
 impl<'a, S> CreateGateBuilder<'a, S>
 where
     S: create_gate_state::State,
-    S::MessageUri: create_gate_state::IsSet,
     S::Streamer: create_gate_state::IsSet,
+    S::MessageUri: create_gate_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateGate<'a> {
@@ -249,10 +272,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CreateGate<'a> {
         CreateGate {
             message_uri: self._fields.0.unwrap(),

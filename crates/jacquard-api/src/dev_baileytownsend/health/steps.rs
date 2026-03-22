@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,37 +28,43 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "dev.baileytownsend.health.steps",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Steps<'a> {
+pub struct Steps<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     pub steps: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StepsGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StepsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Steps<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Steps<S>,
 }
 
-impl<'a> Steps<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, StepsRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Steps<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, StepsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -67,18 +75,17 @@ pub struct StepsRecord;
 impl XrpcResp for StepsRecord {
     const NSID: &'static str = "dev.baileytownsend.health.steps";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StepsGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StepsGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<StepsGetRecordOutput<'_>> for Steps<'_> {
-    fn from(output: StepsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<StepsGetRecordOutput<S>> for Steps<S> {
+    fn from(output: StepsGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Steps<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Steps<S> {
     const NSID: &'static str = "dev.baileytownsend.health.steps";
     type Record = StepsRecord;
 }
@@ -88,7 +95,7 @@ impl Collection for StepsRecord {
     type Record = StepsRecord;
 }
 
-impl<'a> LexiconSchema for Steps<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Steps<S> {
     fn nsid() -> &'static str {
         "dev.baileytownsend.health.steps"
     }
@@ -225,13 +232,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Steps<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Steps<'a> {
         Steps {
             created_at: self._fields.0.unwrap(),
             steps: self._fields.1.unwrap(),

@@ -10,20 +10,28 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct CreatePageRelationship<'a> {
-    #[serde(borrow)]
-    pub relation: CowStr<'a>,
-    #[serde(borrow)]
-    pub resource: CowStr<'a>,
-    #[serde(borrow)]
-    pub subject: CowStr<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreatePageRelationship<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub relation: S,
+    pub resource: S,
+    pub subject: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.blebbit.authr.page.createPageRelationship
@@ -31,11 +39,12 @@ pub struct CreatePageRelationshipResponse;
 impl jacquard_common::xrpc::XrpcResp for CreatePageRelationshipResponse {
     const NSID: &'static str = "app.blebbit.authr.page.createPageRelationship";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreatePageRelationship<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CreatePageRelationship<S> {
     const NSID: &'static str = "app.blebbit.authr.page.createPageRelationship";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -50,6 +59,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreatePageRelationshipRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CreatePageRelationship<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CreatePageRelationship<S>;
     type Response = CreatePageRelationshipResponse;
 }

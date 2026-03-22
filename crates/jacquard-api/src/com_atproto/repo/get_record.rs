@@ -10,43 +10,55 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Nsid, Cid, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRecord<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
+    pub cid: Option<Cid<S>>,
     #[serde(borrow)]
-    pub collection: Nsid<'a>,
+    pub collection: Nsid<S>,
     #[serde(borrow)]
-    pub repo: AtIdentifier<'a>,
+    pub repo: AtIdentifier<S>,
     #[serde(borrow)]
-    pub rkey: RecordKey<Rkey<'a>>,
+    pub rkey: RecordKey<Rkey<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRecordOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Data<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -55,18 +67,19 @@ pub struct GetRecordOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRecordError<'a> {
+pub enum GetRecordError {
     #[serde(rename = "RecordNotFound")]
-    RecordNotFound(Option<CowStr<'a>>),
+    RecordNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetRecordError<'_> {
+impl core::fmt::Display for GetRecordError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RecordNotFound(msg) => {
@@ -76,7 +89,13 @@ impl core::fmt::Display for GetRecordError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -86,11 +105,12 @@ pub struct GetRecordResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecordResponse {
     const NSID: &'static str = "com.atproto.repo.getRecord";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRecordOutput<'de>;
-    type Err<'de> = GetRecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetRecordOutput<S>;
+    type Err = GetRecordError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecord<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetRecord<S> {
     const NSID: &'static str = "com.atproto.repo.getRecord";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecordResponse;
@@ -101,7 +121,7 @@ pub struct GetRecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecordRequest {
     const PATH: &'static str = "/xrpc/com.atproto.repo.getRecord";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRecord<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetRecord<S>;
     type Response = GetRecordResponse;
 }
 
@@ -167,10 +187,10 @@ pub mod get_record_state {
 pub struct GetRecordBuilder<'a, S: get_record_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Cid<'a>>,
-        Option<Nsid<'a>>,
-        Option<AtIdentifier<'a>>,
-        Option<RecordKey<Rkey<'a>>>,
+        Option<Cid<S>>,
+        Option<Nsid<S>>,
+        Option<AtIdentifier<S>>,
+        Option<RecordKey<Rkey<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -195,12 +215,12 @@ impl<'a> GetRecordBuilder<'a, get_record_state::Empty> {
 
 impl<'a, S: get_record_state::State> GetRecordBuilder<'a, S> {
     /// Set the `cid` field (optional)
-    pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
+    pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
-    pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
+    pub fn maybe_cid(mut self, value: Option<Cid<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -214,7 +234,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<Nsid<'a>>,
+        value: impl Into<Nsid<S>>,
     ) -> GetRecordBuilder<'a, get_record_state::SetCollection<S>> {
         self._fields.1 = Option::Some(value.into());
         GetRecordBuilder {
@@ -233,7 +253,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetRecordBuilder<'a, get_record_state::SetRepo<S>> {
         self._fields.2 = Option::Some(value.into());
         GetRecordBuilder {
@@ -252,7 +272,7 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<RecordKey<Rkey<'a>>>,
+        value: impl Into<RecordKey<Rkey<S>>>,
     ) -> GetRecordBuilder<'a, get_record_state::SetRkey<S>> {
         self._fields.3 = Option::Some(value.into());
         GetRecordBuilder {

@@ -10,30 +10,48 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::at_inlay::Element;
 use crate::at_inlay::Response;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Loading<'a> {
-    #[serde(borrow)]
-    pub children: Data<'a>,
-    #[serde(borrow)]
-    pub fallback: Element<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Loading<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub children: Data<S>,
+    pub fallback: Element<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct LoadingOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LoadingOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Response<'a>,
+    pub value: Response<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for at.inlay.Loading
@@ -41,11 +59,12 @@ pub struct LoadingResponse;
 impl jacquard_common::xrpc::XrpcResp for LoadingResponse {
     const NSID: &'static str = "at.inlay.Loading";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LoadingOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LoadingOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Loading<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Loading<S> {
     const NSID: &'static str = "at.inlay.Loading";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -60,7 +79,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for LoadingRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Loading<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Loading<S>;
     type Response = LoadingResponse;
 }
 
@@ -111,7 +130,7 @@ pub mod loading_state {
 /// Builder for constructing an instance of this type
 pub struct LoadingBuilder<'a, S: loading_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Data<'a>>, Option<Element<'a>>),
+    _fields: (Option<Data<S>>, Option<Element<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -141,7 +160,7 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> LoadingBuilder<'a, loading_state::SetChildren<S>> {
         self._fields.0 = Option::Some(value.into());
         LoadingBuilder {
@@ -160,7 +179,7 @@ where
     /// Set the `fallback` field (required)
     pub fn fallback(
         mut self,
-        value: impl Into<Element<'a>>,
+        value: impl Into<Element<S>>,
     ) -> LoadingBuilder<'a, loading_state::SetFallback<S>> {
         self._fields.1 = Option::Some(value.into());
         LoadingBuilder {
@@ -188,7 +207,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Loading<'a> {
         Loading {
             children: self._fields.0.unwrap(),

@@ -7,6 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -14,19 +15,39 @@ use crate::app_rocksky::scrobble::ScrobbleViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetScrobble<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetScrobble<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetScrobbleOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetScrobbleOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: ScrobbleViewDetailed<'a>,
+    pub value: ScrobbleViewDetailed<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for app.rocksky.scrobble.getScrobble
@@ -34,11 +55,12 @@ pub struct GetScrobbleResponse;
 impl jacquard_common::xrpc::XrpcResp for GetScrobbleResponse {
     const NSID: &'static str = "app.rocksky.scrobble.getScrobble";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetScrobbleOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetScrobbleOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetScrobble<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetScrobble<S> {
     const NSID: &'static str = "app.rocksky.scrobble.getScrobble";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetScrobbleResponse;
@@ -49,7 +71,7 @@ pub struct GetScrobbleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetScrobbleRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.scrobble.getScrobble";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetScrobble<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetScrobble<S>;
     type Response = GetScrobbleResponse;
 }
 
@@ -88,7 +110,7 @@ pub mod get_scrobble_state {
 /// Builder for constructing an instance of this type
 pub struct GetScrobbleBuilder<'a, S: get_scrobble_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -118,7 +140,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetScrobbleBuilder<'a, get_scrobble_state::SetUri<S>> {
         self._fields.0 = Option::Some(value.into());
         GetScrobbleBuilder {

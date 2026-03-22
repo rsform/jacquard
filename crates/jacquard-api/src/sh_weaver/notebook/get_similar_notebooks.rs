@@ -10,29 +10,45 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSimilarNotebooks<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSimilarNotebooks<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(borrow)]
-    pub notebook: AtUri<'a>,
+    pub notebook: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSimilarNotebooksOutput<'a> {
-    #[serde(borrow)]
-    pub notebooks: Vec<Data<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSimilarNotebooksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub notebooks: Vec<Data<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.notebook.getSimilarNotebooks
@@ -40,11 +56,12 @@ pub struct GetSimilarNotebooksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSimilarNotebooksResponse {
     const NSID: &'static str = "sh.weaver.notebook.getSimilarNotebooks";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSimilarNotebooksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetSimilarNotebooksOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSimilarNotebooks<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetSimilarNotebooks<S> {
     const NSID: &'static str = "sh.weaver.notebook.getSimilarNotebooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSimilarNotebooksResponse;
@@ -55,7 +72,7 @@ pub struct GetSimilarNotebooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSimilarNotebooksRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getSimilarNotebooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSimilarNotebooks<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetSimilarNotebooks<S>;
     type Response = GetSimilarNotebooksResponse;
 }
 
@@ -98,7 +115,7 @@ pub mod get_similar_notebooks_state {
 /// Builder for constructing an instance of this type
 pub struct GetSimilarNotebooksBuilder<'a, S: get_similar_notebooks_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<AtUri<'a>>),
+    _fields: (Option<i64>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -141,7 +158,7 @@ where
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetSimilarNotebooksBuilder<'a, get_similar_notebooks_state::SetNotebook<S>> {
         self._fields.1 = Option::Some(value.into());
         GetSimilarNotebooksBuilder {

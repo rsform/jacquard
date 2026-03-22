@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,29 +26,42 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::unspecced::get_config;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LiveNowConfig<'a> {
-    #[serde(borrow)]
-    pub did: Did<'a>,
-    #[serde(borrow)]
-    pub domains: Vec<CowStr<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LiveNowConfig<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub did: Did<S>,
+    pub domains: Vec<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetConfigOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetConfigOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub check_email_confirmed: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub live_now: Option<Vec<get_config::LiveNowConfig<'a>>>,
+    pub live_now: Option<Vec<get_config::LiveNowConfig<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for LiveNowConfig<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LiveNowConfig<S> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.getConfig"
     }
@@ -70,8 +85,8 @@ pub struct GetConfigResponse;
 impl jacquard_common::xrpc::XrpcResp for GetConfigResponse {
     const NSID: &'static str = "app.bsky.unspecced.getConfig";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetConfigOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetConfigOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetConfig {
@@ -85,7 +100,7 @@ pub struct GetConfigRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetConfigRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getConfig";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetConfig;
+    type Request<S: Bos<str> + AsRef<str>> = GetConfig;
     type Response = GetConfigResponse;
 }
 
@@ -136,7 +151,7 @@ pub mod live_now_config_state {
 /// Builder for constructing an instance of this type
 pub struct LiveNowConfigBuilder<'a, S: live_now_config_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<Vec<CowStr<'a>>>),
+    _fields: (Option<Did<S>>, Option<Vec<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -166,7 +181,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> LiveNowConfigBuilder<'a, live_now_config_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         LiveNowConfigBuilder {
@@ -185,7 +200,7 @@ where
     /// Set the `domains` field (required)
     pub fn domains(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> LiveNowConfigBuilder<'a, live_now_config_state::SetDomains<S>> {
         self._fields.1 = Option::Some(value.into());
         LiveNowConfigBuilder {
@@ -213,10 +228,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LiveNowConfig<'a> {
         LiveNowConfig {
             did: self._fields.0.unwrap(),

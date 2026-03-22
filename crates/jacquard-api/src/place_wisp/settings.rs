@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,77 +30,87 @@ use serde::{Serialize, Deserialize};
 use crate::place_wisp::settings;
 /// Custom HTTP header configuration
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CustomHeader<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CustomHeader<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///HTTP header name (e.g., 'Cache-Control', 'X-Frame-Options')
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Optional glob pattern to apply this header to specific paths (e.g., '*.html', '/assets/*'). If not specified, applies to all paths.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub path: Option<CowStr<'a>>,
+    pub path: Option<S>,
     ///HTTP header value
-    #[serde(borrow)]
-    pub value: CowStr<'a>,
+    pub value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Configuration settings for a static site hosted on wisp.place
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "place.wisp.settings", tag = "$type")]
-pub struct Settings<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "place.wisp.settings",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Settings<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Enable clean URL routing. When enabled, '/about' will attempt to serve '/about.html' or '/about/index.html' automatically.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_settings_clean_urls")]
     pub clean_urls: Option<bool>,
     ///Custom 404 error page file path. Incompatible with directoryListing and spaMode.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub custom404: Option<CowStr<'a>>,
+    pub custom404: Option<S>,
     ///Enable directory listing mode for paths that resolve to directories without an index file. Incompatible with spaMode.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_settings_directory_listing")]
     pub directory_listing: Option<bool>,
     ///Custom HTTP headers to set on responses
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub headers: Option<Vec<settings::CustomHeader<'a>>>,
+    pub headers: Option<Vec<settings::CustomHeader<S>>>,
     ///Ordered list of files to try when serving a directory. Defaults to ['index.html'] if not specified.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub index_files: Option<Vec<CowStr<'a>>>,
+    pub index_files: Option<Vec<S>>,
     ///File to serve for all routes (e.g., 'index.html'). When set, enables SPA mode where all non-file requests are routed to this file. Incompatible with directoryListing and custom404.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spa_mode: Option<CowStr<'a>>,
+    pub spa_mode: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SettingsGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SettingsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Settings<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Settings<S>,
 }
 
-impl<'a> Settings<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SettingsRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Settings<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SettingsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for CustomHeader<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CustomHeader<S> {
     fn nsid() -> &'static str {
         "place.wisp.settings"
     }
@@ -152,18 +164,17 @@ pub struct SettingsRecord;
 impl XrpcResp for SettingsRecord {
     const NSID: &'static str = "place.wisp.settings";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SettingsGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SettingsGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SettingsGetRecordOutput<'_>> for Settings<'_> {
-    fn from(output: SettingsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SettingsGetRecordOutput<S>> for Settings<S> {
+    fn from(output: SettingsGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Settings<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Settings<S> {
     const NSID: &'static str = "place.wisp.settings";
     type Record = SettingsRecord;
 }
@@ -173,7 +184,7 @@ impl Collection for SettingsRecord {
     type Record = SettingsRecord;
 }
 
-impl<'a> LexiconSchema for Settings<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Settings<S> {
     fn nsid() -> &'static str {
         "place.wisp.settings"
     }
@@ -389,7 +400,7 @@ fn _default_settings_directory_listing() -> Option<bool> {
     Some(false)
 }
 
-impl Default for Settings<'_> {
+impl Default for Settings {
     fn default() -> Self {
         Self {
             clean_urls: Some(false),
@@ -427,11 +438,11 @@ pub struct SettingsBuilder<'a, S: settings_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<bool>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<bool>,
-        Option<Vec<settings::CustomHeader<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<settings::CustomHeader<S>>>,
+        Option<Vec<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -469,12 +480,12 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `custom404` field (optional)
-    pub fn custom404(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn custom404(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `custom404` field to an Option value (optional)
-    pub fn maybe_custom404(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_custom404(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -497,7 +508,7 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `headers` field (optional)
     pub fn headers(
         mut self,
-        value: impl Into<Option<Vec<settings::CustomHeader<'a>>>>,
+        value: impl Into<Option<Vec<settings::CustomHeader<S>>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -505,7 +516,7 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `headers` field to an Option value (optional)
     pub fn maybe_headers(
         mut self,
-        value: Option<Vec<settings::CustomHeader<'a>>>,
+        value: Option<Vec<settings::CustomHeader<S>>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -514,12 +525,12 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `indexFiles` field (optional)
-    pub fn index_files(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn index_files(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `indexFiles` field to an Option value (optional)
-    pub fn maybe_index_files(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_index_files(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -527,12 +538,12 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `spaMode` field (optional)
-    pub fn spa_mode(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn spa_mode(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `spaMode` field to an Option value (optional)
-    pub fn maybe_spa_mode(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_spa_mode(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -557,10 +568,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Settings<'a> {
         Settings {
             clean_urls: self._fields.0.or_else(|| Some(false)),

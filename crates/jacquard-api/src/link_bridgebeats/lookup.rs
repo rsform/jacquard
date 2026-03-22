@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,71 +30,80 @@ use serde::{Serialize, Deserialize};
 use crate::link_bridgebeats::lookup;
 /// Result of parsing and looking up media links across supported music streaming providers.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "link.bridgebeats.lookup", tag = "$type")]
-pub struct Lookup<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "link.bridgebeats.lookup",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Lookup<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///ISO8601 timestamp of when this lookup was performed.
     pub looked_up_at: Datetime,
     ///Collection of lookup results from each provider that returned a match.
-    #[serde(borrow)]
-    pub results: Vec<lookup::ProviderResult<'a>>,
+    pub results: Vec<lookup::ProviderResult<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LookupGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LookupGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Lookup<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Lookup<S>,
 }
 
 /// Music metadata from a specific provider's API query.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ProviderResult<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProviderResult<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///URL to the cover artwork image.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub art_url: Option<UriValue<'a>>,
+    pub art_url: Option<UriValue<S>>,
     ///Primary artist name for the track or album artist.
-    #[serde(borrow)]
-    pub artist: CowStr<'a>,
+    pub artist: S,
     ///ISRC (for tracks) or UPC (for albums) identifier for cross-platform matching.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub external_id: Option<CowStr<'a>>,
+    pub external_id: Option<S>,
     ///True for albums/EPs, false for individual tracks.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_album: Option<bool>,
     ///ISO3166-1 alpha-2 country code for the market/storefront.  Defaults to `"us"`.
     #[serde(default = "_default_provider_result_market_region")]
-    #[serde(borrow)]
-    pub market_region: CowStr<'a>,
+    pub market_region: S,
     ///The streaming platform provider.
-    #[serde(borrow)]
-    pub provider: CowStr<'a>,
+    pub provider: S,
     ///Official title of the track or album as listed in the provider's catalog.
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
     ///Direct web link to the track or album on the provider's platform.
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Lookup<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LookupRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Lookup<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LookupRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -103,18 +114,17 @@ pub struct LookupRecord;
 impl XrpcResp for LookupRecord {
     const NSID: &'static str = "link.bridgebeats.lookup";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LookupGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LookupGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LookupGetRecordOutput<'_>> for Lookup<'_> {
-    fn from(output: LookupGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LookupGetRecordOutput<S>> for Lookup<S> {
+    fn from(output: LookupGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Lookup<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Lookup<S> {
     const NSID: &'static str = "link.bridgebeats.lookup";
     type Record = LookupRecord;
 }
@@ -124,7 +134,7 @@ impl Collection for LookupRecord {
     type Record = LookupRecord;
 }
 
-impl<'a> LexiconSchema for Lookup<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Lookup<S> {
     fn nsid() -> &'static str {
         "link.bridgebeats.lookup"
     }
@@ -161,7 +171,7 @@ impl<'a> LexiconSchema for Lookup<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ProviderResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProviderResult<S> {
     fn nsid() -> &'static str {
         "link.bridgebeats.lookup"
     }
@@ -287,7 +297,7 @@ pub mod lookup_state {
 /// Builder for constructing an instance of this type
 pub struct LookupBuilder<'a, S: lookup_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Vec<lookup::ProviderResult<'a>>>),
+    _fields: (Option<Datetime>, Option<Vec<lookup::ProviderResult<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -336,7 +346,7 @@ where
     /// Set the `results` field (required)
     pub fn results(
         mut self,
-        value: impl Into<Vec<lookup::ProviderResult<'a>>>,
+        value: impl Into<Vec<lookup::ProviderResult<S>>>,
     ) -> LookupBuilder<'a, lookup_state::SetResults<S>> {
         self._fields.1 = Option::Some(value.into());
         LookupBuilder {
@@ -362,13 +372,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Lookup<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Lookup<'a> {
         Lookup {
             looked_up_at: self._fields.0.unwrap(),
             results: self._fields.1.unwrap(),
@@ -559,8 +563,8 @@ fn lexicon_doc_link_bridgebeats_lookup() -> LexiconDoc<'static> {
     }
 }
 
-fn _default_provider_result_market_region() -> CowStr<'static> {
-    CowStr::from("us")
+fn _default_provider_result_market_region<S: From<&'static str>>() -> S {
+    S::from("us")
 }
 
 pub mod provider_result_state {
@@ -573,85 +577,85 @@ pub mod provider_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
-        type MarketRegion;
-        type Title;
-        type Artist;
         type Provider;
+        type Title;
+        type Url;
+        type Artist;
+        type MarketRegion;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
-        type MarketRegion = Unset;
-        type Title = Unset;
-        type Artist = Unset;
         type Provider = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type MarketRegion = S::MarketRegion;
-        type Title = S::Title;
-        type Artist = S::Artist;
-        type Provider = S::Provider;
-    }
-    ///State transition - sets the `market_region` field to Set
-    pub struct SetMarketRegion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMarketRegion<S> {}
-    impl<S: State> State for SetMarketRegion<S> {
-        type Url = S::Url;
-        type MarketRegion = Set<members::market_region>;
-        type Title = S::Title;
-        type Artist = S::Artist;
-        type Provider = S::Provider;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Url = S::Url;
-        type MarketRegion = S::MarketRegion;
-        type Title = Set<members::title>;
-        type Artist = S::Artist;
-        type Provider = S::Provider;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type Url = S::Url;
-        type MarketRegion = S::MarketRegion;
-        type Title = S::Title;
-        type Artist = Set<members::artist>;
-        type Provider = S::Provider;
+        type Title = Unset;
+        type Url = Unset;
+        type Artist = Unset;
+        type MarketRegion = Unset;
     }
     ///State transition - sets the `provider` field to Set
     pub struct SetProvider<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetProvider<S> {}
     impl<S: State> State for SetProvider<S> {
-        type Url = S::Url;
-        type MarketRegion = S::MarketRegion;
-        type Title = S::Title;
-        type Artist = S::Artist;
         type Provider = Set<members::provider>;
+        type Title = S::Title;
+        type Url = S::Url;
+        type Artist = S::Artist;
+        type MarketRegion = S::MarketRegion;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Provider = S::Provider;
+        type Title = Set<members::title>;
+        type Url = S::Url;
+        type Artist = S::Artist;
+        type MarketRegion = S::MarketRegion;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Provider = S::Provider;
+        type Title = S::Title;
+        type Url = Set<members::url>;
+        type Artist = S::Artist;
+        type MarketRegion = S::MarketRegion;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type Provider = S::Provider;
+        type Title = S::Title;
+        type Url = S::Url;
+        type Artist = Set<members::artist>;
+        type MarketRegion = S::MarketRegion;
+    }
+    ///State transition - sets the `market_region` field to Set
+    pub struct SetMarketRegion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMarketRegion<S> {}
+    impl<S: State> State for SetMarketRegion<S> {
+        type Provider = S::Provider;
+        type Title = S::Title;
+        type Url = S::Url;
+        type Artist = S::Artist;
+        type MarketRegion = Set<members::market_region>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
-        ///Marker type for the `market_region` field
-        pub struct market_region(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `artist` field
-        pub struct artist(());
         ///Marker type for the `provider` field
         pub struct provider(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `url` field
+        pub struct url(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
+        ///Marker type for the `market_region` field
+        pub struct market_region(());
     }
 }
 
@@ -659,14 +663,14 @@ pub mod provider_result_state {
 pub struct ProviderResultBuilder<'a, S: provider_result_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<UriValue<S>>,
+        Option<S>,
+        Option<S>,
         Option<bool>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -691,12 +695,12 @@ impl<'a> ProviderResultBuilder<'a, provider_result_state::Empty> {
 
 impl<'a, S: provider_result_state::State> ProviderResultBuilder<'a, S> {
     /// Set the `artUrl` field (optional)
-    pub fn art_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn art_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `artUrl` field to an Option value (optional)
-    pub fn maybe_art_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_art_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -710,7 +714,7 @@ where
     /// Set the `artist` field (required)
     pub fn artist(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetArtist<S>> {
         self._fields.1 = Option::Some(value.into());
         ProviderResultBuilder {
@@ -723,12 +727,12 @@ where
 
 impl<'a, S: provider_result_state::State> ProviderResultBuilder<'a, S> {
     /// Set the `externalId` field (optional)
-    pub fn external_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn external_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `externalId` field to an Option value (optional)
-    pub fn maybe_external_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_external_id(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -755,7 +759,7 @@ where
     /// Set the `marketRegion` field (required)
     pub fn market_region(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetMarketRegion<S>> {
         self._fields.4 = Option::Some(value.into());
         ProviderResultBuilder {
@@ -774,7 +778,7 @@ where
     /// Set the `provider` field (required)
     pub fn provider(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetProvider<S>> {
         self._fields.5 = Option::Some(value.into());
         ProviderResultBuilder {
@@ -793,7 +797,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetTitle<S>> {
         self._fields.6 = Option::Some(value.into());
         ProviderResultBuilder {
@@ -812,7 +816,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetUrl<S>> {
         self._fields.7 = Option::Some(value.into());
         ProviderResultBuilder {
@@ -826,11 +830,11 @@ where
 impl<'a, S> ProviderResultBuilder<'a, S>
 where
     S: provider_result_state::State,
-    S::Url: provider_result_state::IsSet,
-    S::MarketRegion: provider_result_state::IsSet,
-    S::Title: provider_result_state::IsSet,
-    S::Artist: provider_result_state::IsSet,
     S::Provider: provider_result_state::IsSet,
+    S::Title: provider_result_state::IsSet,
+    S::Url: provider_result_state::IsSet,
+    S::Artist: provider_result_state::IsSet,
+    S::MarketRegion: provider_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProviderResult<'a> {
@@ -849,10 +853,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ProviderResult<'a> {
         ProviderResult {
             art_url: self._fields.0,

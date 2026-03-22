@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,42 +27,59 @@ use serde::{Serialize, Deserialize};
 use crate::st_lifepo::profile;
 /// A single life event entry.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LifeEvent<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LifeEvent<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end_date: Option<Datetime>,
     pub start_date: Datetime,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Profile<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub actor: CowStr<'a>,
+    pub actor: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ProfileOutput<'a> {
-    #[serde(borrow)]
-    pub bio: CowStr<'a>,
-    #[serde(borrow)]
-    pub handle: CowStr<'a>,
-    #[serde(borrow)]
-    pub life_events: Vec<profile::LifeEvent<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProfileOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub bio: S,
+    pub handle: S,
+    pub life_events: Vec<profile::LifeEvent<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for LifeEvent<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LifeEvent<S> {
     fn nsid() -> &'static str {
         "st.lifepo.profile"
     }
@@ -80,11 +99,12 @@ pub struct ProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for ProfileResponse {
     const NSID: &'static str = "st.lifepo.profile";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProfileOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ProfileOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Profile<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Profile<S> {
     const NSID: &'static str = "st.lifepo.profile";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ProfileResponse;
@@ -95,7 +115,7 @@ pub struct ProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ProfileRequest {
     const PATH: &'static str = "/xrpc/st.lifepo.profile";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Profile<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Profile<S>;
     type Response = ProfileResponse;
 }
 
@@ -109,49 +129,44 @@ pub mod life_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartDate;
         type Title;
+        type StartDate;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartDate = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `start_date` field to Set
-    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartDate<S> {}
-    impl<S: State> State for SetStartDate<S> {
-        type StartDate = Set<members::start_date>;
-        type Title = S::Title;
+        type StartDate = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type StartDate = S::StartDate;
         type Title = Set<members::title>;
+        type StartDate = S::StartDate;
+    }
+    ///State transition - sets the `start_date` field to Set
+    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartDate<S> {}
+    impl<S: State> State for SetStartDate<S> {
+        type Title = S::Title;
+        type StartDate = Set<members::start_date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start_date` field
-        pub struct start_date(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `start_date` field
+        pub struct start_date(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LifeEventBuilder<'a, S: life_event_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<Datetime>, Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -175,12 +190,12 @@ impl<'a> LifeEventBuilder<'a, life_event_state::Empty> {
 
 impl<'a, S: life_event_state::State> LifeEventBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -226,7 +241,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LifeEventBuilder<'a, life_event_state::SetTitle<S>> {
         self._fields.3 = Option::Some(value.into());
         LifeEventBuilder {
@@ -240,8 +255,8 @@ where
 impl<'a, S> LifeEventBuilder<'a, S>
 where
     S: life_event_state::State,
-    S::StartDate: life_event_state::IsSet,
     S::Title: life_event_state::IsSet,
+    S::StartDate: life_event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LifeEvent<'a> {
@@ -256,10 +271,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LifeEvent<'a> {
         LifeEvent {
             description: self._fields.0,
@@ -388,7 +400,7 @@ pub mod profile_state {
 /// Builder for constructing an instance of this type
 pub struct ProfileBuilder<'a, S: profile_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -418,7 +430,7 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProfileBuilder<'a, profile_state::SetActor<S>> {
         self._fields.0 = Option::Some(value.into());
         ProfileBuilder {

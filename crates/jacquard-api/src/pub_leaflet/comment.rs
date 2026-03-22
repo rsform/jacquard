@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,73 +31,88 @@ use crate::pub_leaflet::pages::linear_document::Quote;
 use crate::pub_leaflet::richtext::facet::Facet;
 use crate::pub_leaflet::comment;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LinearDocumentQuote<'a> {
-    #[serde(borrow)]
-    pub document: AtUri<'a>,
-    #[serde(borrow)]
-    pub quote: Quote<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LinearDocumentQuote<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub document: AtUri<S>,
+    pub quote: Quote<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Record containing a comment
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "pub.leaflet.comment", tag = "$type")]
-pub struct Comment<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "pub.leaflet.comment",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Comment<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub attachment: Option<comment::LinearDocumentQuote<'a>>,
+    pub attachment: Option<comment::LinearDocumentQuote<S>>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Facet<'a>>>,
+    pub facets: Option<Vec<Facet<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub on_page: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub plaintext: CowStr<'a>,
+    pub on_page: Option<S>,
+    pub plaintext: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reply: Option<comment::ReplyRef<'a>>,
-    #[serde(borrow)]
-    pub subject: AtUri<'a>,
+    pub reply: Option<comment::ReplyRef<S>>,
+    pub subject: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CommentGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CommentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Comment<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Comment<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReplyRef<'a> {
-    #[serde(borrow)]
-    pub parent: AtUri<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReplyRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub parent: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Comment<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CommentRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Comment<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CommentRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for LinearDocumentQuote<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LinearDocumentQuote<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.comment"
     }
@@ -117,18 +134,17 @@ pub struct CommentRecord;
 impl XrpcResp for CommentRecord {
     const NSID: &'static str = "pub.leaflet.comment";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CommentGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CommentGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CommentGetRecordOutput<'_>> for Comment<'_> {
-    fn from(output: CommentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CommentGetRecordOutput<S>> for Comment<S> {
+    fn from(output: CommentGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Comment<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Comment<S> {
     const NSID: &'static str = "pub.leaflet.comment";
     type Record = CommentRecord;
 }
@@ -138,7 +154,7 @@ impl Collection for CommentRecord {
     type Record = CommentRecord;
 }
 
-impl<'a> LexiconSchema for Comment<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Comment<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.comment"
     }
@@ -153,7 +169,7 @@ impl<'a> LexiconSchema for Comment<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ReplyRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReplyRef<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.comment"
     }
@@ -215,7 +231,7 @@ pub mod linear_document_quote_state {
 /// Builder for constructing an instance of this type
 pub struct LinearDocumentQuoteBuilder<'a, S: linear_document_quote_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<Quote<'a>>),
+    _fields: (Option<AtUri<S>>, Option<Quote<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -245,7 +261,7 @@ where
     /// Set the `document` field (required)
     pub fn document(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> LinearDocumentQuoteBuilder<'a, linear_document_quote_state::SetDocument<S>> {
         self._fields.0 = Option::Some(value.into());
         LinearDocumentQuoteBuilder {
@@ -264,7 +280,7 @@ where
     /// Set the `quote` field (required)
     pub fn quote(
         mut self,
-        value: impl Into<Quote<'a>>,
+        value: impl Into<Quote<S>>,
     ) -> LinearDocumentQuoteBuilder<'a, linear_document_quote_state::SetQuote<S>> {
         self._fields.1 = Option::Some(value.into());
         LinearDocumentQuoteBuilder {
@@ -292,10 +308,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LinearDocumentQuote<'a> {
         LinearDocumentQuote {
             document: self._fields.0.unwrap(),
@@ -455,49 +468,49 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Plaintext;
         type CreatedAt;
+        type Plaintext;
         type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Plaintext = Unset;
         type CreatedAt = Unset;
+        type Plaintext = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `plaintext` field to Set
-    pub struct SetPlaintext<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlaintext<S> {}
-    impl<S: State> State for SetPlaintext<S> {
-        type Plaintext = Set<members::plaintext>;
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Plaintext = S::Plaintext;
         type CreatedAt = Set<members::created_at>;
+        type Plaintext = S::Plaintext;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `plaintext` field to Set
+    pub struct SetPlaintext<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlaintext<S> {}
+    impl<S: State> State for SetPlaintext<S> {
+        type CreatedAt = S::CreatedAt;
+        type Plaintext = Set<members::plaintext>;
         type Subject = S::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Plaintext = S::Plaintext;
         type CreatedAt = S::CreatedAt;
+        type Plaintext = S::Plaintext;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `plaintext` field
-        pub struct plaintext(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `plaintext` field
+        pub struct plaintext(());
         ///Marker type for the `subject` field
         pub struct subject(());
     }
@@ -507,13 +520,13 @@ pub mod comment_state {
 pub struct CommentBuilder<'a, S: comment_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<comment::LinearDocumentQuote<'a>>,
+        Option<comment::LinearDocumentQuote<S>>,
         Option<Datetime>,
-        Option<Vec<Facet<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<comment::ReplyRef<'a>>,
-        Option<AtUri<'a>>,
+        Option<Vec<Facet<S>>>,
+        Option<S>,
+        Option<S>,
+        Option<comment::ReplyRef<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -540,7 +553,7 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `attachment` field (optional)
     pub fn attachment(
         mut self,
-        value: impl Into<Option<comment::LinearDocumentQuote<'a>>>,
+        value: impl Into<Option<comment::LinearDocumentQuote<S>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
@@ -548,7 +561,7 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `attachment` field to an Option value (optional)
     pub fn maybe_attachment(
         mut self,
-        value: Option<comment::LinearDocumentQuote<'a>>,
+        value: Option<comment::LinearDocumentQuote<S>>,
     ) -> Self {
         self._fields.0 = value;
         self
@@ -576,12 +589,12 @@ where
 
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `facets` field (optional)
-    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
+    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
-    pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -589,12 +602,12 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
 
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `onPage` field (optional)
-    pub fn on_page(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn on_page(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `onPage` field to an Option value (optional)
-    pub fn maybe_on_page(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_on_page(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -608,7 +621,7 @@ where
     /// Set the `plaintext` field (required)
     pub fn plaintext(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CommentBuilder<'a, comment_state::SetPlaintext<S>> {
         self._fields.4 = Option::Some(value.into());
         CommentBuilder {
@@ -621,12 +634,12 @@ where
 
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `reply` field (optional)
-    pub fn reply(mut self, value: impl Into<Option<comment::ReplyRef<'a>>>) -> Self {
+    pub fn reply(mut self, value: impl Into<Option<comment::ReplyRef<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `reply` field to an Option value (optional)
-    pub fn maybe_reply(mut self, value: Option<comment::ReplyRef<'a>>) -> Self {
+    pub fn maybe_reply(mut self, value: Option<comment::ReplyRef<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -640,7 +653,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> CommentBuilder<'a, comment_state::SetSubject<S>> {
         self._fields.6 = Option::Some(value.into());
         CommentBuilder {
@@ -654,8 +667,8 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Plaintext: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
+    S::Plaintext: comment_state::IsSet,
     S::Subject: comment_state::IsSet,
 {
     /// Build the final struct
@@ -674,10 +687,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Comment<'a> {
         Comment {
             attachment: self._fields.0,
@@ -727,7 +737,7 @@ pub mod reply_ref_state {
 /// Builder for constructing an instance of this type
 pub struct ReplyRefBuilder<'a, S: reply_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -757,7 +767,7 @@ where
     /// Set the `parent` field (required)
     pub fn parent(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetParent<S>> {
         self._fields.0 = Option::Some(value.into());
         ReplyRefBuilder {
@@ -783,10 +793,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ReplyRef<'a> {
         ReplyRef {
             parent: self._fields.0.unwrap(),

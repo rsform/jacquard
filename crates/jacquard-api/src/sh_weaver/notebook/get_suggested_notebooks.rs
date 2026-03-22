@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -36,57 +38,72 @@ pub struct GetSuggestedNotebooks {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSuggestedNotebooksOutput<'a> {
-    #[serde(borrow)]
-    pub notebooks: Vec<get_suggested_notebooks::SuggestedNotebook<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSuggestedNotebooksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub notebooks: Vec<get_suggested_notebooks::SuggestedNotebook<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SuggestedNotebook<'a> {
-    #[serde(borrow)]
-    pub notebook: NotebookView<'a>,
-    #[serde(borrow)]
-    pub reason: get_suggested_notebooks::SuggestionReason<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SuggestedNotebook<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub notebook: NotebookView<S>,
+    pub reason: get_suggested_notebooks::SuggestionReason<S>,
     ///Appview-computed relevance score.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub score: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Why this notebook was suggested.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SuggestionReason<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SuggestionReason<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///If followed-author, the author.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub related_author: Option<ProfileViewBasic<'a>>,
+    pub related_author: Option<ProfileViewBasic<S>>,
     ///If from-list, the list it's from.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub related_list: Option<ListView<'a>>,
+    pub related_list: Option<ListView<S>>,
     ///If similar-to-X, the notebook it's similar to.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub related_notebook: Option<NotebookView<'a>>,
+    pub related_notebook: Option<NotebookView<S>>,
     ///Tags that matched.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub related_tags: Option<Vec<CowStr<'a>>>,
-    #[serde(borrow)]
-    pub r#type: SuggestionReasonType<'a>,
+    pub related_tags: Option<Vec<S>>,
+    pub r#type: SuggestionReasonType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SuggestionReasonType<'a> {
+pub enum SuggestionReasonType<S: Bos<str> + AsRef<str> = DefaultStr> {
     SimilarTags,
     SimilarToLiked,
     SimilarToRead,
@@ -94,10 +111,10 @@ pub enum SuggestionReasonType<'a> {
     PopularInTag,
     Trending,
     FromList,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SuggestionReasonType<'a> {
+impl<S: Bos<str> + AsRef<str>> SuggestionReasonType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::SimilarTags => "similar-tags",
@@ -110,11 +127,9 @@ impl<'a> SuggestionReasonType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SuggestionReasonType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "similar-tags" => Self::SimilarTags,
             "similar-to-liked" => Self::SimilarToLiked,
             "similar-to-read" => Self::SimilarToRead,
@@ -122,68 +137,51 @@ impl<'a> From<&'a str> for SuggestionReasonType<'a> {
             "popular-in-tag" => Self::PopularInTag,
             "trending" => Self::Trending,
             "from-list" => Self::FromList,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SuggestionReasonType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "similar-tags" => Self::SimilarTags,
-            "similar-to-liked" => Self::SimilarToLiked,
-            "similar-to-read" => Self::SimilarToRead,
-            "followed-author" => Self::FollowedAuthor,
-            "popular-in-tag" => Self::PopularInTag,
-            "trending" => Self::Trending,
-            "from-list" => Self::FromList,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SuggestionReasonType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SuggestionReasonType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for SuggestionReasonType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SuggestionReasonType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for SuggestionReasonType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SuggestionReasonType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SuggestionReasonType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for SuggestionReasonType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for SuggestionReasonType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for SuggestionReasonType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for SuggestionReasonType<'_> {
-    type Output = SuggestionReasonType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SuggestionReasonType<S> {
+    type Output = SuggestionReasonType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SuggestionReasonType::SimilarTags => SuggestionReasonType::SimilarTags,
@@ -205,8 +203,8 @@ pub struct GetSuggestedNotebooksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedNotebooksResponse {
     const NSID: &'static str = "sh.weaver.notebook.getSuggestedNotebooks";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestedNotebooksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetSuggestedNotebooksOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetSuggestedNotebooks {
@@ -220,11 +218,11 @@ pub struct GetSuggestedNotebooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedNotebooksRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getSuggestedNotebooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSuggestedNotebooks;
+    type Request<S: Bos<str> + AsRef<str>> = GetSuggestedNotebooks;
     type Response = GetSuggestedNotebooksResponse;
 }
 
-impl<'a> LexiconSchema for SuggestedNotebook<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SuggestedNotebook<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getSuggestedNotebooks"
     }
@@ -239,7 +237,7 @@ impl<'a> LexiconSchema for SuggestedNotebook<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SuggestionReason<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SuggestionReason<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getSuggestedNotebooks"
     }
@@ -373,8 +371,8 @@ pub mod suggested_notebook_state {
 pub struct SuggestedNotebookBuilder<'a, S: suggested_notebook_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<NotebookView<'a>>,
-        Option<get_suggested_notebooks::SuggestionReason<'a>>,
+        Option<NotebookView<S>>,
+        Option<get_suggested_notebooks::SuggestionReason<S>>,
         Option<i64>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -406,7 +404,7 @@ where
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
-        value: impl Into<NotebookView<'a>>,
+        value: impl Into<NotebookView<S>>,
     ) -> SuggestedNotebookBuilder<'a, suggested_notebook_state::SetNotebook<S>> {
         self._fields.0 = Option::Some(value.into());
         SuggestedNotebookBuilder {
@@ -425,7 +423,7 @@ where
     /// Set the `reason` field (required)
     pub fn reason(
         mut self,
-        value: impl Into<get_suggested_notebooks::SuggestionReason<'a>>,
+        value: impl Into<get_suggested_notebooks::SuggestionReason<S>>,
     ) -> SuggestedNotebookBuilder<'a, suggested_notebook_state::SetReason<S>> {
         self._fields.1 = Option::Some(value.into());
         SuggestedNotebookBuilder {
@@ -467,10 +465,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SuggestedNotebook<'a> {
         SuggestedNotebook {
             notebook: self._fields.0.unwrap(),

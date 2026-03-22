@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,35 +28,43 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "dev.vielle.guestbook.entry", tag = "$type")]
-pub struct Entry<'a> {
-    #[serde(borrow)]
-    pub book: AtUri<'a>,
-    #[serde(borrow)]
-    pub contents: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "dev.vielle.guestbook.entry",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub book: AtUri<S>,
+    pub contents: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EntryGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EntryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Entry<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Entry<S>,
 }
 
-impl<'a> Entry<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, EntryRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Entry<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, EntryRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -65,18 +75,17 @@ pub struct EntryRecord;
 impl XrpcResp for EntryRecord {
     const NSID: &'static str = "dev.vielle.guestbook.entry";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = EntryGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = EntryGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<EntryGetRecordOutput<'_>> for Entry<'_> {
-    fn from(output: EntryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<EntryGetRecordOutput<S>> for Entry<S> {
+    fn from(output: EntryGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Entry<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Entry<S> {
     const NSID: &'static str = "dev.vielle.guestbook.entry";
     type Record = EntryRecord;
 }
@@ -86,7 +95,7 @@ impl Collection for EntryRecord {
     type Record = EntryRecord;
 }
 
-impl<'a> LexiconSchema for Entry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entry<S> {
     fn nsid() -> &'static str {
         "dev.vielle.guestbook.entry"
     }
@@ -148,7 +157,7 @@ pub mod entry_state {
 /// Builder for constructing an instance of this type
 pub struct EntryBuilder<'a, S: entry_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<AtUri<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -178,7 +187,7 @@ where
     /// Set the `book` field (required)
     pub fn book(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> EntryBuilder<'a, entry_state::SetBook<S>> {
         self._fields.0 = Option::Some(value.into());
         EntryBuilder {
@@ -197,7 +206,7 @@ where
     /// Set the `contents` field (required)
     pub fn contents(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EntryBuilder<'a, entry_state::SetContents<S>> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
@@ -223,13 +232,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Entry<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Entry<'a> {
         Entry {
             book: self._fields.0.unwrap(),
             contents: self._fields.1.unwrap(),

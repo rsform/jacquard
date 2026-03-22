@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,51 +29,57 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A cryptographic grant allowing a streaming service to decrypt the artist's music catalog. This record contains the master content key encrypted with the service's public key.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "ch.indiemusi.alpha.grant", tag = "$type")]
-pub struct Grant<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "ch.indiemusi.alpha.grant",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Grant<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When the grant was created
     pub created_at: Datetime,
     ///Optional expiration date. After this, the grant should be considered revoked.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<Datetime>,
     ///The DID of the streaming service being authorized
-    #[serde(borrow)]
-    pub service_did: Did<'a>,
+    pub service_did: Did<S>,
     ///The Master Content Key (32 bytes) encrypted with the service's public key, base64-encoded. Only the service can decrypt this with their private key.
-    #[serde(borrow)]
-    pub wrapped_master_key: CowStr<'a>,
+    pub wrapped_master_key: S,
     ///Base64-encoded IV (12 bytes) used to encrypt the master key. Only present for AES-GCM wrapping; empty for RSA-OAEP.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub wrapped_master_key_iv: Option<CowStr<'a>>,
+    pub wrapped_master_key_iv: Option<S>,
     ///The algorithm used to wrap the master key. Currently RSA-OAEP (asymmetric, using the service's public key).  Defaults to `"RSA-OAEP"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_grant_wrapping_algorithm")]
-    #[serde(borrow)]
-    pub wrapping_algorithm: Option<CowStr<'a>>,
+    pub wrapping_algorithm: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GrantGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GrantGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Grant<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Grant<S>,
 }
 
-impl<'a> Grant<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, GrantRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Grant<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, GrantRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -82,18 +90,17 @@ pub struct GrantRecord;
 impl XrpcResp for GrantRecord {
     const NSID: &'static str = "ch.indiemusi.alpha.grant";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GrantGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GrantGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<GrantGetRecordOutput<'_>> for Grant<'_> {
-    fn from(output: GrantGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<GrantGetRecordOutput<S>> for Grant<S> {
+    fn from(output: GrantGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Grant<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Grant<S> {
     const NSID: &'static str = "ch.indiemusi.alpha.grant";
     type Record = GrantRecord;
 }
@@ -103,7 +110,7 @@ impl Collection for GrantRecord {
     type Record = GrantRecord;
 }
 
-impl<'a> LexiconSchema for Grant<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Grant<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.grant"
     }
@@ -160,8 +167,10 @@ impl<'a> LexiconSchema for Grant<'a> {
     }
 }
 
-fn _default_grant_wrapping_algorithm() -> Option<CowStr<'static>> {
-    Some(CowStr::from("RSA-OAEP"))
+fn _default_grant_wrapping_algorithm<S: From<&'static str>>() -> ::core::option::Option<
+    S,
+> {
+    Some(S::from("RSA-OAEP"))
 }
 
 pub mod grant_state {
@@ -174,51 +183,51 @@ pub mod grant_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WrappedMasterKey;
-        type ServiceDid;
         type CreatedAt;
+        type ServiceDid;
+        type WrappedMasterKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WrappedMasterKey = Unset;
-        type ServiceDid = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `wrapped_master_key` field to Set
-    pub struct SetWrappedMasterKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWrappedMasterKey<S> {}
-    impl<S: State> State for SetWrappedMasterKey<S> {
-        type WrappedMasterKey = Set<members::wrapped_master_key>;
-        type ServiceDid = S::ServiceDid;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `service_did` field to Set
-    pub struct SetServiceDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceDid<S> {}
-    impl<S: State> State for SetServiceDid<S> {
-        type WrappedMasterKey = S::WrappedMasterKey;
-        type ServiceDid = Set<members::service_did>;
-        type CreatedAt = S::CreatedAt;
+        type ServiceDid = Unset;
+        type WrappedMasterKey = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type WrappedMasterKey = S::WrappedMasterKey;
-        type ServiceDid = S::ServiceDid;
         type CreatedAt = Set<members::created_at>;
+        type ServiceDid = S::ServiceDid;
+        type WrappedMasterKey = S::WrappedMasterKey;
+    }
+    ///State transition - sets the `service_did` field to Set
+    pub struct SetServiceDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServiceDid<S> {}
+    impl<S: State> State for SetServiceDid<S> {
+        type CreatedAt = S::CreatedAt;
+        type ServiceDid = Set<members::service_did>;
+        type WrappedMasterKey = S::WrappedMasterKey;
+    }
+    ///State transition - sets the `wrapped_master_key` field to Set
+    pub struct SetWrappedMasterKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWrappedMasterKey<S> {}
+    impl<S: State> State for SetWrappedMasterKey<S> {
+        type CreatedAt = S::CreatedAt;
+        type ServiceDid = S::ServiceDid;
+        type WrappedMasterKey = Set<members::wrapped_master_key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `wrapped_master_key` field
-        pub struct wrapped_master_key(());
-        ///Marker type for the `service_did` field
-        pub struct service_did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `service_did` field
+        pub struct service_did(());
+        ///Marker type for the `wrapped_master_key` field
+        pub struct wrapped_master_key(());
     }
 }
 
@@ -228,10 +237,10 @@ pub struct GrantBuilder<'a, S: grant_state::State> {
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -294,7 +303,7 @@ where
     /// Set the `serviceDid` field (required)
     pub fn service_did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GrantBuilder<'a, grant_state::SetServiceDid<S>> {
         self._fields.2 = Option::Some(value.into());
         GrantBuilder {
@@ -313,7 +322,7 @@ where
     /// Set the `wrappedMasterKey` field (required)
     pub fn wrapped_master_key(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GrantBuilder<'a, grant_state::SetWrappedMasterKey<S>> {
         self._fields.3 = Option::Some(value.into());
         GrantBuilder {
@@ -326,15 +335,12 @@ where
 
 impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
     /// Set the `wrappedMasterKeyIv` field (optional)
-    pub fn wrapped_master_key_iv(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn wrapped_master_key_iv(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `wrappedMasterKeyIv` field to an Option value (optional)
-    pub fn maybe_wrapped_master_key_iv(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_wrapped_master_key_iv(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -342,12 +348,12 @@ impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
 
 impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
     /// Set the `wrappingAlgorithm` field (optional)
-    pub fn wrapping_algorithm(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn wrapping_algorithm(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `wrappingAlgorithm` field to an Option value (optional)
-    pub fn maybe_wrapping_algorithm(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_wrapping_algorithm(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -356,9 +362,9 @@ impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
 impl<'a, S> GrantBuilder<'a, S>
 where
     S: grant_state::State,
-    S::WrappedMasterKey: grant_state::IsSet,
-    S::ServiceDid: grant_state::IsSet,
     S::CreatedAt: grant_state::IsSet,
+    S::ServiceDid: grant_state::IsSet,
+    S::WrappedMasterKey: grant_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Grant<'a> {
@@ -376,13 +382,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Grant<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Grant<'a> {
         Grant {
             created_at: self._fields.0.unwrap(),
             expires_at: self._fields.1,

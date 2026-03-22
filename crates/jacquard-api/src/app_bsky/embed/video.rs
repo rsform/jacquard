@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::{Cid, Language, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,49 +28,57 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::embed::AspectRatio;
 use crate::app_bsky::embed::video;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Caption<'a> {
-    #[serde(borrow)]
-    pub file: BlobRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Caption<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub file: BlobRef<S>,
     pub lang: Language,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Video<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Video<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text description of the video, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alt: Option<CowStr<'a>>,
+    pub alt: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<AspectRatio<'a>>,
+    pub aspect_ratio: Option<AspectRatio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub captions: Option<Vec<video::Caption<'a>>>,
+    pub captions: Option<Vec<video::Caption<S>>>,
     ///A hint to the client about how to present the video.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub presentation: Option<VideoPresentation<'a>>,
+    pub presentation: Option<VideoPresentation<S>>,
     ///The mp4 video file. May be up to 100mb, formerly limited to 50mb.
-    #[serde(borrow)]
-    pub video: BlobRef<'a>,
+    pub video: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A hint to the client about how to present the video.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VideoPresentation<'a> {
+pub enum VideoPresentation<S: Bos<str> + AsRef<str> = DefaultStr> {
     Default,
     Gif,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> VideoPresentation<'a> {
+impl<S: Bos<str> + AsRef<str>> VideoPresentation<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Default => "default",
@@ -76,70 +86,56 @@ impl<'a> VideoPresentation<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for VideoPresentation<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "default" => Self::Default,
             "gif" => Self::Gif,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for VideoPresentation<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "default" => Self::Default,
-            "gif" => Self::Gif,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VideoPresentation<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VideoPresentation<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for VideoPresentation<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for VideoPresentation<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for VideoPresentation<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for VideoPresentation<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for VideoPresentation<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for VideoPresentation<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for VideoPresentation<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for VideoPresentation<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for VideoPresentation<'_> {
-    type Output = VideoPresentation<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for VideoPresentation<S> {
+    type Output = VideoPresentation<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             VideoPresentation::Default => VideoPresentation::Default,
@@ -150,39 +146,40 @@ impl jacquard_common::IntoStatic for VideoPresentation<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct View<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct View<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alt: Option<CowStr<'a>>,
+    pub alt: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<AspectRatio<'a>>,
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
-    #[serde(borrow)]
-    pub playlist: UriValue<'a>,
+    pub aspect_ratio: Option<AspectRatio<S>>,
+    pub cid: Cid<S>,
+    pub playlist: UriValue<S>,
     ///A hint to the client about how to present the video.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub presentation: Option<ViewPresentation<'a>>,
+    pub presentation: Option<ViewPresentation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail: Option<UriValue<'a>>,
+    pub thumbnail: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A hint to the client about how to present the video.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ViewPresentation<'a> {
+pub enum ViewPresentation<S: Bos<str> + AsRef<str> = DefaultStr> {
     Default,
     Gif,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ViewPresentation<'a> {
+impl<S: Bos<str> + AsRef<str>> ViewPresentation<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Default => "default",
@@ -190,70 +187,56 @@ impl<'a> ViewPresentation<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ViewPresentation<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "default" => Self::Default,
             "gif" => Self::Gif,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ViewPresentation<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "default" => Self::Default,
-            "gif" => Self::Gif,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ViewPresentation<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ViewPresentation<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ViewPresentation<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ViewPresentation<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ViewPresentation<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ViewPresentation<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ViewPresentation<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ViewPresentation<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ViewPresentation<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ViewPresentation<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ViewPresentation<'_> {
-    type Output = ViewPresentation<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ViewPresentation<S> {
+    type Output = ViewPresentation<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ViewPresentation::Default => ViewPresentation::Default,
@@ -263,7 +246,7 @@ impl jacquard_common::IntoStatic for ViewPresentation<'_> {
     }
 }
 
-impl<'a> LexiconSchema for Caption<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Caption<S> {
     fn nsid() -> &'static str {
         "app.bsky.embed.video"
     }
@@ -318,7 +301,7 @@ impl<'a> LexiconSchema for Caption<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Video<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Video<S> {
     fn nsid() -> &'static str {
         "app.bsky.embed.video"
     }
@@ -405,7 +388,7 @@ impl<'a> LexiconSchema for Video<'a> {
     }
 }
 
-impl<'a> LexiconSchema for View<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for View<S> {
     fn nsid() -> &'static str {
         "app.bsky.embed.video"
     }
@@ -452,44 +435,44 @@ pub mod caption_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lang;
         type File;
+        type Lang;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lang = Unset;
         type File = Unset;
-    }
-    ///State transition - sets the `lang` field to Set
-    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLang<S> {}
-    impl<S: State> State for SetLang<S> {
-        type Lang = Set<members::lang>;
-        type File = S::File;
+        type Lang = Unset;
     }
     ///State transition - sets the `file` field to Set
     pub struct SetFile<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFile<S> {}
     impl<S: State> State for SetFile<S> {
-        type Lang = S::Lang;
         type File = Set<members::file>;
+        type Lang = S::Lang;
+    }
+    ///State transition - sets the `lang` field to Set
+    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLang<S> {}
+    impl<S: State> State for SetLang<S> {
+        type File = S::File;
+        type Lang = Set<members::lang>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lang` field
-        pub struct lang(());
         ///Marker type for the `file` field
         pub struct file(());
+        ///Marker type for the `lang` field
+        pub struct lang(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CaptionBuilder<'a, S: caption_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>, Option<Language>),
+    _fields: (Option<BlobRef<S>>, Option<Language>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -519,7 +502,7 @@ where
     /// Set the `file` field (required)
     pub fn file(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> CaptionBuilder<'a, caption_state::SetFile<S>> {
         self._fields.0 = Option::Some(value.into());
         CaptionBuilder {
@@ -552,8 +535,8 @@ where
 impl<'a, S> CaptionBuilder<'a, S>
 where
     S: caption_state::State,
-    S::Lang: caption_state::IsSet,
     S::File: caption_state::IsSet,
+    S::Lang: caption_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Caption<'a> {
@@ -566,10 +549,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Caption<'a> {
         Caption {
             file: self._fields.0.unwrap(),
@@ -779,11 +759,11 @@ pub mod video_state {
 pub struct VideoBuilder<'a, S: video_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<AspectRatio<'a>>,
-        Option<Vec<video::Caption<'a>>>,
-        Option<VideoPresentation<'a>>,
-        Option<BlobRef<'a>>,
+        Option<S>,
+        Option<AspectRatio<S>>,
+        Option<Vec<video::Caption<S>>>,
+        Option<VideoPresentation<S>>,
+        Option<BlobRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -808,12 +788,12 @@ impl<'a> VideoBuilder<'a, video_state::Empty> {
 
 impl<'a, S: video_state::State> VideoBuilder<'a, S> {
     /// Set the `alt` field (optional)
-    pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
-    pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_alt(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -821,12 +801,12 @@ impl<'a, S: video_state::State> VideoBuilder<'a, S> {
 
 impl<'a, S: video_state::State> VideoBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -834,15 +814,12 @@ impl<'a, S: video_state::State> VideoBuilder<'a, S> {
 
 impl<'a, S: video_state::State> VideoBuilder<'a, S> {
     /// Set the `captions` field (optional)
-    pub fn captions(
-        mut self,
-        value: impl Into<Option<Vec<video::Caption<'a>>>>,
-    ) -> Self {
+    pub fn captions(mut self, value: impl Into<Option<Vec<video::Caption<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `captions` field to an Option value (optional)
-    pub fn maybe_captions(mut self, value: Option<Vec<video::Caption<'a>>>) -> Self {
+    pub fn maybe_captions(mut self, value: Option<Vec<video::Caption<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -852,13 +829,13 @@ impl<'a, S: video_state::State> VideoBuilder<'a, S> {
     /// Set the `presentation` field (optional)
     pub fn presentation(
         mut self,
-        value: impl Into<Option<VideoPresentation<'a>>>,
+        value: impl Into<Option<VideoPresentation<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `presentation` field to an Option value (optional)
-    pub fn maybe_presentation(mut self, value: Option<VideoPresentation<'a>>) -> Self {
+    pub fn maybe_presentation(mut self, value: Option<VideoPresentation<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -872,7 +849,7 @@ where
     /// Set the `video` field (required)
     pub fn video(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> VideoBuilder<'a, video_state::SetVideo<S>> {
         self._fields.4 = Option::Some(value.into());
         VideoBuilder {
@@ -900,13 +877,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Video<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Video<'a> {
         Video {
             alt: self._fields.0,
             aspect_ratio: self._fields.1,
@@ -966,12 +937,12 @@ pub mod view_state {
 pub struct ViewBuilder<'a, S: view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<AspectRatio<'a>>,
-        Option<Cid<'a>>,
-        Option<UriValue<'a>>,
-        Option<ViewPresentation<'a>>,
-        Option<UriValue<'a>>,
+        Option<S>,
+        Option<AspectRatio<S>>,
+        Option<Cid<S>>,
+        Option<UriValue<S>>,
+        Option<ViewPresentation<S>>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -996,12 +967,12 @@ impl<'a> ViewBuilder<'a, view_state::Empty> {
 
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `alt` field (optional)
-    pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
-    pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_alt(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1009,12 +980,12 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
 
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1028,7 +999,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> ViewBuilder<'a, view_state::SetCid<S>> {
         self._fields.2 = Option::Some(value.into());
         ViewBuilder {
@@ -1047,7 +1018,7 @@ where
     /// Set the `playlist` field (required)
     pub fn playlist(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ViewBuilder<'a, view_state::SetPlaylist<S>> {
         self._fields.3 = Option::Some(value.into());
         ViewBuilder {
@@ -1062,13 +1033,13 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `presentation` field (optional)
     pub fn presentation(
         mut self,
-        value: impl Into<Option<ViewPresentation<'a>>>,
+        value: impl Into<Option<ViewPresentation<S>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `presentation` field to an Option value (optional)
-    pub fn maybe_presentation(mut self, value: Option<ViewPresentation<'a>>) -> Self {
+    pub fn maybe_presentation(mut self, value: Option<ViewPresentation<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1076,12 +1047,12 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
 
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
-    pub fn thumbnail(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn thumbnail(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
-    pub fn maybe_thumbnail(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_thumbnail(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -1106,13 +1077,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> View<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> View<'a> {
         View {
             alt: self._fields.0,
             aspect_ratio: self._fields.1,

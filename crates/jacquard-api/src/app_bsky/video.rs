@@ -15,13 +15,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -29,41 +31,42 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct JobStatus<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct JobStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub blob: Option<BlobRef<'a>>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub blob: Option<BlobRef<S>>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub error: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub job_id: CowStr<'a>,
+    pub error: Option<S>,
+    pub job_id: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     ///Progress within the current processing state.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub progress: Option<i64>,
     ///The state of the video processing job. All values not listed as a known value indicate that the job is in process.
-    #[serde(borrow)]
-    pub state: JobStatusState<'a>,
+    pub state: JobStatusState<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The state of the video processing job. All values not listed as a known value indicate that the job is in process.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum JobStatusState<'a> {
+pub enum JobStatusState<S: Bos<str> + AsRef<str> = DefaultStr> {
     JobStateCompleted,
     JobStateFailed,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> JobStatusState<'a> {
+impl<S: Bos<str> + AsRef<str>> JobStatusState<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::JobStateCompleted => "JOB_STATE_COMPLETED",
@@ -71,70 +74,56 @@ impl<'a> JobStatusState<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for JobStatusState<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "JOB_STATE_COMPLETED" => Self::JobStateCompleted,
             "JOB_STATE_FAILED" => Self::JobStateFailed,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for JobStatusState<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "JOB_STATE_COMPLETED" => Self::JobStateCompleted,
-            "JOB_STATE_FAILED" => Self::JobStateFailed,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for JobStatusState<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for JobStatusState<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for JobStatusState<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for JobStatusState<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for JobStatusState<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for JobStatusState<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for JobStatusState<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for JobStatusState<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for JobStatusState<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for JobStatusState<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for JobStatusState<'_> {
-    type Output = JobStatusState<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for JobStatusState<S> {
+    type Output = JobStatusState<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             JobStatusState::JobStateCompleted => JobStatusState::JobStateCompleted,
@@ -144,7 +133,7 @@ impl jacquard_common::IntoStatic for JobStatusState<'_> {
     }
 }
 
-impl<'a> LexiconSchema for JobStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for JobStatus<S> {
     fn nsid() -> &'static str {
         "app.bsky.video.defs"
     }
@@ -187,51 +176,51 @@ pub mod job_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type State;
         type JobId;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type State = Unset;
         type JobId = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type State = S::State;
-        type JobId = S::JobId;
+        type Did = Unset;
     }
     ///State transition - sets the `state` field to Set
     pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetState<S> {}
     impl<S: State> State for SetState<S> {
-        type Did = S::Did;
         type State = Set<members::state>;
         type JobId = S::JobId;
+        type Did = S::Did;
     }
     ///State transition - sets the `job_id` field to Set
     pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetJobId<S> {}
     impl<S: State> State for SetJobId<S> {
-        type Did = S::Did;
         type State = S::State;
         type JobId = Set<members::job_id>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type State = S::State;
+        type JobId = S::JobId;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `state` field
         pub struct state(());
         ///Marker type for the `job_id` field
         pub struct job_id(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -239,13 +228,13 @@ pub mod job_status_state {
 pub struct JobStatusBuilder<'a, S: job_status_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<BlobRef<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<BlobRef<S>>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<i64>,
-        Option<JobStatusState<'a>>,
+        Option<JobStatusState<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -270,12 +259,12 @@ impl<'a> JobStatusBuilder<'a, job_status_state::Empty> {
 
 impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     /// Set the `blob` field (optional)
-    pub fn blob(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `blob` field to an Option value (optional)
-    pub fn maybe_blob(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_blob(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -289,7 +278,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> JobStatusBuilder<'a, job_status_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         JobStatusBuilder {
@@ -302,12 +291,12 @@ where
 
 impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     /// Set the `error` field (optional)
-    pub fn error(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn error(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `error` field to an Option value (optional)
-    pub fn maybe_error(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_error(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -321,7 +310,7 @@ where
     /// Set the `jobId` field (required)
     pub fn job_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> JobStatusBuilder<'a, job_status_state::SetJobId<S>> {
         self._fields.3 = Option::Some(value.into());
         JobStatusBuilder {
@@ -334,12 +323,12 @@ where
 
 impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
-    pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_message(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -366,7 +355,7 @@ where
     /// Set the `state` field (required)
     pub fn state(
         mut self,
-        value: impl Into<JobStatusState<'a>>,
+        value: impl Into<JobStatusState<S>>,
     ) -> JobStatusBuilder<'a, job_status_state::SetState<S>> {
         self._fields.6 = Option::Some(value.into());
         JobStatusBuilder {
@@ -380,9 +369,9 @@ where
 impl<'a, S> JobStatusBuilder<'a, S>
 where
     S: job_status_state::State,
-    S::Did: job_status_state::IsSet,
     S::State: job_status_state::IsSet,
     S::JobId: job_status_state::IsSet,
+    S::Did: job_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> JobStatus<'a> {
@@ -400,10 +389,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> JobStatus<'a> {
         JobStatus {
             blob: self._fields.0,

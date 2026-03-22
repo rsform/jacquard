@@ -10,31 +10,46 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::ageassurance::State;
 use crate::app_bsky::ageassurance::StateMetadata;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetState<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetState<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub country_code: CowStr<'a>,
+    pub country_code: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub region_code: Option<CowStr<'a>>,
+    pub region_code: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetStateOutput<'a> {
-    #[serde(borrow)]
-    pub metadata: StateMetadata<'a>,
-    #[serde(borrow)]
-    pub state: State<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetStateOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub metadata: StateMetadata<S>,
+    pub state: State<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.ageassurance.getState
@@ -42,11 +57,12 @@ pub struct GetStateResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStateResponse {
     const NSID: &'static str = "app.bsky.ageassurance.getState";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetStateOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetStateOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetState<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetState<S> {
     const NSID: &'static str = "app.bsky.ageassurance.getState";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetStateResponse;
@@ -57,7 +73,7 @@ pub struct GetStateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStateRequest {
     const PATH: &'static str = "/xrpc/app.bsky.ageassurance.getState";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetState<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetState<S>;
     type Response = GetStateResponse;
 }
 
@@ -96,7 +112,7 @@ pub mod get_state_state {
 /// Builder for constructing an instance of this type
 pub struct GetStateBuilder<'a, S: get_state_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -126,7 +142,7 @@ where
     /// Set the `countryCode` field (required)
     pub fn country_code(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetStateBuilder<'a, get_state_state::SetCountryCode<S>> {
         self._fields.0 = Option::Some(value.into());
         GetStateBuilder {
@@ -139,12 +155,12 @@ where
 
 impl<'a, S: get_state_state::State> GetStateBuilder<'a, S> {
     /// Set the `regionCode` field (optional)
-    pub fn region_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn region_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `regionCode` field to an Option value (optional)
-    pub fn maybe_region_code(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_region_code(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }

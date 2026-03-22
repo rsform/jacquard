@@ -10,11 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,31 +28,42 @@ use crate::science_alt::dataset::entry::ShardChecksum;
 use crate::science_alt::dataset::storage_blobs;
 /// A single PDS blob shard with optional integrity checksum
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BlobEntry<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BlobEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Blob reference to a WebDataset tar archive
-    #[serde(borrow)]
-    pub blob: BlobRef<'a>,
+    pub blob: BlobRef<S>,
     ///Content hash for integrity verification (optional since PDS blobs have built-in CID integrity)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub checksum: Option<ShardChecksum<'a>>,
+    pub checksum: Option<ShardChecksum<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Storage via ATProto PDS blobs for WebDataset tar archives. Used in science.alt.dataset.entry storage union for maximum decentralization.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StorageBlobs<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StorageBlobs<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of blob entries for WebDataset tar files
-    #[serde(borrow)]
-    pub blobs: Vec<storage_blobs::BlobEntry<'a>>,
+    pub blobs: Vec<storage_blobs::BlobEntry<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for BlobEntry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BlobEntry<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageBlobs"
     }
@@ -104,7 +118,7 @@ impl<'a> LexiconSchema for BlobEntry<'a> {
     }
 }
 
-impl<'a> LexiconSchema for StorageBlobs<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for StorageBlobs<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageBlobs"
     }
@@ -165,7 +179,7 @@ pub mod blob_entry_state {
 /// Builder for constructing an instance of this type
 pub struct BlobEntryBuilder<'a, S: blob_entry_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>, Option<ShardChecksum<'a>>),
+    _fields: (Option<BlobRef<S>>, Option<ShardChecksum<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -195,7 +209,7 @@ where
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> BlobEntryBuilder<'a, blob_entry_state::SetBlob<S>> {
         self._fields.0 = Option::Some(value.into());
         BlobEntryBuilder {
@@ -208,12 +222,12 @@ where
 
 impl<'a, S: blob_entry_state::State> BlobEntryBuilder<'a, S> {
     /// Set the `checksum` field (optional)
-    pub fn checksum(mut self, value: impl Into<Option<ShardChecksum<'a>>>) -> Self {
+    pub fn checksum(mut self, value: impl Into<Option<ShardChecksum<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `checksum` field to an Option value (optional)
-    pub fn maybe_checksum(mut self, value: Option<ShardChecksum<'a>>) -> Self {
+    pub fn maybe_checksum(mut self, value: Option<ShardChecksum<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -235,10 +249,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BlobEntry<'a> {
         BlobEntry {
             blob: self._fields.0.unwrap(),
@@ -362,7 +373,7 @@ pub mod storage_blobs_state {
 /// Builder for constructing an instance of this type
 pub struct StorageBlobsBuilder<'a, S: storage_blobs_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<storage_blobs::BlobEntry<'a>>>,),
+    _fields: (Option<Vec<storage_blobs::BlobEntry<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -392,7 +403,7 @@ where
     /// Set the `blobs` field (required)
     pub fn blobs(
         mut self,
-        value: impl Into<Vec<storage_blobs::BlobEntry<'a>>>,
+        value: impl Into<Vec<storage_blobs::BlobEntry<S>>>,
     ) -> StorageBlobsBuilder<'a, storage_blobs_state::SetBlobs<S>> {
         self._fields.0 = Option::Some(value.into());
         StorageBlobsBuilder {
@@ -418,10 +429,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> StorageBlobs<'a> {
         StorageBlobs {
             blobs: self._fields.0.unwrap(),

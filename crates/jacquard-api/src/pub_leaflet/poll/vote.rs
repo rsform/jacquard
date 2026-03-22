@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,35 +30,43 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Record declaring a vote on a poll
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "pub.leaflet.poll.vote", tag = "$type")]
-pub struct Vote<'a> {
-    #[serde(borrow)]
-    pub option: Vec<CowStr<'a>>,
-    #[serde(borrow)]
-    pub poll: StrongRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "pub.leaflet.poll.vote",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Vote<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub option: Vec<S>,
+    pub poll: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct VoteGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct VoteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Vote<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Vote<S>,
 }
 
-impl<'a> Vote<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, VoteRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Vote<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, VoteRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -67,18 +77,17 @@ pub struct VoteRecord;
 impl XrpcResp for VoteRecord {
     const NSID: &'static str = "pub.leaflet.poll.vote";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = VoteGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = VoteGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<VoteGetRecordOutput<'_>> for Vote<'_> {
-    fn from(output: VoteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<VoteGetRecordOutput<S>> for Vote<S> {
+    fn from(output: VoteGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Vote<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Vote<S> {
     const NSID: &'static str = "pub.leaflet.poll.vote";
     type Record = VoteRecord;
 }
@@ -88,7 +97,7 @@ impl Collection for VoteRecord {
     type Record = VoteRecord;
 }
 
-impl<'a> LexiconSchema for Vote<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Vote<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.poll.vote"
     }
@@ -113,44 +122,44 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Option;
         type Poll;
+        type Option;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Option = Unset;
         type Poll = Unset;
-    }
-    ///State transition - sets the `option` field to Set
-    pub struct SetOption<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOption<S> {}
-    impl<S: State> State for SetOption<S> {
-        type Option = Set<members::option>;
-        type Poll = S::Poll;
+        type Option = Unset;
     }
     ///State transition - sets the `poll` field to Set
     pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPoll<S> {}
     impl<S: State> State for SetPoll<S> {
-        type Option = S::Option;
         type Poll = Set<members::poll>;
+        type Option = S::Option;
+    }
+    ///State transition - sets the `option` field to Set
+    pub struct SetOption<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOption<S> {}
+    impl<S: State> State for SetOption<S> {
+        type Poll = S::Poll;
+        type Option = Set<members::option>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `option` field
-        pub struct option(());
         ///Marker type for the `poll` field
         pub struct poll(());
+        ///Marker type for the `option` field
+        pub struct option(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct VoteBuilder<'a, S: vote_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<CowStr<'a>>>, Option<StrongRef<'a>>),
+    _fields: (Option<Vec<S>>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -180,7 +189,7 @@ where
     /// Set the `option` field (required)
     pub fn option(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> VoteBuilder<'a, vote_state::SetOption<S>> {
         self._fields.0 = Option::Some(value.into());
         VoteBuilder {
@@ -199,7 +208,7 @@ where
     /// Set the `poll` field (required)
     pub fn poll(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> VoteBuilder<'a, vote_state::SetPoll<S>> {
         self._fields.1 = Option::Some(value.into());
         VoteBuilder {
@@ -213,8 +222,8 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
-    S::Option: vote_state::IsSet,
     S::Poll: vote_state::IsSet,
+    S::Option: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -225,13 +234,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Vote<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Vote<'a> {
         Vote {
             option: self._fields.0.unwrap(),
             poll: self._fields.1.unwrap(),

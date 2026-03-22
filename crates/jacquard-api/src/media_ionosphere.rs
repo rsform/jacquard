@@ -16,12 +16,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Datetime, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -30,15 +32,19 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::media_ionosphere;
 /// BearerURI as specified in ETSI TS 103 270
-pub type Bearer<'a> = UriValue<'a>;
+pub type Bearer<'a> = UriValue<S>;
 /// Represents the method of accessing a broadcast; i.e. live
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Broadcast<'a> {
-    #[serde(borrow)]
-    pub bearer: media_ionosphere::Bearer<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Broadcast<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub bearer: media_ionosphere::Bearer<S>,
     ///When used in a list, this can be used to sort the attempted connections or preferred methods  Defaults to `0`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_broadcast_cost")]
@@ -53,31 +59,38 @@ pub struct Broadcast<'a> {
     ///The datetime where this method is no longer available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub until: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Credit<'a> {
-    #[serde(borrow)]
-    pub entity: media_ionosphere::Entity<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Credit<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub entity: media_ionosphere::Entity<S>,
     ///Self-explanatory, but beware that the expected values may change in future (possibly to match TV-Anytime role classification schema)
-    #[serde(borrow)]
-    pub role: CreditRole<'a>,
+    pub role: CreditRole<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Self-explanatory, but beware that the expected values may change in future (possibly to match TV-Anytime role classification schema)
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CreditRole<'a> {
+pub enum CreditRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     Creator,
     Contributor,
     Guest,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> CreditRole<'a> {
+impl<S: Bos<str> + AsRef<str>> CreditRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Creator => "creator",
@@ -86,72 +99,57 @@ impl<'a> CreditRole<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for CreditRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "creator" => Self::Creator,
             "contributor" => Self::Contributor,
             "guest" => Self::Guest,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for CreditRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "creator" => Self::Creator,
-            "contributor" => Self::Contributor,
-            "guest" => Self::Guest,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CreditRole<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CreditRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for CreditRole<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for CreditRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for CreditRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for CreditRole<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for CreditRole<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for CreditRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for CreditRole<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for CreditRole<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for CreditRole<'_> {
-    type Output = CreditRole<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for CreditRole<S> {
+    type Output = CreditRole<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             CreditRole::Creator => CreditRole::Creator,
@@ -163,49 +161,69 @@ impl jacquard_common::IntoStatic for CreditRole<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Entity<'a> {
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
-    #[serde(borrow)]
-    pub r#type: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Entity<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub name: S,
+    pub r#type: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// TV-Anytime classification scheme URIs permitted by ETSI TS 102 818 section 5.3
-pub type Genre<'a> = UriValue<'a>;
+pub type Genre<'a> = UriValue<S>;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Geocoordinates<'a> {
-    #[serde(borrow)]
-    pub latitude: CowStr<'a>,
-    #[serde(borrow)]
-    pub longitude: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Geocoordinates<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub latitude: S,
+    pub longitude: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Represents membership to a group, optionally with an index
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Membership<'a> {
-    #[serde(borrow)]
-    pub group: AtUri<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Membership<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub group: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub index: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Represents the method of accessing a recording
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Recording<'a> {
-    #[serde(borrow)]
-    pub bearer: media_ionosphere::Bearer<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Recording<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub bearer: media_ionosphere::Bearer<S>,
     ///When used in a list, this can be used to sort the attempted connections or preferred methods  Defaults to `0`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_recording_cost")]
@@ -216,24 +234,30 @@ pub struct Recording<'a> {
     ///The datetime where this method is no longer available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub until: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Track<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Track<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub album: Option<CowStr<'a>>,
+    pub album: Option<S>,
     ///Artists in order of importance to the track
-    #[serde(borrow)]
-    pub artists: Vec<CowStr<'a>>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub artists: Vec<S>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Broadcast<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Broadcast<S> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
@@ -248,7 +272,7 @@ impl<'a> LexiconSchema for Broadcast<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Credit<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Credit<S> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
@@ -274,7 +298,7 @@ impl<'a> LexiconSchema for Credit<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Entity<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entity<S> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
@@ -313,7 +337,7 @@ impl<'a> LexiconSchema for Entity<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Geocoordinates<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Geocoordinates<S> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
@@ -350,7 +374,7 @@ impl<'a> LexiconSchema for Geocoordinates<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Membership<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Membership<S> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
@@ -365,7 +389,7 @@ impl<'a> LexiconSchema for Membership<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Recording<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Recording<S> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
@@ -380,7 +404,7 @@ impl<'a> LexiconSchema for Recording<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Track<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Track<S> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
@@ -460,7 +484,7 @@ pub mod broadcast_state {
 pub struct BroadcastBuilder<'a, S: broadcast_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<media_ionosphere::Bearer<'a>>,
+        Option<media_ionosphere::Bearer<S>>,
         Option<i64>,
         Option<Datetime>,
         Option<i64>,
@@ -495,7 +519,7 @@ where
     /// Set the `bearer` field (required)
     pub fn bearer(
         mut self,
-        value: impl Into<media_ionosphere::Bearer<'a>>,
+        value: impl Into<media_ionosphere::Bearer<S>>,
     ) -> BroadcastBuilder<'a, broadcast_state::SetBearer<S>> {
         self._fields.0 = Option::Some(value.into());
         BroadcastBuilder {
@@ -577,10 +601,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Broadcast<'a> {
         Broadcast {
             bearer: self._fields.0.unwrap(),
@@ -959,7 +980,7 @@ pub mod credit_state {
 /// Builder for constructing an instance of this type
 pub struct CreditBuilder<'a, S: credit_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<media_ionosphere::Entity<'a>>, Option<CreditRole<'a>>),
+    _fields: (Option<media_ionosphere::Entity<S>>, Option<CreditRole<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -989,7 +1010,7 @@ where
     /// Set the `entity` field (required)
     pub fn entity(
         mut self,
-        value: impl Into<media_ionosphere::Entity<'a>>,
+        value: impl Into<media_ionosphere::Entity<S>>,
     ) -> CreditBuilder<'a, credit_state::SetEntity<S>> {
         self._fields.0 = Option::Some(value.into());
         CreditBuilder {
@@ -1008,7 +1029,7 @@ where
     /// Set the `role` field (required)
     pub fn role(
         mut self,
-        value: impl Into<CreditRole<'a>>,
+        value: impl Into<CreditRole<S>>,
     ) -> CreditBuilder<'a, credit_state::SetRole<S>> {
         self._fields.1 = Option::Some(value.into());
         CreditBuilder {
@@ -1034,13 +1055,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Credit<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Credit<'a> {
         Credit {
             entity: self._fields.0.unwrap(),
             role: self._fields.1.unwrap(),
@@ -1084,7 +1099,7 @@ pub mod membership_state {
 /// Builder for constructing an instance of this type
 pub struct MembershipBuilder<'a, S: membership_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<i64>),
+    _fields: (Option<AtUri<S>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1114,7 +1129,7 @@ where
     /// Set the `group` field (required)
     pub fn group(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> MembershipBuilder<'a, membership_state::SetGroup<S>> {
         self._fields.0 = Option::Some(value.into());
         MembershipBuilder {
@@ -1154,10 +1169,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Membership<'a> {
         Membership {
             group: self._fields.0.unwrap(),
@@ -1207,7 +1219,7 @@ pub mod recording_state {
 pub struct RecordingBuilder<'a, S: recording_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<media_ionosphere::Bearer<'a>>,
+        Option<media_ionosphere::Bearer<S>>,
         Option<i64>,
         Option<Datetime>,
         Option<Datetime>,
@@ -1241,7 +1253,7 @@ where
     /// Set the `bearer` field (required)
     pub fn bearer(
         mut self,
-        value: impl Into<media_ionosphere::Bearer<'a>>,
+        value: impl Into<media_ionosphere::Bearer<S>>,
     ) -> RecordingBuilder<'a, recording_state::SetBearer<S>> {
         self._fields.0 = Option::Some(value.into());
         RecordingBuilder {
@@ -1309,10 +1321,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Recording<'a> {
         Recording {
             bearer: self._fields.0.unwrap(),
@@ -1334,44 +1343,44 @@ pub mod track_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artists;
         type Title;
+        type Artists;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artists = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `artists` field to Set
-    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtists<S> {}
-    impl<S: State> State for SetArtists<S> {
-        type Artists = Set<members::artists>;
-        type Title = S::Title;
+        type Artists = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Artists = S::Artists;
         type Title = Set<members::title>;
+        type Artists = S::Artists;
+    }
+    ///State transition - sets the `artists` field to Set
+    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtists<S> {}
+    impl<S: State> State for SetArtists<S> {
+        type Title = S::Title;
+        type Artists = Set<members::artists>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artists` field
-        pub struct artists(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `artists` field
+        pub struct artists(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TrackBuilder<'a, S: track_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Vec<CowStr<'a>>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<Vec<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1395,12 +1404,12 @@ impl<'a> TrackBuilder<'a, track_state::Empty> {
 
 impl<'a, S: track_state::State> TrackBuilder<'a, S> {
     /// Set the `album` field (optional)
-    pub fn album(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn album(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `album` field to an Option value (optional)
-    pub fn maybe_album(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_album(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1414,7 +1423,7 @@ where
     /// Set the `artists` field (required)
     pub fn artists(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> TrackBuilder<'a, track_state::SetArtists<S>> {
         self._fields.1 = Option::Some(value.into());
         TrackBuilder {
@@ -1433,7 +1442,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TrackBuilder<'a, track_state::SetTitle<S>> {
         self._fields.2 = Option::Some(value.into());
         TrackBuilder {
@@ -1447,8 +1456,8 @@ where
 impl<'a, S> TrackBuilder<'a, S>
 where
     S: track_state::State,
-    S::Artists: track_state::IsSet,
     S::Title: track_state::IsSet,
+    S::Artists: track_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Track<'a> {
@@ -1460,13 +1469,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Track<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Track<'a> {
         Track {
             album: self._fields.0,
             artists: self._fields.1.unwrap(),

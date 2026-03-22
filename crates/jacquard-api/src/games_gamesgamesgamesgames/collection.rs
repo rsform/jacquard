@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::RecordError;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,47 +31,45 @@ use crate::games_gamesgamesgamesgames::MediaItem;
 use crate::games_gamesgamesgamesgames::Website;
 /// A grouping of games — franchise, series, or curated list.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "games.gamesgamesgamesgames.collection",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Collection<'a> {
+pub struct Collection<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub games: Option<Vec<AtUri<'a>>>,
+    pub games: Option<Vec<AtUri<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub media: Option<Vec<MediaItem<'a>>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub media: Option<Vec<MediaItem<S>>>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent: Option<AtUri<'a>>,
+    pub parent: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<CollectionType<'a>>,
+    pub r#type: Option<CollectionType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub websites: Option<Vec<Website<'a>>>,
+    pub websites: Option<Vec<Website<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CollectionType<'a> {
+pub enum CollectionType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Franchise,
     Series,
     Curated,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> CollectionType<'a> {
+impl<S: Bos<str> + AsRef<str>> CollectionType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Franchise => "franchise",
@@ -78,72 +78,57 @@ impl<'a> CollectionType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for CollectionType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "franchise" => Self::Franchise,
             "series" => Self::Series,
             "curated" => Self::Curated,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for CollectionType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "franchise" => Self::Franchise,
-            "series" => Self::Series,
-            "curated" => Self::Curated,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CollectionType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CollectionType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for CollectionType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for CollectionType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for CollectionType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for CollectionType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for CollectionType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for CollectionType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for CollectionType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for CollectionType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for CollectionType<'_> {
-    type Output = CollectionType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for CollectionType<S> {
+    type Output = CollectionType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             CollectionType::Franchise => CollectionType::Franchise,
@@ -157,22 +142,23 @@ impl jacquard_common::IntoStatic for CollectionType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollectionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Collection<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Collection<S>,
 }
 
-impl<'a> Collection<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CollectionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Collection<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CollectionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -183,18 +169,18 @@ pub struct CollectionRecord;
 impl XrpcResp for CollectionRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.collection";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollectionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CollectionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CollectionGetRecordOutput<'_>> for Collection<'_> {
-    fn from(output: CollectionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CollectionGetRecordOutput<S>> for Collection<S> {
+    fn from(output: CollectionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl jacquard_common::types::collection::Collection for Collection<'_> {
+impl<S: Bos<str> + AsRef<str>> jacquard_common::types::collection::Collection
+for Collection<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.collection";
     type Record = CollectionRecord;
 }
@@ -204,7 +190,7 @@ impl jacquard_common::types::collection::Collection for CollectionRecord {
     type Record = CollectionRecord;
 }
 
-impl<'a> LexiconSchema for Collection<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Collection<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.collection"
     }
@@ -268,13 +254,13 @@ pub struct CollectionBuilder<'a, S: collection_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Vec<AtUri<'a>>>,
-        Option<Vec<MediaItem<'a>>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<CollectionType<'a>>,
-        Option<Vec<Website<'a>>>,
+        Option<S>,
+        Option<Vec<AtUri<S>>>,
+        Option<Vec<MediaItem<S>>>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<CollectionType<S>>,
+        Option<Vec<Website<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -318,12 +304,12 @@ where
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -331,12 +317,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `games` field (optional)
-    pub fn games(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn games(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `games` field to an Option value (optional)
-    pub fn maybe_games(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_games(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -344,12 +330,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `media` field (optional)
-    pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<'a>>>>) -> Self {
+    pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `media` field to an Option value (optional)
-    pub fn maybe_media(mut self, value: Option<Vec<MediaItem<'a>>>) -> Self {
+    pub fn maybe_media(mut self, value: Option<Vec<MediaItem<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -363,7 +349,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CollectionBuilder<'a, collection_state::SetName<S>> {
         self._fields.4 = Option::Some(value.into());
         CollectionBuilder {
@@ -376,12 +362,12 @@ where
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `parent` field (optional)
-    pub fn parent(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn parent(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
-    pub fn maybe_parent(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_parent(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -389,12 +375,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(mut self, value: impl Into<Option<CollectionType<'a>>>) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<CollectionType<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
-    pub fn maybe_type(mut self, value: Option<CollectionType<'a>>) -> Self {
+    pub fn maybe_type(mut self, value: Option<CollectionType<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -402,12 +388,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `websites` field (optional)
-    pub fn websites(mut self, value: impl Into<Option<Vec<Website<'a>>>>) -> Self {
+    pub fn websites(mut self, value: impl Into<Option<Vec<Website<S>>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `websites` field to an Option value (optional)
-    pub fn maybe_websites(mut self, value: Option<Vec<Website<'a>>>) -> Self {
+    pub fn maybe_websites(mut self, value: Option<Vec<Website<S>>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -436,10 +422,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Collection<'a> {
         Collection {
             created_at: self._fields.0.unwrap(),

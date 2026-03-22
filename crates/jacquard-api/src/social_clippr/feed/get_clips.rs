@@ -10,26 +10,43 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::social_clippr::feed::ClipView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetClips<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetClips<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub uris: Vec<AtUri<'a>>,
+    pub uris: Vec<AtUri<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetClipsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetClipsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///An array of hydrated clip views
-    #[serde(borrow)]
-    pub clips: Vec<ClipView<'a>>,
+    pub clips: Vec<ClipView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for social.clippr.feed.getClips
@@ -37,11 +54,12 @@ pub struct GetClipsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetClipsResponse {
     const NSID: &'static str = "social.clippr.feed.getClips";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetClipsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetClipsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetClips<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetClips<S> {
     const NSID: &'static str = "social.clippr.feed.getClips";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetClipsResponse;
@@ -52,7 +70,7 @@ pub struct GetClipsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetClipsRequest {
     const PATH: &'static str = "/xrpc/social.clippr.feed.getClips";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetClips<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetClips<S>;
     type Response = GetClipsResponse;
 }
 
@@ -91,7 +109,7 @@ pub mod get_clips_state {
 /// Builder for constructing an instance of this type
 pub struct GetClipsBuilder<'a, S: get_clips_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<AtUri<'a>>>,),
+    _fields: (Option<Vec<AtUri<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -121,7 +139,7 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<S>>>,
     ) -> GetClipsBuilder<'a, get_clips_state::SetUris<S>> {
         self._fields.0 = Option::Some(value.into());
         GetClipsBuilder {

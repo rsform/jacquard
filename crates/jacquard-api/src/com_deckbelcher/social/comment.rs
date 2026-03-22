@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -31,138 +33,189 @@ use crate::com_deckbelcher::richtext::Document;
 use crate::com_deckbelcher::social::comment;
 /// Subject: a card (global comment on the card itself).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CardSubject<'a> {
-    #[serde(borrow)]
-    pub r#ref: CardRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CardSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub r#ref: CardRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Target: a card (in a deck or collection).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CardTarget<'a> {
-    #[serde(borrow)]
-    pub r#ref: CardRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CardTarget<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub r#ref: CardRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Target: a deck (in a collection).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DeckTarget<'a> {
-    #[serde(borrow)]
-    pub r#ref: StrongRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeckTarget<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub r#ref: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Top-level comment on a card, deck, or collection.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "com.deckbelcher.social.comment",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Comment<'a> {
+pub struct Comment<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Rich text content.
-    #[serde(borrow)]
-    pub content: Document<'a>,
+    pub content: Document<S>,
     pub created_at: Datetime,
     ///What this comment is on.
-    #[serde(borrow)]
-    pub subject: CommentSubject<'a>,
+    pub subject: CommentSubject<S>,
     ///Optional refinement within subject (card/section/tag in a deck).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub target: Option<CommentTarget<'a>>,
+    pub target: Option<CommentTarget<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum CommentSubject<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum CommentSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.deckbelcher.social.comment#cardSubject")]
-    CardSubject(Box<comment::CardSubject<'a>>),
+    CardSubject(Box<comment::CardSubject<S>>),
     #[serde(rename = "com.deckbelcher.social.comment#recordSubject")]
-    RecordSubject(Box<comment::RecordSubject<'a>>),
+    RecordSubject(Box<comment::RecordSubject<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum CommentTarget<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum CommentTarget<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.deckbelcher.social.comment#cardTarget")]
-    CardTarget(Box<comment::CardTarget<'a>>),
+    CardTarget(Box<comment::CardTarget<S>>),
     #[serde(rename = "com.deckbelcher.social.comment#deckTarget")]
-    DeckTarget(Box<comment::DeckTarget<'a>>),
+    DeckTarget(Box<comment::DeckTarget<S>>),
     #[serde(rename = "com.deckbelcher.social.comment#sectionTarget")]
-    SectionTarget(Box<comment::SectionTarget<'a>>),
+    SectionTarget(Box<comment::SectionTarget<S>>),
     #[serde(rename = "com.deckbelcher.social.comment#tagTarget")]
-    TagTarget(Box<comment::TagTarget<'a>>),
+    TagTarget(Box<comment::TagTarget<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CommentGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CommentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Comment<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Comment<S>,
 }
 
 /// Subject: an ATProto record (deck, collection).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordSubject<'a> {
-    #[serde(borrow)]
-    pub r#ref: StrongRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RecordSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub r#ref: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Target: a deck section (mainboard, sideboard, etc).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SectionTarget<'a> {
-    #[serde(borrow)]
-    pub section: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SectionTarget<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub section: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Target: a tag package (ramp, removal, wincons, etc).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct TagTarget<'a> {
-    #[serde(borrow)]
-    pub tag: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TagTarget<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub tag: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Comment<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CommentRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Comment<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CommentRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for CardSubject<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardSubject<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.social.comment"
     }
@@ -177,7 +230,7 @@ impl<'a> LexiconSchema for CardSubject<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CardTarget<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardTarget<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.social.comment"
     }
@@ -192,7 +245,7 @@ impl<'a> LexiconSchema for CardTarget<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DeckTarget<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DeckTarget<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.social.comment"
     }
@@ -214,18 +267,17 @@ pub struct CommentRecord;
 impl XrpcResp for CommentRecord {
     const NSID: &'static str = "com.deckbelcher.social.comment";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CommentGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CommentGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CommentGetRecordOutput<'_>> for Comment<'_> {
-    fn from(output: CommentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CommentGetRecordOutput<S>> for Comment<S> {
+    fn from(output: CommentGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Comment<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Comment<S> {
     const NSID: &'static str = "com.deckbelcher.social.comment";
     type Record = CommentRecord;
 }
@@ -235,7 +287,7 @@ impl Collection for CommentRecord {
     type Record = CommentRecord;
 }
 
-impl<'a> LexiconSchema for Comment<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Comment<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.social.comment"
     }
@@ -250,7 +302,7 @@ impl<'a> LexiconSchema for Comment<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RecordSubject<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RecordSubject<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.social.comment"
     }
@@ -265,7 +317,7 @@ impl<'a> LexiconSchema for RecordSubject<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SectionTarget<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SectionTarget<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.social.comment"
     }
@@ -304,7 +356,7 @@ impl<'a> LexiconSchema for SectionTarget<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TagTarget<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TagTarget<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.social.comment"
     }
@@ -378,7 +430,7 @@ pub mod card_subject_state {
 /// Builder for constructing an instance of this type
 pub struct CardSubjectBuilder<'a, S: card_subject_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CardRef<'a>>,),
+    _fields: (Option<CardRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -408,7 +460,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<CardRef<'a>>,
+        value: impl Into<CardRef<S>>,
     ) -> CardSubjectBuilder<'a, card_subject_state::SetRef<S>> {
         self._fields.0 = Option::Some(value.into());
         CardSubjectBuilder {
@@ -434,10 +486,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CardSubject<'a> {
         CardSubject {
             r#ref: self._fields.0.unwrap(),
@@ -719,7 +768,7 @@ pub mod card_target_state {
 /// Builder for constructing an instance of this type
 pub struct CardTargetBuilder<'a, S: card_target_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CardRef<'a>>,),
+    _fields: (Option<CardRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -749,7 +798,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<CardRef<'a>>,
+        value: impl Into<CardRef<S>>,
     ) -> CardTargetBuilder<'a, card_target_state::SetRef<S>> {
         self._fields.0 = Option::Some(value.into());
         CardTargetBuilder {
@@ -775,10 +824,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CardTarget<'a> {
         CardTarget {
             r#ref: self._fields.0.unwrap(),
@@ -822,7 +868,7 @@ pub mod deck_target_state {
 /// Builder for constructing an instance of this type
 pub struct DeckTargetBuilder<'a, S: deck_target_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>,),
+    _fields: (Option<StrongRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -852,7 +898,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> DeckTargetBuilder<'a, deck_target_state::SetRef<S>> {
         self._fields.0 = Option::Some(value.into());
         DeckTargetBuilder {
@@ -878,10 +924,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DeckTarget<'a> {
         DeckTarget {
             r#ref: self._fields.0.unwrap(),
@@ -952,10 +995,10 @@ pub mod comment_state {
 pub struct CommentBuilder<'a, S: comment_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Document<'a>>,
+        Option<Document<S>>,
         Option<Datetime>,
-        Option<CommentSubject<'a>>,
-        Option<CommentTarget<'a>>,
+        Option<CommentSubject<S>>,
+        Option<CommentTarget<S>>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -987,7 +1030,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<Document<'a>>,
+        value: impl Into<Document<S>>,
     ) -> CommentBuilder<'a, comment_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         CommentBuilder {
@@ -1025,7 +1068,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<CommentSubject<'a>>,
+        value: impl Into<CommentSubject<S>>,
     ) -> CommentBuilder<'a, comment_state::SetSubject<S>> {
         self._fields.2 = Option::Some(value.into());
         CommentBuilder {
@@ -1038,12 +1081,12 @@ where
 
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `target` field (optional)
-    pub fn target(mut self, value: impl Into<Option<CommentTarget<'a>>>) -> Self {
+    pub fn target(mut self, value: impl Into<Option<CommentTarget<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `target` field to an Option value (optional)
-    pub fn maybe_target(mut self, value: Option<CommentTarget<'a>>) -> Self {
+    pub fn maybe_target(mut self, value: Option<CommentTarget<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1083,10 +1126,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Comment<'a> {
         Comment {
             content: self._fields.0.unwrap(),
@@ -1134,7 +1174,7 @@ pub mod record_subject_state {
 /// Builder for constructing an instance of this type
 pub struct RecordSubjectBuilder<'a, S: record_subject_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>,),
+    _fields: (Option<StrongRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1164,7 +1204,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> RecordSubjectBuilder<'a, record_subject_state::SetRef<S>> {
         self._fields.0 = Option::Some(value.into());
         RecordSubjectBuilder {
@@ -1190,10 +1230,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RecordSubject<'a> {
         RecordSubject {
             r#ref: self._fields.0.unwrap(),

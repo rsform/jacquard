@@ -10,43 +10,56 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notebook::BookEntryView;
 use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetNotebookDetail<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetNotebookDetail<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub entry_cursor: Option<CowStr<'a>>,
+    pub entry_cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_entry_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub entry_limit: Option<i64>,
     #[serde(borrow)]
-    pub notebook: AtUri<'a>,
+    pub notebook: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetNotebookDetailOutput<'a> {
-    #[serde(borrow)]
-    pub entries: Vec<BookEntryView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetNotebookDetailOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub entries: Vec<BookEntryView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub entry_cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub notebook: NotebookView<'a>,
+    pub entry_cursor: Option<S>,
+    pub notebook: NotebookView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -55,18 +68,19 @@ pub struct GetNotebookDetailOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetNotebookDetailError<'a> {
+pub enum GetNotebookDetailError {
     #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(Option<CowStr<'a>>),
+    NotebookNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetNotebookDetailError<'_> {
+impl core::fmt::Display for GetNotebookDetailError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::NotebookNotFound(msg) => {
@@ -76,7 +90,13 @@ impl core::fmt::Display for GetNotebookDetailError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -86,11 +106,12 @@ pub struct GetNotebookDetailResponse;
 impl jacquard_common::xrpc::XrpcResp for GetNotebookDetailResponse {
     const NSID: &'static str = "sh.weaver.notebook.getNotebookDetail";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetNotebookDetailOutput<'de>;
-    type Err<'de> = GetNotebookDetailError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetNotebookDetailOutput<S>;
+    type Err = GetNotebookDetailError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetNotebookDetail<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetNotebookDetail<S> {
     const NSID: &'static str = "sh.weaver.notebook.getNotebookDetail";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetNotebookDetailResponse;
@@ -101,7 +122,7 @@ pub struct GetNotebookDetailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookDetailRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getNotebookDetail";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetNotebookDetail<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetNotebookDetail<S>;
     type Response = GetNotebookDetailResponse;
 }
 
@@ -144,7 +165,7 @@ pub mod get_notebook_detail_state {
 /// Builder for constructing an instance of this type
 pub struct GetNotebookDetailBuilder<'a, S: get_notebook_detail_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -168,12 +189,12 @@ impl<'a> GetNotebookDetailBuilder<'a, get_notebook_detail_state::Empty> {
 
 impl<'a, S: get_notebook_detail_state::State> GetNotebookDetailBuilder<'a, S> {
     /// Set the `entryCursor` field (optional)
-    pub fn entry_cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn entry_cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `entryCursor` field to an Option value (optional)
-    pub fn maybe_entry_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_entry_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -200,7 +221,7 @@ where
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetNotebookDetailBuilder<'a, get_notebook_detail_state::SetNotebook<S>> {
         self._fields.2 = Option::Some(value.into());
         GetNotebookDetailBuilder {

@@ -10,26 +10,46 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteSet<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteSet<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Name of the set to delete
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteSetOutput<'a> {}
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteSetOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
 
-#[open_union]
+
 #[derive(
     Serialize,
     Deserialize,
@@ -38,19 +58,20 @@ pub struct DeleteSetOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteSetError<'a> {
+pub enum DeleteSetError {
     /// set with the given name does not exist
     #[serde(rename = "SetNotFound")]
-    SetNotFound(Option<CowStr<'a>>),
+    SetNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for DeleteSetError<'_> {
+impl core::fmt::Display for DeleteSetError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::SetNotFound(msg) => {
@@ -60,7 +81,13 @@ impl core::fmt::Display for DeleteSetError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -70,11 +97,12 @@ pub struct DeleteSetResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteSetResponse {
     const NSID: &'static str = "tools.ozone.set.deleteSet";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeleteSetOutput<'de>;
-    type Err<'de> = DeleteSetError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DeleteSetOutput<S>;
+    type Err = DeleteSetError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteSet<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DeleteSet<S> {
     const NSID: &'static str = "tools.ozone.set.deleteSet";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -89,6 +117,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteSetRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DeleteSet<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DeleteSet<S>;
     type Response = DeleteSetResponse;
 }

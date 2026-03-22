@@ -10,7 +10,10 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::fm_teal::alpha::feed::PlayView;
 
@@ -24,12 +27,20 @@ pub struct GetLatest {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetLatestOutput<'a> {
-    #[serde(borrow)]
-    pub plays: Vec<PlayView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetLatestOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub plays: Vec<PlayView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for fm.teal.alpha.stats.getLatest
@@ -37,8 +48,8 @@ pub struct GetLatestResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLatestResponse {
     const NSID: &'static str = "fm.teal.alpha.stats.getLatest";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetLatestOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetLatestOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetLatest {
@@ -52,7 +63,7 @@ pub struct GetLatestRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLatestRequest {
     const PATH: &'static str = "/xrpc/fm.teal.alpha.stats.getLatest";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetLatest;
+    type Request<S: Bos<str> + AsRef<str>> = GetLatest;
     type Response = GetLatestResponse;
 }
 

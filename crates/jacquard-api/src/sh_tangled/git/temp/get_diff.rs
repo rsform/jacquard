@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::{IntoStatic, open_union};
@@ -15,13 +15,19 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetDiff<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetDiff<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub repo: AtUri<'a>,
+    pub repo: AtUri<S>,
     #[serde(borrow)]
-    pub rev1: CowStr<'a>,
+    pub rev1: S,
     #[serde(borrow)]
-    pub rev2: CowStr<'a>,
+    pub rev2: S,
 }
 
 /// Compare output in application/json
@@ -33,7 +39,6 @@ pub struct GetDiffOutput {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -42,28 +47,32 @@ pub struct GetDiffOutput {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetDiffError<'a> {
+pub enum GetDiffError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// One or both revisions not found
     #[serde(rename = "RevisionNotFound")]
-    RevisionNotFound(Option<CowStr<'a>>),
+    RevisionNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Failed to compare revisions
     #[serde(rename = "CompareError")]
-    CompareError(Option<CowStr<'a>>),
+    CompareError(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for GetDiffError<'_> {
+impl core::fmt::Display for GetDiffError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -94,7 +103,13 @@ impl core::fmt::Display for GetDiffError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -104,18 +119,22 @@ pub struct GetDiffResponse;
 impl jacquard_common::xrpc::XrpcResp for GetDiffResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getDiff";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = GetDiffOutput;
-    type Err<'de> = GetDiffError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = GetDiffOutput;
+    type Err = GetDiffError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(GetDiffOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -123,7 +142,8 @@ impl jacquard_common::xrpc::XrpcResp for GetDiffResponse {
     }
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetDiff<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetDiff<S> {
     const NSID: &'static str = "sh.tangled.git.temp.getDiff";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetDiffResponse;
@@ -134,7 +154,7 @@ pub struct GetDiffRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetDiffRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getDiff";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetDiff<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetDiff<S>;
     type Response = GetDiffResponse;
 }
 
@@ -149,57 +169,57 @@ pub mod get_diff_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Repo;
-        type Rev1;
         type Rev2;
+        type Rev1;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Repo = Unset;
-        type Rev1 = Unset;
         type Rev2 = Unset;
+        type Rev1 = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
         type Repo = Set<members::repo>;
+        type Rev2 = S::Rev2;
         type Rev1 = S::Rev1;
-        type Rev2 = S::Rev2;
-    }
-    ///State transition - sets the `rev1` field to Set
-    pub struct SetRev1<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev1<S> {}
-    impl<S: State> State for SetRev1<S> {
-        type Repo = S::Repo;
-        type Rev1 = Set<members::rev1>;
-        type Rev2 = S::Rev2;
     }
     ///State transition - sets the `rev2` field to Set
     pub struct SetRev2<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev2<S> {}
     impl<S: State> State for SetRev2<S> {
         type Repo = S::Repo;
-        type Rev1 = S::Rev1;
         type Rev2 = Set<members::rev2>;
+        type Rev1 = S::Rev1;
+    }
+    ///State transition - sets the `rev1` field to Set
+    pub struct SetRev1<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev1<S> {}
+    impl<S: State> State for SetRev1<S> {
+        type Repo = S::Repo;
+        type Rev2 = S::Rev2;
+        type Rev1 = Set<members::rev1>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `rev1` field
-        pub struct rev1(());
         ///Marker type for the `rev2` field
         pub struct rev2(());
+        ///Marker type for the `rev1` field
+        pub struct rev1(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetDiffBuilder<'a, S: get_diff_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<AtUri<S>>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -229,7 +249,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetDiffBuilder<'a, get_diff_state::SetRepo<S>> {
         self._fields.0 = Option::Some(value.into());
         GetDiffBuilder {
@@ -248,7 +268,7 @@ where
     /// Set the `rev1` field (required)
     pub fn rev1(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetDiffBuilder<'a, get_diff_state::SetRev1<S>> {
         self._fields.1 = Option::Some(value.into());
         GetDiffBuilder {
@@ -267,7 +287,7 @@ where
     /// Set the `rev2` field (required)
     pub fn rev2(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetDiffBuilder<'a, get_diff_state::SetRev2<S>> {
         self._fields.2 = Option::Some(value.into());
         GetDiffBuilder {
@@ -282,8 +302,8 @@ impl<'a, S> GetDiffBuilder<'a, S>
 where
     S: get_diff_state::State,
     S::Repo: get_diff_state::IsSet,
-    S::Rev1: get_diff_state::IsSet,
     S::Rev2: get_diff_state::IsSet,
+    S::Rev1: get_diff_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetDiff<'a> {

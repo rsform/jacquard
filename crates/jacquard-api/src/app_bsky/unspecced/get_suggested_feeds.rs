@@ -10,7 +10,10 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::GeneratorView;
 
@@ -24,12 +27,20 @@ pub struct GetSuggestedFeeds {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSuggestedFeedsOutput<'a> {
-    #[serde(borrow)]
-    pub feeds: Vec<GeneratorView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSuggestedFeedsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub feeds: Vec<GeneratorView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.unspecced.getSuggestedFeeds
@@ -37,8 +48,8 @@ pub struct GetSuggestedFeedsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedFeedsResponse {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedFeeds";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestedFeedsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetSuggestedFeedsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetSuggestedFeeds {
@@ -52,7 +63,7 @@ pub struct GetSuggestedFeedsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedFeedsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedFeeds";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSuggestedFeeds;
+    type Request<S: Bos<str> + AsRef<str>> = GetSuggestedFeeds;
     type Response = GetSuggestedFeedsResponse;
 }
 

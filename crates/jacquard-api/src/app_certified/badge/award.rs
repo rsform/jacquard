@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,58 +32,70 @@ use crate::app_certified::badge::definition::Definition;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Records a badge award to a user, project, or activity claim.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.certified.badge.award", tag = "$type")]
-pub struct Award<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.certified.badge.award",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Award<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reference to the badge definition for this award.
-    #[serde(borrow)]
-    pub badge: Definition<'a>,
+    pub badge: Definition<S>,
     ///Client-declared timestamp when this record was originally created
     pub created_at: Datetime,
     ///Optional statement explaining the reason for this badge award.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub note: Option<CowStr<'a>>,
+    pub note: Option<S>,
     ///Entity the badge award is for (either an account DID or any specific AT Protocol record), e.g. a user, a project, or a specific activity claim.
-    #[serde(borrow)]
-    pub subject: AwardSubject<'a>,
+    pub subject: AwardSubject<S>,
     ///Optional URL the badge award links to.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<UriValue<'a>>,
+    pub url: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum AwardSubject<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum AwardSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.certified.defs#did")]
-    Did(Box<Did<'a>>),
+    Did(Box<Did<S>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<StrongRef<'a>>),
+    StrongRef(Box<StrongRef<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AwardGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AwardGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Award<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Award<S>,
 }
 
-impl<'a> Award<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AwardRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Award<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AwardRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -92,18 +106,17 @@ pub struct AwardRecord;
 impl XrpcResp for AwardRecord {
     const NSID: &'static str = "app.certified.badge.award";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AwardGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AwardGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AwardGetRecordOutput<'_>> for Award<'_> {
-    fn from(output: AwardGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AwardGetRecordOutput<S>> for Award<S> {
+    fn from(output: AwardGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Award<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Award<S> {
     const NSID: &'static str = "app.certified.badge.award";
     type Record = AwardRecord;
 }
@@ -113,7 +126,7 @@ impl Collection for AwardRecord {
     type Record = AwardRecord;
 }
 
-impl<'a> LexiconSchema for Award<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Award<S> {
     fn nsid() -> &'static str {
         "app.certified.badge.award"
     }
@@ -158,49 +171,49 @@ pub mod award_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Badge;
+        type CreatedAt;
         type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Badge = Unset;
+        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Badge = S::Badge;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `badge` field to Set
     pub struct SetBadge<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBadge<S> {}
     impl<S: State> State for SetBadge<S> {
-        type CreatedAt = S::CreatedAt;
         type Badge = Set<members::badge>;
+        type CreatedAt = S::CreatedAt;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Badge = S::Badge;
+        type CreatedAt = Set<members::created_at>;
         type Subject = S::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
         type Badge = S::Badge;
+        type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `badge` field
         pub struct badge(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
     }
@@ -210,11 +223,11 @@ pub mod award_state {
 pub struct AwardBuilder<'a, S: award_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Definition<'a>>,
+        Option<Definition<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<AwardSubject<'a>>,
-        Option<UriValue<'a>>,
+        Option<S>,
+        Option<AwardSubject<S>>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -245,7 +258,7 @@ where
     /// Set the `badge` field (required)
     pub fn badge(
         mut self,
-        value: impl Into<Definition<'a>>,
+        value: impl Into<Definition<S>>,
     ) -> AwardBuilder<'a, award_state::SetBadge<S>> {
         self._fields.0 = Option::Some(value.into());
         AwardBuilder {
@@ -277,12 +290,12 @@ where
 
 impl<'a, S: award_state::State> AwardBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -296,7 +309,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<AwardSubject<'a>>,
+        value: impl Into<AwardSubject<S>>,
     ) -> AwardBuilder<'a, award_state::SetSubject<S>> {
         self._fields.3 = Option::Some(value.into());
         AwardBuilder {
@@ -309,12 +322,12 @@ where
 
 impl<'a, S: award_state::State> AwardBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -323,8 +336,8 @@ impl<'a, S: award_state::State> AwardBuilder<'a, S> {
 impl<'a, S> AwardBuilder<'a, S>
 where
     S: award_state::State,
-    S::CreatedAt: award_state::IsSet,
     S::Badge: award_state::IsSet,
+    S::CreatedAt: award_state::IsSet,
     S::Subject: award_state::IsSet,
 {
     /// Build the final struct
@@ -339,13 +352,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Award<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Award<'a> {
         Award {
             badge: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

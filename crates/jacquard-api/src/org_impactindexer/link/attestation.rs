@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,66 +30,69 @@ use serde::{Serialize, Deserialize};
 use crate::org_impactindexer::link::attestation;
 /// The EIP-712 typed data message structure
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Eip712Message<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Eip712Message<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The chain ID as a string (for bigint compatibility, max uint256)
-    #[serde(borrow)]
-    pub chain_id: CowStr<'a>,
+    pub chain_id: S,
     ///The ATProto DID being linked
-    #[serde(borrow)]
-    pub did: CowStr<'a>,
+    pub did: S,
     ///The EVM address being linked (0x-prefixed)
-    #[serde(borrow)]
-    pub evm_address: CowStr<'a>,
+    pub evm_address: S,
     ///Replay protection nonce as a string (for bigint compatibility)
-    #[serde(borrow)]
-    pub nonce: CowStr<'a>,
+    pub nonce: S,
     ///Unix timestamp as a string (for bigint compatibility)
-    #[serde(borrow)]
-    pub timestamp: CowStr<'a>,
+    pub timestamp: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// An attestation linking an ATProto DID to an EVM wallet address, signed with EIP-712.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.impactindexer.link.attestation",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Attestation<'a> {
+pub struct Attestation<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The EVM wallet address (checksummed or lowercase, 0x-prefixed)
-    #[serde(borrow)]
-    pub address: CowStr<'a>,
+    pub address: S,
     ///The EVM chain ID where the signature was created
     pub chain_id: i64,
     ///Timestamp when the attestation was created
     pub created_at: Datetime,
     ///The EIP-712 typed data message that was signed
-    #[serde(borrow)]
-    pub message: attestation::Eip712Message<'a>,
+    pub message: attestation::Eip712Message<S>,
     ///The EIP-712 signature in hex format (0x-prefixed, 65 bytes for ECDSA, longer for smart contract sigs)
-    #[serde(borrow)]
-    pub signature: CowStr<'a>,
+    pub signature: S,
     ///The type of signature: eoa (EOA/ECDSA), erc1271 (smart contract), erc6492 (counterfactual)
-    #[serde(borrow)]
-    pub signature_type: AttestationSignatureType<'a>,
+    pub signature_type: AttestationSignatureType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The type of signature: eoa (EOA/ECDSA), erc1271 (smart contract), erc6492 (counterfactual)
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AttestationSignatureType<'a> {
+pub enum AttestationSignatureType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Eoa,
     Erc1271,
     Erc6492,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> AttestationSignatureType<'a> {
+impl<S: Bos<str> + AsRef<str>> AttestationSignatureType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Eoa => "eoa",
@@ -96,72 +101,57 @@ impl<'a> AttestationSignatureType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for AttestationSignatureType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "eoa" => Self::Eoa,
             "erc1271" => Self::Erc1271,
             "erc6492" => Self::Erc6492,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for AttestationSignatureType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "eoa" => Self::Eoa,
-            "erc1271" => Self::Erc1271,
-            "erc6492" => Self::Erc6492,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for AttestationSignatureType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for AttestationSignatureType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for AttestationSignatureType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for AttestationSignatureType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for AttestationSignatureType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for AttestationSignatureType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for AttestationSignatureType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for AttestationSignatureType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for AttestationSignatureType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for AttestationSignatureType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for AttestationSignatureType<'_> {
-    type Output = AttestationSignatureType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for AttestationSignatureType<S> {
+    type Output = AttestationSignatureType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             AttestationSignatureType::Eoa => AttestationSignatureType::Eoa,
@@ -177,26 +167,27 @@ impl jacquard_common::IntoStatic for AttestationSignatureType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AttestationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AttestationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Attestation<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Attestation<S>,
 }
 
-impl<'a> Attestation<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AttestationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Attestation<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AttestationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Eip712Message<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Eip712Message<S> {
     fn nsid() -> &'static str {
         "org.impactindexer.link.attestation"
     }
@@ -284,18 +275,17 @@ pub struct AttestationRecord;
 impl XrpcResp for AttestationRecord {
     const NSID: &'static str = "org.impactindexer.link.attestation";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AttestationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AttestationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AttestationGetRecordOutput<'_>> for Attestation<'_> {
-    fn from(output: AttestationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AttestationGetRecordOutput<S>> for Attestation<S> {
+    fn from(output: AttestationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Attestation<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Attestation<S> {
     const NSID: &'static str = "org.impactindexer.link.attestation";
     type Record = AttestationRecord;
 }
@@ -305,7 +295,7 @@ impl Collection for AttestationRecord {
     type Record = AttestationRecord;
 }
 
-impl<'a> LexiconSchema for Attestation<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Attestation<S> {
     fn nsid() -> &'static str {
         "org.impactindexer.link.attestation"
     }
@@ -588,104 +578,104 @@ pub mod attestation_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Signature;
-        type Address;
-        type ChainId;
         type SignatureType;
-        type CreatedAt;
+        type ChainId;
         type Message;
+        type CreatedAt;
+        type Address;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Signature = Unset;
-        type Address = Unset;
-        type ChainId = Unset;
         type SignatureType = Unset;
-        type CreatedAt = Unset;
+        type ChainId = Unset;
         type Message = Unset;
+        type CreatedAt = Unset;
+        type Address = Unset;
     }
     ///State transition - sets the `signature` field to Set
     pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSignature<S> {}
     impl<S: State> State for SetSignature<S> {
         type Signature = Set<members::signature>;
-        type Address = S::Address;
+        type SignatureType = S::SignatureType;
         type ChainId = S::ChainId;
-        type SignatureType = S::SignatureType;
-        type CreatedAt = S::CreatedAt;
         type Message = S::Message;
-    }
-    ///State transition - sets the `address` field to Set
-    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddress<S> {}
-    impl<S: State> State for SetAddress<S> {
-        type Signature = S::Signature;
-        type Address = Set<members::address>;
-        type ChainId = S::ChainId;
-        type SignatureType = S::SignatureType;
         type CreatedAt = S::CreatedAt;
-        type Message = S::Message;
-    }
-    ///State transition - sets the `chain_id` field to Set
-    pub struct SetChainId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChainId<S> {}
-    impl<S: State> State for SetChainId<S> {
-        type Signature = S::Signature;
         type Address = S::Address;
-        type ChainId = Set<members::chain_id>;
-        type SignatureType = S::SignatureType;
-        type CreatedAt = S::CreatedAt;
-        type Message = S::Message;
     }
     ///State transition - sets the `signature_type` field to Set
     pub struct SetSignatureType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSignatureType<S> {}
     impl<S: State> State for SetSignatureType<S> {
         type Signature = S::Signature;
-        type Address = S::Address;
-        type ChainId = S::ChainId;
         type SignatureType = Set<members::signature_type>;
-        type CreatedAt = S::CreatedAt;
-        type Message = S::Message;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Signature = S::Signature;
-        type Address = S::Address;
         type ChainId = S::ChainId;
-        type SignatureType = S::SignatureType;
-        type CreatedAt = Set<members::created_at>;
         type Message = S::Message;
+        type CreatedAt = S::CreatedAt;
+        type Address = S::Address;
+    }
+    ///State transition - sets the `chain_id` field to Set
+    pub struct SetChainId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChainId<S> {}
+    impl<S: State> State for SetChainId<S> {
+        type Signature = S::Signature;
+        type SignatureType = S::SignatureType;
+        type ChainId = Set<members::chain_id>;
+        type Message = S::Message;
+        type CreatedAt = S::CreatedAt;
+        type Address = S::Address;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
         type Signature = S::Signature;
-        type Address = S::Address;
-        type ChainId = S::ChainId;
         type SignatureType = S::SignatureType;
-        type CreatedAt = S::CreatedAt;
+        type ChainId = S::ChainId;
         type Message = Set<members::message>;
+        type CreatedAt = S::CreatedAt;
+        type Address = S::Address;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Signature = S::Signature;
+        type SignatureType = S::SignatureType;
+        type ChainId = S::ChainId;
+        type Message = S::Message;
+        type CreatedAt = Set<members::created_at>;
+        type Address = S::Address;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddress<S> {}
+    impl<S: State> State for SetAddress<S> {
+        type Signature = S::Signature;
+        type SignatureType = S::SignatureType;
+        type ChainId = S::ChainId;
+        type Message = S::Message;
+        type CreatedAt = S::CreatedAt;
+        type Address = Set<members::address>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `signature` field
         pub struct signature(());
-        ///Marker type for the `address` field
-        pub struct address(());
-        ///Marker type for the `chain_id` field
-        pub struct chain_id(());
         ///Marker type for the `signature_type` field
         pub struct signature_type(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `chain_id` field
+        pub struct chain_id(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `address` field
+        pub struct address(());
     }
 }
 
@@ -693,12 +683,12 @@ pub mod attestation_state {
 pub struct AttestationBuilder<'a, S: attestation_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
         Option<Datetime>,
-        Option<attestation::Eip712Message<'a>>,
-        Option<CowStr<'a>>,
-        Option<AttestationSignatureType<'a>>,
+        Option<attestation::Eip712Message<S>>,
+        Option<S>,
+        Option<AttestationSignatureType<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -729,7 +719,7 @@ where
     /// Set the `address` field (required)
     pub fn address(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AttestationBuilder<'a, attestation_state::SetAddress<S>> {
         self._fields.0 = Option::Some(value.into());
         AttestationBuilder {
@@ -786,7 +776,7 @@ where
     /// Set the `message` field (required)
     pub fn message(
         mut self,
-        value: impl Into<attestation::Eip712Message<'a>>,
+        value: impl Into<attestation::Eip712Message<S>>,
     ) -> AttestationBuilder<'a, attestation_state::SetMessage<S>> {
         self._fields.3 = Option::Some(value.into());
         AttestationBuilder {
@@ -805,7 +795,7 @@ where
     /// Set the `signature` field (required)
     pub fn signature(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AttestationBuilder<'a, attestation_state::SetSignature<S>> {
         self._fields.4 = Option::Some(value.into());
         AttestationBuilder {
@@ -824,7 +814,7 @@ where
     /// Set the `signatureType` field (required)
     pub fn signature_type(
         mut self,
-        value: impl Into<AttestationSignatureType<'a>>,
+        value: impl Into<AttestationSignatureType<S>>,
     ) -> AttestationBuilder<'a, attestation_state::SetSignatureType<S>> {
         self._fields.5 = Option::Some(value.into());
         AttestationBuilder {
@@ -839,11 +829,11 @@ impl<'a, S> AttestationBuilder<'a, S>
 where
     S: attestation_state::State,
     S::Signature: attestation_state::IsSet,
-    S::Address: attestation_state::IsSet,
-    S::ChainId: attestation_state::IsSet,
     S::SignatureType: attestation_state::IsSet,
-    S::CreatedAt: attestation_state::IsSet,
+    S::ChainId: attestation_state::IsSet,
     S::Message: attestation_state::IsSet,
+    S::CreatedAt: attestation_state::IsSet,
+    S::Address: attestation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Attestation<'a> {
@@ -860,10 +850,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Attestation<'a> {
         Attestation {
             address: self._fields.0.unwrap(),

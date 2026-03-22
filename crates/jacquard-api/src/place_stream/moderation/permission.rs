@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,46 +29,50 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Record granting moderation permissions to a user for this streamer's content.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "place.stream.moderation.permission",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Permission<'a> {
+pub struct Permission<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Client-declared timestamp when this moderator was added.
     pub created_at: Datetime,
     ///Optional expiration time for this delegation. If set, the delegation is invalid after this time.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expiration_time: Option<Datetime>,
     ///The DID of the user granted moderator permissions.
-    #[serde(borrow)]
-    pub moderator: Did<'a>,
+    pub moderator: Did<S>,
     ///Array of permissions granted to this moderator. 'ban' covers blocks/bans (with optional expiration), 'hide' covers message gates, 'livestream.manage' allows updating livestream metadata.
-    #[serde(borrow)]
-    pub permissions: Vec<CowStr<'a>>,
+    pub permissions: Vec<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PermissionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PermissionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Permission<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Permission<S>,
 }
 
-impl<'a> Permission<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PermissionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Permission<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PermissionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -77,18 +83,17 @@ pub struct PermissionRecord;
 impl XrpcResp for PermissionRecord {
     const NSID: &'static str = "place.stream.moderation.permission";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PermissionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PermissionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PermissionGetRecordOutput<'_>> for Permission<'_> {
-    fn from(output: PermissionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PermissionGetRecordOutput<S>> for Permission<S> {
+    fn from(output: PermissionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Permission<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Permission<S> {
     const NSID: &'static str = "place.stream.moderation.permission";
     type Record = PermissionRecord;
 }
@@ -98,7 +103,7 @@ impl Collection for PermissionRecord {
     type Record = PermissionRecord;
 }
 
-impl<'a> LexiconSchema for Permission<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Permission<S> {
     fn nsid() -> &'static str {
         "place.stream.moderation.permission"
     }
@@ -174,12 +179,7 @@ pub mod permission_state {
 /// Builder for constructing an instance of this type
 pub struct PermissionBuilder<'a, S: permission_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<Datetime>,
-        Option<Did<'a>>,
-        Option<Vec<CowStr<'a>>>,
-    ),
+    _fields: (Option<Datetime>, Option<Datetime>, Option<Did<S>>, Option<Vec<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -241,7 +241,7 @@ where
     /// Set the `moderator` field (required)
     pub fn moderator(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> PermissionBuilder<'a, permission_state::SetModerator<S>> {
         self._fields.2 = Option::Some(value.into());
         PermissionBuilder {
@@ -260,7 +260,7 @@ where
     /// Set the `permissions` field (required)
     pub fn permissions(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> PermissionBuilder<'a, permission_state::SetPermissions<S>> {
         self._fields.3 = Option::Some(value.into());
         PermissionBuilder {
@@ -291,10 +291,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Permission<'a> {
         Permission {
             created_at: self._fields.0.unwrap(),

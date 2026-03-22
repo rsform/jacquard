@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,39 +29,47 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A single chat message in a whoossh channel.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "zip.viruus.chat.message", tag = "$type")]
-pub struct Message<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "zip.viruus.chat.message",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Message<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The channel the message was sent in.
-    #[serde(borrow)]
-    pub channel: CowStr<'a>,
+    pub channel: S,
     ///Timestamp of when the message was sent.
     pub created_at: Datetime,
     ///The message content.
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MessageGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MessageGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Message<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Message<S>,
 }
 
-impl<'a> Message<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, MessageRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Message<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, MessageRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -70,18 +80,17 @@ pub struct MessageRecord;
 impl XrpcResp for MessageRecord {
     const NSID: &'static str = "zip.viruus.chat.message";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MessageGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MessageGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<MessageGetRecordOutput<'_>> for Message<'_> {
-    fn from(output: MessageGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<MessageGetRecordOutput<S>> for Message<S> {
+    fn from(output: MessageGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Message<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Message<S> {
     const NSID: &'static str = "zip.viruus.chat.message";
     type Record = MessageRecord;
 }
@@ -91,7 +100,7 @@ impl Collection for MessageRecord {
     type Record = MessageRecord;
 }
 
-impl<'a> LexiconSchema for Message<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Message<S> {
     fn nsid() -> &'static str {
         "zip.viruus.chat.message"
     }
@@ -151,58 +160,58 @@ pub mod message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Channel;
         type Text;
         type CreatedAt;
-        type Channel;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Channel = Unset;
         type Text = Unset;
         type CreatedAt = Unset;
-        type Channel = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
-        type Channel = S::Channel;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
-        type CreatedAt = Set<members::created_at>;
-        type Channel = S::Channel;
     }
     ///State transition - sets the `channel` field to Set
     pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChannel<S> {}
     impl<S: State> State for SetChannel<S> {
+        type Channel = Set<members::channel>;
         type Text = S::Text;
         type CreatedAt = S::CreatedAt;
-        type Channel = Set<members::channel>;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Channel = S::Channel;
+        type Text = Set<members::text>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Channel = S::Channel;
+        type Text = S::Text;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `channel` field
+        pub struct channel(());
         ///Marker type for the `text` field
         pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `channel` field
-        pub struct channel(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MessageBuilder<'a, S: message_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Datetime>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -232,7 +241,7 @@ where
     /// Set the `channel` field (required)
     pub fn channel(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MessageBuilder<'a, message_state::SetChannel<S>> {
         self._fields.0 = Option::Some(value.into());
         MessageBuilder {
@@ -270,7 +279,7 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MessageBuilder<'a, message_state::SetText<S>> {
         self._fields.2 = Option::Some(value.into());
         MessageBuilder {
@@ -284,9 +293,9 @@ where
 impl<'a, S> MessageBuilder<'a, S>
 where
     S: message_state::State,
+    S::Channel: message_state::IsSet,
     S::Text: message_state::IsSet,
     S::CreatedAt: message_state::IsSet,
-    S::Channel: message_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Message<'a> {
@@ -300,10 +309,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Message<'a> {
         Message {
             channel: self._fields.0.unwrap(),

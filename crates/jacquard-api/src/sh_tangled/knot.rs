@@ -15,13 +15,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -31,32 +33,42 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.tangled.knot", tag = "$type")]
-pub struct Knot<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.tangled.knot",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Knot<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct KnotGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct KnotGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Knot<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Knot<S>,
 }
 
-impl<'a> Knot<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, KnotRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Knot<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, KnotRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -67,18 +79,17 @@ pub struct KnotRecord;
 impl XrpcResp for KnotRecord {
     const NSID: &'static str = "sh.tangled.knot";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = KnotGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = KnotGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<KnotGetRecordOutput<'_>> for Knot<'_> {
-    fn from(output: KnotGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<KnotGetRecordOutput<S>> for Knot<S> {
+    fn from(output: KnotGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Knot<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Knot<S> {
     const NSID: &'static str = "sh.tangled.knot";
     type Record = KnotRecord;
 }
@@ -88,7 +99,7 @@ impl Collection for KnotRecord {
     type Record = KnotRecord;
 }
 
-impl<'a> LexiconSchema for Knot<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Knot<S> {
     fn nsid() -> &'static str {
         "sh.tangled.knot"
     }
@@ -192,13 +203,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Knot<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Knot<'a> {
         Knot {
             created_at: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

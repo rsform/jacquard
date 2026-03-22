@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -28,35 +29,44 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// allow service to push. key must be did
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "win.tomo-x.pushat.allow", tag = "$type")]
-pub struct Allow<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "win.tomo-x.pushat.allow",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Allow<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub config: Option<Data<'a>>,
+    pub config: Option<Data<S>>,
     pub created_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AllowGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AllowGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Allow<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Allow<S>,
 }
 
-impl<'a> Allow<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AllowRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Allow<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AllowRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -67,18 +77,17 @@ pub struct AllowRecord;
 impl XrpcResp for AllowRecord {
     const NSID: &'static str = "win.tomo-x.pushat.allow";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AllowGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AllowGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AllowGetRecordOutput<'_>> for Allow<'_> {
-    fn from(output: AllowGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AllowGetRecordOutput<S>> for Allow<S> {
+    fn from(output: AllowGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Allow<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Allow<S> {
     const NSID: &'static str = "win.tomo-x.pushat.allow";
     type Record = AllowRecord;
 }
@@ -88,7 +97,7 @@ impl Collection for AllowRecord {
     type Record = AllowRecord;
 }
 
-impl<'a> LexiconSchema for Allow<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Allow<S> {
     fn nsid() -> &'static str {
         "win.tomo-x.pushat.allow"
     }
@@ -138,7 +147,7 @@ pub mod allow_state {
 /// Builder for constructing an instance of this type
 pub struct AllowBuilder<'a, S: allow_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Data<'a>>, Option<Datetime>),
+    _fields: (Option<Data<S>>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -162,12 +171,12 @@ impl<'a> AllowBuilder<'a, allow_state::Empty> {
 
 impl<'a, S: allow_state::State> AllowBuilder<'a, S> {
     /// Set the `config` field (optional)
-    pub fn config(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn config(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `config` field to an Option value (optional)
-    pub fn maybe_config(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_config(mut self, value: Option<Data<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -206,10 +215,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Allow<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Allow<'a> {
         Allow {
             config: self._fields.0,
             created_at: self._fields.1.unwrap(),

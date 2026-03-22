@@ -5,12 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::CowStr;
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -18,29 +21,32 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Callout<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Callout<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Background color (CSS color value)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub color: Option<CowStr<'a>>,
+    pub color: Option<S>,
     ///Emoji icon for the callout  Defaults to `"💡"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_callout_emoji")]
-    #[serde(borrow)]
-    pub emoji: Option<CowStr<'a>>,
+    pub emoji: Option<S>,
     ///Facets for text formatting
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Data<'a>>>,
+    pub facets: Option<Vec<Data<S>>>,
     ///The callout text content
-    #[serde(borrow)]
-    pub plaintext: CowStr<'a>,
+    pub plaintext: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Callout<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Callout<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.callout"
     }
@@ -55,8 +61,8 @@ impl<'a> LexiconSchema for Callout<'a> {
     }
 }
 
-fn _default_callout_emoji() -> Option<CowStr<'static>> {
-    Some(CowStr::from("💡"))
+fn _default_callout_emoji<S: From<&'static str>>() -> ::core::option::Option<S> {
+    Some(S::from("💡"))
 }
 
 fn lexicon_doc_app_offprint_block_callout() -> LexiconDoc<'static> {

@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,46 +26,65 @@ use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::SparklinePoint;
 use crate::network_slices::slice::get_sparklines;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSparklines<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSparklines<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Time range to fetch data for  Defaults to `"24h"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_get_sparklines_duration")]
-    #[serde(borrow)]
-    pub duration: Option<CowStr<'a>>,
+    pub duration: Option<S>,
     ///Time interval for data points  Defaults to `"hour"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_get_sparklines_interval")]
-    #[serde(borrow)]
-    pub interval: Option<CowStr<'a>>,
+    pub interval: Option<S>,
     ///Array of slice AT-URIs to get sparkline data for
-    #[serde(borrow)]
-    pub slices: Vec<CowStr<'a>>,
+    pub slices: Vec<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSparklinesOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSparklinesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of slice sparkline data entries
-    #[serde(borrow)]
-    pub sparklines: Vec<get_sparklines::SparklineEntry<'a>>,
+    pub sparklines: Vec<get_sparklines::SparklineEntry<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SparklineEntry<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SparklineEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of sparkline data points
-    #[serde(borrow)]
-    pub points: Vec<SparklinePoint<'a>>,
+    pub points: Vec<SparklinePoint<S>>,
     ///AT-URI of the slice
-    #[serde(borrow)]
-    pub slice_uri: CowStr<'a>,
+    pub slice_uri: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for network.slices.slice.getSparklines
@@ -71,11 +92,12 @@ pub struct GetSparklinesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSparklinesResponse {
     const NSID: &'static str = "network.slices.slice.getSparklines";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSparklinesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetSparklinesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSparklines<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetSparklines<S> {
     const NSID: &'static str = "network.slices.slice.getSparklines";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -90,11 +112,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSparklinesRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = GetSparklines<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetSparklines<S>;
     type Response = GetSparklinesResponse;
 }
 
-impl<'a> LexiconSchema for SparklineEntry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SparklineEntry<S> {
     fn nsid() -> &'static str {
         "network.slices.slice.getSparklines"
     }
@@ -109,12 +131,16 @@ impl<'a> LexiconSchema for SparklineEntry<'a> {
     }
 }
 
-fn _default_get_sparklines_duration() -> Option<CowStr<'static>> {
-    Some(CowStr::from("24h"))
+fn _default_get_sparklines_duration<S: From<&'static str>>() -> ::core::option::Option<
+    S,
+> {
+    Some(S::from("24h"))
 }
 
-fn _default_get_sparklines_interval() -> Option<CowStr<'static>> {
-    Some(CowStr::from("hour"))
+fn _default_get_sparklines_interval<S: From<&'static str>>() -> ::core::option::Option<
+    S,
+> {
+    Some(S::from("hour"))
 }
 
 pub mod get_sparklines_state {
@@ -152,7 +178,7 @@ pub mod get_sparklines_state {
 /// Builder for constructing an instance of this type
 pub struct GetSparklinesBuilder<'a, S: get_sparklines_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Vec<CowStr<'a>>>),
+    _fields: (Option<S>, Option<S>, Option<Vec<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -176,12 +202,12 @@ impl<'a> GetSparklinesBuilder<'a, get_sparklines_state::Empty> {
 
 impl<'a, S: get_sparklines_state::State> GetSparklinesBuilder<'a, S> {
     /// Set the `duration` field (optional)
-    pub fn duration(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn duration(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
-    pub fn maybe_duration(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_duration(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -189,12 +215,12 @@ impl<'a, S: get_sparklines_state::State> GetSparklinesBuilder<'a, S> {
 
 impl<'a, S: get_sparklines_state::State> GetSparklinesBuilder<'a, S> {
     /// Set the `interval` field (optional)
-    pub fn interval(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn interval(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `interval` field to an Option value (optional)
-    pub fn maybe_interval(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_interval(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -208,7 +234,7 @@ where
     /// Set the `slices` field (required)
     pub fn slices(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> GetSparklinesBuilder<'a, get_sparklines_state::SetSlices<S>> {
         self._fields.2 = Option::Some(value.into());
         GetSparklinesBuilder {
@@ -236,10 +262,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> GetSparklines<'a> {
         GetSparklines {
             duration: self._fields.0.or_else(|| Some(CowStr::from("24h"))),
@@ -260,44 +283,44 @@ pub mod sparkline_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SliceUri;
         type Points;
+        type SliceUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SliceUri = Unset;
         type Points = Unset;
-    }
-    ///State transition - sets the `slice_uri` field to Set
-    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
-    impl<S: State> State for SetSliceUri<S> {
-        type SliceUri = Set<members::slice_uri>;
-        type Points = S::Points;
+        type SliceUri = Unset;
     }
     ///State transition - sets the `points` field to Set
     pub struct SetPoints<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPoints<S> {}
     impl<S: State> State for SetPoints<S> {
-        type SliceUri = S::SliceUri;
         type Points = Set<members::points>;
+        type SliceUri = S::SliceUri;
+    }
+    ///State transition - sets the `slice_uri` field to Set
+    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
+    impl<S: State> State for SetSliceUri<S> {
+        type Points = S::Points;
+        type SliceUri = Set<members::slice_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slice_uri` field
-        pub struct slice_uri(());
         ///Marker type for the `points` field
         pub struct points(());
+        ///Marker type for the `slice_uri` field
+        pub struct slice_uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SparklineEntryBuilder<'a, S: sparkline_entry_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<SparklinePoint<'a>>>, Option<CowStr<'a>>),
+    _fields: (Option<Vec<SparklinePoint<S>>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -327,7 +350,7 @@ where
     /// Set the `points` field (required)
     pub fn points(
         mut self,
-        value: impl Into<Vec<SparklinePoint<'a>>>,
+        value: impl Into<Vec<SparklinePoint<S>>>,
     ) -> SparklineEntryBuilder<'a, sparkline_entry_state::SetPoints<S>> {
         self._fields.0 = Option::Some(value.into());
         SparklineEntryBuilder {
@@ -346,7 +369,7 @@ where
     /// Set the `sliceUri` field (required)
     pub fn slice_uri(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SparklineEntryBuilder<'a, sparkline_entry_state::SetSliceUri<S>> {
         self._fields.1 = Option::Some(value.into());
         SparklineEntryBuilder {
@@ -360,8 +383,8 @@ where
 impl<'a, S> SparklineEntryBuilder<'a, S>
 where
     S: sparkline_entry_state::State,
-    S::SliceUri: sparkline_entry_state::IsSet,
     S::Points: sparkline_entry_state::IsSet,
+    S::SliceUri: sparkline_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SparklineEntry<'a> {
@@ -374,10 +397,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SparklineEntry<'a> {
         SparklineEntry {
             points: self._fields.0.unwrap(),

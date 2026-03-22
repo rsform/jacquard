@@ -10,17 +10,25 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notebook::PublishedVersionView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPublishedVersions<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPublishedVersions<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub entry: AtUri<'a>,
+    pub entry: AtUri<S>,
     /// Defaults to `false`.
     #[serde(default = "_default_include_content")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -28,21 +36,27 @@ pub struct GetPublishedVersions<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPublishedVersionsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPublishedVersionsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub canonical: Option<PublishedVersionView<'a>>,
+    pub canonical: Option<PublishedVersionView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub has_divergence: Option<bool>,
     ///Full entry records if includeContent=true
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub records: Option<Vec<Data<'a>>>,
-    #[serde(borrow)]
-    pub versions: Vec<PublishedVersionView<'a>>,
+    pub records: Option<Vec<Data<S>>>,
+    pub versions: Vec<PublishedVersionView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.notebook.getPublishedVersions
@@ -50,11 +64,12 @@ pub struct GetPublishedVersionsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPublishedVersionsResponse {
     const NSID: &'static str = "sh.weaver.notebook.getPublishedVersions";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPublishedVersionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetPublishedVersionsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPublishedVersions<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetPublishedVersions<S> {
     const NSID: &'static str = "sh.weaver.notebook.getPublishedVersions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPublishedVersionsResponse;
@@ -65,7 +80,7 @@ pub struct GetPublishedVersionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPublishedVersionsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getPublishedVersions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPublishedVersions<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetPublishedVersions<S>;
     type Response = GetPublishedVersionsResponse;
 }
 
@@ -108,7 +123,7 @@ pub mod get_published_versions_state {
 /// Builder for constructing an instance of this type
 pub struct GetPublishedVersionsBuilder<'a, S: get_published_versions_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<bool>),
+    _fields: (Option<AtUri<S>>, Option<bool>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -141,7 +156,7 @@ where
     /// Set the `entry` field (required)
     pub fn entry(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetPublishedVersionsBuilder<'a, get_published_versions_state::SetEntry<S>> {
         self._fields.0 = Option::Some(value.into());
         GetPublishedVersionsBuilder {

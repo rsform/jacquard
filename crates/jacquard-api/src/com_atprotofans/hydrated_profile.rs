@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::{Did, Handle};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,46 +28,46 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 /// A hydrated identity profile with computed fields.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct HydratedProfile<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct HydratedProfile<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether the identity is currently accepting new supporters.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepting_supporters: Option<bool>,
     ///Avatar image blob reference.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
+    pub avatar: Option<BlobRef<S>>,
     ///Banner image blob reference.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub banner: Option<BlobRef<'a>>,
+    pub banner: Option<BlobRef<S>>,
     ///Profile bio/description with optional rich text.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///DID of the profile owner.
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///Display name for the profile.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     ///Rich text facets for description annotations.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Facet<'a>>>,
+    pub facets: Option<Vec<Facet<S>>>,
     ///Handle of the profile owner.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub handle: Option<Handle<'a>>,
+    pub handle: Option<Handle<S>>,
     ///Number of supporters for this profile.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub supporter_count: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for HydratedProfile<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for HydratedProfile<S> {
     fn nsid() -> &'static str {
         "com.atprotofans.hydratedProfile"
     }
@@ -243,13 +245,13 @@ pub struct HydratedProfileBuilder<'a, S: hydrated_profile_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<bool>,
-        Option<BlobRef<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<Handle<'a>>,
+        Option<BlobRef<S>>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<Handle<S>>,
         Option<i64>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -288,12 +290,12 @@ impl<'a, S: hydrated_profile_state::State> HydratedProfileBuilder<'a, S> {
 
 impl<'a, S: hydrated_profile_state::State> HydratedProfileBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -301,12 +303,12 @@ impl<'a, S: hydrated_profile_state::State> HydratedProfileBuilder<'a, S> {
 
 impl<'a, S: hydrated_profile_state::State> HydratedProfileBuilder<'a, S> {
     /// Set the `banner` field (optional)
-    pub fn banner(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn banner(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `banner` field to an Option value (optional)
-    pub fn maybe_banner(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_banner(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -314,12 +316,12 @@ impl<'a, S: hydrated_profile_state::State> HydratedProfileBuilder<'a, S> {
 
 impl<'a, S: hydrated_profile_state::State> HydratedProfileBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -333,7 +335,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> HydratedProfileBuilder<'a, hydrated_profile_state::SetDid<S>> {
         self._fields.4 = Option::Some(value.into());
         HydratedProfileBuilder {
@@ -346,12 +348,12 @@ where
 
 impl<'a, S: hydrated_profile_state::State> HydratedProfileBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -359,12 +361,12 @@ impl<'a, S: hydrated_profile_state::State> HydratedProfileBuilder<'a, S> {
 
 impl<'a, S: hydrated_profile_state::State> HydratedProfileBuilder<'a, S> {
     /// Set the `facets` field (optional)
-    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
+    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
-    pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -372,12 +374,12 @@ impl<'a, S: hydrated_profile_state::State> HydratedProfileBuilder<'a, S> {
 
 impl<'a, S: hydrated_profile_state::State> HydratedProfileBuilder<'a, S> {
     /// Set the `handle` field (optional)
-    pub fn handle(mut self, value: impl Into<Option<Handle<'a>>>) -> Self {
+    pub fn handle(mut self, value: impl Into<Option<Handle<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `handle` field to an Option value (optional)
-    pub fn maybe_handle(mut self, value: Option<Handle<'a>>) -> Self {
+    pub fn maybe_handle(mut self, value: Option<Handle<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -419,10 +421,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> HydratedProfile<'a> {
         HydratedProfile {
             accepting_supporters: self._fields.0,

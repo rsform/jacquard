@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -27,36 +29,45 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::edit::list_drafts;
 /// Hydrated view of a draft with edit state.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DraftView<'a> {
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DraftView<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub cid: Cid<S>,
     pub created_at: Datetime,
     ///Associated edit root if one exists
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub edit_root: Option<StrongRef<'a>>,
+    pub edit_root: Option<StrongRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_edit_at: Option<Datetime>,
     ///Extracted title if available from edit state
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub title: Option<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListDrafts<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListDrafts<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub actor: AtIdentifier<'a>,
+    pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -64,18 +75,25 @@ pub struct ListDrafts<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListDraftsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListDraftsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub drafts: Vec<list_drafts::DraftView<'a>>,
+    pub cursor: Option<S>,
+    pub drafts: Vec<list_drafts::DraftView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for DraftView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DraftView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.listDrafts"
     }
@@ -95,11 +113,12 @@ pub struct ListDraftsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListDraftsResponse {
     const NSID: &'static str = "sh.weaver.edit.listDrafts";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListDraftsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListDraftsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListDrafts<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListDrafts<S> {
     const NSID: &'static str = "sh.weaver.edit.listDrafts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListDraftsResponse;
@@ -110,7 +129,7 @@ pub struct ListDraftsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListDraftsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.edit.listDrafts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListDrafts<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListDrafts<S>;
     type Response = ListDraftsResponse;
 }
 
@@ -124,51 +143,51 @@ pub mod draft_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
         type CreatedAt;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
         type Cid = Set<members::cid>;
         type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
         type Cid = S::Cid;
         type CreatedAt = Set<members::created_at>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -176,12 +195,12 @@ pub mod draft_view_state {
 pub struct DraftViewBuilder<'a, S: draft_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Cid<'a>>,
+        Option<Cid<S>>,
         Option<Datetime>,
-        Option<StrongRef<'a>>,
+        Option<StrongRef<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
+        Option<S>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -212,7 +231,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> DraftViewBuilder<'a, draft_view_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         DraftViewBuilder {
@@ -244,12 +263,12 @@ where
 
 impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
     /// Set the `editRoot` field (optional)
-    pub fn edit_root(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn edit_root(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `editRoot` field to an Option value (optional)
-    pub fn maybe_edit_root(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_edit_root(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -270,12 +289,12 @@ impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
 
 impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -289,7 +308,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> DraftViewBuilder<'a, draft_view_state::SetUri<S>> {
         self._fields.5 = Option::Some(value.into());
         DraftViewBuilder {
@@ -303,9 +322,9 @@ where
 impl<'a, S> DraftViewBuilder<'a, S>
 where
     S: draft_view_state::State,
-    S::Uri: draft_view_state::IsSet,
     S::Cid: draft_view_state::IsSet,
     S::CreatedAt: draft_view_state::IsSet,
+    S::Uri: draft_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DraftView<'a> {
@@ -322,10 +341,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DraftView<'a> {
         DraftView {
             cid: self._fields.0.unwrap(),
@@ -499,7 +515,7 @@ pub mod list_drafts_state {
 /// Builder for constructing an instance of this type
 pub struct ListDraftsBuilder<'a, S: list_drafts_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -529,7 +545,7 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> ListDraftsBuilder<'a, list_drafts_state::SetActor<S>> {
         self._fields.0 = Option::Some(value.into());
         ListDraftsBuilder {
@@ -542,12 +558,12 @@ where
 
 impl<'a, S: list_drafts_state::State> ListDraftsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }

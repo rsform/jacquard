@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,18 +25,23 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BskyPost<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BskyPost<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub client_host: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub post_ref: StrongRef<'a>,
+    pub client_host: Option<S>,
+    pub post_ref: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for BskyPost<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BskyPost<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.bskyPost"
     }
@@ -84,7 +91,7 @@ pub mod bsky_post_state {
 /// Builder for constructing an instance of this type
 pub struct BskyPostBuilder<'a, S: bsky_post_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<StrongRef<'a>>),
+    _fields: (Option<S>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -108,12 +115,12 @@ impl<'a> BskyPostBuilder<'a, bsky_post_state::Empty> {
 
 impl<'a, S: bsky_post_state::State> BskyPostBuilder<'a, S> {
     /// Set the `clientHost` field (optional)
-    pub fn client_host(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn client_host(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `clientHost` field to an Option value (optional)
-    pub fn maybe_client_host(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_client_host(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -127,7 +134,7 @@ where
     /// Set the `postRef` field (required)
     pub fn post_ref(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> BskyPostBuilder<'a, bsky_post_state::SetPostRef<S>> {
         self._fields.1 = Option::Some(value.into());
         BskyPostBuilder {
@@ -154,10 +161,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BskyPost<'a> {
         BskyPost {
             client_host: self._fields.0,

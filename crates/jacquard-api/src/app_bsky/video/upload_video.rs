@@ -10,8 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::video::JobStatus;
 
@@ -22,12 +25,20 @@ pub struct UploadVideo {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct UploadVideoOutput<'a> {
-    #[serde(borrow)]
-    pub job_status: JobStatus<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UploadVideoOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub job_status: JobStatus<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.video.uploadVideo
@@ -35,8 +46,8 @@ pub struct UploadVideoResponse;
 impl jacquard_common::xrpc::XrpcResp for UploadVideoResponse {
     const NSID: &'static str = "app.bsky.video.uploadVideo";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = UploadVideoOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = UploadVideoOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for UploadVideo {
@@ -52,7 +63,7 @@ impl jacquard_common::xrpc::XrpcRequest for UploadVideo {
         body: &'de [u8],
     ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
     where
-        Self: serde::Deserialize<'de>,
+        Self: Deserialize<'de>,
     {
         Ok(
             Box::new(Self {
@@ -69,6 +80,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for UploadVideoRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "video/mp4",
     );
-    type Request<'de> = UploadVideo;
+    type Request<S: Bos<str> + AsRef<str>> = UploadVideo;
     type Response = UploadVideoResponse;
 }

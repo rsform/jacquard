@@ -15,12 +15,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -30,35 +32,35 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 /// Profile view of a user for API responses. Based on the actor.profile record but with resolved avatar URL.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProfileView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text for the avatar image
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar_alt: Option<CowStr<'a>>,
+    pub avatar_alt: Option<S>,
     ///Resolved URL to the avatar image
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar_url: Option<UriValue<'a>>,
+    pub avatar_url: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Rich text facets for the description
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description_facets: Option<Vec<Facet<'a>>>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub description_facets: Option<Vec<Facet<S>>>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub display_name: Option<S>,
+    pub handle: Handle<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for ProfileView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileView<S> {
     fn nsid() -> &'static str {
         "org.passingreads.actor.defs"
     }
@@ -151,13 +153,13 @@ pub mod profile_view_state {
 pub struct ProfileViewBuilder<'a, S: profile_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<Handle<'a>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<Handle<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -182,12 +184,12 @@ impl<'a> ProfileViewBuilder<'a, profile_view_state::Empty> {
 
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `avatarAlt` field (optional)
-    pub fn avatar_alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn avatar_alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatarAlt` field to an Option value (optional)
-    pub fn maybe_avatar_alt(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_avatar_alt(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -195,12 +197,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `avatarUrl` field (optional)
-    pub fn avatar_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn avatar_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `avatarUrl` field to an Option value (optional)
-    pub fn maybe_avatar_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_avatar_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -208,12 +210,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -223,13 +225,13 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
-        value: impl Into<Option<Vec<Facet<'a>>>>,
+        value: impl Into<Option<Vec<Facet<S>>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
-    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -243,7 +245,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ProfileViewBuilder<'a, profile_view_state::SetDid<S>> {
         self._fields.4 = Option::Some(value.into());
         ProfileViewBuilder {
@@ -256,12 +258,12 @@ where
 
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -275,7 +277,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<Handle<'a>>,
+        value: impl Into<Handle<S>>,
     ) -> ProfileViewBuilder<'a, profile_view_state::SetHandle<S>> {
         self._fields.6 = Option::Some(value.into());
         ProfileViewBuilder {
@@ -308,10 +310,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ProfileView<'a> {
         ProfileView {
             avatar_alt: self._fields.0,

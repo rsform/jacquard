@@ -10,50 +10,52 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::social_showcase::ItemImage;
 use crate::social_showcase::ItemView;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateItem<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category: Option<CowStr<'a>>,
+    pub category: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub external_link: Option<UriValue<'a>>,
-    #[serde(borrow)]
-    pub images: Vec<ItemImage<'a>>,
+    pub external_link: Option<UriValue<S>>,
+    pub images: Vec<ItemImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub metadata: Option<Data<'a>>,
-    #[serde(borrow)]
-    pub tags: Vec<CowStr<'a>>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
-    #[serde(borrow)]
-    pub visibility: CreateItemVisibility<'a>,
+    pub metadata: Option<Data<S>>,
+    pub tags: Vec<S>,
+    pub title: S,
+    pub visibility: CreateItemVisibility<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CreateItemVisibility<'a> {
+pub enum CreateItemVisibility<S: Bos<str> + AsRef<str> = DefaultStr> {
     Public,
     Unlisted,
     Private,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> CreateItemVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> CreateItemVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -62,72 +64,57 @@ impl<'a> CreateItemVisibility<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for CreateItemVisibility<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "public" => Self::Public,
             "unlisted" => Self::Unlisted,
             "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for CreateItemVisibility<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "unlisted" => Self::Unlisted,
-            "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CreateItemVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CreateItemVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for CreateItemVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for CreateItemVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for CreateItemVisibility<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for CreateItemVisibility<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for CreateItemVisibility<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for CreateItemVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for CreateItemVisibility<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for CreateItemVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for CreateItemVisibility<'_> {
-    type Output = CreateItemVisibility<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for CreateItemVisibility<S> {
+    type Output = CreateItemVisibility<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             CreateItemVisibility::Public => CreateItemVisibility::Public,
@@ -141,13 +128,22 @@ impl jacquard_common::IntoStatic for CreateItemVisibility<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateItemOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateItemOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: ItemView<'a>,
+    pub value: ItemView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for social.showcase.library.createItem
@@ -155,11 +151,12 @@ pub struct CreateItemResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateItemResponse {
     const NSID: &'static str = "social.showcase.library.createItem";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateItemOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CreateItemOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateItem<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CreateItem<S> {
     const NSID: &'static str = "social.showcase.library.createItem";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -174,7 +171,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateItemRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CreateItem<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CreateItem<S>;
     type Response = CreateItemResponse;
 }
 
@@ -256,14 +253,14 @@ pub mod create_item_state {
 pub struct CreateItemBuilder<'a, S: create_item_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<Vec<ItemImage<'a>>>,
-        Option<Data<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CreateItemVisibility<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<Vec<ItemImage<S>>>,
+        Option<Data<S>>,
+        Option<Vec<S>>,
+        Option<S>,
+        Option<CreateItemVisibility<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -288,12 +285,12 @@ impl<'a> CreateItemBuilder<'a, create_item_state::Empty> {
 
 impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -301,12 +298,12 @@ impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
 
 impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -314,12 +311,12 @@ impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
 
 impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     /// Set the `externalLink` field (optional)
-    pub fn external_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn external_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `externalLink` field to an Option value (optional)
-    pub fn maybe_external_link(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_external_link(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -333,7 +330,7 @@ where
     /// Set the `images` field (required)
     pub fn images(
         mut self,
-        value: impl Into<Vec<ItemImage<'a>>>,
+        value: impl Into<Vec<ItemImage<S>>>,
     ) -> CreateItemBuilder<'a, create_item_state::SetImages<S>> {
         self._fields.3 = Option::Some(value.into());
         CreateItemBuilder {
@@ -346,12 +343,12 @@ where
 
 impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     /// Set the `metadata` field (optional)
-    pub fn metadata(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn metadata(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
-    pub fn maybe_metadata(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_metadata(mut self, value: Option<Data<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -365,7 +362,7 @@ where
     /// Set the `tags` field (required)
     pub fn tags(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> CreateItemBuilder<'a, create_item_state::SetTags<S>> {
         self._fields.5 = Option::Some(value.into());
         CreateItemBuilder {
@@ -384,7 +381,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CreateItemBuilder<'a, create_item_state::SetTitle<S>> {
         self._fields.6 = Option::Some(value.into());
         CreateItemBuilder {
@@ -403,7 +400,7 @@ where
     /// Set the `visibility` field (required)
     pub fn visibility(
         mut self,
-        value: impl Into<CreateItemVisibility<'a>>,
+        value: impl Into<CreateItemVisibility<S>>,
     ) -> CreateItemBuilder<'a, create_item_state::SetVisibility<S>> {
         self._fields.7 = Option::Some(value.into());
         CreateItemBuilder {
@@ -439,7 +436,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CreateItem<'a> {
         CreateItem {
             category: self._fields.0,

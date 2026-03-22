@@ -10,27 +10,45 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct AcceptConvo<'a> {
-    #[serde(borrow)]
-    pub convo_id: CowStr<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AcceptConvo<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub convo_id: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct AcceptConvoOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AcceptConvoOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Rev when the convo was accepted. If not present, the convo was already accepted.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rev: Option<CowStr<'a>>,
+    pub rev: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for chat.bsky.convo.acceptConvo
@@ -38,11 +56,12 @@ pub struct AcceptConvoResponse;
 impl jacquard_common::xrpc::XrpcResp for AcceptConvoResponse {
     const NSID: &'static str = "chat.bsky.convo.acceptConvo";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AcceptConvoOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AcceptConvoOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for AcceptConvo<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for AcceptConvo<S> {
     const NSID: &'static str = "chat.bsky.convo.acceptConvo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -57,6 +76,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for AcceptConvoRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = AcceptConvo<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = AcceptConvo<S>;
     type Response = AcceptConvoResponse;
 }

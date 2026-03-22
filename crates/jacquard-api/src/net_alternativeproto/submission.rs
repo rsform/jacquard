@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,60 +30,57 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A user submission of a project to AlternativeProto
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "net.alternativeproto.submission",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Submission<'a> {
+pub struct Submission<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Services this project is an alternative to
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternative_to: Option<Vec<CowStr<'a>>>,
+    pub alternative_to: Option<Vec<S>>,
     ///Authentication method used by the project
-    #[serde(borrow)]
-    pub auth_type: SubmissionAuthType<'a>,
+    pub auth_type: SubmissionAuthType<S>,
     ///Timestamp when the submission was created
     pub created_at: Datetime,
     ///Description of the project
-    #[serde(borrow)]
-    pub description: CowStr<'a>,
+    pub description: S,
     ///Project icon image blob
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub icon: Option<BlobRef<'a>>,
+    pub icon: Option<BlobRef<S>>,
     ///Whether the project is open source
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_open_source: Option<bool>,
     ///The project name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Source code repository URL
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub repository_url: Option<UriValue<'a>>,
+    pub repository_url: Option<UriValue<S>>,
     ///Tags for categorization
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///The project URL
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Authentication method used by the project
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SubmissionAuthType<'a> {
+pub enum SubmissionAuthType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Oauth,
     AppPassword,
     None,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SubmissionAuthType<'a> {
+impl<S: Bos<str> + AsRef<str>> SubmissionAuthType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Oauth => "oauth",
@@ -90,72 +89,57 @@ impl<'a> SubmissionAuthType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SubmissionAuthType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "oauth" => Self::Oauth,
             "app-password" => Self::AppPassword,
             "none" => Self::None,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SubmissionAuthType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "oauth" => Self::Oauth,
-            "app-password" => Self::AppPassword,
-            "none" => Self::None,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SubmissionAuthType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SubmissionAuthType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for SubmissionAuthType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SubmissionAuthType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for SubmissionAuthType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SubmissionAuthType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SubmissionAuthType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for SubmissionAuthType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for SubmissionAuthType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for SubmissionAuthType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for SubmissionAuthType<'_> {
-    type Output = SubmissionAuthType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SubmissionAuthType<S> {
+    type Output = SubmissionAuthType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SubmissionAuthType::Oauth => SubmissionAuthType::Oauth,
@@ -169,22 +153,23 @@ impl jacquard_common::IntoStatic for SubmissionAuthType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SubmissionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SubmissionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Submission<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Submission<S>,
 }
 
-impl<'a> Submission<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SubmissionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Submission<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SubmissionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -195,18 +180,17 @@ pub struct SubmissionRecord;
 impl XrpcResp for SubmissionRecord {
     const NSID: &'static str = "net.alternativeproto.submission";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SubmissionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SubmissionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SubmissionGetRecordOutput<'_>> for Submission<'_> {
-    fn from(output: SubmissionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SubmissionGetRecordOutput<S>> for Submission<S> {
+    fn from(output: SubmissionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Submission<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Submission<S> {
     const NSID: &'static str = "net.alternativeproto.submission";
     type Record = SubmissionRecord;
 }
@@ -216,7 +200,7 @@ impl Collection for SubmissionRecord {
     type Record = SubmissionRecord;
 }
 
-impl<'a> LexiconSchema for Submission<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Submission<S> {
     fn nsid() -> &'static str {
         "net.alternativeproto.submission"
     }
@@ -313,85 +297,85 @@ pub mod submission_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AuthType;
-        type Name;
-        type Url;
         type CreatedAt;
+        type Name;
+        type AuthType;
         type Description;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AuthType = Unset;
-        type Name = Unset;
-        type Url = Unset;
         type CreatedAt = Unset;
+        type Name = Unset;
+        type AuthType = Unset;
         type Description = Unset;
-    }
-    ///State transition - sets the `auth_type` field to Set
-    pub struct SetAuthType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthType<S> {}
-    impl<S: State> State for SetAuthType<S> {
-        type AuthType = Set<members::auth_type>;
-        type Name = S::Name;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type AuthType = S::AuthType;
-        type Name = Set<members::name>;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type AuthType = S::AuthType;
-        type Name = S::Name;
-        type Url = Set<members::url>;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
+        type Url = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type AuthType = S::AuthType;
-        type Name = S::Name;
-        type Url = S::Url;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+        type AuthType = S::AuthType;
         type Description = S::Description;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+        type AuthType = S::AuthType;
+        type Description = S::Description;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `auth_type` field to Set
+    pub struct SetAuthType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthType<S> {}
+    impl<S: State> State for SetAuthType<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type AuthType = Set<members::auth_type>;
+        type Description = S::Description;
+        type Url = S::Url;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type AuthType = S::AuthType;
-        type Name = S::Name;
-        type Url = S::Url;
         type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type AuthType = S::AuthType;
         type Description = Set<members::description>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type AuthType = S::AuthType;
+        type Description = S::Description;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `auth_type` field
-        pub struct auth_type(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `auth_type` field
+        pub struct auth_type(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -399,16 +383,16 @@ pub mod submission_state {
 pub struct SubmissionBuilder<'a, S: submission_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<CowStr<'a>>>,
-        Option<SubmissionAuthType<'a>>,
+        Option<Vec<S>>,
+        Option<SubmissionAuthType<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
+        Option<S>,
+        Option<BlobRef<S>>,
         Option<bool>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<UriValue<'a>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<Vec<S>>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -433,12 +417,12 @@ impl<'a> SubmissionBuilder<'a, submission_state::Empty> {
 
 impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     /// Set the `alternativeTo` field (optional)
-    pub fn alternative_to(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn alternative_to(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alternativeTo` field to an Option value (optional)
-    pub fn maybe_alternative_to(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_alternative_to(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -452,7 +436,7 @@ where
     /// Set the `authType` field (required)
     pub fn auth_type(
         mut self,
-        value: impl Into<SubmissionAuthType<'a>>,
+        value: impl Into<SubmissionAuthType<S>>,
     ) -> SubmissionBuilder<'a, submission_state::SetAuthType<S>> {
         self._fields.1 = Option::Some(value.into());
         SubmissionBuilder {
@@ -490,7 +474,7 @@ where
     /// Set the `description` field (required)
     pub fn description(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SubmissionBuilder<'a, submission_state::SetDescription<S>> {
         self._fields.3 = Option::Some(value.into());
         SubmissionBuilder {
@@ -503,12 +487,12 @@ where
 
 impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     /// Set the `icon` field (optional)
-    pub fn icon(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `icon` field to an Option value (optional)
-    pub fn maybe_icon(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_icon(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -535,7 +519,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SubmissionBuilder<'a, submission_state::SetName<S>> {
         self._fields.6 = Option::Some(value.into());
         SubmissionBuilder {
@@ -548,12 +532,12 @@ where
 
 impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     /// Set the `repositoryUrl` field (optional)
-    pub fn repository_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn repository_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `repositoryUrl` field to an Option value (optional)
-    pub fn maybe_repository_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_repository_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -561,12 +545,12 @@ impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
 
 impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -580,7 +564,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> SubmissionBuilder<'a, submission_state::SetUrl<S>> {
         self._fields.9 = Option::Some(value.into());
         SubmissionBuilder {
@@ -594,11 +578,11 @@ where
 impl<'a, S> SubmissionBuilder<'a, S>
 where
     S: submission_state::State,
-    S::AuthType: submission_state::IsSet,
-    S::Name: submission_state::IsSet,
-    S::Url: submission_state::IsSet,
     S::CreatedAt: submission_state::IsSet,
+    S::Name: submission_state::IsSet,
+    S::AuthType: submission_state::IsSet,
     S::Description: submission_state::IsSet,
+    S::Url: submission_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Submission<'a> {
@@ -619,10 +603,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Submission<'a> {
         Submission {
             alternative_to: self._fields.0,

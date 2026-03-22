@@ -10,10 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,27 +26,39 @@ use serde::{Serialize, Deserialize};
 use crate::blog_pckt::block::table_cell::TableCell;
 use crate::blog_pckt::block::table_header::TableHeader;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TableRow<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TableRow<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of table cells or header cells
-    #[serde(borrow)]
-    pub content: Vec<TableRowContentItem<'a>>,
+    pub content: Vec<TableRowContentItem<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TableRowContentItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TableRowContentItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "blog.pckt.block.tableCell")]
-    TableCell(Box<TableCell<'a>>),
+    TableCell(Box<TableCell<S>>),
     #[serde(rename = "blog.pckt.block.tableHeader")]
-    TableHeader(Box<TableHeader<'a>>),
+    TableHeader(Box<TableHeader<S>>),
 }
 
-impl<'a> LexiconSchema for TableRow<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TableRow<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.tableRow"
     }
@@ -93,7 +108,7 @@ pub mod table_row_state {
 /// Builder for constructing an instance of this type
 pub struct TableRowBuilder<'a, S: table_row_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<TableRowContentItem<'a>>>,),
+    _fields: (Option<Vec<TableRowContentItem<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -123,7 +138,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<Vec<TableRowContentItem<'a>>>,
+        value: impl Into<Vec<TableRowContentItem<S>>>,
     ) -> TableRowBuilder<'a, table_row_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         TableRowBuilder {
@@ -149,10 +164,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TableRow<'a> {
         TableRow {
             content: self._fields.0.unwrap(),

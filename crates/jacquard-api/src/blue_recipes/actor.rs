@@ -13,13 +13,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::{Did, Handle};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -27,30 +29,31 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileViewBasic<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProfileViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Small image to be displayed on the profile.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
+    pub avatar: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub created_at: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub created_at: Option<S>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub display_name: Option<S>,
+    pub handle: Handle<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pronouns: Option<CowStr<'a>>,
+    pub pronouns: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for ProfileViewBasic<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileViewBasic<S> {
     fn nsid() -> &'static str {
         "blue.recipes.actor.defs"
     }
@@ -175,12 +178,12 @@ pub mod profile_view_basic_state {
 pub struct ProfileViewBasicBuilder<'a, S: profile_view_basic_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<Handle<'a>>,
-        Option<CowStr<'a>>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<Handle<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -205,12 +208,12 @@ impl<'a> ProfileViewBasicBuilder<'a, profile_view_basic_state::Empty> {
 
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -218,12 +221,12 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
 
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
-    pub fn created_at(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn created_at(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
-    pub fn maybe_created_at(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_created_at(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -237,7 +240,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ProfileViewBasicBuilder<'a, profile_view_basic_state::SetDid<S>> {
         self._fields.2 = Option::Some(value.into());
         ProfileViewBasicBuilder {
@@ -250,12 +253,12 @@ where
 
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -269,7 +272,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<Handle<'a>>,
+        value: impl Into<Handle<S>>,
     ) -> ProfileViewBasicBuilder<'a, profile_view_basic_state::SetHandle<S>> {
         self._fields.4 = Option::Some(value.into());
         ProfileViewBasicBuilder {
@@ -282,12 +285,12 @@ where
 
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `pronouns` field (optional)
-    pub fn pronouns(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn pronouns(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
-    pub fn maybe_pronouns(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_pronouns(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -314,10 +317,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ProfileViewBasic<'a> {
         ProfileViewBasic {
             avatar: self._fields.0,

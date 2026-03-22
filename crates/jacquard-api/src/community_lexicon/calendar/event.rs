@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -62,89 +64,97 @@ impl core::fmt::Display for Inperson {
 
 /// A calendar event.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "community.lexicon.calendar.event",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Event<'a> {
+pub struct Event<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Client-declared timestamp when the event was created.
     pub created_at: Datetime,
     ///The description of the event.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Client-declared timestamp when the event ends.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ends_at: Option<Datetime>,
     ///The locations where the event takes place.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub locations: Option<Vec<EventLocationsItem<'a>>>,
+    pub locations: Option<Vec<EventLocationsItem<S>>>,
     ///The attendance mode of the event.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mode: Option<event::Mode<'a>>,
+    pub mode: Option<event::Mode<S>>,
     ///The name of the event.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Client-declared timestamp when the event starts.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub starts_at: Option<Datetime>,
     ///The status of the event.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<event::Status<'a>>,
+    pub status: Option<event::Status<S>>,
     ///URIs associated with the event.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uris: Option<Vec<event::Uri<'a>>>,
+    pub uris: Option<Vec<event::Uri<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EventLocationsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EventLocationsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "community.lexicon.calendar.event#uri")]
-    Uri(Box<event::Uri<'a>>),
+    Uri(Box<event::Uri<S>>),
     #[serde(rename = "community.lexicon.location.address")]
-    Address(Box<Address<'a>>),
+    Address(Box<Address<S>>),
     #[serde(rename = "community.lexicon.location.fsq")]
-    Fsq(Box<Fsq<'a>>),
+    Fsq(Box<Fsq<S>>),
     #[serde(rename = "community.lexicon.location.geo")]
-    Geo(Box<Geo<'a>>),
+    Geo(Box<Geo<S>>),
     #[serde(rename = "community.lexicon.location.hthree")]
-    Hthree(Box<Hthree<'a>>),
+    Hthree(Box<Hthree<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EventGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EventGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Event<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Event<S>,
 }
 
 /// The mode of the event.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Mode<'a> {
+pub enum Mode<S: Bos<str> + AsRef<str> = DefaultStr> {
     CommunityLexiconCalendarEventHybrid,
     CommunityLexiconCalendarEventInperson,
     CommunityLexiconCalendarEventVirtual,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> Mode<'a> {
+impl<S: Bos<str> + AsRef<str>> Mode<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::CommunityLexiconCalendarEventHybrid => {
@@ -159,11 +169,9 @@ impl<'a> Mode<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for Mode<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "community.lexicon.calendar.event#hybrid" => {
                 Self::CommunityLexiconCalendarEventHybrid
             }
@@ -173,64 +181,44 @@ impl<'a> From<&'a str> for Mode<'a> {
             "community.lexicon.calendar.event#virtual" => {
                 Self::CommunityLexiconCalendarEventVirtual
             }
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for Mode<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "community.lexicon.calendar.event#hybrid" => {
-                Self::CommunityLexiconCalendarEventHybrid
-            }
-            "community.lexicon.calendar.event#inperson" => {
-                Self::CommunityLexiconCalendarEventInperson
-            }
-            "community.lexicon.calendar.event#virtual" => {
-                Self::CommunityLexiconCalendarEventVirtual
-            }
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Mode<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for Mode<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for Mode<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Mode<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for Mode<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for Mode<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for Mode<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Mode<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for Mode<'_> {
-    type Output = Mode<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for Mode<S> {
+    type Output = Mode<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             Mode::CommunityLexiconCalendarEventHybrid => {
@@ -290,16 +278,16 @@ impl core::fmt::Display for Scheduled {
 /// The status of the event.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Status<'a> {
+pub enum Status<S: Bos<str> + AsRef<str> = DefaultStr> {
     CommunityLexiconCalendarEventCancelled,
     CommunityLexiconCalendarEventPlanned,
     CommunityLexiconCalendarEventPostponed,
     CommunityLexiconCalendarEventRescheduled,
     CommunityLexiconCalendarEventScheduled,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> Status<'a> {
+impl<S: Bos<str> + AsRef<str>> Status<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::CommunityLexiconCalendarEventCancelled => {
@@ -320,11 +308,9 @@ impl<'a> Status<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for Status<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "community.lexicon.calendar.event#cancelled" => {
                 Self::CommunityLexiconCalendarEventCancelled
             }
@@ -340,70 +326,44 @@ impl<'a> From<&'a str> for Status<'a> {
             "community.lexicon.calendar.event#scheduled" => {
                 Self::CommunityLexiconCalendarEventScheduled
             }
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for Status<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "community.lexicon.calendar.event#cancelled" => {
-                Self::CommunityLexiconCalendarEventCancelled
-            }
-            "community.lexicon.calendar.event#planned" => {
-                Self::CommunityLexiconCalendarEventPlanned
-            }
-            "community.lexicon.calendar.event#postponed" => {
-                Self::CommunityLexiconCalendarEventPostponed
-            }
-            "community.lexicon.calendar.event#rescheduled" => {
-                Self::CommunityLexiconCalendarEventRescheduled
-            }
-            "community.lexicon.calendar.event#scheduled" => {
-                Self::CommunityLexiconCalendarEventScheduled
-            }
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Status<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for Status<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for Status<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Status<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for Status<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for Status<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for Status<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Status<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for Status<'_> {
-    type Output = Status<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for Status<S> {
+    type Output = Status<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             Status::CommunityLexiconCalendarEventCancelled => {
@@ -428,16 +388,21 @@ impl jacquard_common::IntoStatic for Status<'_> {
 
 /// A URI associated with the event.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Uri<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Uri<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The display name of the URI.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+    pub name: Option<S>,
+    pub uri: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A virtual event that takes place online.
@@ -450,11 +415,9 @@ impl core::fmt::Display for Virtual {
     }
 }
 
-impl<'a> Event<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, EventRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Event<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, EventRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -465,18 +428,17 @@ pub struct EventRecord;
 impl XrpcResp for EventRecord {
     const NSID: &'static str = "community.lexicon.calendar.event";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = EventGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = EventGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<EventGetRecordOutput<'_>> for Event<'_> {
-    fn from(output: EventGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<EventGetRecordOutput<S>> for Event<S> {
+    fn from(output: EventGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Event<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Event<S> {
     const NSID: &'static str = "community.lexicon.calendar.event";
     type Record = EventRecord;
 }
@@ -486,7 +448,7 @@ impl Collection for EventRecord {
     type Record = EventRecord;
 }
 
-impl<'a> LexiconSchema for Event<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Event<S> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.event"
     }
@@ -501,7 +463,7 @@ impl<'a> LexiconSchema for Event<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Uri<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Uri<S> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.event"
     }
@@ -526,37 +488,37 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -565,14 +527,14 @@ pub struct EventBuilder<'a, S: event_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<Vec<EventLocationsItem<'a>>>,
-        Option<event::Mode<'a>>,
-        Option<CowStr<'a>>,
+        Option<Vec<EventLocationsItem<S>>>,
+        Option<event::Mode<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<event::Status<'a>>,
-        Option<Vec<event::Uri<'a>>>,
+        Option<event::Status<S>>,
+        Option<Vec<event::Uri<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -616,12 +578,12 @@ where
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -644,16 +606,13 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `locations` field (optional)
     pub fn locations(
         mut self,
-        value: impl Into<Option<Vec<EventLocationsItem<'a>>>>,
+        value: impl Into<Option<Vec<EventLocationsItem<S>>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `locations` field to an Option value (optional)
-    pub fn maybe_locations(
-        mut self,
-        value: Option<Vec<EventLocationsItem<'a>>>,
-    ) -> Self {
+    pub fn maybe_locations(mut self, value: Option<Vec<EventLocationsItem<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -661,12 +620,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `mode` field (optional)
-    pub fn mode(mut self, value: impl Into<Option<event::Mode<'a>>>) -> Self {
+    pub fn mode(mut self, value: impl Into<Option<event::Mode<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `mode` field to an Option value (optional)
-    pub fn maybe_mode(mut self, value: Option<event::Mode<'a>>) -> Self {
+    pub fn maybe_mode(mut self, value: Option<event::Mode<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -680,7 +639,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EventBuilder<'a, event_state::SetName<S>> {
         self._fields.5 = Option::Some(value.into());
         EventBuilder {
@@ -706,12 +665,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<event::Status<'a>>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<event::Status<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<event::Status<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<event::Status<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -719,12 +678,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `uris` field (optional)
-    pub fn uris(mut self, value: impl Into<Option<Vec<event::Uri<'a>>>>) -> Self {
+    pub fn uris(mut self, value: impl Into<Option<Vec<event::Uri<S>>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `uris` field to an Option value (optional)
-    pub fn maybe_uris(mut self, value: Option<Vec<event::Uri<'a>>>) -> Self {
+    pub fn maybe_uris(mut self, value: Option<Vec<event::Uri<S>>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -733,8 +692,8 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::Name: event_state::IsSet,
     S::CreatedAt: event_state::IsSet,
+    S::Name: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -752,13 +711,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Event<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Event<'a> {
         Event {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -1032,7 +985,7 @@ pub mod uri_state {
 /// Builder for constructing an instance of this type
 pub struct UriBuilder<'a, S: uri_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _fields: (Option<S>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1056,12 +1009,12 @@ impl<'a> UriBuilder<'a, uri_state::Empty> {
 
 impl<'a, S: uri_state::State> UriBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1075,7 +1028,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> UriBuilder<'a, uri_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         UriBuilder {
@@ -1100,13 +1053,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Uri<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Uri<'a> {
         Uri {
             name: self._fields.0,
             uri: self._fields.1.unwrap(),

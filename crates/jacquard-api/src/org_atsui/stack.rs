@@ -10,33 +10,35 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Stack<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Stack<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Cross-axis alignment of children.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub align: Option<StackAlign<'a>>,
-    #[serde(borrow)]
-    pub children: Data<'a>,
+    pub align: Option<StackAlign<S>>,
+    pub children: Data<S>,
     ///Space between children.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gap: Option<StackGap<'a>>,
+    pub gap: Option<StackGap<S>>,
     ///Whether this container has inset padding. The theme controls the amount.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inset: Option<bool>,
     ///Main-axis distribution of children.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub justify: Option<StackJustify<'a>>,
+    pub justify: Option<StackJustify<S>>,
     ///Whether the container has an opaque background.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opaque: Option<bool>,
@@ -46,20 +48,24 @@ pub struct Stack<'a> {
     ///Whether the container sticks to the top of the scroll area.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sticky: Option<bool>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Cross-axis alignment of children.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StackAlign<'a> {
+pub enum StackAlign<S: Bos<str> + AsRef<str> = DefaultStr> {
     Start,
     Center,
     End,
     Stretch,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> StackAlign<'a> {
+impl<S: Bos<str> + AsRef<str>> StackAlign<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Start => "start",
@@ -69,74 +75,58 @@ impl<'a> StackAlign<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for StackAlign<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "start" => Self::Start,
             "center" => Self::Center,
             "end" => Self::End,
             "stretch" => Self::Stretch,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for StackAlign<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "start" => Self::Start,
-            "center" => Self::Center,
-            "end" => Self::End,
-            "stretch" => Self::Stretch,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for StackAlign<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for StackAlign<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for StackAlign<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for StackAlign<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for StackAlign<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for StackAlign<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for StackAlign<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for StackAlign<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for StackAlign<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for StackAlign<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for StackAlign<'_> {
-    type Output = StackAlign<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for StackAlign<S> {
+    type Output = StackAlign<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             StackAlign::Start => StackAlign::Start,
@@ -151,15 +141,15 @@ impl jacquard_common::IntoStatic for StackAlign<'_> {
 /// Space between children.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StackGap<'a> {
+pub enum StackGap<S: Bos<str> + AsRef<str> = DefaultStr> {
     None,
     Small,
     Medium,
     Large,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> StackGap<'a> {
+impl<S: Bos<str> + AsRef<str>> StackGap<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -169,74 +159,57 @@ impl<'a> StackGap<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for StackGap<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "none" => Self::None,
             "small" => Self::Small,
             "medium" => Self::Medium,
             "large" => Self::Large,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for StackGap<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "small" => Self::Small,
-            "medium" => Self::Medium,
-            "large" => Self::Large,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for StackGap<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for StackGap<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for StackGap<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for StackGap<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for StackGap<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for StackGap<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for StackGap<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for StackGap<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for StackGap<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for StackGap<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for StackGap<'_> {
-    type Output = StackGap<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for StackGap<S> {
+    type Output = StackGap<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             StackGap::None => StackGap::None,
@@ -251,15 +224,15 @@ impl jacquard_common::IntoStatic for StackGap<'_> {
 /// Main-axis distribution of children.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StackJustify<'a> {
+pub enum StackJustify<S: Bos<str> + AsRef<str> = DefaultStr> {
     Start,
     Center,
     End,
     Between,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> StackJustify<'a> {
+impl<S: Bos<str> + AsRef<str>> StackJustify<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Start => "start",
@@ -269,74 +242,58 @@ impl<'a> StackJustify<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for StackJustify<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "start" => Self::Start,
             "center" => Self::Center,
             "end" => Self::End,
             "between" => Self::Between,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for StackJustify<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "start" => Self::Start,
-            "center" => Self::Center,
-            "end" => Self::End,
-            "between" => Self::Between,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for StackJustify<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for StackJustify<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for StackJustify<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for StackJustify<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for StackJustify<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for StackJustify<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for StackJustify<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for StackJustify<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for StackJustify<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for StackJustify<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for StackJustify<'_> {
-    type Output = StackJustify<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for StackJustify<S> {
+    type Output = StackJustify<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             StackJustify::Start => StackJustify::Start,
@@ -349,13 +306,22 @@ impl jacquard_common::IntoStatic for StackJustify<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct StackOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StackOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Response<'a>,
+    pub value: Response<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for org.atsui.Stack
@@ -363,11 +329,12 @@ pub struct StackResponse;
 impl jacquard_common::xrpc::XrpcResp for StackResponse {
     const NSID: &'static str = "org.atsui.Stack";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StackOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StackOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Stack<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Stack<S> {
     const NSID: &'static str = "org.atsui.Stack";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -382,7 +349,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for StackRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Stack<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Stack<S>;
     type Response = StackResponse;
 }
 
@@ -422,11 +389,11 @@ pub mod stack_state {
 pub struct StackBuilder<'a, S: stack_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<StackAlign<'a>>,
-        Option<Data<'a>>,
-        Option<StackGap<'a>>,
+        Option<StackAlign<S>>,
+        Option<Data<S>>,
+        Option<StackGap<S>>,
         Option<bool>,
-        Option<StackJustify<'a>>,
+        Option<StackJustify<S>>,
         Option<bool>,
         Option<bool>,
         Option<bool>,
@@ -454,12 +421,12 @@ impl<'a> StackBuilder<'a, stack_state::Empty> {
 
 impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     /// Set the `align` field (optional)
-    pub fn align(mut self, value: impl Into<Option<StackAlign<'a>>>) -> Self {
+    pub fn align(mut self, value: impl Into<Option<StackAlign<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `align` field to an Option value (optional)
-    pub fn maybe_align(mut self, value: Option<StackAlign<'a>>) -> Self {
+    pub fn maybe_align(mut self, value: Option<StackAlign<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -473,7 +440,7 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> StackBuilder<'a, stack_state::SetChildren<S>> {
         self._fields.1 = Option::Some(value.into());
         StackBuilder {
@@ -486,12 +453,12 @@ where
 
 impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     /// Set the `gap` field (optional)
-    pub fn gap(mut self, value: impl Into<Option<StackGap<'a>>>) -> Self {
+    pub fn gap(mut self, value: impl Into<Option<StackGap<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `gap` field to an Option value (optional)
-    pub fn maybe_gap(mut self, value: Option<StackGap<'a>>) -> Self {
+    pub fn maybe_gap(mut self, value: Option<StackGap<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -512,12 +479,12 @@ impl<'a, S: stack_state::State> StackBuilder<'a, S> {
 
 impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     /// Set the `justify` field (optional)
-    pub fn justify(mut self, value: impl Into<Option<StackJustify<'a>>>) -> Self {
+    pub fn justify(mut self, value: impl Into<Option<StackJustify<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `justify` field to an Option value (optional)
-    pub fn maybe_justify(mut self, value: Option<StackJustify<'a>>) -> Self {
+    pub fn maybe_justify(mut self, value: Option<StackJustify<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -582,10 +549,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Stack<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Stack<'a> {
         Stack {
             align: self._fields.0,
             children: self._fields.1.unwrap(),

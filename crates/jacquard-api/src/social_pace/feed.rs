@@ -13,11 +13,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -27,7 +29,7 @@ use serde::{Serialize, Deserialize};
 /// The type of activity being recorded. List taken from Apple Health Activities mostly
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ActivityType<'a> {
+pub enum ActivityType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Running,
     Walking,
     Cycling,
@@ -65,10 +67,10 @@ pub enum ActivityType<'a> {
     Skating,
     OtherWorkout,
     Activity,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ActivityType<'a> {
+impl<S: Bos<str> + AsRef<str>> ActivityType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Running => "Running",
@@ -111,11 +113,9 @@ impl<'a> ActivityType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ActivityType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "Running" => Self::Running,
             "Walking" => Self::Walking,
             "Cycling" => Self::Cycling,
@@ -153,92 +153,45 @@ impl<'a> From<&'a str> for ActivityType<'a> {
             "Skating" => Self::Skating,
             "Other Workout" => Self::OtherWorkout,
             "Activity" => Self::Activity,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ActivityType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "Running" => Self::Running,
-            "Walking" => Self::Walking,
-            "Cycling" => Self::Cycling,
-            "Hiking" => Self::Hiking,
-            "Swimming" => Self::Swimming,
-            "Yoga" => Self::Yoga,
-            "Functional Training" => Self::FunctionalTraining,
-            "Strength Training" => Self::StrengthTraining,
-            "Elliptical" => Self::Elliptical,
-            "Rowing" => Self::Rowing,
-            "Stair Climbing" => Self::StairClimbing,
-            "Dancing" => Self::Dancing,
-            "Golf" => Self::Golf,
-            "Tennis" => Self::Tennis,
-            "Basketball" => Self::Basketball,
-            "Soccer" => Self::Soccer,
-            "Baseball" => Self::Baseball,
-            "Football" => Self::Football,
-            "Skiing" => Self::Skiing,
-            "Snowboarding" => Self::Snowboarding,
-            "Climbing" => Self::Climbing,
-            "Boxing" => Self::Boxing,
-            "Martial Arts" => Self::MartialArts,
-            "Jump Rope" => Self::JumpRope,
-            "Pilates" => Self::Pilates,
-            "Cross Training" => Self::CrossTraining,
-            "Mixed Cardio" => Self::MixedCardio,
-            "HIIT" => Self::Hiit,
-            "Core Training" => Self::CoreTraining,
-            "Flexibility" => Self::Flexibility,
-            "Cooldown" => Self::Cooldown,
-            "Wheelchair Walk" => Self::WheelchairWalk,
-            "Wheelchair Run" => Self::WheelchairRun,
-            "Pickleball" => Self::Pickleball,
-            "Skating" => Self::Skating,
-            "Other Workout" => Self::OtherWorkout,
-            "Activity" => Self::Activity,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for ActivityType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ActivityType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for ActivityType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ActivityType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for ActivityType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ActivityType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ActivityType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ActivityType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for ActivityType<'_> {
-    type Output = ActivityType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ActivityType<S> {
+    type Output = ActivityType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ActivityType::Running => ActivityType::Running,
@@ -285,20 +238,26 @@ impl jacquard_common::IntoStatic for ActivityType<'_> {
 
 /// A split within an activity, like a mile split or kilometer split.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Split<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Split<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The distance covered in this split. Follows the units defined in the parent.
-    #[serde(borrow)]
-    pub distance: CowStr<'a>,
+    pub distance: S,
     ///The duration of the split in seconds.
     pub duration: i64,
     ///The order of the split within the activity, starting at 1.
     pub order: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Split<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Split<S> {
     fn nsid() -> &'static str {
         "social.pace.feed.defs"
     }
@@ -374,7 +333,7 @@ pub mod split_state {
 /// Builder for constructing an instance of this type
 pub struct SplitBuilder<'a, S: split_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<i64>),
+    _fields: (Option<S>, Option<i64>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -404,7 +363,7 @@ where
     /// Set the `distance` field (required)
     pub fn distance(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SplitBuilder<'a, split_state::SetDistance<S>> {
         self._fields.0 = Option::Some(value.into());
         SplitBuilder {
@@ -470,13 +429,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Split<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Split<'a> {
         Split {
             distance: self._fields.0.unwrap(),
             duration: self._fields.1.unwrap(),

@@ -10,25 +10,42 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::chat_bsky::convo::ConvoView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetConvoForMembers<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetConvoForMembers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub members: Vec<Did<'a>>,
+    pub members: Vec<Did<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetConvoForMembersOutput<'a> {
-    #[serde(borrow)]
-    pub convo: ConvoView<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetConvoForMembersOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub convo: ConvoView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for chat.bsky.convo.getConvoForMembers
@@ -36,11 +53,12 @@ pub struct GetConvoForMembersResponse;
 impl jacquard_common::xrpc::XrpcResp for GetConvoForMembersResponse {
     const NSID: &'static str = "chat.bsky.convo.getConvoForMembers";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetConvoForMembersOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetConvoForMembersOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetConvoForMembers<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetConvoForMembers<S> {
     const NSID: &'static str = "chat.bsky.convo.getConvoForMembers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetConvoForMembersResponse;
@@ -51,7 +69,7 @@ pub struct GetConvoForMembersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetConvoForMembersRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.getConvoForMembers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetConvoForMembers<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetConvoForMembers<S>;
     type Response = GetConvoForMembersResponse;
 }
 
@@ -90,7 +108,7 @@ pub mod get_convo_for_members_state {
 /// Builder for constructing an instance of this type
 pub struct GetConvoForMembersBuilder<'a, S: get_convo_for_members_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<Did<'a>>>,),
+    _fields: (Option<Vec<Did<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -120,7 +138,7 @@ where
     /// Set the `members` field (required)
     pub fn members(
         mut self,
-        value: impl Into<Vec<Did<'a>>>,
+        value: impl Into<Vec<Did<S>>>,
     ) -> GetConvoForMembersBuilder<'a, get_convo_for_members_state::SetMembers<S>> {
         self._fields.0 = Option::Some(value.into());
         GetConvoForMembersBuilder {

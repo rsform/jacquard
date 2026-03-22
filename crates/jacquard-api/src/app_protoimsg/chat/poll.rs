@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,49 +29,56 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A poll within a chat channel. Lives in the creator's repo.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.protoimsg.chat.poll", tag = "$type")]
-pub struct Poll<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.protoimsg.chat.poll",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Poll<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether voters can select multiple options.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_poll_allow_multiple")]
     pub allow_multiple: Option<bool>,
     ///AT-URI of the channel this poll belongs to.
-    #[serde(borrow)]
-    pub channel: AtUri<'a>,
+    pub channel: AtUri<S>,
     ///Timestamp of poll creation.
     pub created_at: Datetime,
     ///When the poll closes. Omit for no expiry.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<Datetime>,
     ///Poll answer options.
-    #[serde(borrow)]
-    pub options: Vec<CowStr<'a>>,
+    pub options: Vec<S>,
     ///The poll question.
-    #[serde(borrow)]
-    pub question: CowStr<'a>,
+    pub question: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PollGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PollGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Poll<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Poll<S>,
 }
 
-impl<'a> Poll<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PollRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Poll<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PollRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -80,18 +89,17 @@ pub struct PollRecord;
 impl XrpcResp for PollRecord {
     const NSID: &'static str = "app.protoimsg.chat.poll";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PollGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PollGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PollGetRecordOutput<'_>> for Poll<'_> {
-    fn from(output: PollGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PollGetRecordOutput<S>> for Poll<S> {
+    fn from(output: PollGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Poll<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Poll<S> {
     const NSID: &'static str = "app.protoimsg.chat.poll";
     type Record = PollRecord;
 }
@@ -101,7 +109,7 @@ impl Collection for PollRecord {
     type Record = PollRecord;
 }
 
-impl<'a> LexiconSchema for Poll<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Poll<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.poll"
     }
@@ -163,67 +171,67 @@ pub mod poll_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Channel;
         type Question;
-        type CreatedAt;
         type Options;
+        type Channel;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Channel = Unset;
         type Question = Unset;
-        type CreatedAt = Unset;
         type Options = Unset;
-    }
-    ///State transition - sets the `channel` field to Set
-    pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChannel<S> {}
-    impl<S: State> State for SetChannel<S> {
-        type Channel = Set<members::channel>;
-        type Question = S::Question;
-        type CreatedAt = S::CreatedAt;
-        type Options = S::Options;
+        type Channel = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `question` field to Set
     pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuestion<S> {}
     impl<S: State> State for SetQuestion<S> {
-        type Channel = S::Channel;
         type Question = Set<members::question>;
-        type CreatedAt = S::CreatedAt;
         type Options = S::Options;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Channel = S::Channel;
-        type Question = S::Question;
-        type CreatedAt = Set<members::created_at>;
-        type Options = S::Options;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `options` field to Set
     pub struct SetOptions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOptions<S> {}
     impl<S: State> State for SetOptions<S> {
-        type Channel = S::Channel;
         type Question = S::Question;
-        type CreatedAt = S::CreatedAt;
         type Options = Set<members::options>;
+        type Channel = S::Channel;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `channel` field to Set
+    pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChannel<S> {}
+    impl<S: State> State for SetChannel<S> {
+        type Question = S::Question;
+        type Options = S::Options;
+        type Channel = Set<members::channel>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Question = S::Question;
+        type Options = S::Options;
+        type Channel = S::Channel;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `channel` field
-        pub struct channel(());
         ///Marker type for the `question` field
         pub struct question(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `options` field
         pub struct options(());
+        ///Marker type for the `channel` field
+        pub struct channel(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -232,11 +240,11 @@ pub struct PollBuilder<'a, S: poll_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<bool>,
-        Option<AtUri<'a>>,
+        Option<AtUri<S>>,
         Option<Datetime>,
         Option<Datetime>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -280,7 +288,7 @@ where
     /// Set the `channel` field (required)
     pub fn channel(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> PollBuilder<'a, poll_state::SetChannel<S>> {
         self._fields.1 = Option::Some(value.into());
         PollBuilder {
@@ -331,7 +339,7 @@ where
     /// Set the `options` field (required)
     pub fn options(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> PollBuilder<'a, poll_state::SetOptions<S>> {
         self._fields.4 = Option::Some(value.into());
         PollBuilder {
@@ -350,7 +358,7 @@ where
     /// Set the `question` field (required)
     pub fn question(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PollBuilder<'a, poll_state::SetQuestion<S>> {
         self._fields.5 = Option::Some(value.into());
         PollBuilder {
@@ -364,10 +372,10 @@ where
 impl<'a, S> PollBuilder<'a, S>
 where
     S: poll_state::State,
-    S::Channel: poll_state::IsSet,
     S::Question: poll_state::IsSet,
-    S::CreatedAt: poll_state::IsSet,
     S::Options: poll_state::IsSet,
+    S::Channel: poll_state::IsSet,
+    S::CreatedAt: poll_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Poll<'a> {
@@ -382,13 +390,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Poll<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Poll<'a> {
         Poll {
             allow_multiple: self._fields.0.or_else(|| Some(false)),
             channel: self._fields.1.unwrap(),

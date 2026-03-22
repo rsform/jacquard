@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,53 +32,55 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_okazu_diary::material::Tag;
 /// A diary entry to record a self-gratification activity.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "org.okazu-diary.feed.entry", tag = "$type")]
-pub struct Entry<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.okazu-diary.feed.entry",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///User-defined date and time associated with the activity, typically the datetime of the climax of the activity or simply of the record creation. The string format must satisfy all the requirements of the `datetime` format from the Lexicon language, except the requirement of whole seconds precision, but the datetime must at least specify up to the day (e.g. valid: `4545-07-21Z`, `1919-04-05T04:05+09:00`, invalid: `1919Z`). This is a subset of ISO 8601-1:2019 datetime format, but not RFC 3339 (whose time format requires whole seconds precision).
-    #[serde(borrow)]
-    pub datetime: CowStr<'a>,
+    pub datetime: S,
     ///If `true`, indicates that there may have been unrecorded activities since the last entry, so that the data in the meantime are not reliable for statistical purposes.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_entry_had_hiatus")]
     pub had_hiatus: Option<bool>,
     ///Self-label values for this post. Effectively content warnings for the note and tags.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<SelfLabels<'a>>,
+    pub labels: Option<SelfLabels<S>>,
     ///Remarks on the activity.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub note: Option<CowStr<'a>>,
+    pub note: Option<S>,
     ///References to `org.okazu-diary.material.external` records associated with the activity. Leave the array empty if it is known that there is no applicable material. Omit the property if the materials are uncertain. Although this property uses a `strongRef` to make a reference to an external repository reliable to some extent, it is recommended that you copy the record to your own repository if you want to reference a record from another repository.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subjects: Option<Vec<StrongRef<'a>>>,
+    pub subjects: Option<Vec<StrongRef<S>>>,
     ///User-specified tags for the activity.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<Tag<'a>>>,
+    pub tags: Option<Vec<Tag<S>>>,
     ///Reference to another `org.okazu-diary.feed.entry` record or an `org.okazu-diary.material.collectionItem` record from this entry is derived.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub via: Option<StrongRef<'a>>,
+    pub via: Option<StrongRef<S>>,
     ///Indicates the intended audience of the entry. A `public` entry (default) is fully public. An `unlisted` entry should not be listed in public profile feeds.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub visibility: Option<EntryVisibility<'a>>,
+    pub visibility: Option<EntryVisibility<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Indicates the intended audience of the entry. A `public` entry (default) is fully public. An `unlisted` entry should not be listed in public profile feeds.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EntryVisibility<'a> {
+pub enum EntryVisibility<S: Bos<str> + AsRef<str> = DefaultStr> {
     Public,
     Unlisted,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> EntryVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> EntryVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -84,70 +88,56 @@ impl<'a> EntryVisibility<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for EntryVisibility<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "public" => Self::Public,
             "unlisted" => Self::Unlisted,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for EntryVisibility<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "unlisted" => Self::Unlisted,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for EntryVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for EntryVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for EntryVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for EntryVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for EntryVisibility<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for EntryVisibility<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for EntryVisibility<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for EntryVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for EntryVisibility<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for EntryVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for EntryVisibility<'_> {
-    type Output = EntryVisibility<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for EntryVisibility<S> {
+    type Output = EntryVisibility<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             EntryVisibility::Public => EntryVisibility::Public,
@@ -160,22 +150,23 @@ impl jacquard_common::IntoStatic for EntryVisibility<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EntryGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EntryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Entry<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Entry<S>,
 }
 
-impl<'a> Entry<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, EntryRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Entry<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, EntryRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -186,18 +177,17 @@ pub struct EntryRecord;
 impl XrpcResp for EntryRecord {
     const NSID: &'static str = "org.okazu-diary.feed.entry";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = EntryGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = EntryGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<EntryGetRecordOutput<'_>> for Entry<'_> {
-    fn from(output: EntryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<EntryGetRecordOutput<S>> for Entry<S> {
+    fn from(output: EntryGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Entry<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Entry<S> {
     const NSID: &'static str = "org.okazu-diary.feed.entry";
     type Record = EntryRecord;
 }
@@ -207,7 +197,7 @@ impl Collection for EntryRecord {
     type Record = EntryRecord;
 }
 
-impl<'a> LexiconSchema for Entry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entry<S> {
     fn nsid() -> &'static str {
         "org.okazu-diary.feed.entry"
     }
@@ -304,14 +294,14 @@ pub mod entry_state {
 pub struct EntryBuilder<'a, S: entry_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<bool>,
-        Option<SelfLabels<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<StrongRef<'a>>>,
-        Option<Vec<Tag<'a>>>,
-        Option<StrongRef<'a>>,
-        Option<EntryVisibility<'a>>,
+        Option<SelfLabels<S>>,
+        Option<S>,
+        Option<Vec<StrongRef<S>>>,
+        Option<Vec<Tag<S>>>,
+        Option<StrongRef<S>>,
+        Option<EntryVisibility<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -342,7 +332,7 @@ where
     /// Set the `datetime` field (required)
     pub fn datetime(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EntryBuilder<'a, entry_state::SetDatetime<S>> {
         self._fields.0 = Option::Some(value.into());
         EntryBuilder {
@@ -368,12 +358,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -381,12 +371,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -394,12 +384,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `subjects` field (optional)
-    pub fn subjects(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
+    pub fn subjects(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `subjects` field to an Option value (optional)
-    pub fn maybe_subjects(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
+    pub fn maybe_subjects(mut self, value: Option<Vec<StrongRef<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -407,12 +397,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<Tag<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<Tag<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<Tag<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<Tag<S>>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -420,12 +410,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `via` field (optional)
-    pub fn via(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn via(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `via` field to an Option value (optional)
-    pub fn maybe_via(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_via(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -433,12 +423,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(mut self, value: impl Into<Option<EntryVisibility<'a>>>) -> Self {
+    pub fn visibility(mut self, value: impl Into<Option<EntryVisibility<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
-    pub fn maybe_visibility(mut self, value: Option<EntryVisibility<'a>>) -> Self {
+    pub fn maybe_visibility(mut self, value: Option<EntryVisibility<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -464,13 +454,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Entry<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Entry<'a> {
         Entry {
             datetime: self._fields.0.unwrap(),
             had_hiatus: self._fields.1.or_else(|| Some(false)),

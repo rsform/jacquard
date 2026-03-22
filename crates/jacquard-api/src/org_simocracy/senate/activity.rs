@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,51 +30,50 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Senate simulation activity log entry.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.simocracy.senate.activity",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Activity<'a> {
+pub struct Activity<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Type of senate activity
-    #[serde(borrow)]
-    pub activity_type: ActivityActivityType<'a>,
+    pub activity_type: ActivityActivityType<S>,
     ///References to the sim records participating in this committee
-    #[serde(borrow)]
-    pub committee_sims: Vec<StrongRef<'a>>,
+    pub committee_sims: Vec<StrongRef<S>>,
     ///Timestamp when the activity was logged
     pub created_at: Datetime,
     ///Link to org.hypercerts.claim.evaluation record
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub evaluation: Option<StrongRef<'a>>,
+    pub evaluation: Option<StrongRef<S>>,
     ///The proposal text being evaluated
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub proposal_text: Option<CowStr<'a>>,
+    pub proposal_text: Option<S>,
     ///Summary of the simulation result
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub result_summary: Option<CowStr<'a>>,
+    pub result_summary: Option<S>,
     ///Current status of the activity
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<ActivityStatus<'a>>,
+    pub status: Option<ActivityStatus<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Type of senate activity
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ActivityActivityType<'a> {
+pub enum ActivityActivityType<S: Bos<str> + AsRef<str> = DefaultStr> {
     CommitteeEvaluation,
     SimulationStarted,
     SimulationCompleted,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ActivityActivityType<'a> {
+impl<S: Bos<str> + AsRef<str>> ActivityActivityType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::CommitteeEvaluation => "committee_evaluation",
@@ -81,72 +82,57 @@ impl<'a> ActivityActivityType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ActivityActivityType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "committee_evaluation" => Self::CommitteeEvaluation,
             "simulation_started" => Self::SimulationStarted,
             "simulation_completed" => Self::SimulationCompleted,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ActivityActivityType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "committee_evaluation" => Self::CommitteeEvaluation,
-            "simulation_started" => Self::SimulationStarted,
-            "simulation_completed" => Self::SimulationCompleted,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ActivityActivityType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ActivityActivityType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ActivityActivityType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ActivityActivityType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ActivityActivityType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ActivityActivityType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ActivityActivityType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ActivityActivityType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ActivityActivityType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ActivityActivityType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ActivityActivityType<'_> {
-    type Output = ActivityActivityType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ActivityActivityType<S> {
+    type Output = ActivityActivityType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ActivityActivityType::CommitteeEvaluation => {
@@ -168,14 +154,14 @@ impl jacquard_common::IntoStatic for ActivityActivityType<'_> {
 /// Current status of the activity
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ActivityStatus<'a> {
+pub enum ActivityStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     InProgress,
     Completed,
     Failed,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ActivityStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> ActivityStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::InProgress => "in_progress",
@@ -184,72 +170,57 @@ impl<'a> ActivityStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ActivityStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "in_progress" => Self::InProgress,
             "completed" => Self::Completed,
             "failed" => Self::Failed,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ActivityStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "in_progress" => Self::InProgress,
-            "completed" => Self::Completed,
-            "failed" => Self::Failed,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ActivityStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ActivityStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ActivityStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ActivityStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ActivityStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ActivityStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ActivityStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ActivityStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ActivityStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ActivityStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ActivityStatus<'_> {
-    type Output = ActivityStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ActivityStatus<S> {
+    type Output = ActivityStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ActivityStatus::InProgress => ActivityStatus::InProgress,
@@ -263,22 +234,23 @@ impl jacquard_common::IntoStatic for ActivityStatus<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ActivityGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ActivityGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Activity<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Activity<S>,
 }
 
-impl<'a> Activity<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ActivityRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Activity<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ActivityRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -289,18 +261,17 @@ pub struct ActivityRecord;
 impl XrpcResp for ActivityRecord {
     const NSID: &'static str = "org.simocracy.senate.activity";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ActivityGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ActivityGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ActivityGetRecordOutput<'_>> for Activity<'_> {
-    fn from(output: ActivityGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ActivityGetRecordOutput<S>> for Activity<S> {
+    fn from(output: ActivityGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Activity<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Activity<S> {
     const NSID: &'static str = "org.simocracy.senate.activity";
     type Record = ActivityRecord;
 }
@@ -310,7 +281,7 @@ impl Collection for ActivityRecord {
     type Record = ActivityRecord;
 }
 
-impl<'a> LexiconSchema for Activity<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Activity<S> {
     fn nsid() -> &'static str {
         "org.simocracy.senate.activity"
     }
@@ -366,51 +337,51 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type ActivityType;
         type CommitteeSims;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type ActivityType = Unset;
         type CommitteeSims = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `activity_type` field to Set
-    pub struct SetActivityType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActivityType<S> {}
-    impl<S: State> State for SetActivityType<S> {
-        type ActivityType = Set<members::activity_type>;
-        type CommitteeSims = S::CommitteeSims;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `committee_sims` field to Set
-    pub struct SetCommitteeSims<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommitteeSims<S> {}
-    impl<S: State> State for SetCommitteeSims<S> {
-        type ActivityType = S::ActivityType;
-        type CommitteeSims = Set<members::committee_sims>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type ActivityType = S::ActivityType;
         type CommitteeSims = S::CommitteeSims;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `activity_type` field to Set
+    pub struct SetActivityType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActivityType<S> {}
+    impl<S: State> State for SetActivityType<S> {
+        type CreatedAt = S::CreatedAt;
+        type ActivityType = Set<members::activity_type>;
+        type CommitteeSims = S::CommitteeSims;
+    }
+    ///State transition - sets the `committee_sims` field to Set
+    pub struct SetCommitteeSims<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommitteeSims<S> {}
+    impl<S: State> State for SetCommitteeSims<S> {
+        type CreatedAt = S::CreatedAt;
+        type ActivityType = S::ActivityType;
+        type CommitteeSims = Set<members::committee_sims>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `activity_type` field
         pub struct activity_type(());
         ///Marker type for the `committee_sims` field
         pub struct committee_sims(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -418,13 +389,13 @@ pub mod activity_state {
 pub struct ActivityBuilder<'a, S: activity_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ActivityActivityType<'a>>,
-        Option<Vec<StrongRef<'a>>>,
+        Option<ActivityActivityType<S>>,
+        Option<Vec<StrongRef<S>>>,
         Option<Datetime>,
-        Option<StrongRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<ActivityStatus<'a>>,
+        Option<StrongRef<S>>,
+        Option<S>,
+        Option<S>,
+        Option<ActivityStatus<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -455,7 +426,7 @@ where
     /// Set the `activityType` field (required)
     pub fn activity_type(
         mut self,
-        value: impl Into<ActivityActivityType<'a>>,
+        value: impl Into<ActivityActivityType<S>>,
     ) -> ActivityBuilder<'a, activity_state::SetActivityType<S>> {
         self._fields.0 = Option::Some(value.into());
         ActivityBuilder {
@@ -474,7 +445,7 @@ where
     /// Set the `committeeSims` field (required)
     pub fn committee_sims(
         mut self,
-        value: impl Into<Vec<StrongRef<'a>>>,
+        value: impl Into<Vec<StrongRef<S>>>,
     ) -> ActivityBuilder<'a, activity_state::SetCommitteeSims<S>> {
         self._fields.1 = Option::Some(value.into());
         ActivityBuilder {
@@ -506,12 +477,12 @@ where
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `evaluation` field (optional)
-    pub fn evaluation(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn evaluation(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `evaluation` field to an Option value (optional)
-    pub fn maybe_evaluation(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_evaluation(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -519,12 +490,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `proposalText` field (optional)
-    pub fn proposal_text(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn proposal_text(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `proposalText` field to an Option value (optional)
-    pub fn maybe_proposal_text(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_proposal_text(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -532,12 +503,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `resultSummary` field (optional)
-    pub fn result_summary(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn result_summary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `resultSummary` field to an Option value (optional)
-    pub fn maybe_result_summary(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_result_summary(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -545,12 +516,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<ActivityStatus<'a>>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<ActivityStatus<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<ActivityStatus<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<ActivityStatus<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -559,9 +530,9 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
+    S::CreatedAt: activity_state::IsSet,
     S::ActivityType: activity_state::IsSet,
     S::CommitteeSims: activity_state::IsSet,
-    S::CreatedAt: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
@@ -579,10 +550,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Activity<'a> {
         Activity {
             activity_type: self._fields.0.unwrap(),

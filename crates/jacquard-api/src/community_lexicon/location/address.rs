@@ -5,11 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::CowStr;
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -18,36 +22,37 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A physical location in the form of a street address.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Address<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Address<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The ISO 3166 country code. Preferably the 2-letter code.
-    #[serde(borrow)]
-    pub country: CowStr<'a>,
+    pub country: S,
     ///The locality of the region. For example, a city in the USA.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub locality: Option<CowStr<'a>>,
+    pub locality: Option<S>,
     ///The name of the location.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///The postal code of the location.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub postal_code: Option<CowStr<'a>>,
+    pub postal_code: Option<S>,
     ///The administrative region of the country. For example, a state in the USA.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub region: Option<CowStr<'a>>,
+    pub region: Option<S>,
     ///The street address.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub street: Option<CowStr<'a>>,
+    pub street: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Address<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Address<S> {
     fn nsid() -> &'static str {
         "community.lexicon.location.address"
     }

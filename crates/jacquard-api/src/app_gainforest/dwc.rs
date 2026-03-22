@@ -9,11 +9,16 @@ pub mod event;
 pub mod measurement;
 pub mod occurrence;
 
-use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,7 +28,7 @@ use serde::{Serialize, Deserialize};
 /// The specific nature of the data record. Controlled vocabulary per Darwin Core.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum BasisOfRecordEnum<'a> {
+pub enum BasisOfRecordEnum<S: Bos<str> + AsRef<str> = DefaultStr> {
     HumanObservation,
     MachineObservation,
     PreservedSpecimen,
@@ -32,10 +37,10 @@ pub enum BasisOfRecordEnum<'a> {
     MaterialSample,
     MaterialEntity,
     MaterialCitation,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> BasisOfRecordEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> BasisOfRecordEnum<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::HumanObservation => "HumanObservation",
@@ -49,11 +54,9 @@ impl<'a> BasisOfRecordEnum<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for BasisOfRecordEnum<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "HumanObservation" => Self::HumanObservation,
             "MachineObservation" => Self::MachineObservation,
             "PreservedSpecimen" => Self::PreservedSpecimen,
@@ -62,63 +65,45 @@ impl<'a> From<&'a str> for BasisOfRecordEnum<'a> {
             "MaterialSample" => Self::MaterialSample,
             "MaterialEntity" => Self::MaterialEntity,
             "MaterialCitation" => Self::MaterialCitation,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for BasisOfRecordEnum<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "HumanObservation" => Self::HumanObservation,
-            "MachineObservation" => Self::MachineObservation,
-            "PreservedSpecimen" => Self::PreservedSpecimen,
-            "LivingSpecimen" => Self::LivingSpecimen,
-            "FossilSpecimen" => Self::FossilSpecimen,
-            "MaterialSample" => Self::MaterialSample,
-            "MaterialEntity" => Self::MaterialEntity,
-            "MaterialCitation" => Self::MaterialCitation,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for BasisOfRecordEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for BasisOfRecordEnum<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for BasisOfRecordEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for BasisOfRecordEnum<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for BasisOfRecordEnum<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for BasisOfRecordEnum<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for BasisOfRecordEnum<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for BasisOfRecordEnum<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for BasisOfRecordEnum<'_> {
-    type Output = BasisOfRecordEnum<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for BasisOfRecordEnum<S> {
+    type Output = BasisOfRecordEnum<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             BasisOfRecordEnum::HumanObservation => BasisOfRecordEnum::HumanObservation,
@@ -139,7 +124,7 @@ impl jacquard_common::IntoStatic for BasisOfRecordEnum<'_> {
 /// Dublin Core type vocabulary for the nature of the resource.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DublinCoreTypeEnum<'a> {
+pub enum DublinCoreTypeEnum<S: Bos<str> + AsRef<str> = DefaultStr> {
     PhysicalObject,
     StillImage,
     MovingImage,
@@ -147,10 +132,10 @@ pub enum DublinCoreTypeEnum<'a> {
     Text,
     Event,
     Dataset,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> DublinCoreTypeEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> DublinCoreTypeEnum<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::PhysicalObject => "PhysicalObject",
@@ -163,11 +148,9 @@ impl<'a> DublinCoreTypeEnum<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for DublinCoreTypeEnum<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "PhysicalObject" => Self::PhysicalObject,
             "StillImage" => Self::StillImage,
             "MovingImage" => Self::MovingImage,
@@ -175,62 +158,45 @@ impl<'a> From<&'a str> for DublinCoreTypeEnum<'a> {
             "Text" => Self::Text,
             "Event" => Self::Event,
             "Dataset" => Self::Dataset,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for DublinCoreTypeEnum<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "PhysicalObject" => Self::PhysicalObject,
-            "StillImage" => Self::StillImage,
-            "MovingImage" => Self::MovingImage,
-            "Sound" => Self::Sound,
-            "Text" => Self::Text,
-            "Event" => Self::Event,
-            "Dataset" => Self::Dataset,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for DublinCoreTypeEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for DublinCoreTypeEnum<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for DublinCoreTypeEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for DublinCoreTypeEnum<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for DublinCoreTypeEnum<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for DublinCoreTypeEnum<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for DublinCoreTypeEnum<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for DublinCoreTypeEnum<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for DublinCoreTypeEnum<'_> {
-    type Output = DublinCoreTypeEnum<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for DublinCoreTypeEnum<S> {
+    type Output = DublinCoreTypeEnum<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             DublinCoreTypeEnum::PhysicalObject => DublinCoreTypeEnum::PhysicalObject,
@@ -247,38 +213,42 @@ impl jacquard_common::IntoStatic for DublinCoreTypeEnum<'_> {
 
 /// A geographic point with uncertainty, following Darwin Core Location class
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Geolocation<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Geolocation<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Horizontal distance from the coordinates describing the smallest circle containing the whole location. Zero is not valid.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub coordinate_uncertainty_in_meters: Option<i64>,
     ///Geographic latitude in decimal degrees (WGS84). Positive values north of the Equator, negative south. Range: -90 to 90.
-    #[serde(borrow)]
-    pub decimal_latitude: CowStr<'a>,
+    pub decimal_latitude: S,
     ///Geographic longitude in decimal degrees (WGS84). Positive values east of the Greenwich Meridian, negative west. Range: -180 to 180.
-    #[serde(borrow)]
-    pub decimal_longitude: CowStr<'a>,
+    pub decimal_longitude: S,
     ///The ellipsoid, geodetic datum, or spatial reference system. Recommended: 'EPSG:4326' (WGS84)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geodetic_datum: Option<CowStr<'a>>,
+    pub geodetic_datum: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The nomenclatural code under which the scientific name is constructed.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum NomenclaturalCodeEnum<'a> {
+pub enum NomenclaturalCodeEnum<S: Bos<str> + AsRef<str> = DefaultStr> {
     Iczn,
     Icn,
     Icnp,
     Ictv,
     BioCode,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> NomenclaturalCodeEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> NomenclaturalCodeEnum<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Iczn => "ICZN",
@@ -289,70 +259,53 @@ impl<'a> NomenclaturalCodeEnum<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for NomenclaturalCodeEnum<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "ICZN" => Self::Iczn,
             "ICN" => Self::Icn,
             "ICNP" => Self::Icnp,
             "ICTV" => Self::Ictv,
             "BioCode" => Self::BioCode,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for NomenclaturalCodeEnum<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "ICZN" => Self::Iczn,
-            "ICN" => Self::Icn,
-            "ICNP" => Self::Icnp,
-            "ICTV" => Self::Ictv,
-            "BioCode" => Self::BioCode,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for NomenclaturalCodeEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for NomenclaturalCodeEnum<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for NomenclaturalCodeEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for NomenclaturalCodeEnum<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for NomenclaturalCodeEnum<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for NomenclaturalCodeEnum<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for NomenclaturalCodeEnum<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for NomenclaturalCodeEnum<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for NomenclaturalCodeEnum<'_> {
-    type Output = NomenclaturalCodeEnum<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for NomenclaturalCodeEnum<S> {
+    type Output = NomenclaturalCodeEnum<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             NomenclaturalCodeEnum::Iczn => NomenclaturalCodeEnum::Iczn,
@@ -370,13 +323,13 @@ impl jacquard_common::IntoStatic for NomenclaturalCodeEnum<'_> {
 /// Statement about the presence or absence of a taxon at a location.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum OccurrenceStatusEnum<'a> {
+pub enum OccurrenceStatusEnum<S: Bos<str> + AsRef<str> = DefaultStr> {
     Present,
     Absent,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> OccurrenceStatusEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> OccurrenceStatusEnum<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Present => "present",
@@ -384,64 +337,50 @@ impl<'a> OccurrenceStatusEnum<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for OccurrenceStatusEnum<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "present" => Self::Present,
             "absent" => Self::Absent,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for OccurrenceStatusEnum<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "present" => Self::Present,
-            "absent" => Self::Absent,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for OccurrenceStatusEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for OccurrenceStatusEnum<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for OccurrenceStatusEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for OccurrenceStatusEnum<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for OccurrenceStatusEnum<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for OccurrenceStatusEnum<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for OccurrenceStatusEnum<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for OccurrenceStatusEnum<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for OccurrenceStatusEnum<'_> {
-    type Output = OccurrenceStatusEnum<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for OccurrenceStatusEnum<S> {
+    type Output = OccurrenceStatusEnum<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             OccurrenceStatusEnum::Present => OccurrenceStatusEnum::Present,
@@ -456,14 +395,14 @@ impl jacquard_common::IntoStatic for OccurrenceStatusEnum<'_> {
 /// The sex of the biological individual(s) represented in the occurrence.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SexEnum<'a> {
+pub enum SexEnum<S: Bos<str> + AsRef<str> = DefaultStr> {
     Male,
     Female,
     Hermaphrodite,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SexEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> SexEnum<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Male => "male",
@@ -472,66 +411,50 @@ impl<'a> SexEnum<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SexEnum<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "male" => Self::Male,
             "female" => Self::Female,
             "hermaphrodite" => Self::Hermaphrodite,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SexEnum<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "male" => Self::Male,
-            "female" => Self::Female,
-            "hermaphrodite" => Self::Hermaphrodite,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for SexEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SexEnum<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for SexEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SexEnum<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for SexEnum<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SexEnum<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SexEnum<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for SexEnum<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for SexEnum<'_> {
-    type Output = SexEnum<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SexEnum<S> {
+    type Output = SexEnum<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SexEnum::Male => SexEnum::Male,
@@ -544,43 +467,43 @@ impl jacquard_common::IntoStatic for SexEnum<'_> {
 
 /// A taxonomic identification with provenance metadata
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct TaxonIdentification<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TaxonIdentification<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Date the identification was made (ISO 8601)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_identified: Option<CowStr<'a>>,
+    pub date_identified: Option<S>,
     ///GBIF backbone taxonomy key for the identified taxon
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gbif_taxon_key: Option<CowStr<'a>>,
+    pub gbif_taxon_key: Option<S>,
     ///Uncertainty qualifier applied to the taxon name (e.g., 'cf. agrestis', 'aff. agrestis')
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identification_qualifier: Option<CowStr<'a>>,
+    pub identification_qualifier: Option<S>,
     ///Notes or comments about the identification
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identification_remarks: Option<CowStr<'a>>,
+    pub identification_remarks: Option<S>,
     ///Person(s) who made the identification (pipe-delimited for multiple)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identified_by: Option<CowStr<'a>>,
+    pub identified_by: Option<S>,
     ///ORCID or other persistent identifier for the person(s) who identified (pipe-delimited)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identified_by_id: Option<CowStr<'a>>,
+    pub identified_by_id: Option<S>,
     ///The full scientific name including authorship and date
-    #[serde(borrow)]
-    pub scientific_name: CowStr<'a>,
+    pub scientific_name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The taxonomic rank of the most specific name in the scientificName.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TaxonRankEnum<'a> {
+pub enum TaxonRankEnum<S: Bos<str> + AsRef<str> = DefaultStr> {
     Kingdom,
     Phylum,
     Class,
@@ -593,10 +516,10 @@ pub enum TaxonRankEnum<'a> {
     Subspecies,
     Variety,
     Form,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> TaxonRankEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> TaxonRankEnum<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Kingdom => "kingdom",
@@ -614,11 +537,9 @@ impl<'a> TaxonRankEnum<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for TaxonRankEnum<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "kingdom" => Self::Kingdom,
             "phylum" => Self::Phylum,
             "class" => Self::Class,
@@ -631,67 +552,45 @@ impl<'a> From<&'a str> for TaxonRankEnum<'a> {
             "subspecies" => Self::Subspecies,
             "variety" => Self::Variety,
             "form" => Self::Form,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for TaxonRankEnum<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "kingdom" => Self::Kingdom,
-            "phylum" => Self::Phylum,
-            "class" => Self::Class,
-            "order" => Self::Order,
-            "family" => Self::Family,
-            "subfamily" => Self::Subfamily,
-            "genus" => Self::Genus,
-            "subgenus" => Self::Subgenus,
-            "species" => Self::Species,
-            "subspecies" => Self::Subspecies,
-            "variety" => Self::Variety,
-            "form" => Self::Form,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for TaxonRankEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for TaxonRankEnum<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for TaxonRankEnum<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for TaxonRankEnum<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for TaxonRankEnum<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for TaxonRankEnum<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for TaxonRankEnum<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for TaxonRankEnum<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for TaxonRankEnum<'_> {
-    type Output = TaxonRankEnum<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for TaxonRankEnum<S> {
+    type Output = TaxonRankEnum<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             TaxonRankEnum::Kingdom => TaxonRankEnum::Kingdom,
@@ -711,7 +610,7 @@ impl jacquard_common::IntoStatic for TaxonRankEnum<'_> {
     }
 }
 
-impl<'a> LexiconSchema for Geolocation<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Geolocation<S> {
     fn nsid() -> &'static str {
         "app.gainforest.dwc.defs"
     }
@@ -773,7 +672,7 @@ impl<'a> LexiconSchema for Geolocation<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TaxonIdentification<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TaxonIdentification<S> {
     fn nsid() -> &'static str {
         "app.gainforest.dwc.defs"
     }

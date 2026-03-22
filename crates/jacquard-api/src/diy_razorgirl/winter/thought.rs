@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,34 +28,35 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "diy.razorgirl.winter.thought",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Thought<'a> {
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
+pub struct Thought<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub content: S,
     pub created_at: Datetime,
     ///Duration for tool_call thoughts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration_ms: Option<i64>,
-    #[serde(borrow)]
-    pub kind: ThoughtKind<'a>,
+    pub kind: ThoughtKind<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///What prompted this thought
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub trigger: Option<CowStr<'a>>,
+    pub trigger: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThoughtKind<'a> {
+pub enum ThoughtKind<S: Bos<str> + AsRef<str> = DefaultStr> {
     Insight,
     Question,
     Plan,
@@ -61,10 +64,10 @@ pub enum ThoughtKind<'a> {
     Error,
     Response,
     ToolCall,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ThoughtKind<'a> {
+impl<S: Bos<str> + AsRef<str>> ThoughtKind<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Insight => "insight",
@@ -77,11 +80,9 @@ impl<'a> ThoughtKind<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ThoughtKind<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "insight" => Self::Insight,
             "question" => Self::Question,
             "plan" => Self::Plan,
@@ -89,68 +90,51 @@ impl<'a> From<&'a str> for ThoughtKind<'a> {
             "error" => Self::Error,
             "response" => Self::Response,
             "tool_call" => Self::ToolCall,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ThoughtKind<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "insight" => Self::Insight,
-            "question" => Self::Question,
-            "plan" => Self::Plan,
-            "reflection" => Self::Reflection,
-            "error" => Self::Error,
-            "response" => Self::Response,
-            "tool_call" => Self::ToolCall,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ThoughtKind<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ThoughtKind<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ThoughtKind<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ThoughtKind<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ThoughtKind<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ThoughtKind<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ThoughtKind<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ThoughtKind<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ThoughtKind<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ThoughtKind<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ThoughtKind<'_> {
-    type Output = ThoughtKind<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ThoughtKind<S> {
+    type Output = ThoughtKind<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ThoughtKind::Insight => ThoughtKind::Insight,
@@ -168,22 +152,23 @@ impl jacquard_common::IntoStatic for ThoughtKind<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ThoughtGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ThoughtGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Thought<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Thought<S>,
 }
 
-impl<'a> Thought<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ThoughtRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Thought<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ThoughtRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -194,18 +179,17 @@ pub struct ThoughtRecord;
 impl XrpcResp for ThoughtRecord {
     const NSID: &'static str = "diy.razorgirl.winter.thought";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ThoughtGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ThoughtGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ThoughtGetRecordOutput<'_>> for Thought<'_> {
-    fn from(output: ThoughtGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ThoughtGetRecordOutput<S>> for Thought<S> {
+    fn from(output: ThoughtGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Thought<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Thought<S> {
     const NSID: &'static str = "diy.razorgirl.winter.thought";
     type Record = ThoughtRecord;
 }
@@ -215,7 +199,7 @@ impl Collection for ThoughtRecord {
     type Record = ThoughtRecord;
 }
 
-impl<'a> LexiconSchema for Thought<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Thought<S> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.thought"
     }
@@ -261,51 +245,51 @@ pub mod thought_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Kind;
         type Content;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Kind = Unset;
         type Content = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `kind` field to Set
-    pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKind<S> {}
-    impl<S: State> State for SetKind<S> {
-        type Kind = Set<members::kind>;
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Kind = S::Kind;
-        type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Kind = S::Kind;
         type Content = S::Content;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `kind` field to Set
+    pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKind<S> {}
+    impl<S: State> State for SetKind<S> {
+        type CreatedAt = S::CreatedAt;
+        type Kind = Set<members::kind>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type CreatedAt = S::CreatedAt;
+        type Kind = S::Kind;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `kind` field
         pub struct kind(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -313,12 +297,12 @@ pub mod thought_state {
 pub struct ThoughtBuilder<'a, S: thought_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
         Option<i64>,
-        Option<ThoughtKind<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<ThoughtKind<S>>,
+        Option<Vec<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -349,7 +333,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ThoughtBuilder<'a, thought_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         ThoughtBuilder {
@@ -400,7 +384,7 @@ where
     /// Set the `kind` field (required)
     pub fn kind(
         mut self,
-        value: impl Into<ThoughtKind<'a>>,
+        value: impl Into<ThoughtKind<S>>,
     ) -> ThoughtBuilder<'a, thought_state::SetKind<S>> {
         self._fields.3 = Option::Some(value.into());
         ThoughtBuilder {
@@ -413,12 +397,12 @@ where
 
 impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -426,12 +410,12 @@ impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
 
 impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `trigger` field (optional)
-    pub fn trigger(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn trigger(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `trigger` field to an Option value (optional)
-    pub fn maybe_trigger(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_trigger(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -440,9 +424,9 @@ impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
 impl<'a, S> ThoughtBuilder<'a, S>
 where
     S: thought_state::State,
+    S::CreatedAt: thought_state::IsSet,
     S::Kind: thought_state::IsSet,
     S::Content: thought_state::IsSet,
-    S::CreatedAt: thought_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Thought<'a> {
@@ -459,10 +443,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Thought<'a> {
         Thought {
             content: self._fields.0.unwrap(),

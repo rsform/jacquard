@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Nsid, Datetime};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,10 +26,15 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::get_job_status;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct JobStatus<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct JobStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When the job completed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<Datetime>,
@@ -35,63 +42,81 @@ pub struct JobStatus<'a> {
     pub created_at: Datetime,
     ///Error message if job failed
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub error: Option<CowStr<'a>>,
+    pub error: Option<S>,
     ///UUID of the job
-    #[serde(borrow)]
-    pub job_id: CowStr<'a>,
+    pub job_id: S,
     ///Job result if completed successfully
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub result: Option<get_job_status::SyncJobResult<'a>>,
+    pub result: Option<get_job_status::SyncJobResult<S>>,
     ///Number of times the job has been retried
     pub retry_count: i64,
     ///When the job started executing
     #[serde(skip_serializing_if = "Option::is_none")]
     pub started_at: Option<Datetime>,
     ///Current status of the job
-    #[serde(borrow)]
-    pub status: CowStr<'a>,
+    pub status: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetJobStatus<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetJobStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub job_id: CowStr<'a>,
+    pub job_id: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetJobStatusOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetJobStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
+    pub value: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SyncJobResult<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SyncJobResult<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of collection NSIDs that were synced
-    #[serde(borrow)]
-    pub collections_synced: Vec<Nsid<'a>>,
+    pub collections_synced: Vec<Nsid<S>>,
     ///Human-readable message about the job completion
-    #[serde(borrow)]
-    pub message: CowStr<'a>,
+    pub message: S,
     ///Number of repositories processed
     pub repos_processed: i64,
     ///Whether the sync job completed successfully
     pub success: bool,
     ///Total number of records synced
     pub total_records: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for JobStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for JobStatus<S> {
     fn nsid() -> &'static str {
         "network.slices.slice.getJobStatus"
     }
@@ -111,11 +136,12 @@ pub struct GetJobStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJobStatusResponse {
     const NSID: &'static str = "network.slices.slice.getJobStatus";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetJobStatusOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetJobStatusOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetJobStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetJobStatus<S> {
     const NSID: &'static str = "network.slices.slice.getJobStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetJobStatusResponse;
@@ -126,11 +152,11 @@ pub struct GetJobStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJobStatusRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getJobStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetJobStatus<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetJobStatus<S>;
     type Response = GetJobStatusResponse;
 }
 
-impl<'a> LexiconSchema for SyncJobResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SyncJobResult<S> {
     fn nsid() -> &'static str {
         "network.slices.slice.getJobStatus"
     }
@@ -156,66 +182,66 @@ pub mod job_status_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type RetryCount;
+        type JobId;
         type CreatedAt;
         type Status;
-        type JobId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type RetryCount = Unset;
+        type JobId = Unset;
         type CreatedAt = Unset;
         type Status = Unset;
-        type JobId = Unset;
     }
     ///State transition - sets the `retry_count` field to Set
     pub struct SetRetryCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRetryCount<S> {}
     impl<S: State> State for SetRetryCount<S> {
         type RetryCount = Set<members::retry_count>;
+        type JobId = S::JobId;
         type CreatedAt = S::CreatedAt;
         type Status = S::Status;
-        type JobId = S::JobId;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type RetryCount = S::RetryCount;
-        type CreatedAt = Set<members::created_at>;
-        type Status = S::Status;
-        type JobId = S::JobId;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type RetryCount = S::RetryCount;
-        type CreatedAt = S::CreatedAt;
-        type Status = Set<members::status>;
-        type JobId = S::JobId;
     }
     ///State transition - sets the `job_id` field to Set
     pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetJobId<S> {}
     impl<S: State> State for SetJobId<S> {
         type RetryCount = S::RetryCount;
+        type JobId = Set<members::job_id>;
         type CreatedAt = S::CreatedAt;
         type Status = S::Status;
-        type JobId = Set<members::job_id>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type RetryCount = S::RetryCount;
+        type JobId = S::JobId;
+        type CreatedAt = Set<members::created_at>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type RetryCount = S::RetryCount;
+        type JobId = S::JobId;
+        type CreatedAt = S::CreatedAt;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `retry_count` field
         pub struct retry_count(());
+        ///Marker type for the `job_id` field
+        pub struct job_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `status` field
         pub struct status(());
-        ///Marker type for the `job_id` field
-        pub struct job_id(());
     }
 }
 
@@ -225,12 +251,12 @@ pub struct JobStatusBuilder<'a, S: job_status_state::State> {
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<get_job_status::SyncJobResult<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<get_job_status::SyncJobResult<S>>,
         Option<i64>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -287,12 +313,12 @@ where
 
 impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     /// Set the `error` field (optional)
-    pub fn error(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn error(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `error` field to an Option value (optional)
-    pub fn maybe_error(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_error(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -306,7 +332,7 @@ where
     /// Set the `jobId` field (required)
     pub fn job_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> JobStatusBuilder<'a, job_status_state::SetJobId<S>> {
         self._fields.3 = Option::Some(value.into());
         JobStatusBuilder {
@@ -321,7 +347,7 @@ impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     /// Set the `result` field (optional)
     pub fn result(
         mut self,
-        value: impl Into<Option<get_job_status::SyncJobResult<'a>>>,
+        value: impl Into<Option<get_job_status::SyncJobResult<S>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
@@ -329,7 +355,7 @@ impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     /// Set the `result` field to an Option value (optional)
     pub fn maybe_result(
         mut self,
-        value: Option<get_job_status::SyncJobResult<'a>>,
+        value: Option<get_job_status::SyncJobResult<S>>,
     ) -> Self {
         self._fields.4 = value;
         self
@@ -376,7 +402,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> JobStatusBuilder<'a, job_status_state::SetStatus<S>> {
         self._fields.7 = Option::Some(value.into());
         JobStatusBuilder {
@@ -391,9 +417,9 @@ impl<'a, S> JobStatusBuilder<'a, S>
 where
     S: job_status_state::State,
     S::RetryCount: job_status_state::IsSet,
+    S::JobId: job_status_state::IsSet,
     S::CreatedAt: job_status_state::IsSet,
     S::Status: job_status_state::IsSet,
-    S::JobId: job_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> JobStatus<'a> {
@@ -412,10 +438,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> JobStatus<'a> {
         JobStatus {
             completed_at: self._fields.0,
@@ -658,7 +681,7 @@ pub mod get_job_status_state {
 /// Builder for constructing an instance of this type
 pub struct GetJobStatusBuilder<'a, S: get_job_status_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -688,7 +711,7 @@ where
     /// Set the `jobId` field (required)
     pub fn job_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetJobStatusBuilder<'a, get_job_status_state::SetJobId<S>> {
         self._fields.0 = Option::Some(value.into());
         GetJobStatusBuilder {
@@ -725,8 +748,8 @@ pub mod sync_job_result_state {
         type Message;
         type Success;
         type CollectionsSynced;
-        type TotalRecords;
         type ReposProcessed;
+        type TotalRecords;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -735,8 +758,8 @@ pub mod sync_job_result_state {
         type Message = Unset;
         type Success = Unset;
         type CollectionsSynced = Unset;
-        type TotalRecords = Unset;
         type ReposProcessed = Unset;
+        type TotalRecords = Unset;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
@@ -745,8 +768,8 @@ pub mod sync_job_result_state {
         type Message = Set<members::message>;
         type Success = S::Success;
         type CollectionsSynced = S::CollectionsSynced;
-        type TotalRecords = S::TotalRecords;
         type ReposProcessed = S::ReposProcessed;
+        type TotalRecords = S::TotalRecords;
     }
     ///State transition - sets the `success` field to Set
     pub struct SetSuccess<S: State = Empty>(PhantomData<fn() -> S>);
@@ -755,8 +778,8 @@ pub mod sync_job_result_state {
         type Message = S::Message;
         type Success = Set<members::success>;
         type CollectionsSynced = S::CollectionsSynced;
-        type TotalRecords = S::TotalRecords;
         type ReposProcessed = S::ReposProcessed;
+        type TotalRecords = S::TotalRecords;
     }
     ///State transition - sets the `collections_synced` field to Set
     pub struct SetCollectionsSynced<S: State = Empty>(PhantomData<fn() -> S>);
@@ -765,18 +788,8 @@ pub mod sync_job_result_state {
         type Message = S::Message;
         type Success = S::Success;
         type CollectionsSynced = Set<members::collections_synced>;
+        type ReposProcessed = S::ReposProcessed;
         type TotalRecords = S::TotalRecords;
-        type ReposProcessed = S::ReposProcessed;
-    }
-    ///State transition - sets the `total_records` field to Set
-    pub struct SetTotalRecords<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalRecords<S> {}
-    impl<S: State> State for SetTotalRecords<S> {
-        type Message = S::Message;
-        type Success = S::Success;
-        type CollectionsSynced = S::CollectionsSynced;
-        type TotalRecords = Set<members::total_records>;
-        type ReposProcessed = S::ReposProcessed;
     }
     ///State transition - sets the `repos_processed` field to Set
     pub struct SetReposProcessed<S: State = Empty>(PhantomData<fn() -> S>);
@@ -785,8 +798,18 @@ pub mod sync_job_result_state {
         type Message = S::Message;
         type Success = S::Success;
         type CollectionsSynced = S::CollectionsSynced;
-        type TotalRecords = S::TotalRecords;
         type ReposProcessed = Set<members::repos_processed>;
+        type TotalRecords = S::TotalRecords;
+    }
+    ///State transition - sets the `total_records` field to Set
+    pub struct SetTotalRecords<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalRecords<S> {}
+    impl<S: State> State for SetTotalRecords<S> {
+        type Message = S::Message;
+        type Success = S::Success;
+        type CollectionsSynced = S::CollectionsSynced;
+        type ReposProcessed = S::ReposProcessed;
+        type TotalRecords = Set<members::total_records>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -797,23 +820,17 @@ pub mod sync_job_result_state {
         pub struct success(());
         ///Marker type for the `collections_synced` field
         pub struct collections_synced(());
-        ///Marker type for the `total_records` field
-        pub struct total_records(());
         ///Marker type for the `repos_processed` field
         pub struct repos_processed(());
+        ///Marker type for the `total_records` field
+        pub struct total_records(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SyncJobResultBuilder<'a, S: sync_job_result_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Vec<Nsid<'a>>>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<bool>,
-        Option<i64>,
-    ),
+    _fields: (Option<Vec<Nsid<S>>>, Option<S>, Option<i64>, Option<bool>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -843,7 +860,7 @@ where
     /// Set the `collectionsSynced` field (required)
     pub fn collections_synced(
         mut self,
-        value: impl Into<Vec<Nsid<'a>>>,
+        value: impl Into<Vec<Nsid<S>>>,
     ) -> SyncJobResultBuilder<'a, sync_job_result_state::SetCollectionsSynced<S>> {
         self._fields.0 = Option::Some(value.into());
         SyncJobResultBuilder {
@@ -862,7 +879,7 @@ where
     /// Set the `message` field (required)
     pub fn message(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SyncJobResultBuilder<'a, sync_job_result_state::SetMessage<S>> {
         self._fields.1 = Option::Some(value.into());
         SyncJobResultBuilder {
@@ -936,8 +953,8 @@ where
     S::Message: sync_job_result_state::IsSet,
     S::Success: sync_job_result_state::IsSet,
     S::CollectionsSynced: sync_job_result_state::IsSet,
-    S::TotalRecords: sync_job_result_state::IsSet,
     S::ReposProcessed: sync_job_result_state::IsSet,
+    S::TotalRecords: sync_job_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SyncJobResult<'a> {
@@ -953,10 +970,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SyncJobResult<'a> {
         SyncJobResult {
             collections_synced: self._fields.0.unwrap(),

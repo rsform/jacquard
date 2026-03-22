@@ -7,6 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -14,20 +15,40 @@ use crate::app_rocksky::player::CurrentlyPlayingViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetCurrentlyPlaying<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetCurrentlyPlaying<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub actor: Option<AtIdentifier<'a>>,
+    pub actor: Option<AtIdentifier<S>>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetCurrentlyPlayingOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetCurrentlyPlayingOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: CurrentlyPlayingViewDetailed<'a>,
+    pub value: CurrentlyPlayingViewDetailed<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for app.rocksky.spotify.getCurrentlyPlaying
@@ -35,11 +56,12 @@ pub struct GetCurrentlyPlayingResponse;
 impl jacquard_common::xrpc::XrpcResp for GetCurrentlyPlayingResponse {
     const NSID: &'static str = "app.rocksky.spotify.getCurrentlyPlaying";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetCurrentlyPlayingOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetCurrentlyPlayingOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetCurrentlyPlaying<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetCurrentlyPlaying<S> {
     const NSID: &'static str = "app.rocksky.spotify.getCurrentlyPlaying";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetCurrentlyPlayingResponse;
@@ -50,7 +72,7 @@ pub struct GetCurrentlyPlayingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetCurrentlyPlayingRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.spotify.getCurrentlyPlaying";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetCurrentlyPlaying<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetCurrentlyPlaying<S>;
     type Response = GetCurrentlyPlayingResponse;
 }
 
@@ -76,7 +98,7 @@ pub mod get_currently_playing_state {
 /// Builder for constructing an instance of this type
 pub struct GetCurrentlyPlayingBuilder<'a, S: get_currently_playing_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>,),
+    _fields: (Option<AtIdentifier<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -100,12 +122,12 @@ impl<'a> GetCurrentlyPlayingBuilder<'a, get_currently_playing_state::Empty> {
 
 impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S> {
     /// Set the `actor` field (optional)
-    pub fn actor(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
+    pub fn actor(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
-    pub fn maybe_actor(mut self, value: Option<AtIdentifier<'a>>) -> Self {
+    pub fn maybe_actor(mut self, value: Option<AtIdentifier<S>>) -> Self {
         self._fields.0 = value;
         self
     }

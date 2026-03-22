@@ -10,15 +10,17 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -34,71 +36,77 @@ use crate::pub_leaflet::publication::Preferences;
 use crate::pub_leaflet::publication::Theme;
 /// Record containing a document
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "pub.leaflet.document", tag = "$type")]
-pub struct Document<'a> {
-    #[serde(borrow)]
-    pub author: AtIdentifier<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "pub.leaflet.document",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Document<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub author: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cover_image: Option<BlobRef<'a>>,
+    pub cover_image: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub pages: Vec<DocumentPagesItem<'a>>,
+    pub description: Option<S>,
+    pub pages: Vec<DocumentPagesItem<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub post_ref: Option<StrongRef<'a>>,
+    pub post_ref: Option<StrongRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub preferences: Option<Preferences<'a>>,
+    pub preferences: Option<Preferences<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publication: Option<AtUri<'a>>,
+    pub publication: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub theme: Option<Theme<'a>>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub theme: Option<Theme<S>>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum DocumentPagesItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum DocumentPagesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "pub.leaflet.pages.linearDocument")]
-    LinearDocument(Box<LinearDocument<'a>>),
+    LinearDocument(Box<LinearDocument<S>>),
     #[serde(rename = "pub.leaflet.pages.canvas")]
-    Canvas(Box<Canvas<'a>>),
+    Canvas(Box<Canvas<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DocumentGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DocumentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Document<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Document<S>,
 }
 
-impl<'a> Document<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DocumentRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Document<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DocumentRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -109,18 +117,17 @@ pub struct DocumentRecord;
 impl XrpcResp for DocumentRecord {
     const NSID: &'static str = "pub.leaflet.document";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DocumentGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DocumentGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DocumentGetRecordOutput<'_>> for Document<'_> {
-    fn from(output: DocumentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DocumentGetRecordOutput<S>> for Document<S> {
+    fn from(output: DocumentGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Document<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Document<S> {
     const NSID: &'static str = "pub.leaflet.document";
     type Record = DocumentRecord;
 }
@@ -130,7 +137,7 @@ impl Collection for DocumentRecord {
     type Record = DocumentRecord;
 }
 
-impl<'a> LexiconSchema for Document<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Document<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.document"
     }
@@ -242,51 +249,51 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Author;
         type Pages;
+        type Author;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Author = Unset;
         type Pages = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Author = S::Author;
-        type Pages = S::Pages;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Title = S::Title;
-        type Author = Set<members::author>;
-        type Pages = S::Pages;
+        type Author = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `pages` field to Set
     pub struct SetPages<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPages<S> {}
     impl<S: State> State for SetPages<S> {
-        type Title = S::Title;
-        type Author = S::Author;
         type Pages = Set<members::pages>;
+        type Author = S::Author;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Pages = S::Pages;
+        type Author = Set<members::author>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Pages = S::Pages;
+        type Author = S::Author;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `pages` field
         pub struct pages(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -294,17 +301,17 @@ pub mod document_state {
 pub struct DocumentBuilder<'a, S: document_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtIdentifier<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<DocumentPagesItem<'a>>>,
-        Option<StrongRef<'a>>,
-        Option<Preferences<'a>>,
-        Option<AtUri<'a>>,
+        Option<AtIdentifier<S>>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<Vec<DocumentPagesItem<S>>>,
+        Option<StrongRef<S>>,
+        Option<Preferences<S>>,
+        Option<AtUri<S>>,
         Option<Datetime>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Theme<'a>>,
-        Option<CowStr<'a>>,
+        Option<Vec<S>>,
+        Option<Theme<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -335,7 +342,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> DocumentBuilder<'a, document_state::SetAuthor<S>> {
         self._fields.0 = Option::Some(value.into());
         DocumentBuilder {
@@ -348,12 +355,12 @@ where
 
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `coverImage` field (optional)
-    pub fn cover_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn cover_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `coverImage` field to an Option value (optional)
-    pub fn maybe_cover_image(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_cover_image(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -361,12 +368,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -380,7 +387,7 @@ where
     /// Set the `pages` field (required)
     pub fn pages(
         mut self,
-        value: impl Into<Vec<DocumentPagesItem<'a>>>,
+        value: impl Into<Vec<DocumentPagesItem<S>>>,
     ) -> DocumentBuilder<'a, document_state::SetPages<S>> {
         self._fields.3 = Option::Some(value.into());
         DocumentBuilder {
@@ -393,12 +400,12 @@ where
 
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `postRef` field (optional)
-    pub fn post_ref(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn post_ref(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `postRef` field to an Option value (optional)
-    pub fn maybe_post_ref(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_post_ref(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -406,12 +413,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `preferences` field (optional)
-    pub fn preferences(mut self, value: impl Into<Option<Preferences<'a>>>) -> Self {
+    pub fn preferences(mut self, value: impl Into<Option<Preferences<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `preferences` field to an Option value (optional)
-    pub fn maybe_preferences(mut self, value: Option<Preferences<'a>>) -> Self {
+    pub fn maybe_preferences(mut self, value: Option<Preferences<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -419,12 +426,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `publication` field (optional)
-    pub fn publication(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn publication(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `publication` field to an Option value (optional)
-    pub fn maybe_publication(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_publication(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -445,12 +452,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -458,12 +465,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `theme` field (optional)
-    pub fn theme(mut self, value: impl Into<Option<Theme<'a>>>) -> Self {
+    pub fn theme(mut self, value: impl Into<Option<Theme<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
-    pub fn maybe_theme(mut self, value: Option<Theme<'a>>) -> Self {
+    pub fn maybe_theme(mut self, value: Option<Theme<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -477,7 +484,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DocumentBuilder<'a, document_state::SetTitle<S>> {
         self._fields.10 = Option::Some(value.into());
         DocumentBuilder {
@@ -491,9 +498,9 @@ where
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
-    S::Title: document_state::IsSet,
-    S::Author: document_state::IsSet,
     S::Pages: document_state::IsSet,
+    S::Author: document_state::IsSet,
+    S::Title: document_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Document<'a> {
@@ -515,10 +522,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Document<'a> {
         Document {
             author: self._fields.0.unwrap(),

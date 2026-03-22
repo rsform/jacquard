@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
@@ -15,9 +15,15 @@ use crate::place_stream::live::subscribe_segments;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SubscribeSegments<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SubscribeSegments<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub streamer: CowStr<'a>,
+    pub streamer: S,
 }
 
 
@@ -62,7 +68,7 @@ impl jacquard_common::xrpc::SubscriptionResp for SubscribeSegmentsStream {
     const NSID: &'static str = "place.stream.live.subscribeSegments";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Message<'de> = SubscribeSegmentsMessage<'de>;
-    type Error<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Error = jacquard_common::xrpc::GenericError;
 }
 
 impl<'a> jacquard_common::xrpc::XrpcSubscription for SubscribeSegments<'a> {
@@ -114,7 +120,7 @@ pub mod subscribe_segments_state {
 /// Builder for constructing an instance of this type
 pub struct SubscribeSegmentsBuilder<'a, S: subscribe_segments_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -144,7 +150,7 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SubscribeSegmentsBuilder<'a, subscribe_segments_state::SetStreamer<S>> {
         self._fields.0 = Option::Some(value.into());
         SubscribeSegmentsBuilder {

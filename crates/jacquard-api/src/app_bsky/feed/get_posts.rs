@@ -10,25 +10,42 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::PostView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPosts<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPosts<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub uris: Vec<AtUri<'a>>,
+    pub uris: Vec<AtUri<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPostsOutput<'a> {
-    #[serde(borrow)]
-    pub posts: Vec<PostView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPostsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub posts: Vec<PostView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.feed.getPosts
@@ -36,11 +53,12 @@ pub struct GetPostsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostsResponse {
     const NSID: &'static str = "app.bsky.feed.getPosts";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPostsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetPostsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPosts<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetPosts<S> {
     const NSID: &'static str = "app.bsky.feed.getPosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPostsResponse;
@@ -51,7 +69,7 @@ pub struct GetPostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.getPosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPosts<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetPosts<S>;
     type Response = GetPostsResponse;
 }
 
@@ -90,7 +108,7 @@ pub mod get_posts_state {
 /// Builder for constructing an instance of this type
 pub struct GetPostsBuilder<'a, S: get_posts_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<AtUri<'a>>>,),
+    _fields: (Option<Vec<AtUri<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -120,7 +138,7 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<S>>>,
     ) -> GetPostsBuilder<'a, get_posts_state::SetUris<S>> {
         self._fields.0 = Option::Some(value.into());
         GetPostsBuilder {

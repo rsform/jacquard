@@ -10,26 +10,42 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTrackShouts<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTrackShouts<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTrackShoutsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTrackShoutsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub shouts: Option<Vec<Data<'a>>>,
+    pub shouts: Option<Vec<Data<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.shout.getTrackShouts
@@ -37,11 +53,12 @@ pub struct GetTrackShoutsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTrackShoutsResponse {
     const NSID: &'static str = "app.rocksky.shout.getTrackShouts";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTrackShoutsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetTrackShoutsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTrackShouts<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetTrackShouts<S> {
     const NSID: &'static str = "app.rocksky.shout.getTrackShouts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTrackShoutsResponse;
@@ -52,7 +69,7 @@ pub struct GetTrackShoutsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTrackShoutsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.getTrackShouts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTrackShouts<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetTrackShouts<S>;
     type Response = GetTrackShoutsResponse;
 }
 
@@ -91,7 +108,7 @@ pub mod get_track_shouts_state {
 /// Builder for constructing an instance of this type
 pub struct GetTrackShoutsBuilder<'a, S: get_track_shouts_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -121,7 +138,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetTrackShoutsBuilder<'a, get_track_shouts_state::SetUri<S>> {
         self._fields.0 = Option::Some(value.into());
         GetTrackShoutsBuilder {

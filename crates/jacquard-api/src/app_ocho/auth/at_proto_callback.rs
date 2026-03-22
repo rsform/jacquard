@@ -7,19 +7,25 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct AtProtoCallback<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AtProtoCallback<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub code: CowStr<'a>,
+    pub code: S,
     #[serde(borrow)]
-    pub iss: CowStr<'a>,
+    pub iss: S,
     #[serde(borrow)]
-    pub state: CowStr<'a>,
+    pub state: S,
 }
 
 /// Response type for app.ocho.auth.atProtoCallback
@@ -27,11 +33,12 @@ pub struct AtProtoCallbackResponse;
 impl jacquard_common::xrpc::XrpcResp for AtProtoCallbackResponse {
     const NSID: &'static str = "app.ocho.auth.atProtoCallback";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for AtProtoCallback<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for AtProtoCallback<S> {
     const NSID: &'static str = "app.ocho.auth.atProtoCallback";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = AtProtoCallbackResponse;
@@ -42,7 +49,7 @@ pub struct AtProtoCallbackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AtProtoCallbackRequest {
     const PATH: &'static str = "/xrpc/app.ocho.auth.atProtoCallback";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = AtProtoCallback<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = AtProtoCallback<S>;
     type Response = AtProtoCallbackResponse;
 }
 
@@ -56,49 +63,49 @@ pub mod at_proto_callback_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type State;
         type Code;
+        type State;
         type Iss;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type State = Unset;
         type Code = Unset;
+        type State = Unset;
         type Iss = Unset;
-    }
-    ///State transition - sets the `state` field to Set
-    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetState<S> {}
-    impl<S: State> State for SetState<S> {
-        type State = Set<members::state>;
-        type Code = S::Code;
-        type Iss = S::Iss;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
-        type State = S::State;
         type Code = Set<members::code>;
+        type State = S::State;
+        type Iss = S::Iss;
+    }
+    ///State transition - sets the `state` field to Set
+    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetState<S> {}
+    impl<S: State> State for SetState<S> {
+        type Code = S::Code;
+        type State = Set<members::state>;
         type Iss = S::Iss;
     }
     ///State transition - sets the `iss` field to Set
     pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIss<S> {}
     impl<S: State> State for SetIss<S> {
-        type State = S::State;
         type Code = S::Code;
+        type State = S::State;
         type Iss = Set<members::iss>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `state` field
-        pub struct state(());
         ///Marker type for the `code` field
         pub struct code(());
+        ///Marker type for the `state` field
+        pub struct state(());
         ///Marker type for the `iss` field
         pub struct iss(());
     }
@@ -107,7 +114,7 @@ pub mod at_proto_callback_state {
 /// Builder for constructing an instance of this type
 pub struct AtProtoCallbackBuilder<'a, S: at_proto_callback_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -137,7 +144,7 @@ where
     /// Set the `code` field (required)
     pub fn code(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AtProtoCallbackBuilder<'a, at_proto_callback_state::SetCode<S>> {
         self._fields.0 = Option::Some(value.into());
         AtProtoCallbackBuilder {
@@ -156,7 +163,7 @@ where
     /// Set the `iss` field (required)
     pub fn iss(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AtProtoCallbackBuilder<'a, at_proto_callback_state::SetIss<S>> {
         self._fields.1 = Option::Some(value.into());
         AtProtoCallbackBuilder {
@@ -175,7 +182,7 @@ where
     /// Set the `state` field (required)
     pub fn state(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AtProtoCallbackBuilder<'a, at_proto_callback_state::SetState<S>> {
         self._fields.2 = Option::Some(value.into());
         AtProtoCallbackBuilder {
@@ -189,8 +196,8 @@ where
 impl<'a, S> AtProtoCallbackBuilder<'a, S>
 where
     S: at_proto_callback_state::State,
-    S::State: at_proto_callback_state::IsSet,
     S::Code: at_proto_callback_state::IsSet,
+    S::State: at_proto_callback_state::IsSet,
     S::Iss: at_proto_callback_state::IsSet,
 {
     /// Build the final struct

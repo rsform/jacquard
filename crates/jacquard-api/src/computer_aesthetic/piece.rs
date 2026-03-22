@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,39 +29,47 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A piece (interactive program) from Aesthetic Computer
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "computer.aesthetic.piece", tag = "$type")]
-pub struct Piece<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "computer.aesthetic.piece",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Piece<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///MongoDB ObjectId reference for bidirectional sync
-    #[serde(borrow)]
-    pub r#ref: CowStr<'a>,
+    pub r#ref: S,
     ///The piece identifier (e.g., 'wand')
-    #[serde(borrow)]
-    pub slug: CowStr<'a>,
+    pub slug: S,
     ///Creation timestamp (ISO 8601)
     pub when: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PieceGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PieceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Piece<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Piece<S>,
 }
 
-impl<'a> Piece<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PieceRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Piece<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PieceRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -70,18 +80,17 @@ pub struct PieceRecord;
 impl XrpcResp for PieceRecord {
     const NSID: &'static str = "computer.aesthetic.piece";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PieceGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PieceGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PieceGetRecordOutput<'_>> for Piece<'_> {
-    fn from(output: PieceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PieceGetRecordOutput<S>> for Piece<S> {
+    fn from(output: PieceGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Piece<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Piece<S> {
     const NSID: &'static str = "computer.aesthetic.piece";
     type Record = PieceRecord;
 }
@@ -91,7 +100,7 @@ impl Collection for PieceRecord {
     type Record = PieceRecord;
 }
 
-impl<'a> LexiconSchema for Piece<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Piece<S> {
     fn nsid() -> &'static str {
         "computer.aesthetic.piece"
     }
@@ -139,57 +148,57 @@ pub mod piece_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type When;
-        type Ref;
         type Slug;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type When = Unset;
-        type Ref = Unset;
         type Slug = Unset;
+        type Ref = Unset;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
         type When = Set<members::when>;
+        type Slug = S::Slug;
         type Ref = S::Ref;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type When = S::When;
-        type Ref = Set<members::r#ref>;
-        type Slug = S::Slug;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
         type When = S::When;
-        type Ref = S::Ref;
         type Slug = Set<members::slug>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type When = S::When;
+        type Slug = S::Slug;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `when` field
         pub struct when(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PieceBuilder<'a, S: piece_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _fields: (Option<S>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -219,7 +228,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PieceBuilder<'a, piece_state::SetRef<S>> {
         self._fields.0 = Option::Some(value.into());
         PieceBuilder {
@@ -238,7 +247,7 @@ where
     /// Set the `slug` field (required)
     pub fn slug(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PieceBuilder<'a, piece_state::SetSlug<S>> {
         self._fields.1 = Option::Some(value.into());
         PieceBuilder {
@@ -272,8 +281,8 @@ impl<'a, S> PieceBuilder<'a, S>
 where
     S: piece_state::State,
     S::When: piece_state::IsSet,
-    S::Ref: piece_state::IsSet,
     S::Slug: piece_state::IsSet,
+    S::Ref: piece_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Piece<'a> {
@@ -285,13 +294,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Piece<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Piece<'a> {
         Piece {
             r#ref: self._fields.0.unwrap(),
             slug: self._fields.1.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,48 +30,54 @@ use serde::{Serialize, Deserialize};
 use crate::bond_biblio::BookRequirement;
 /// A reading list curated by a librarian
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "bond.biblio.list", tag = "$type")]
-pub struct List<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "bond.biblio.list",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct List<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Required books for this reading challenge
-    #[serde(borrow)]
-    pub books: Vec<BookRequirement<'a>>,
+    pub books: Vec<BookRequirement<S>>,
     ///When this list was created
     pub created_at: Datetime,
     ///Description of the reading challenge
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Deadline for completing the reading challenge
     pub duedate: Datetime,
     ///DIDs of users who can issue stamps for this list
-    #[serde(borrow)]
-    pub librarians: Vec<Did<'a>>,
+    pub librarians: Vec<Did<S>>,
     ///Display name for the reading list
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ListGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: List<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: List<S>,
 }
 
-impl<'a> List<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ListRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> List<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ListRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -80,18 +88,17 @@ pub struct ListRecord;
 impl XrpcResp for ListRecord {
     const NSID: &'static str = "bond.biblio.list";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ListGetRecordOutput<'_>> for List<'_> {
-    fn from(output: ListGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ListGetRecordOutput<S>> for List<S> {
+    fn from(output: ListGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for List<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for List<S> {
     const NSID: &'static str = "bond.biblio.list";
     type Record = ListRecord;
 }
@@ -101,7 +108,7 @@ impl Collection for ListRecord {
     type Record = ListRecord;
 }
 
-impl<'a> LexiconSchema for List<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for List<S> {
     fn nsid() -> &'static str {
         "bond.biblio.list"
     }
@@ -173,84 +180,84 @@ pub mod list_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Duedate;
+        type Librarians;
         type Title;
         type Books;
-        type Librarians;
+        type Duedate;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Duedate = Unset;
+        type Librarians = Unset;
         type Title = Unset;
         type Books = Unset;
-        type Librarians = Unset;
+        type Duedate = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
-        type Duedate = S::Duedate;
+        type Librarians = S::Librarians;
         type Title = S::Title;
         type Books = S::Books;
-        type Librarians = S::Librarians;
-    }
-    ///State transition - sets the `duedate` field to Set
-    pub struct SetDuedate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuedate<S> {}
-    impl<S: State> State for SetDuedate<S> {
-        type CreatedAt = S::CreatedAt;
-        type Duedate = Set<members::duedate>;
-        type Title = S::Title;
-        type Books = S::Books;
-        type Librarians = S::Librarians;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
         type Duedate = S::Duedate;
-        type Title = Set<members::title>;
-        type Books = S::Books;
-        type Librarians = S::Librarians;
-    }
-    ///State transition - sets the `books` field to Set
-    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBooks<S> {}
-    impl<S: State> State for SetBooks<S> {
-        type CreatedAt = S::CreatedAt;
-        type Duedate = S::Duedate;
-        type Title = S::Title;
-        type Books = Set<members::books>;
-        type Librarians = S::Librarians;
     }
     ///State transition - sets the `librarians` field to Set
     pub struct SetLibrarians<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLibrarians<S> {}
     impl<S: State> State for SetLibrarians<S> {
         type CreatedAt = S::CreatedAt;
-        type Duedate = S::Duedate;
+        type Librarians = Set<members::librarians>;
         type Title = S::Title;
         type Books = S::Books;
-        type Librarians = Set<members::librarians>;
+        type Duedate = S::Duedate;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Librarians = S::Librarians;
+        type Title = Set<members::title>;
+        type Books = S::Books;
+        type Duedate = S::Duedate;
+    }
+    ///State transition - sets the `books` field to Set
+    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBooks<S> {}
+    impl<S: State> State for SetBooks<S> {
+        type CreatedAt = S::CreatedAt;
+        type Librarians = S::Librarians;
+        type Title = S::Title;
+        type Books = Set<members::books>;
+        type Duedate = S::Duedate;
+    }
+    ///State transition - sets the `duedate` field to Set
+    pub struct SetDuedate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuedate<S> {}
+    impl<S: State> State for SetDuedate<S> {
+        type CreatedAt = S::CreatedAt;
+        type Librarians = S::Librarians;
+        type Title = S::Title;
+        type Books = S::Books;
+        type Duedate = Set<members::duedate>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `duedate` field
-        pub struct duedate(());
+        ///Marker type for the `librarians` field
+        pub struct librarians(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `books` field
         pub struct books(());
-        ///Marker type for the `librarians` field
-        pub struct librarians(());
+        ///Marker type for the `duedate` field
+        pub struct duedate(());
     }
 }
 
@@ -258,12 +265,12 @@ pub mod list_state {
 pub struct ListBuilder<'a, S: list_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<BookRequirement<'a>>>,
+        Option<Vec<BookRequirement<S>>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<Vec<Did<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<Did<S>>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -294,7 +301,7 @@ where
     /// Set the `books` field (required)
     pub fn books(
         mut self,
-        value: impl Into<Vec<BookRequirement<'a>>>,
+        value: impl Into<Vec<BookRequirement<S>>>,
     ) -> ListBuilder<'a, list_state::SetBooks<S>> {
         self._fields.0 = Option::Some(value.into());
         ListBuilder {
@@ -326,12 +333,12 @@ where
 
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -364,7 +371,7 @@ where
     /// Set the `librarians` field (required)
     pub fn librarians(
         mut self,
-        value: impl Into<Vec<Did<'a>>>,
+        value: impl Into<Vec<Did<S>>>,
     ) -> ListBuilder<'a, list_state::SetLibrarians<S>> {
         self._fields.4 = Option::Some(value.into());
         ListBuilder {
@@ -383,7 +390,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ListBuilder<'a, list_state::SetTitle<S>> {
         self._fields.5 = Option::Some(value.into());
         ListBuilder {
@@ -398,10 +405,10 @@ impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
     S::CreatedAt: list_state::IsSet,
-    S::Duedate: list_state::IsSet,
+    S::Librarians: list_state::IsSet,
     S::Title: list_state::IsSet,
     S::Books: list_state::IsSet,
-    S::Librarians: list_state::IsSet,
+    S::Duedate: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -416,13 +423,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> List<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> List<'a> {
         List {
             books: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

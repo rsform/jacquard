@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,14 +29,17 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Configuration settings for a Smoke Signal event, controlling RSVP behavior and access requirements.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "events.smokesignal.calendar.eventConfiguration",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct EventConfiguration<'a> {
+pub struct EventConfiguration<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When true, the RSVP button redirects to an external ticketing URL instead of creating a direct RSVP.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_direct_rsvp: Option<bool>,
@@ -43,29 +48,31 @@ pub struct EventConfiguration<'a> {
     pub require_confirmed_email: Option<bool>,
     ///URL to redirect users to for external ticketing (e.g., ti.to, eventbrite).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rsvp_redirect_url: Option<UriValue<'a>>,
+    pub rsvp_redirect_url: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EventConfigurationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EventConfigurationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: EventConfiguration<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: EventConfiguration<S>,
 }
 
-impl<'a> EventConfiguration<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, EventConfigurationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> EventConfiguration<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, EventConfigurationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -76,18 +83,18 @@ pub struct EventConfigurationRecord;
 impl XrpcResp for EventConfigurationRecord {
     const NSID: &'static str = "events.smokesignal.calendar.eventConfiguration";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = EventConfigurationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = EventConfigurationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<EventConfigurationGetRecordOutput<'_>> for EventConfiguration<'_> {
-    fn from(output: EventConfigurationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<EventConfigurationGetRecordOutput<S>>
+for EventConfiguration<S> {
+    fn from(output: EventConfigurationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for EventConfiguration<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for EventConfiguration<S> {
     const NSID: &'static str = "events.smokesignal.calendar.eventConfiguration";
     type Record = EventConfigurationRecord;
 }
@@ -97,7 +104,7 @@ impl Collection for EventConfigurationRecord {
     type Record = EventConfigurationRecord;
 }
 
-impl<'a> LexiconSchema for EventConfiguration<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for EventConfiguration<S> {
     fn nsid() -> &'static str {
         "events.smokesignal.calendar.eventConfiguration"
     }
@@ -144,7 +151,7 @@ pub mod event_configuration_state {
 /// Builder for constructing an instance of this type
 pub struct EventConfigurationBuilder<'a, S: event_configuration_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<bool>, Option<UriValue<'a>>),
+    _fields: (Option<bool>, Option<bool>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -194,12 +201,12 @@ impl<'a, S: event_configuration_state::State> EventConfigurationBuilder<'a, S> {
 
 impl<'a, S: event_configuration_state::State> EventConfigurationBuilder<'a, S> {
     /// Set the `rsvpRedirectUrl` field (optional)
-    pub fn rsvp_redirect_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn rsvp_redirect_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `rsvpRedirectUrl` field to an Option value (optional)
-    pub fn maybe_rsvp_redirect_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_rsvp_redirect_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -221,10 +228,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> EventConfiguration<'a> {
         EventConfiguration {
             disable_direct_rsvp: self._fields.0,

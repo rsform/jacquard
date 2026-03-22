@@ -10,38 +10,52 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::sync::HostStatus;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetHostStatus<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetHostStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub hostname: CowStr<'a>,
+    pub hostname: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetHostStatusOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetHostStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Number of accounts on the server which are associated with the upstream host. Note that the upstream may actually have more accounts.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub account_count: Option<i64>,
-    #[serde(borrow)]
-    pub hostname: CowStr<'a>,
+    pub hostname: S,
     ///Recent repo stream event sequence number. May be delayed from actual stream processing (eg, persisted cursor not in-memory cursor).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub seq: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<HostStatus<'a>>,
+    pub status: Option<HostStatus<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -50,18 +64,19 @@ pub struct GetHostStatusOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetHostStatusError<'a> {
+pub enum GetHostStatusError {
     #[serde(rename = "HostNotFound")]
-    HostNotFound(Option<CowStr<'a>>),
+    HostNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetHostStatusError<'_> {
+impl core::fmt::Display for GetHostStatusError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::HostNotFound(msg) => {
@@ -71,7 +86,13 @@ impl core::fmt::Display for GetHostStatusError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -81,11 +102,12 @@ pub struct GetHostStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetHostStatusResponse {
     const NSID: &'static str = "com.atproto.sync.getHostStatus";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetHostStatusOutput<'de>;
-    type Err<'de> = GetHostStatusError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetHostStatusOutput<S>;
+    type Err = GetHostStatusError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetHostStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetHostStatus<S> {
     const NSID: &'static str = "com.atproto.sync.getHostStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetHostStatusResponse;
@@ -96,7 +118,7 @@ pub struct GetHostStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetHostStatusRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getHostStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetHostStatus<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetHostStatus<S>;
     type Response = GetHostStatusResponse;
 }
 
@@ -135,7 +157,7 @@ pub mod get_host_status_state {
 /// Builder for constructing an instance of this type
 pub struct GetHostStatusBuilder<'a, S: get_host_status_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -165,7 +187,7 @@ where
     /// Set the `hostname` field (required)
     pub fn hostname(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetHostStatusBuilder<'a, get_host_status_state::SetHostname<S>> {
         self._fields.0 = Option::Some(value.into());
         GetHostStatusBuilder {

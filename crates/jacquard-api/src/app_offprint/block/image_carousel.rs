@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,28 +25,33 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::app_offprint::block::image_grid::GridImage;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageCarousel<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImageCarousel<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Auto-advance slides  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_image_carousel_autoplay")]
     pub autoplay: Option<bool>,
     ///Carousel caption
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub caption: Option<CowStr<'a>>,
+    pub caption: Option<S>,
     ///Array of images in the carousel (2-6)
-    #[serde(borrow)]
-    pub images: Vec<GridImage<'a>>,
+    pub images: Vec<GridImage<S>>,
     ///Milliseconds between slides  Defaults to `3000`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_image_carousel_interval")]
     pub interval: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for ImageCarousel<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageCarousel<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.imageCarousel"
     }
@@ -124,7 +131,7 @@ pub mod image_carousel_state {
 /// Builder for constructing an instance of this type
 pub struct ImageCarouselBuilder<'a, S: image_carousel_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<CowStr<'a>>, Option<Vec<GridImage<'a>>>, Option<i64>),
+    _fields: (Option<bool>, Option<S>, Option<Vec<GridImage<S>>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -161,12 +168,12 @@ impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
 
 impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
     /// Set the `caption` field (optional)
-    pub fn caption(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn caption(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `caption` field to an Option value (optional)
-    pub fn maybe_caption(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_caption(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -180,7 +187,7 @@ where
     /// Set the `images` field (required)
     pub fn images(
         mut self,
-        value: impl Into<Vec<GridImage<'a>>>,
+        value: impl Into<Vec<GridImage<S>>>,
     ) -> ImageCarouselBuilder<'a, image_carousel_state::SetImages<S>> {
         self._fields.2 = Option::Some(value.into());
         ImageCarouselBuilder {
@@ -222,10 +229,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ImageCarousel<'a> {
         ImageCarousel {
             autoplay: self._fields.0.or_else(|| Some(false)),

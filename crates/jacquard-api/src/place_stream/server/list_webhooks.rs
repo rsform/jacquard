@@ -10,22 +10,30 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::place_stream::server::Webhook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListWebhooks<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListWebhooks<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub event: Option<CowStr<'a>>,
+    pub event: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -33,20 +41,26 @@ pub struct ListWebhooks<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListWebhooksOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListWebhooksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///A cursor for pagination, if there are more results.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub webhooks: Vec<Webhook<'a>>,
+    pub cursor: Option<S>,
+    pub webhooks: Vec<Webhook<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -55,19 +69,20 @@ pub struct ListWebhooksOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListWebhooksError<'a> {
+pub enum ListWebhooksError {
     /// The provided cursor is invalid or expired.
     #[serde(rename = "InvalidCursor")]
-    InvalidCursor(Option<CowStr<'a>>),
+    InvalidCursor(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for ListWebhooksError<'_> {
+impl core::fmt::Display for ListWebhooksError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidCursor(msg) => {
@@ -77,7 +92,13 @@ impl core::fmt::Display for ListWebhooksError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -87,11 +108,12 @@ pub struct ListWebhooksResponse;
 impl jacquard_common::xrpc::XrpcResp for ListWebhooksResponse {
     const NSID: &'static str = "place.stream.server.listWebhooks";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListWebhooksOutput<'de>;
-    type Err<'de> = ListWebhooksError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListWebhooksOutput<S>;
+    type Err = ListWebhooksError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListWebhooks<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListWebhooks<S> {
     const NSID: &'static str = "place.stream.server.listWebhooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListWebhooksResponse;
@@ -102,7 +124,7 @@ pub struct ListWebhooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListWebhooksRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.listWebhooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListWebhooks<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListWebhooks<S>;
     type Response = ListWebhooksResponse;
 }
 
@@ -132,7 +154,7 @@ pub mod list_webhooks_state {
 /// Builder for constructing an instance of this type
 pub struct ListWebhooksBuilder<'a, S: list_webhooks_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<bool>, Option<S>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -169,12 +191,12 @@ impl<'a, S: list_webhooks_state::State> ListWebhooksBuilder<'a, S> {
 
 impl<'a, S: list_webhooks_state::State> ListWebhooksBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -182,12 +204,12 @@ impl<'a, S: list_webhooks_state::State> ListWebhooksBuilder<'a, S> {
 
 impl<'a, S: list_webhooks_state::State> ListWebhooksBuilder<'a, S> {
     /// Set the `event` field (optional)
-    pub fn event(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn event(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `event` field to an Option value (optional)
-    pub fn maybe_event(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_event(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }

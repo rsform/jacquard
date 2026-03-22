@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,84 +27,141 @@ use serde::{Serialize, Deserialize};
 use crate::network_slices::tools::richtext::facet;
 /// Facet feature for bold text.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Bold<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Bold<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Specifies the sub-string range a facet feature applies to. Start index is inclusive, end index is exclusive. Indices are zero-indexed, counting bytes of the UTF-8 encoded text.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ByteSlice<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ByteSlice<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub byte_end: i64,
     pub byte_start: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Facet feature for inline code.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Code<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Code<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Facet feature for fenced code blocks.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CodeBlock<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CodeBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional language identifier for syntax highlighting.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lang: Option<CowStr<'a>>,
+    pub lang: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Facet feature for italic text.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Italic<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Italic<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Facet feature for a URL.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Link<'a> {
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Link<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub uri: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Annotation of a sub-string within rich text.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Facet<'a> {
-    #[serde(borrow)]
-    pub features: Vec<FacetFeaturesItem<'a>>,
-    #[serde(borrow)]
-    pub index: facet::ByteSlice<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Facet<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub features: Vec<FacetFeaturesItem<S>>,
+    pub index: facet::ByteSlice<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum FacetFeaturesItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum FacetFeaturesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "network.slices.tools.richtext.facet#link")]
-    Link(Box<facet::Link<'a>>),
+    Link(Box<facet::Link<S>>),
     #[serde(rename = "network.slices.tools.richtext.facet#bold")]
-    Bold(Box<facet::Bold<'a>>),
+    Bold(Box<facet::Bold<S>>),
     #[serde(rename = "network.slices.tools.richtext.facet#italic")]
-    Italic(Box<facet::Italic<'a>>),
+    Italic(Box<facet::Italic<S>>),
     #[serde(rename = "network.slices.tools.richtext.facet#code")]
-    Code(Box<facet::Code<'a>>),
+    Code(Box<facet::Code<S>>),
     #[serde(rename = "network.slices.tools.richtext.facet#codeBlock")]
-    CodeBlock(Box<facet::CodeBlock<'a>>),
+    CodeBlock(Box<facet::CodeBlock<S>>),
 }
 
-impl<'a> LexiconSchema for Bold<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bold<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -117,7 +176,7 @@ impl<'a> LexiconSchema for Bold<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ByteSlice<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ByteSlice<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -152,7 +211,7 @@ impl<'a> LexiconSchema for ByteSlice<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Code<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Code<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -167,7 +226,7 @@ impl<'a> LexiconSchema for Code<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CodeBlock<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeBlock<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -182,7 +241,7 @@ impl<'a> LexiconSchema for CodeBlock<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Italic<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Italic<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -197,7 +256,7 @@ impl<'a> LexiconSchema for Italic<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Link<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Link<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -212,7 +271,7 @@ impl<'a> LexiconSchema for Link<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Facet<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Facet<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -536,10 +595,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ByteSlice<'a> {
         ByteSlice {
             byte_end: self._fields.0.unwrap(),
@@ -584,7 +640,7 @@ pub mod link_state {
 /// Builder for constructing an instance of this type
 pub struct LinkBuilder<'a, S: link_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<UriValue<'a>>,),
+    _fields: (Option<UriValue<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -614,7 +670,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> LinkBuilder<'a, link_state::SetUri<S>> {
         self._fields.0 = Option::Some(value.into());
         LinkBuilder {
@@ -638,13 +694,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Link<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Link<'a> {
         Link {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -699,7 +749,7 @@ pub mod facet_state {
 /// Builder for constructing an instance of this type
 pub struct FacetBuilder<'a, S: facet_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<FacetFeaturesItem<'a>>>, Option<facet::ByteSlice<'a>>),
+    _fields: (Option<Vec<FacetFeaturesItem<S>>>, Option<facet::ByteSlice<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -729,7 +779,7 @@ where
     /// Set the `features` field (required)
     pub fn features(
         mut self,
-        value: impl Into<Vec<FacetFeaturesItem<'a>>>,
+        value: impl Into<Vec<FacetFeaturesItem<S>>>,
     ) -> FacetBuilder<'a, facet_state::SetFeatures<S>> {
         self._fields.0 = Option::Some(value.into());
         FacetBuilder {
@@ -748,7 +798,7 @@ where
     /// Set the `index` field (required)
     pub fn index(
         mut self,
-        value: impl Into<facet::ByteSlice<'a>>,
+        value: impl Into<facet::ByteSlice<S>>,
     ) -> FacetBuilder<'a, facet_state::SetIndex<S>> {
         self._fields.1 = Option::Some(value.into());
         FacetBuilder {
@@ -774,13 +824,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Facet<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Facet<'a> {
         Facet {
             features: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),

@@ -10,25 +10,33 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::social_clippr::feed::ClipView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetProfileClips<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetProfileClips<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub actor: AtIdentifier<'a>,
+    pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `"all_clips"`.
     #[serde(default = "_default_filter")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub filter: Option<CowStr<'a>>,
+    pub filter: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -36,15 +44,22 @@ pub struct GetProfileClips<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetProfileClipsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetProfileClipsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub feed: Vec<ClipView<'a>>,
+    pub cursor: Option<S>,
+    pub feed: Vec<ClipView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for social.clippr.feed.getProfileClips
@@ -52,11 +67,12 @@ pub struct GetProfileClipsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileClipsResponse {
     const NSID: &'static str = "social.clippr.feed.getProfileClips";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetProfileClipsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetProfileClipsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfileClips<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetProfileClips<S> {
     const NSID: &'static str = "social.clippr.feed.getProfileClips";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetProfileClipsResponse;
@@ -67,7 +83,7 @@ pub struct GetProfileClipsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileClipsRequest {
     const PATH: &'static str = "/xrpc/social.clippr.feed.getProfileClips";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetProfileClips<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetProfileClips<S>;
     type Response = GetProfileClipsResponse;
 }
 
@@ -114,12 +130,7 @@ pub mod get_profile_clips_state {
 /// Builder for constructing an instance of this type
 pub struct GetProfileClipsBuilder<'a, S: get_profile_clips_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<AtIdentifier<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-    ),
+    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -149,7 +160,7 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetProfileClipsBuilder<'a, get_profile_clips_state::SetActor<S>> {
         self._fields.0 = Option::Some(value.into());
         GetProfileClipsBuilder {
@@ -162,12 +173,12 @@ where
 
 impl<'a, S: get_profile_clips_state::State> GetProfileClipsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -175,12 +186,12 @@ impl<'a, S: get_profile_clips_state::State> GetProfileClipsBuilder<'a, S> {
 
 impl<'a, S: get_profile_clips_state::State> GetProfileClipsBuilder<'a, S> {
     /// Set the `filter` field (optional)
-    pub fn filter(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn filter(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `filter` field to an Option value (optional)
-    pub fn maybe_filter(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_filter(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }

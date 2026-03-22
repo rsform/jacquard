@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,46 +30,53 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Repository page metadata including description and avatar. Users can edit this directly in their PDS to customize their repository page.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "io.atcr.repo.page", tag = "$type")]
-pub struct Page<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "io.atcr.repo.page",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Page<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Repository avatar/icon image.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
+    pub avatar: Option<BlobRef<S>>,
     ///Record creation timestamp
     pub created_at: Datetime,
     ///Markdown README/description content for the repository page.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The name of the repository (e.g., 'myapp'). Must match the rkey.
-    #[serde(borrow)]
-    pub repository: CowStr<'a>,
+    pub repository: S,
     ///Record last updated timestamp
     pub updated_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PageGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PageGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Page<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Page<S>,
 }
 
-impl<'a> Page<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PageRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Page<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PageRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -78,18 +87,17 @@ pub struct PageRecord;
 impl XrpcResp for PageRecord {
     const NSID: &'static str = "io.atcr.repo.page";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PageGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PageGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PageGetRecordOutput<'_>> for Page<'_> {
-    fn from(output: PageGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PageGetRecordOutput<S>> for Page<S> {
+    fn from(output: PageGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Page<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Page<S> {
     const NSID: &'static str = "io.atcr.repo.page";
     type Record = PageRecord;
 }
@@ -99,7 +107,7 @@ impl Collection for PageRecord {
     type Record = PageRecord;
 }
 
-impl<'a> LexiconSchema for Page<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Page<S> {
     fn nsid() -> &'static str {
         "io.atcr.repo.page"
     }
@@ -186,51 +194,51 @@ pub mod page_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type UpdatedAt;
         type Repository;
         type CreatedAt;
-        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type UpdatedAt = Unset;
         type Repository = Unset;
         type CreatedAt = Unset;
-        type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Repository = Set<members::repository>;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Repository = S::Repository;
-        type CreatedAt = Set<members::created_at>;
-        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
+        type UpdatedAt = Set<members::updated_at>;
         type Repository = S::Repository;
         type CreatedAt = S::CreatedAt;
-        type UpdatedAt = Set<members::updated_at>;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Repository = Set<members::repository>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Repository = S::Repository;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
         ///Marker type for the `repository` field
         pub struct repository(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
     }
 }
 
@@ -238,10 +246,10 @@ pub mod page_state {
 pub struct PageBuilder<'a, S: page_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<BlobRef<'a>>,
+        Option<BlobRef<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -267,12 +275,12 @@ impl<'a> PageBuilder<'a, page_state::Empty> {
 
 impl<'a, S: page_state::State> PageBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -299,12 +307,12 @@ where
 
 impl<'a, S: page_state::State> PageBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -318,7 +326,7 @@ where
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PageBuilder<'a, page_state::SetRepository<S>> {
         self._fields.3 = Option::Some(value.into());
         PageBuilder {
@@ -351,9 +359,9 @@ where
 impl<'a, S> PageBuilder<'a, S>
 where
     S: page_state::State,
+    S::UpdatedAt: page_state::IsSet,
     S::Repository: page_state::IsSet,
     S::CreatedAt: page_state::IsSet,
-    S::UpdatedAt: page_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Page<'a> {
@@ -367,13 +375,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Page<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Page<'a> {
         Page {
             avatar: self._fields.0,
             created_at: self._fields.1.unwrap(),

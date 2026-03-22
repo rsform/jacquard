@@ -10,28 +10,34 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRecommendedDidCredentialsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRecommendedDidCredentialsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub also_known_as: Option<Vec<CowStr<'a>>>,
+    pub also_known_as: Option<Vec<S>>,
     ///Recommended rotation keys for PLC dids. Should be undefined (or ignored) for did:webs.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rotation_keys: Option<Vec<CowStr<'a>>>,
+    pub rotation_keys: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub services: Option<Data<'a>>,
+    pub services: Option<Data<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub verification_methods: Option<Data<'a>>,
+    pub verification_methods: Option<Data<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// XRPC request marker type.
@@ -43,8 +49,8 @@ pub struct GetRecommendedDidCredentialsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecommendedDidCredentialsResponse {
     const NSID: &'static str = "com.atproto.identity.getRecommendedDidCredentials";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRecommendedDidCredentialsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetRecommendedDidCredentialsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetRecommendedDidCredentials {
@@ -58,6 +64,6 @@ pub struct GetRecommendedDidCredentialsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecommendedDidCredentialsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.getRecommendedDidCredentials";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRecommendedDidCredentials;
+    type Request<S: Bos<str> + AsRef<str>> = GetRecommendedDidCredentials;
     type Response = GetRecommendedDidCredentialsResponse;
 }

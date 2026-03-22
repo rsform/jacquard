@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,34 +29,43 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Sign that you want to join a social listing experience of a specific song
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "ch.indiemusi.social.join", tag = "$type")]
-pub struct Join<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "ch.indiemusi.social.join",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Join<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Link to the song that the user wants to listen to together with others
-    #[serde(borrow)]
-    pub song: AtUri<'a>,
+    pub song: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct JoinGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct JoinGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Join<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Join<S>,
 }
 
-impl<'a> Join<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, JoinRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Join<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, JoinRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -65,18 +76,17 @@ pub struct JoinRecord;
 impl XrpcResp for JoinRecord {
     const NSID: &'static str = "ch.indiemusi.social.join";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = JoinGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = JoinGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<JoinGetRecordOutput<'_>> for Join<'_> {
-    fn from(output: JoinGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<JoinGetRecordOutput<S>> for Join<S> {
+    fn from(output: JoinGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Join<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Join<S> {
     const NSID: &'static str = "ch.indiemusi.social.join";
     type Record = JoinRecord;
 }
@@ -86,7 +96,7 @@ impl Collection for JoinRecord {
     type Record = JoinRecord;
 }
 
-impl<'a> LexiconSchema for Join<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Join<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.social.join"
     }
@@ -136,7 +146,7 @@ pub mod join_state {
 /// Builder for constructing an instance of this type
 pub struct JoinBuilder<'a, S: join_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -166,7 +176,7 @@ where
     /// Set the `song` field (required)
     pub fn song(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> JoinBuilder<'a, join_state::SetSong<S>> {
         self._fields.0 = Option::Some(value.into());
         JoinBuilder {
@@ -190,13 +200,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Join<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Join<'a> {
         Join {
             song: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

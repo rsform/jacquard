@@ -10,36 +10,44 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ProfileTab<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProfileTab<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// Defaults to `10`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_profile_tab_limit")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tab: Option<ProfileTabTab<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub tab: Option<ProfileTabTab<S>>,
+    pub uri: AtUri<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileTabTab<'a> {
+pub enum ProfileTabTab<S: Bos<str> + AsRef<str> = DefaultStr> {
     PostsAndAuthorThreads,
     PostsAndReplies,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ProfileTabTab<'a> {
+impl<S: Bos<str> + AsRef<str>> ProfileTabTab<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::PostsAndAuthorThreads => "posts_and_author_threads",
@@ -47,70 +55,56 @@ impl<'a> ProfileTabTab<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ProfileTabTab<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "posts_and_author_threads" => Self::PostsAndAuthorThreads,
             "posts_and_replies" => Self::PostsAndReplies,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ProfileTabTab<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "posts_and_author_threads" => Self::PostsAndAuthorThreads,
-            "posts_and_replies" => Self::PostsAndReplies,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ProfileTabTab<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ProfileTabTab<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ProfileTabTab<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ProfileTabTab<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ProfileTabTab<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ProfileTabTab<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ProfileTabTab<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ProfileTabTab<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ProfileTabTab<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ProfileTabTab<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ProfileTabTab<'_> {
-    type Output = ProfileTabTab<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileTabTab<S> {
+    type Output = ProfileTabTab<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ProfileTabTab::PostsAndAuthorThreads => ProfileTabTab::PostsAndAuthorThreads,
@@ -121,13 +115,22 @@ impl jacquard_common::IntoStatic for ProfileTabTab<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ProfileTabOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProfileTabOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Data<'a>,
+    pub value: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for mov.danabra.ProfileTab
@@ -135,11 +138,12 @@ pub struct ProfileTabResponse;
 impl jacquard_common::xrpc::XrpcResp for ProfileTabResponse {
     const NSID: &'static str = "mov.danabra.ProfileTab";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProfileTabOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ProfileTabOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ProfileTab<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ProfileTab<S> {
     const NSID: &'static str = "mov.danabra.ProfileTab";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -154,7 +158,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ProfileTabRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = ProfileTab<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ProfileTab<S>;
     type Response = ProfileTabResponse;
 }
 
@@ -197,7 +201,7 @@ pub mod profile_tab_state {
 /// Builder for constructing an instance of this type
 pub struct ProfileTabBuilder<'a, S: profile_tab_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<ProfileTabTab<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<i64>, Option<ProfileTabTab<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -234,12 +238,12 @@ impl<'a, S: profile_tab_state::State> ProfileTabBuilder<'a, S> {
 
 impl<'a, S: profile_tab_state::State> ProfileTabBuilder<'a, S> {
     /// Set the `tab` field (optional)
-    pub fn tab(mut self, value: impl Into<Option<ProfileTabTab<'a>>>) -> Self {
+    pub fn tab(mut self, value: impl Into<Option<ProfileTabTab<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `tab` field to an Option value (optional)
-    pub fn maybe_tab(mut self, value: Option<ProfileTabTab<'a>>) -> Self {
+    pub fn maybe_tab(mut self, value: Option<ProfileTabTab<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -253,7 +257,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ProfileTabBuilder<'a, profile_tab_state::SetUri<S>> {
         self._fields.2 = Option::Some(value.into());
         ProfileTabBuilder {
@@ -281,7 +285,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ProfileTab<'a> {
         ProfileTab {
             limit: self._fields.0.or_else(|| Some(10i64)),

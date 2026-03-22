@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,44 +29,51 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Agent acknowledgment record for a processed job.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "top.launchpadx.agent.ack", tag = "$type")]
-pub struct Ack<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "top.launchpadx.agent.ack",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Ack<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when the acknowledgment was created.
     pub created_at: Datetime,
     ///Additional context or details for the acknowledgment.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub note: Option<CowStr<'a>>,
+    pub note: Option<S>,
     ///URI of the content being processed by the agent.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_uri: Option<UriValue<'a>>,
+    pub subject_uri: Option<UriValue<S>>,
     ///Job type identifier being acknowledged by the agent.
-    #[serde(borrow)]
-    pub work_type: CowStr<'a>,
+    pub work_type: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AckGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AckGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Ack<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Ack<S>,
 }
 
-impl<'a> Ack<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AckRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Ack<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AckRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -75,18 +84,17 @@ pub struct AckRecord;
 impl XrpcResp for AckRecord {
     const NSID: &'static str = "top.launchpadx.agent.ack";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AckGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AckGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AckGetRecordOutput<'_>> for Ack<'_> {
-    fn from(output: AckGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AckGetRecordOutput<S>> for Ack<S> {
+    fn from(output: AckGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Ack<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Ack<S> {
     const NSID: &'static str = "top.launchpadx.agent.ack";
     type Record = AckRecord;
 }
@@ -96,7 +104,7 @@ impl Collection for AckRecord {
     type Record = AckRecord;
 }
 
-impl<'a> LexiconSchema for Ack<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Ack<S> {
     fn nsid() -> &'static str {
         "top.launchpadx.agent.ack"
     }
@@ -121,49 +129,44 @@ pub mod ack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WorkType;
         type CreatedAt;
+        type WorkType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WorkType = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `work_type` field to Set
-    pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkType<S> {}
-    impl<S: State> State for SetWorkType<S> {
-        type WorkType = Set<members::work_type>;
-        type CreatedAt = S::CreatedAt;
+        type WorkType = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type WorkType = S::WorkType;
         type CreatedAt = Set<members::created_at>;
+        type WorkType = S::WorkType;
+    }
+    ///State transition - sets the `work_type` field to Set
+    pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkType<S> {}
+    impl<S: State> State for SetWorkType<S> {
+        type CreatedAt = S::CreatedAt;
+        type WorkType = Set<members::work_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `work_type` field
-        pub struct work_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `work_type` field
+        pub struct work_type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AckBuilder<'a, S: ack_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<UriValue<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -206,12 +209,12 @@ where
 
 impl<'a, S: ack_state::State> AckBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -219,12 +222,12 @@ impl<'a, S: ack_state::State> AckBuilder<'a, S> {
 
 impl<'a, S: ack_state::State> AckBuilder<'a, S> {
     /// Set the `subjectUri` field (optional)
-    pub fn subject_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn subject_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `subjectUri` field to an Option value (optional)
-    pub fn maybe_subject_uri(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_subject_uri(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -238,7 +241,7 @@ where
     /// Set the `workType` field (required)
     pub fn work_type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AckBuilder<'a, ack_state::SetWorkType<S>> {
         self._fields.3 = Option::Some(value.into());
         AckBuilder {
@@ -252,8 +255,8 @@ where
 impl<'a, S> AckBuilder<'a, S>
 where
     S: ack_state::State,
-    S::WorkType: ack_state::IsSet,
     S::CreatedAt: ack_state::IsSet,
+    S::WorkType: ack_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ack<'a> {
@@ -266,13 +269,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Ack<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Ack<'a> {
         Ack {
             created_at: self._fields.0.unwrap(),
             note: self._fields.1,

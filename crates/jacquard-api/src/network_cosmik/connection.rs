@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,51 +29,57 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A connection linking a source to a target, with optional type and note.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "network.cosmik.connection", tag = "$type")]
-pub struct Connection<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "network.cosmik.connection",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Connection<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional type of connection
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub connection_type: Option<CowStr<'a>>,
+    pub connection_type: Option<S>,
     ///Timestamp when this connection was created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///Optional note about the connection
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub note: Option<CowStr<'a>>,
+    pub note: Option<S>,
     ///Source entity (URL string or AT URI)
-    #[serde(borrow)]
-    pub source: CowStr<'a>,
+    pub source: S,
     ///Target entity (URL string or AT URI)
-    #[serde(borrow)]
-    pub target: CowStr<'a>,
+    pub target: S,
     ///Timestamp when this connection was last updated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ConnectionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ConnectionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Connection<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Connection<S>,
 }
 
-impl<'a> Connection<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ConnectionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Connection<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ConnectionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -82,18 +90,17 @@ pub struct ConnectionRecord;
 impl XrpcResp for ConnectionRecord {
     const NSID: &'static str = "network.cosmik.connection";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ConnectionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ConnectionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ConnectionGetRecordOutput<'_>> for Connection<'_> {
-    fn from(output: ConnectionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ConnectionGetRecordOutput<S>> for Connection<S> {
+    fn from(output: ConnectionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Connection<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Connection<S> {
     const NSID: &'static str = "network.cosmik.connection";
     type Record = ConnectionRecord;
 }
@@ -103,7 +110,7 @@ impl Collection for ConnectionRecord {
     type Record = ConnectionRecord;
 }
 
-impl<'a> LexiconSchema for Connection<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Connection<S> {
     fn nsid() -> &'static str {
         "network.cosmik.connection"
     }
@@ -176,11 +183,11 @@ pub mod connection_state {
 pub struct ConnectionBuilder<'a, S: connection_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -206,12 +213,12 @@ impl<'a> ConnectionBuilder<'a, connection_state::Empty> {
 
 impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     /// Set the `connectionType` field (optional)
-    pub fn connection_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn connection_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `connectionType` field to an Option value (optional)
-    pub fn maybe_connection_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_connection_type(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -232,12 +239,12 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
 
 impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -251,7 +258,7 @@ where
     /// Set the `source` field (required)
     pub fn source(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ConnectionBuilder<'a, connection_state::SetSource<S>> {
         self._fields.3 = Option::Some(value.into());
         ConnectionBuilder {
@@ -270,7 +277,7 @@ where
     /// Set the `target` field (required)
     pub fn target(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ConnectionBuilder<'a, connection_state::SetTarget<S>> {
         self._fields.4 = Option::Some(value.into());
         ConnectionBuilder {
@@ -315,10 +322,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Connection<'a> {
         Connection {
             connection_type: self._fields.0,

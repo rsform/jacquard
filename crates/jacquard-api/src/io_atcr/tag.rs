@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,48 +29,54 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A named tag pointing to a specific manifest digest
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "io.atcr.tag", tag = "$type")]
-pub struct Tag<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "io.atcr.tag",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///AT-URI of the manifest this tag points to (e.g., 'at://did:plc:xyz/io.atcr.manifest/abc123'). Preferred over manifestDigest for new records.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub manifest: Option<AtUri<'a>>,
+    pub manifest: Option<AtUri<S>>,
     ///DEPRECATED: Digest of the manifest (e.g., 'sha256:...'). Kept for backward compatibility with old records. New records should use 'manifest' field instead.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub manifest_digest: Option<CowStr<'a>>,
+    pub manifest_digest: Option<S>,
     ///Repository name (e.g., 'myapp'). Scoped to user's DID.
-    #[serde(borrow)]
-    pub repository: CowStr<'a>,
+    pub repository: S,
     ///Tag name (e.g., 'latest', 'v1.0.0', '12-slim')
-    #[serde(borrow)]
-    pub tag: CowStr<'a>,
+    pub tag: S,
     ///Timestamp of last tag update
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TagGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TagGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Tag<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Tag<S>,
 }
 
-impl<'a> Tag<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TagRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Tag<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TagRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -79,18 +87,17 @@ pub struct TagRecord;
 impl XrpcResp for TagRecord {
     const NSID: &'static str = "io.atcr.tag";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TagGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TagGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TagGetRecordOutput<'_>> for Tag<'_> {
-    fn from(output: TagGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TagGetRecordOutput<S>> for Tag<S> {
+    fn from(output: TagGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Tag<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Tag<S> {
     const NSID: &'static str = "io.atcr.tag";
     type Record = TagRecord;
 }
@@ -100,7 +107,7 @@ impl Collection for TagRecord {
     type Record = TagRecord;
 }
 
-impl<'a> LexiconSchema for Tag<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tag<S> {
     fn nsid() -> &'static str {
         "io.atcr.tag"
     }
@@ -157,50 +164,44 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repository;
         type Tag;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repository = Unset;
         type Tag = Unset;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Repository = Set<members::repository>;
-        type Tag = S::Tag;
+        type Repository = Unset;
     }
     ///State transition - sets the `tag` field to Set
     pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTag<S> {}
     impl<S: State> State for SetTag<S> {
-        type Repository = S::Repository;
         type Tag = Set<members::tag>;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type Tag = S::Tag;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `tag` field
         pub struct tag(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TagBuilder<'a, S: tag_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<AtUri<S>>, Option<S>, Option<S>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -224,12 +225,12 @@ impl<'a> TagBuilder<'a, tag_state::Empty> {
 
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `manifest` field (optional)
-    pub fn manifest(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn manifest(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `manifest` field to an Option value (optional)
-    pub fn maybe_manifest(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_manifest(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -237,12 +238,12 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `manifestDigest` field (optional)
-    pub fn manifest_digest(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn manifest_digest(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `manifestDigest` field to an Option value (optional)
-    pub fn maybe_manifest_digest(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_manifest_digest(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -256,7 +257,7 @@ where
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TagBuilder<'a, tag_state::SetRepository<S>> {
         self._fields.2 = Option::Some(value.into());
         TagBuilder {
@@ -273,10 +274,7 @@ where
     S::Tag: tag_state::IsUnset,
 {
     /// Set the `tag` field (required)
-    pub fn tag(
-        mut self,
-        value: impl Into<CowStr<'a>>,
-    ) -> TagBuilder<'a, tag_state::SetTag<S>> {
+    pub fn tag(mut self, value: impl Into<S>) -> TagBuilder<'a, tag_state::SetTag<S>> {
         self._fields.3 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
@@ -302,8 +300,8 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 impl<'a, S> TagBuilder<'a, S>
 where
     S: tag_state::State,
-    S::Repository: tag_state::IsSet,
     S::Tag: tag_state::IsSet,
+    S::Repository: tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tag<'a> {
@@ -317,13 +315,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Tag<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Tag<'a> {
         Tag {
             manifest: self._fields.0,
             manifest_digest: self._fields.1,

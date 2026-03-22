@@ -10,31 +10,49 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DenyTeleport<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DenyTeleport<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The URI of the teleport record to deny.
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DenyTeleportOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DenyTeleportOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether the teleport was successfully denied.
     pub success: bool,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -43,22 +61,23 @@ pub struct DenyTeleportOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DenyTeleportError<'a> {
+pub enum DenyTeleportError {
     /// The specified teleport was not found.
     #[serde(rename = "TeleportNotFound")]
-    TeleportNotFound(Option<CowStr<'a>>),
+    TeleportNotFound(Option<SmolStr>),
     /// The authenticated user is not the target of this teleport.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(Option<CowStr<'a>>),
+    Unauthorized(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for DenyTeleportError<'_> {
+impl core::fmt::Display for DenyTeleportError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::TeleportNotFound(msg) => {
@@ -75,7 +94,13 @@ impl core::fmt::Display for DenyTeleportError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -85,11 +110,12 @@ pub struct DenyTeleportResponse;
 impl jacquard_common::xrpc::XrpcResp for DenyTeleportResponse {
     const NSID: &'static str = "place.stream.live.denyTeleport";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DenyTeleportOutput<'de>;
-    type Err<'de> = DenyTeleportError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DenyTeleportOutput<S>;
+    type Err = DenyTeleportError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DenyTeleport<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DenyTeleport<S> {
     const NSID: &'static str = "place.stream.live.denyTeleport";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -104,7 +130,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DenyTeleportRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DenyTeleport<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DenyTeleport<S>;
     type Response = DenyTeleportResponse;
 }
 
@@ -143,7 +169,7 @@ pub mod deny_teleport_state {
 /// Builder for constructing an instance of this type
 pub struct DenyTeleportBuilder<'a, S: deny_teleport_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -173,7 +199,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> DenyTeleportBuilder<'a, deny_teleport_state::SetUri<S>> {
         self._fields.0 = Option::Some(value.into());
         DenyTeleportBuilder {
@@ -199,10 +225,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DenyTeleport<'a> {
         DenyTeleport {
             uri: self._fields.0.unwrap(),

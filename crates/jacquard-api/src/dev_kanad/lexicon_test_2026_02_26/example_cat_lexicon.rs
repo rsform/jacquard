@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,43 +30,47 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// some example cat lexicon
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "dev.kanad.lexicon-test-2026-02-26.exampleCatLexicon",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct ExampleCatLexicon<'a> {
+pub struct ExampleCatLexicon<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///picture of the cat
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
+    pub avatar: Option<BlobRef<S>>,
     pub created_at: Datetime,
     ///cat name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ExampleCatLexiconGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExampleCatLexiconGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: ExampleCatLexicon<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: ExampleCatLexicon<S>,
 }
 
-impl<'a> ExampleCatLexicon<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ExampleCatLexiconRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> ExampleCatLexicon<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ExampleCatLexiconRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -75,18 +81,18 @@ pub struct ExampleCatLexiconRecord;
 impl XrpcResp for ExampleCatLexiconRecord {
     const NSID: &'static str = "dev.kanad.lexicon-test-2026-02-26.exampleCatLexicon";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ExampleCatLexiconGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ExampleCatLexiconGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ExampleCatLexiconGetRecordOutput<'_>> for ExampleCatLexicon<'_> {
-    fn from(output: ExampleCatLexiconGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ExampleCatLexiconGetRecordOutput<S>>
+for ExampleCatLexicon<S> {
+    fn from(output: ExampleCatLexiconGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for ExampleCatLexicon<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for ExampleCatLexicon<S> {
     const NSID: &'static str = "dev.kanad.lexicon-test-2026-02-26.exampleCatLexicon";
     type Record = ExampleCatLexiconRecord;
 }
@@ -96,7 +102,7 @@ impl Collection for ExampleCatLexiconRecord {
     type Record = ExampleCatLexiconRecord;
 }
 
-impl<'a> LexiconSchema for ExampleCatLexicon<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExampleCatLexicon<S> {
     fn nsid() -> &'static str {
         "dev.kanad.lexicon-test-2026-02-26.exampleCatLexicon"
     }
@@ -196,44 +202,44 @@ pub mod example_cat_lexicon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ExampleCatLexiconBuilder<'a, S: example_cat_lexicon_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>, Option<Datetime>, Option<CowStr<'a>>),
+    _fields: (Option<BlobRef<S>>, Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -257,12 +263,12 @@ impl<'a> ExampleCatLexiconBuilder<'a, example_cat_lexicon_state::Empty> {
 
 impl<'a, S: example_cat_lexicon_state::State> ExampleCatLexiconBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -295,7 +301,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ExampleCatLexiconBuilder<'a, example_cat_lexicon_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         ExampleCatLexiconBuilder {
@@ -309,8 +315,8 @@ where
 impl<'a, S> ExampleCatLexiconBuilder<'a, S>
 where
     S: example_cat_lexicon_state::State,
-    S::Name: example_cat_lexicon_state::IsSet,
     S::CreatedAt: example_cat_lexicon_state::IsSet,
+    S::Name: example_cat_lexicon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ExampleCatLexicon<'a> {
@@ -324,10 +330,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ExampleCatLexicon<'a> {
         ExampleCatLexicon {
             avatar: self._fields.0,

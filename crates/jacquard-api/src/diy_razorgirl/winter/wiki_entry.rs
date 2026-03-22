@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,51 +28,48 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "diy.razorgirl.winter.wikiEntry",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct WikiEntry<'a> {
+pub struct WikiEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alternative names for [[alias]] resolution
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aliases: Option<Vec<CowStr<'a>>>,
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
+    pub aliases: Option<Vec<S>>,
+    pub content: S,
     pub created_at: Datetime,
     pub last_updated: Datetime,
     ///URL-safe identifier for [[slug]] linking
-    #[serde(borrow)]
-    pub slug: CowStr<'a>,
+    pub slug: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<WikiEntryStatus<'a>>,
+    pub status: Option<WikiEntryStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub summary: Option<CowStr<'a>>,
+    pub summary: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub supersedes: Option<AtUri<'a>>,
+    pub supersedes: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub tags: Option<Vec<S>>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WikiEntryStatus<'a> {
+pub enum WikiEntryStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Draft,
     Stable,
     Deprecated,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> WikiEntryStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> WikiEntryStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Draft => "draft",
@@ -79,72 +78,57 @@ impl<'a> WikiEntryStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for WikiEntryStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "draft" => Self::Draft,
             "stable" => Self::Stable,
             "deprecated" => Self::Deprecated,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for WikiEntryStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "draft" => Self::Draft,
-            "stable" => Self::Stable,
-            "deprecated" => Self::Deprecated,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WikiEntryStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WikiEntryStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for WikiEntryStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for WikiEntryStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for WikiEntryStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for WikiEntryStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for WikiEntryStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for WikiEntryStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for WikiEntryStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for WikiEntryStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for WikiEntryStatus<'_> {
-    type Output = WikiEntryStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for WikiEntryStatus<S> {
+    type Output = WikiEntryStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             WikiEntryStatus::Draft => WikiEntryStatus::Draft,
@@ -158,22 +142,23 @@ impl jacquard_common::IntoStatic for WikiEntryStatus<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct WikiEntryGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct WikiEntryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: WikiEntry<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: WikiEntry<S>,
 }
 
-impl<'a> WikiEntry<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, WikiEntryRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> WikiEntry<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, WikiEntryRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -184,18 +169,17 @@ pub struct WikiEntryRecord;
 impl XrpcResp for WikiEntryRecord {
     const NSID: &'static str = "diy.razorgirl.winter.wikiEntry";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = WikiEntryGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = WikiEntryGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<WikiEntryGetRecordOutput<'_>> for WikiEntry<'_> {
-    fn from(output: WikiEntryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<WikiEntryGetRecordOutput<S>> for WikiEntry<S> {
+    fn from(output: WikiEntryGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for WikiEntry<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for WikiEntry<S> {
     const NSID: &'static str = "diy.razorgirl.winter.wikiEntry";
     type Record = WikiEntryRecord;
 }
@@ -205,7 +189,7 @@ impl Collection for WikiEntryRecord {
     type Record = WikiEntryRecord;
 }
 
-impl<'a> LexiconSchema for WikiEntry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for WikiEntry<S> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.wikiEntry"
     }
@@ -293,85 +277,85 @@ pub mod wiki_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type CreatedAt;
         type Slug;
-        type LastUpdated;
         type Content;
+        type CreatedAt;
+        type LastUpdated;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type CreatedAt = Unset;
         type Slug = Unset;
-        type LastUpdated = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Slug = S::Slug;
-        type LastUpdated = S::LastUpdated;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type Slug = S::Slug;
-        type LastUpdated = S::LastUpdated;
-        type Content = S::Content;
+        type CreatedAt = Unset;
+        type LastUpdated = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
         type Slug = Set<members::slug>;
-        type LastUpdated = S::LastUpdated;
         type Content = S::Content;
-    }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
-    impl<S: State> State for SetLastUpdated<S> {
-        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
-        type Slug = S::Slug;
-        type LastUpdated = Set<members::last_updated>;
-        type Content = S::Content;
+        type LastUpdated = S::LastUpdated;
+        type Title = S::Title;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
         type Slug = S::Slug;
-        type LastUpdated = S::LastUpdated;
         type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+        type LastUpdated = S::LastUpdated;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Slug = S::Slug;
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
+        type LastUpdated = S::LastUpdated;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
+    impl<S: State> State for SetLastUpdated<S> {
+        type Slug = S::Slug;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type LastUpdated = Set<members::last_updated>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Slug = S::Slug;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type LastUpdated = S::LastUpdated;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `slug` field
         pub struct slug(());
-        ///Marker type for the `last_updated` field
-        pub struct last_updated(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -379,16 +363,16 @@ pub mod wiki_entry_state {
 pub struct WikiEntryBuilder<'a, S: wiki_entry_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<S>>,
+        Option<S>,
         Option<Datetime>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<WikiEntryStatus<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<WikiEntryStatus<S>>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<Vec<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -413,12 +397,12 @@ impl<'a> WikiEntryBuilder<'a, wiki_entry_state::Empty> {
 
 impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
     /// Set the `aliases` field (optional)
-    pub fn aliases(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn aliases(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `aliases` field to an Option value (optional)
-    pub fn maybe_aliases(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_aliases(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -432,7 +416,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> WikiEntryBuilder<'a, wiki_entry_state::SetContent<S>> {
         self._fields.1 = Option::Some(value.into());
         WikiEntryBuilder {
@@ -489,7 +473,7 @@ where
     /// Set the `slug` field (required)
     pub fn slug(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> WikiEntryBuilder<'a, wiki_entry_state::SetSlug<S>> {
         self._fields.4 = Option::Some(value.into());
         WikiEntryBuilder {
@@ -502,12 +486,12 @@ where
 
 impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<WikiEntryStatus<'a>>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<WikiEntryStatus<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<WikiEntryStatus<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<WikiEntryStatus<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -515,12 +499,12 @@ impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
 
 impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
     /// Set the `summary` field (optional)
-    pub fn summary(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn summary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `summary` field to an Option value (optional)
-    pub fn maybe_summary(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_summary(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -528,12 +512,12 @@ impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
 
 impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
     /// Set the `supersedes` field (optional)
-    pub fn supersedes(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn supersedes(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `supersedes` field to an Option value (optional)
-    pub fn maybe_supersedes(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_supersedes(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -541,12 +525,12 @@ impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
 
 impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -560,7 +544,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> WikiEntryBuilder<'a, wiki_entry_state::SetTitle<S>> {
         self._fields.9 = Option::Some(value.into());
         WikiEntryBuilder {
@@ -574,11 +558,11 @@ where
 impl<'a, S> WikiEntryBuilder<'a, S>
 where
     S: wiki_entry_state::State,
-    S::Title: wiki_entry_state::IsSet,
-    S::CreatedAt: wiki_entry_state::IsSet,
     S::Slug: wiki_entry_state::IsSet,
-    S::LastUpdated: wiki_entry_state::IsSet,
     S::Content: wiki_entry_state::IsSet,
+    S::CreatedAt: wiki_entry_state::IsSet,
+    S::LastUpdated: wiki_entry_state::IsSet,
+    S::Title: wiki_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WikiEntry<'a> {
@@ -599,10 +583,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> WikiEntry<'a> {
         WikiEntry {
             aliases: self._fields.0,

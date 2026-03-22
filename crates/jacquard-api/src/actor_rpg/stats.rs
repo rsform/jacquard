@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,10 +30,15 @@ use serde::{Serialize, Deserialize};
 use crate::actor_rpg::stats;
 /// The six ability scores (1-30 per SRD)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Abilities<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Abilities<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Charisma
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cha: Option<i64>,
@@ -50,40 +57,50 @@ pub struct Abilities<'a> {
     ///Wisdom
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wis: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// An attack action
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Attack<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Attack<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Attack bonus (e.g., +5)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub bonus: Option<CowStr<'a>>,
+    pub bonus: Option<S>,
     ///Damage dice (e.g., 1d8)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub damage: Option<CowStr<'a>>,
+    pub damage: Option<S>,
     ///Damage bonus
     #[serde(skip_serializing_if = "Option::is_none")]
     pub damage_bonus: Option<i64>,
     ///Damage type
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub damage_type: Option<CowStr<'a>>,
+    pub damage_type: Option<S>,
     ///Attack name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Currency
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Coinage<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Coinage<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Copper pieces
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cp: Option<i64>,
@@ -99,21 +116,27 @@ pub struct Coinage<'a> {
     ///Silver pieces
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sp: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Combat and defensive stats
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Combat<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Combat<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Armor Class
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ac: Option<i64>,
     ///Hit dice (e.g., 5d10)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub hit_dice: Option<CowStr<'a>>,
+    pub hit_dice: Option<S>,
     ///Hit dice expended
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hit_dice_used: Option<i64>,
@@ -123,36 +146,48 @@ pub struct Combat<'a> {
     ///Speed in feet
     #[serde(skip_serializing_if = "Option::is_none")]
     pub speed: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Status conditions and effects
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Conditions<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Conditions<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Death saving throw progress
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub death_saves: Option<stats::DeathSaves<'a>>,
+    pub death_saves: Option<stats::DeathSaves<S>>,
     ///Exhaustion level (0-6)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exhaustion: Option<i64>,
     ///Has inspiration
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inspiration: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A custom stat
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CustomStat<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CustomStat<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Category (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category: Option<CowStr<'a>>,
+    pub category: Option<S>,
     ///Maximum (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max: Option<i64>,
@@ -160,38 +195,48 @@ pub struct CustomStat<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min: Option<i64>,
     ///Stat name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Value
     pub value: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// User-defined custom stat system
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CustomStats<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CustomStats<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Custom stat entries
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub stats: Option<Vec<stats::CustomStat<'a>>>,
+    pub stats: Option<Vec<stats::CustomStat<S>>>,
     ///System name
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub system_name: Option<CowStr<'a>>,
+    pub system_name: Option<S>,
     ///Version
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub system_version: Option<CowStr<'a>>,
+    pub system_version: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// DCC ability scores (3-18 standard, can be modified by corruption/spellburn)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccAbilities<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccAbilities<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Agility
     #[serde(skip_serializing_if = "Option::is_none")]
     pub agi: Option<i64>,
@@ -219,72 +264,74 @@ pub struct DccAbilities<'a> {
     ///Strength base (before spellburn)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub str_base: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A weapon attack (includes deed die for warriors)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccAttack<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccAttack<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Attack modifier (e.g., +2, d16+2 for deed die)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub attack_mod: Option<CowStr<'a>>,
+    pub attack_mod: Option<S>,
     ///Damage dice (e.g., 1d8+2, 1d6+d3)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub damage: Option<CowStr<'a>>,
+    pub damage: Option<S>,
     ///Damage bonus (e.g., +2, +d3 for deed die)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub damage_bonus: Option<CowStr<'a>>,
+    pub damage_bonus: Option<S>,
     ///Weapon name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Special properties (backstab, trained weapon, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notes: Option<CowStr<'a>>,
+    pub notes: Option<S>,
     ///Range (melee or distance)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub range: Option<CowStr<'a>>,
+    pub range: Option<S>,
     ///Attack type (melee, ranged, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<CowStr<'a>>,
+    pub r#type: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Cleric spellcasting features
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccCleric<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccCleric<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Deity or supernatural patron
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub deity: Option<CowStr<'a>>,
+    pub deity: Option<S>,
     ///Current disapproval range (starts at 1, accumulates)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disapproval_range: Option<i64>,
     ///Deity-specific disapproval table if any
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disapproval_table: Option<CowStr<'a>>,
+    pub disapproval_table: Option<S>,
     ///Holy symbol description
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub holy_symbol: Option<CowStr<'a>>,
+    pub holy_symbol: Option<S>,
     ///Known cleric spells
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub known_spells: Option<Vec<stats::DccClericSpell<'a>>>,
+    pub known_spells: Option<Vec<stats::DccClericSpell<S>>>,
     ///Lay on hands die (e.g., d14, d16)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lay_on_hands_die: Option<CowStr<'a>>,
+    pub lay_on_hands_die: Option<S>,
     ///Highest spell level accessible
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_spell_level: Option<i64>,
@@ -293,39 +340,50 @@ pub struct DccCleric<'a> {
     pub spell_check_mod: Option<i64>,
     ///Turn unholy die (e.g., d14, d16)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub turn_unholy_die: Option<CowStr<'a>>,
+    pub turn_unholy_die: Option<S>,
     ///Serves a Chaotic deity (unholy instead of holy)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub unholy: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A cleric spell
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DccClericSpell<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccClericSpell<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Spell level
     pub level: i64,
     ///Spell name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Additional spell notes
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notes: Option<CowStr<'a>>,
+    pub notes: Option<S>,
     ///Casting may cause additional disapproval
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sinful: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// DCC uses cp, sp, gp (10cp = 1sp, 10sp = 1gp)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccCoinage<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccCoinage<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Copper pieces
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cp: Option<i64>,
@@ -335,108 +393,123 @@ pub struct DccCoinage<'a> {
     ///Silver pieces
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sp: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Combat statistics
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccCombat<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccCombat<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Armor Class (10 + armor + AGI mod + shield)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ac: Option<i64>,
     ///Primary action die (e.g., d20, d20+d14)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub action_die: Option<CowStr<'a>>,
+    pub action_die: Option<S>,
     ///Base attack modifier (level-based for non-warriors)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attack_mod: Option<i64>,
     ///Critical hit die (e.g., d8, d12, d14)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub crit_die: Option<CowStr<'a>>,
+    pub crit_die: Option<S>,
     ///Critical hit table (I, II, III, IV, V)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub crit_table: Option<CowStr<'a>>,
+    pub crit_table: Option<S>,
     ///Fumble die (typically d4 for 0-level, varies by armor)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub fumble_die: Option<CowStr<'a>>,
+    pub fumble_die: Option<S>,
     ///Initiative modifier (AGI mod)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub initiative: Option<i64>,
     ///Speed in feet (typically 30, Dwarves 20)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub speed: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A corruption effect from failed spell checks
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccCorruption<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccCorruption<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Description of the corruption
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub effect: Option<CowStr<'a>>,
+    pub effect: Option<S>,
     ///Whether this corruption is permanent
     #[serde(skip_serializing_if = "Option::is_none")]
     pub permanent: Option<bool>,
     ///What spell caused this corruption
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source: Option<CowStr<'a>>,
+    pub source: Option<S>,
     ///Corruption severity (minor, major, greater)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<CowStr<'a>>,
+    pub r#type: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Equipment and inventory
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccEquipment<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccEquipment<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Armor worn (affects fumble die)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub armor: Option<CowStr<'a>>,
+    pub armor: Option<S>,
     ///Armor check penalty (affects skills)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub armor_check_penalty: Option<i64>,
     ///Other equipment
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gear: Option<CowStr<'a>>,
+    pub gear: Option<S>,
     ///Shield (if any)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub shield: Option<CowStr<'a>>,
+    pub shield: Option<S>,
     ///Trade goods from occupation
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub trade_goods: Option<CowStr<'a>>,
+    pub trade_goods: Option<S>,
     ///Valuables and treasure
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub treasure: Option<CowStr<'a>>,
+    pub treasure: Option<S>,
     ///Weapons carried
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub weapons: Option<CowStr<'a>>,
+    pub weapons: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Halfling class features
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccHalfling<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccHalfling<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Can spend luck to aid nearby allies
     #[serde(skip_serializing_if = "Option::is_none")]
     pub good_luck_charm: Option<bool>,
@@ -448,89 +521,109 @@ pub struct DccHalfling<'a> {
     pub luck_spent_on_allies: Option<i64>,
     ///Weapon type luck modifier applies to
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lucky_weapon: Option<CowStr<'a>>,
+    pub lucky_weapon: Option<S>,
     ///Bonus to sneak/hide when in natural environment
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sneak_and_hide: Option<i64>,
     ///Can dual-wield without penalty
     #[serde(skip_serializing_if = "Option::is_none")]
     pub two_weapon_fighting: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Hit points (0-level characters use 1d4 + STA mod)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccHp<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccHp<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Current HP
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current: Option<i64>,
     ///Maximum HP
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// DCC character identity and progression
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccIdentity<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccIdentity<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alignment (Lawful, Neutral, Chaotic)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alignment: Option<CowStr<'a>>,
+    pub alignment: Option<S>,
     ///Class (Warrior, Wizard, Cleric, Thief, Elf, Dwarf, Halfling)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub class: Option<CowStr<'a>>,
+    pub class: Option<S>,
     ///Character level (0 for funnel characters)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub level: Option<i64>,
     ///0-level occupation (e.g., Blacksmith, Farmer)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub occupation: Option<CowStr<'a>>,
+    pub occupation: Option<S>,
     ///Level title (e.g., Squire, Cutpurse, Acolyte)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     ///Experience points
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Birth augur and luck mechanics
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccLuck<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccLuck<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Birth augur name (e.g., Harsh Winter, The Bull, Fortunate Date)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub birth_augur: Option<CowStr<'a>>,
+    pub birth_augur: Option<S>,
     ///What the luck modifier applies to
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub birth_augur_effect: Option<CowStr<'a>>,
+    pub birth_augur_effect: Option<S>,
     ///Weapon type that luck applies to (Dwarves/Halflings)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lucky_weapon: Option<CowStr<'a>>,
+    pub lucky_weapon: Option<S>,
     ///Starting luck score (for tracking burned luck)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub starting_luck: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// DCC saving throws (3 saves, not 6)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccSaves<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccSaves<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Fortitude save modifier
     #[serde(skip_serializing_if = "Option::is_none")]
     pub fort: Option<i64>,
@@ -540,14 +633,21 @@ pub struct DccSaves<'a> {
     ///Willpower save modifier
     #[serde(skip_serializing_if = "Option::is_none")]
     pub will: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Current spellburn (temporary ability score sacrifice)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccSpellburn<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccSpellburn<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Agility points currently burned
     #[serde(skip_serializing_if = "Option::is_none")]
     pub agi_burned: Option<i64>,
@@ -560,113 +660,114 @@ pub struct DccSpellburn<'a> {
     ///Strength points currently burned
     #[serde(skip_serializing_if = "Option::is_none")]
     pub str_burned: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Dungeon Crawl Classics RPG character sheet. Supports 0-level funnel characters through 10th level.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccStats<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccStats<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The six ability scores (STR, AGI, STA, INT, PER, LUK)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub abilities: Option<stats::DccAbilities<'a>>,
+    pub abilities: Option<stats::DccAbilities<S>>,
     ///Notes about special abilities, class features, and racial traits
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub abilities_notes: Option<CowStr<'a>>,
+    pub abilities_notes: Option<S>,
     ///Weapon attacks
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub attacks: Option<Vec<stats::DccAttack<'a>>>,
+    pub attacks: Option<Vec<stats::DccAttack<S>>>,
     ///Cleric spellcasting (disapproval, turn unholy, lay on hands)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cleric: Option<stats::DccCleric<'a>>,
+    pub cleric: Option<stats::DccCleric<S>>,
     ///Currency (cp, sp, gp)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub coinage: Option<stats::DccCoinage<'a>>,
+    pub coinage: Option<stats::DccCoinage<S>>,
     ///Combat stats (AC, speed, action die, initiative, crit die/table)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub combat: Option<stats::DccCombat<'a>>,
+    pub combat: Option<stats::DccCombat<S>>,
     ///Gear, treasure, and trade goods
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub equipment: Option<stats::DccEquipment<'a>>,
+    pub equipment: Option<stats::DccEquipment<S>>,
     ///Halfling luck-sharing and dual wielding
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub halfling: Option<stats::DccHalfling<'a>>,
+    pub halfling: Option<stats::DccHalfling<S>>,
     ///Hit points
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub hp: Option<stats::DccHp<'a>>,
+    pub hp: Option<stats::DccHp<S>>,
     ///Character identity (occupation, class, level, alignment)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identity: Option<stats::DccIdentity<'a>>,
+    pub identity: Option<stats::DccIdentity<S>>,
     ///Languages known
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub languages: Option<CowStr<'a>>,
+    pub languages: Option<S>,
     ///Birth augur and luck tracking
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub luck: Option<stats::DccLuck<'a>>,
+    pub luck: Option<stats::DccLuck<S>>,
     ///Character notes, backstory, and special abilities
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notes: Option<CowStr<'a>>,
+    pub notes: Option<S>,
     ///Saving throws (Reflex, Fortitude, Willpower)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub saves: Option<stats::DccSaves<'a>>,
+    pub saves: Option<stats::DccSaves<S>>,
     ///Thief skills and abilities
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thief: Option<stats::DccThief<'a>>,
+    pub thief: Option<stats::DccThief<S>>,
     ///Warrior/Dwarf class features (deed die, mighty deeds)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub warrior: Option<stats::DccWarrior<'a>>,
+    pub warrior: Option<stats::DccWarrior<S>>,
     ///Wizard/Elf spellcasting (spellburn, corruption, mercurial magic)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub wizard: Option<stats::DccWizard<'a>>,
+    pub wizard: Option<stats::DccWizard<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Thief class features and skills
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccThief<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccThief<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alignment (affects some skill targets)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alignment: Option<CowStr<'a>>,
+    pub alignment: Option<S>,
     ///Backstab damage die level (+1, +2, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub backstab: Option<i64>,
     ///Weapon type that luck applies to (one type only)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lucky_weapon: Option<CowStr<'a>>,
+    pub lucky_weapon: Option<S>,
     ///Thief skill modifiers
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub skills: Option<stats::DccThiefSkills<'a>>,
+    pub skills: Option<stats::DccThiefSkills<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Thief skill bonuses (roll d20 + skill vs target)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccThiefSkills<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccThiefSkills<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Backstab attack bonus
     #[serde(skip_serializing_if = "Option::is_none")]
     pub backstab: Option<i64>,
@@ -706,29 +807,33 @@ pub struct DccThiefSkills<'a> {
     ///Sneak silently bonus
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sneak_silently: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Warrior and Dwarf class features
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccWarrior<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccWarrior<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Current deed die (d3, d4, d5, d6, d7, d8, d10+d3, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub deed_die: Option<CowStr<'a>>,
+    pub deed_die: Option<S>,
     ///Infravision range in feet (Dwarves: 60)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub infravision: Option<i64>,
     ///Weapon type luck modifier applies to
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lucky_weapon: Option<CowStr<'a>>,
+    pub lucky_weapon: Option<S>,
     ///Signature mighty deeds of arms
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mighty_deeds: Option<Vec<CowStr<'a>>>,
+    pub mighty_deeds: Option<Vec<S>>,
     ///Can use shield bash (Dwarves)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shield_bash: Option<bool>,
@@ -738,52 +843,60 @@ pub struct DccWarrior<'a> {
     ///Underground detection bonus (Dwarves: equal to level)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub underground_skills: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Wizard and Elf spellcasting features
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DccWizard<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccWizard<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Corruption effects suffered (structured)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub corruption: Option<Vec<stats::DccCorruption<'a>>>,
+    pub corruption: Option<Vec<stats::DccCorruption<S>>>,
     ///Corruption effects as free-form text
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub corruption_text: Option<CowStr<'a>>,
+    pub corruption_text: Option<S>,
     ///Known spells with mercurial magic effects
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub known_spells: Option<Vec<stats::DccWizardSpell<'a>>>,
+    pub known_spells: Option<Vec<stats::DccWizardSpell<S>>>,
     ///Highest spell level accessible
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_spell_level: Option<i64>,
     ///Supernatural patron (if any)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub patron: Option<CowStr<'a>>,
+    pub patron: Option<S>,
     ///Patron bond description and effects
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub patron_bond: Option<CowStr<'a>>,
+    pub patron_bond: Option<S>,
     ///Spell check modifier (INT mod + level)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub spell_check_mod: Option<i64>,
     ///Current spellburn status
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spellburn: Option<stats::DccSpellburn<'a>>,
+    pub spellburn: Option<stats::DccSpellburn<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A wizard spell with mercurial magic effect
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DccWizardSpell<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DccWizardSpell<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Spell level
     pub level: i64,
     ///Spell is currently lost (must be re-learned)
@@ -791,136 +904,141 @@ pub struct DccWizardSpell<'a> {
     pub lost: Option<bool>,
     ///Unique mercurial magic effect (d100 roll result)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mercurial_magic: Option<CowStr<'a>>,
+    pub mercurial_magic: Option<S>,
     ///The d100 roll for mercurial magic
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mercurial_roll: Option<i64>,
     ///Spell name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Additional spell notes
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notes: Option<CowStr<'a>>,
+    pub notes: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Death saving throw successes and failures
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DeathSaves<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeathSaves<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Failures (0-3)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub failures: Option<i64>,
     ///Successes (0-3)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub successes: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// D&D 5e character sheet. All sub-objects are optional.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DndStats<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DndStats<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The six ability scores (STR, DEX, CON, INT, WIS, CHA)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub abilities: Option<stats::Abilities<'a>>,
+    pub abilities: Option<stats::Abilities<S>>,
     ///Attack actions
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub attacks: Option<Vec<stats::Attack<'a>>>,
+    pub attacks: Option<Vec<stats::Attack<S>>>,
     ///Currency (cp, sp, ep, gp, pp)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub coinage: Option<stats::Coinage<'a>>,
+    pub coinage: Option<stats::Coinage<S>>,
     ///Combat stats (AC, speed, initiative, hit dice)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub combat: Option<stats::Combat<'a>>,
+    pub combat: Option<stats::Combat<S>>,
     ///Status conditions (inspiration, exhaustion, death saves)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub conditions: Option<stats::Conditions<'a>>,
+    pub conditions: Option<stats::Conditions<S>>,
     ///Gear and inventory
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub equipment: Option<stats::Equipment<'a>>,
+    pub equipment: Option<stats::Equipment<S>>,
     ///Class features, racial traits, and feats
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub features: Option<CowStr<'a>>,
+    pub features: Option<S>,
     ///Hit points (current, max, temp)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub hp: Option<stats::Hp<'a>>,
+    pub hp: Option<stats::Hp<S>>,
     ///Character identity (race, class, level, background)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identity: Option<stats::Identity<'a>>,
+    pub identity: Option<stats::Identity<S>>,
     ///Languages known
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub languages: Option<CowStr<'a>>,
+    pub languages: Option<S>,
     ///Passive scores (Perception, Investigation, Insight)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub passives: Option<stats::Passives<'a>>,
+    pub passives: Option<stats::Passives<S>>,
     ///Traits, ideals, bonds, flaws, backstory
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub personality: Option<stats::Personality<'a>>,
+    pub personality: Option<stats::Personality<S>>,
     ///Armor, weapon, and tool proficiencies
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub proficiencies: Option<CowStr<'a>>,
+    pub proficiencies: Option<S>,
     ///Saving throw modifiers
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub saves: Option<stats::Saves<'a>>,
+    pub saves: Option<stats::Saves<S>>,
     ///Skill modifiers
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub skills: Option<stats::Skills<'a>>,
+    pub skills: Option<stats::Skills<S>>,
     ///Spellcasting details (for casters)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spellcasting: Option<stats::Spellcasting<'a>>,
+    pub spellcasting: Option<stats::Spellcasting<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Gear and inventory
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Equipment<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Equipment<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Armor
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub armor: Option<CowStr<'a>>,
+    pub armor: Option<S>,
     ///Other equipment
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gear: Option<CowStr<'a>>,
+    pub gear: Option<S>,
     ///Valuables and treasure
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub treasure: Option<CowStr<'a>>,
+    pub treasure: Option<S>,
     ///Weapons
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub weapons: Option<CowStr<'a>>,
+    pub weapons: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Hit point tracking
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Hp<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Hp<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Current HP
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current: Option<i64>,
@@ -930,26 +1048,30 @@ pub struct Hp<'a> {
     ///Temporary HP
     #[serde(skip_serializing_if = "Option::is_none")]
     pub temp: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Character identity and progression
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Identity<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Identity<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alignment (e.g., Lawful Good)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alignment: Option<CowStr<'a>>,
+    pub alignment: Option<S>,
     ///Background (e.g., Soldier, Sage)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub background: Option<CowStr<'a>>,
+    pub background: Option<S>,
     ///Class and subclass (e.g., Fighter (Champion))
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub class: Option<CowStr<'a>>,
+    pub class: Option<S>,
     ///Character level
     #[serde(skip_serializing_if = "Option::is_none")]
     pub level: Option<i64>,
@@ -958,66 +1080,79 @@ pub struct Identity<'a> {
     pub proficiency: Option<i64>,
     ///Race (e.g., Human, Elf, Dwarf)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub race: Option<CowStr<'a>>,
+    pub race: Option<S>,
     ///Experience points
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A user's RPG character statistics. One record per user (rkey: self).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "actor.rpg.stats", tag = "$type")]
-pub struct Stats<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "actor.rpg.stats",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Stats<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when this record was created
     pub created_at: Datetime,
     ///User-defined custom stat system
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub custom: Option<stats::CustomStats<'a>>,
+    pub custom: Option<stats::CustomStats<S>>,
     ///Dungeon Crawl Classics RPG character sheet
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub dcc: Option<stats::DccStats<'a>>,
+    pub dcc: Option<stats::DccStats<S>>,
     ///Dungeons & Dragons 5th Edition character sheet
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub dnd: Option<stats::DndStats<'a>>,
+    pub dnd: Option<stats::DndStats<S>>,
     ///Reverie House philosophical alignment
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reverie: Option<stats::ReverieStats<'a>>,
+    pub reverie: Option<stats::ReverieStats<S>>,
     ///RPG Maker MZ engine character parameters
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rmmz: Option<stats::RmmzStats<'a>>,
+    pub rmmz: Option<stats::RmmzStats<S>>,
     ///Timestamp when this record was last modified
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StatsGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StatsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Stats<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Stats<S>,
 }
 
 /// Passive scores (10 + skill modifier)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Passives<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Passives<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Passive Insight
     #[serde(skip_serializing_if = "Option::is_none")]
     pub insight: Option<i64>,
@@ -1027,42 +1162,51 @@ pub struct Passives<'a> {
     ///Passive Perception
     #[serde(skip_serializing_if = "Option::is_none")]
     pub perception: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Personality and backstory
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Personality<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Personality<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Backstory
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub backstory: Option<CowStr<'a>>,
+    pub backstory: Option<S>,
     ///Bonds
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub bonds: Option<CowStr<'a>>,
+    pub bonds: Option<S>,
     ///Flaws
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub flaws: Option<CowStr<'a>>,
+    pub flaws: Option<S>,
     ///Ideals
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ideals: Option<CowStr<'a>>,
+    pub ideals: Option<S>,
     ///Personality traits
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub traits: Option<CowStr<'a>>,
+    pub traits: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Reverie House philosophical alignment
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ReverieStats<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReverieStats<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Authority (0-100)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub authority: Option<i64>,
@@ -1077,20 +1221,21 @@ pub struct ReverieStats<'a> {
     pub oblivion: Option<i64>,
     ///Philosophical octant
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub octant: Option<ReverieStatsOctant<'a>>,
+    pub octant: Option<ReverieStatsOctant<S>>,
     ///Receptive (0-100)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub receptive: Option<i64>,
     ///Skeptic (0-100)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub skeptic: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Philosophical octant
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReverieStatsOctant<'a> {
+pub enum ReverieStatsOctant<S: Bos<str> + AsRef<str> = DefaultStr> {
     Adaptive,
     Chaotic,
     Prepared,
@@ -1102,10 +1247,10 @@ pub enum ReverieStatsOctant<'a> {
     Equilibrium,
     Singling,
     Confused,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ReverieStatsOctant<'a> {
+impl<S: Bos<str> + AsRef<str>> ReverieStatsOctant<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Adaptive => "adaptive",
@@ -1122,11 +1267,9 @@ impl<'a> ReverieStatsOctant<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ReverieStatsOctant<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "adaptive" => Self::Adaptive,
             "chaotic" => Self::Chaotic,
             "prepared" => Self::Prepared,
@@ -1138,72 +1281,51 @@ impl<'a> From<&'a str> for ReverieStatsOctant<'a> {
             "equilibrium" => Self::Equilibrium,
             "singling" => Self::Singling,
             "confused" => Self::Confused,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ReverieStatsOctant<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "adaptive" => Self::Adaptive,
-            "chaotic" => Self::Chaotic,
-            "prepared" => Self::Prepared,
-            "intended" => Self::Intended,
-            "contented" => Self::Contented,
-            "assertive" => Self::Assertive,
-            "ordered" => Self::Ordered,
-            "guarded" => Self::Guarded,
-            "equilibrium" => Self::Equilibrium,
-            "singling" => Self::Singling,
-            "confused" => Self::Confused,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ReverieStatsOctant<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ReverieStatsOctant<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ReverieStatsOctant<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ReverieStatsOctant<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ReverieStatsOctant<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ReverieStatsOctant<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ReverieStatsOctant<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ReverieStatsOctant<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ReverieStatsOctant<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ReverieStatsOctant<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ReverieStatsOctant<'_> {
-    type Output = ReverieStatsOctant<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ReverieStatsOctant<S> {
+    type Output = ReverieStatsOctant<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ReverieStatsOctant::Adaptive => ReverieStatsOctant::Adaptive,
@@ -1224,10 +1346,15 @@ impl jacquard_common::IntoStatic for ReverieStatsOctant<'_> {
 
 /// RPG Maker MZ character parameters
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct RmmzStats<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RmmzStats<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Agility
     #[serde(skip_serializing_if = "Option::is_none")]
     pub agi: Option<i64>,
@@ -1236,8 +1363,7 @@ pub struct RmmzStats<'a> {
     pub atk: Option<i64>,
     ///Class
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub class: Option<CowStr<'a>>,
+    pub class: Option<S>,
     ///Critical %
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cri: Option<i64>,
@@ -1283,14 +1409,21 @@ pub struct RmmzStats<'a> {
     ///Experience
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Saving throw modifiers (actual values, not proficiency flags)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Saves<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Saves<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Charisma save modifier
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cha: Option<i64>,
@@ -1309,14 +1442,21 @@ pub struct Saves<'a> {
     ///Wisdom save modifier
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wis: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Skill modifiers (actual values, not proficiency flags)
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Skills<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Skills<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Acrobatics (DEX)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub acrobatics: Option<i64>,
@@ -1371,66 +1511,69 @@ pub struct Skills<'a> {
     ///Survival (WIS)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub survival: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Spells organized by level
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SpellList<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SpellList<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Cantrips (at-will)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cantrips: Option<Vec<CowStr<'a>>>,
+    pub cantrips: Option<Vec<S>>,
     ///1st-level spells
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub l1: Option<Vec<CowStr<'a>>>,
+    pub l1: Option<Vec<S>>,
     ///2nd-level spells
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub l2: Option<Vec<CowStr<'a>>>,
+    pub l2: Option<Vec<S>>,
     ///3rd-level spells
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub l3: Option<Vec<CowStr<'a>>>,
+    pub l3: Option<Vec<S>>,
     ///4th-level spells
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub l4: Option<Vec<CowStr<'a>>>,
+    pub l4: Option<Vec<S>>,
     ///5th-level spells
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub l5: Option<Vec<CowStr<'a>>>,
+    pub l5: Option<Vec<S>>,
     ///6th-level spells
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub l6: Option<Vec<CowStr<'a>>>,
+    pub l6: Option<Vec<S>>,
     ///7th-level spells
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub l7: Option<Vec<CowStr<'a>>>,
+    pub l7: Option<Vec<S>>,
     ///8th-level spells
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub l8: Option<Vec<CowStr<'a>>>,
+    pub l8: Option<Vec<S>>,
     ///9th-level spells
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub l9: Option<Vec<CowStr<'a>>>,
+    pub l9: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Spellcasting details
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Spellcasting<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Spellcasting<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Spellcasting ability (INT, WIS, CHA)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ability: Option<CowStr<'a>>,
+    pub ability: Option<S>,
     ///Spell attack bonus
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attack: Option<i64>,
@@ -1439,20 +1582,25 @@ pub struct Spellcasting<'a> {
     pub dc: Option<i64>,
     ///Spell slots by level
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub slots: Option<Vec<stats::Spellslot<'a>>>,
+    pub slots: Option<Vec<stats::Spellslot<S>>>,
     ///Known/prepared spells by level
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spells: Option<stats::SpellList<'a>>,
+    pub spells: Option<stats::SpellList<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Spell slot entry
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Spellslot<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Spellslot<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Spell level
     pub level: i64,
     ///Total slots
@@ -1460,17 +1608,17 @@ pub struct Spellslot<'a> {
     ///Slots used
     #[serde(skip_serializing_if = "Option::is_none")]
     pub used: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Stats<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, StatsRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Stats<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, StatsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Abilities<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Abilities<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -1593,7 +1741,7 @@ impl<'a> LexiconSchema for Abilities<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Attack<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Attack<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -1649,7 +1797,7 @@ impl<'a> LexiconSchema for Attack<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Coinage<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Coinage<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -1709,7 +1857,7 @@ impl<'a> LexiconSchema for Coinage<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Combat<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Combat<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -1761,7 +1909,7 @@ impl<'a> LexiconSchema for Combat<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Conditions<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Conditions<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -1794,7 +1942,7 @@ impl<'a> LexiconSchema for Conditions<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CustomStat<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CustomStat<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -1830,7 +1978,7 @@ impl<'a> LexiconSchema for CustomStat<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CustomStats<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CustomStats<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -1865,7 +2013,7 @@ impl<'a> LexiconSchema for CustomStats<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccAbilities<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccAbilities<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2042,7 +2190,7 @@ impl<'a> LexiconSchema for DccAbilities<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccAttack<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccAttack<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2128,7 +2276,7 @@ impl<'a> LexiconSchema for DccAttack<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccCleric<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccCleric<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2239,7 +2387,7 @@ impl<'a> LexiconSchema for DccCleric<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccClericSpell<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccClericSpell<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2295,7 +2443,7 @@ impl<'a> LexiconSchema for DccClericSpell<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccCoinage<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccCoinage<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2337,7 +2485,7 @@ impl<'a> LexiconSchema for DccCoinage<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccCombat<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccCombat<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2410,7 +2558,7 @@ impl<'a> LexiconSchema for DccCombat<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccCorruption<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccCorruption<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2455,7 +2603,7 @@ impl<'a> LexiconSchema for DccCorruption<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccEquipment<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccEquipment<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2539,7 +2687,7 @@ impl<'a> LexiconSchema for DccEquipment<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccHalfling<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccHalfling<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2582,7 +2730,7 @@ impl<'a> LexiconSchema for DccHalfling<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccHp<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccHp<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2615,7 +2763,7 @@ impl<'a> LexiconSchema for DccHp<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccIdentity<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccIdentity<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2697,7 +2845,7 @@ impl<'a> LexiconSchema for DccIdentity<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccLuck<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccLuck<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2760,7 +2908,7 @@ impl<'a> LexiconSchema for DccLuck<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccSaves<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccSaves<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2775,7 +2923,7 @@ impl<'a> LexiconSchema for DccSaves<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccSpellburn<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccSpellburn<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2826,7 +2974,7 @@ impl<'a> LexiconSchema for DccSpellburn<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccStats<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccStats<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2881,7 +3029,7 @@ impl<'a> LexiconSchema for DccStats<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccThief<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccThief<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2925,7 +3073,7 @@ impl<'a> LexiconSchema for DccThief<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccThiefSkills<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccThiefSkills<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2940,7 +3088,7 @@ impl<'a> LexiconSchema for DccThiefSkills<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccWarrior<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccWarrior<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3003,7 +3151,7 @@ impl<'a> LexiconSchema for DccWarrior<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccWizard<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccWizard<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3086,7 +3234,7 @@ impl<'a> LexiconSchema for DccWizard<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DccWizardSpell<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccWizardSpell<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3170,7 +3318,7 @@ impl<'a> LexiconSchema for DccWizardSpell<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DeathSaves<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DeathSaves<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3221,7 +3369,7 @@ impl<'a> LexiconSchema for DeathSaves<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DndStats<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DndStats<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3276,7 +3424,7 @@ impl<'a> LexiconSchema for DndStats<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Equipment<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Equipment<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3331,7 +3479,7 @@ impl<'a> LexiconSchema for Equipment<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Hp<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Hp<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3373,7 +3521,7 @@ impl<'a> LexiconSchema for Hp<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Identity<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Identity<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3462,18 +3610,17 @@ pub struct StatsRecord;
 impl XrpcResp for StatsRecord {
     const NSID: &'static str = "actor.rpg.stats";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StatsGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StatsGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
-    fn from(output: StatsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<StatsGetRecordOutput<S>> for Stats<S> {
+    fn from(output: StatsGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Stats<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Stats<S> {
     const NSID: &'static str = "actor.rpg.stats";
     type Record = StatsRecord;
 }
@@ -3483,7 +3630,7 @@ impl Collection for StatsRecord {
     type Record = StatsRecord;
 }
 
-impl<'a> LexiconSchema for Stats<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Stats<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3498,7 +3645,7 @@ impl<'a> LexiconSchema for Stats<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Passives<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Passives<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3513,7 +3660,7 @@ impl<'a> LexiconSchema for Passives<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Personality<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Personality<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3578,7 +3725,7 @@ impl<'a> LexiconSchema for Personality<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ReverieStats<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReverieStats<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3701,7 +3848,7 @@ impl<'a> LexiconSchema for ReverieStats<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RmmzStats<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RmmzStats<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3906,7 +4053,7 @@ impl<'a> LexiconSchema for RmmzStats<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Saves<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Saves<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3921,7 +4068,7 @@ impl<'a> LexiconSchema for Saves<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Skills<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Skills<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3936,7 +4083,7 @@ impl<'a> LexiconSchema for Skills<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SpellList<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SpellList<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -4051,7 +4198,7 @@ impl<'a> LexiconSchema for SpellList<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Spellcasting<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Spellcasting<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -4095,7 +4242,7 @@ impl<'a> LexiconSchema for Spellcasting<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Spellslot<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Spellslot<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -7068,13 +7215,7 @@ pub mod custom_stat_state {
 /// Builder for constructing an instance of this type
 pub struct CustomStatBuilder<'a, S: custom_stat_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-    ),
+    _fields: (Option<S>, Option<i64>, Option<i64>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -7098,12 +7239,12 @@ impl<'a> CustomStatBuilder<'a, custom_stat_state::Empty> {
 
 impl<'a, S: custom_stat_state::State> CustomStatBuilder<'a, S> {
     /// Set the `category` field (optional)
-    pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
-    pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_category(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -7143,7 +7284,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CustomStatBuilder<'a, custom_stat_state::SetName<S>> {
         self._fields.3 = Option::Some(value.into());
         CustomStatBuilder {
@@ -7193,10 +7334,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CustomStat<'a> {
         CustomStat {
             category: self._fields.0,
@@ -7219,44 +7357,44 @@ pub mod dcc_cleric_spell_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Level;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Level = S::Level;
+        type Name = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type Name = S::Name;
         type Level = Set<members::level>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Level = S::Level;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DccClericSpellBuilder<'a, S: dcc_cleric_spell_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<CowStr<'a>>, Option<CowStr<'a>>, Option<bool>),
+    _fields: (Option<i64>, Option<S>, Option<S>, Option<bool>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -7305,7 +7443,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DccClericSpellBuilder<'a, dcc_cleric_spell_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         DccClericSpellBuilder {
@@ -7318,12 +7456,12 @@ where
 
 impl<'a, S: dcc_cleric_spell_state::State> DccClericSpellBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
-    pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_notes(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -7345,8 +7483,8 @@ impl<'a, S: dcc_cleric_spell_state::State> DccClericSpellBuilder<'a, S> {
 impl<'a, S> DccClericSpellBuilder<'a, S>
 where
     S: dcc_cleric_spell_state::State,
-    S::Name: dcc_cleric_spell_state::IsSet,
     S::Level: dcc_cleric_spell_state::IsSet,
+    S::Name: dcc_cleric_spell_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DccClericSpell<'a> {
@@ -7361,10 +7499,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DccClericSpell<'a> {
         DccClericSpell {
             level: self._fields.0.unwrap(),
@@ -7386,51 +7521,44 @@ pub mod dcc_wizard_spell_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
         type Name;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Level = Set<members::level>;
-        type Name = S::Name;
+        type Level = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Level = S::Level;
         type Name = Set<members::name>;
+        type Level = S::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type Name = S::Name;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DccWizardSpellBuilder<'a, S: dcc_wizard_spell_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<i64>,
-        Option<bool>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<i64>, Option<bool>, Option<S>, Option<i64>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -7486,12 +7614,12 @@ impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
 
 impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
     /// Set the `mercurialMagic` field (optional)
-    pub fn mercurial_magic(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn mercurial_magic(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `mercurialMagic` field to an Option value (optional)
-    pub fn maybe_mercurial_magic(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_mercurial_magic(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -7518,7 +7646,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DccWizardSpellBuilder<'a, dcc_wizard_spell_state::SetName<S>> {
         self._fields.4 = Option::Some(value.into());
         DccWizardSpellBuilder {
@@ -7531,12 +7659,12 @@ where
 
 impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
-    pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_notes(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -7545,8 +7673,8 @@ impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
 impl<'a, S> DccWizardSpellBuilder<'a, S>
 where
     S: dcc_wizard_spell_state::State,
-    S::Level: dcc_wizard_spell_state::IsSet,
     S::Name: dcc_wizard_spell_state::IsSet,
+    S::Level: dcc_wizard_spell_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DccWizardSpell<'a> {
@@ -7563,10 +7691,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DccWizardSpell<'a> {
         DccWizardSpell {
             level: self._fields.0.unwrap(),
@@ -7617,11 +7742,11 @@ pub struct StatsBuilder<'a, S: stats_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<stats::CustomStats<'a>>,
-        Option<stats::DccStats<'a>>,
-        Option<stats::DndStats<'a>>,
-        Option<stats::ReverieStats<'a>>,
-        Option<stats::RmmzStats<'a>>,
+        Option<stats::CustomStats<S>>,
+        Option<stats::DccStats<S>>,
+        Option<stats::DndStats<S>>,
+        Option<stats::ReverieStats<S>>,
+        Option<stats::RmmzStats<S>>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -7666,12 +7791,12 @@ where
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `custom` field (optional)
-    pub fn custom(mut self, value: impl Into<Option<stats::CustomStats<'a>>>) -> Self {
+    pub fn custom(mut self, value: impl Into<Option<stats::CustomStats<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `custom` field to an Option value (optional)
-    pub fn maybe_custom(mut self, value: Option<stats::CustomStats<'a>>) -> Self {
+    pub fn maybe_custom(mut self, value: Option<stats::CustomStats<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -7679,12 +7804,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `dcc` field (optional)
-    pub fn dcc(mut self, value: impl Into<Option<stats::DccStats<'a>>>) -> Self {
+    pub fn dcc(mut self, value: impl Into<Option<stats::DccStats<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `dcc` field to an Option value (optional)
-    pub fn maybe_dcc(mut self, value: Option<stats::DccStats<'a>>) -> Self {
+    pub fn maybe_dcc(mut self, value: Option<stats::DccStats<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -7692,12 +7817,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `dnd` field (optional)
-    pub fn dnd(mut self, value: impl Into<Option<stats::DndStats<'a>>>) -> Self {
+    pub fn dnd(mut self, value: impl Into<Option<stats::DndStats<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `dnd` field to an Option value (optional)
-    pub fn maybe_dnd(mut self, value: Option<stats::DndStats<'a>>) -> Self {
+    pub fn maybe_dnd(mut self, value: Option<stats::DndStats<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -7705,12 +7830,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `reverie` field (optional)
-    pub fn reverie(mut self, value: impl Into<Option<stats::ReverieStats<'a>>>) -> Self {
+    pub fn reverie(mut self, value: impl Into<Option<stats::ReverieStats<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `reverie` field to an Option value (optional)
-    pub fn maybe_reverie(mut self, value: Option<stats::ReverieStats<'a>>) -> Self {
+    pub fn maybe_reverie(mut self, value: Option<stats::ReverieStats<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -7718,12 +7843,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `rmmz` field (optional)
-    pub fn rmmz(mut self, value: impl Into<Option<stats::RmmzStats<'a>>>) -> Self {
+    pub fn rmmz(mut self, value: impl Into<Option<stats::RmmzStats<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `rmmz` field to an Option value (optional)
-    pub fn maybe_rmmz(mut self, value: Option<stats::RmmzStats<'a>>) -> Self {
+    pub fn maybe_rmmz(mut self, value: Option<stats::RmmzStats<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -7761,13 +7886,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Stats<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Stats<'a> {
         Stats {
             created_at: self._fields.0.unwrap(),
             custom: self._fields.1,
@@ -7919,10 +8038,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Spellslot<'a> {
         Spellslot {
             level: self._fields.0.unwrap(),

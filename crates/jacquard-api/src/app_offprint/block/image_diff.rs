@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,32 +25,34 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::app_offprint::block::image_grid::GridImage;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageDiff<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImageDiff<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Horizontal alignment
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alignment: Option<CowStr<'a>>,
+    pub alignment: Option<S>,
     ///Comparison caption
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub caption: Option<CowStr<'a>>,
+    pub caption: Option<S>,
     ///Exactly 2 images for comparison [before, after]
-    #[serde(borrow)]
-    pub images: Vec<GridImage<'a>>,
+    pub images: Vec<GridImage<S>>,
     ///Labels for the images [before label, after label]
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<Vec<CowStr<'a>>>,
+    pub labels: Option<Vec<S>>,
     ///CSS width value
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub width: Option<CowStr<'a>>,
+    pub width: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for ImageDiff<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageDiff<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.imageDiff"
     }
@@ -141,11 +145,11 @@ pub mod image_diff_state {
 pub struct ImageDiffBuilder<'a, S: image_diff_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<GridImage<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<Vec<GridImage<S>>>,
+        Option<Vec<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -170,12 +174,12 @@ impl<'a> ImageDiffBuilder<'a, image_diff_state::Empty> {
 
 impl<'a, S: image_diff_state::State> ImageDiffBuilder<'a, S> {
     /// Set the `alignment` field (optional)
-    pub fn alignment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn alignment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alignment` field to an Option value (optional)
-    pub fn maybe_alignment(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_alignment(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -183,12 +187,12 @@ impl<'a, S: image_diff_state::State> ImageDiffBuilder<'a, S> {
 
 impl<'a, S: image_diff_state::State> ImageDiffBuilder<'a, S> {
     /// Set the `caption` field (optional)
-    pub fn caption(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn caption(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `caption` field to an Option value (optional)
-    pub fn maybe_caption(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_caption(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -202,7 +206,7 @@ where
     /// Set the `images` field (required)
     pub fn images(
         mut self,
-        value: impl Into<Vec<GridImage<'a>>>,
+        value: impl Into<Vec<GridImage<S>>>,
     ) -> ImageDiffBuilder<'a, image_diff_state::SetImages<S>> {
         self._fields.2 = Option::Some(value.into());
         ImageDiffBuilder {
@@ -215,12 +219,12 @@ where
 
 impl<'a, S: image_diff_state::State> ImageDiffBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -228,12 +232,12 @@ impl<'a, S: image_diff_state::State> ImageDiffBuilder<'a, S> {
 
 impl<'a, S: image_diff_state::State> ImageDiffBuilder<'a, S> {
     /// Set the `width` field (optional)
-    pub fn width(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn width(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `width` field to an Option value (optional)
-    pub fn maybe_width(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_width(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -258,10 +262,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ImageDiff<'a> {
         ImageDiff {
             alignment: self._fields.0,

@@ -10,7 +10,10 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::Preferences;
 
@@ -18,12 +21,20 @@ use crate::app_bsky::actor::Preferences;
 #[serde(rename_all = "camelCase")]
 pub struct GetPreferences;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPreferencesOutput<'a> {
-    #[serde(borrow)]
-    pub preferences: Preferences<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPreferencesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub preferences: Preferences<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.actor.getPreferences
@@ -31,8 +42,8 @@ pub struct GetPreferencesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPreferencesResponse {
     const NSID: &'static str = "app.bsky.actor.getPreferences";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPreferencesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetPreferencesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetPreferences {
@@ -46,6 +57,6 @@ pub struct GetPreferencesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPreferencesRequest {
     const PATH: &'static str = "/xrpc/app.bsky.actor.getPreferences";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPreferences;
+    type Request<S: Bos<str> + AsRef<str>> = GetPreferences;
     type Response = GetPreferencesResponse;
 }

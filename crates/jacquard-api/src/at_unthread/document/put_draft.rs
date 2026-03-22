@@ -10,13 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,44 +25,64 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DraftView<'a> {
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DraftView<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub content: S,
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub tid: CowStr<'a>,
+    pub tid: S,
     pub updated_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct PutDraft<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PutDraft<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Markdown content of the draft.
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
+    pub content: S,
     ///TID of an existing draft to update. Omit to create a new draft.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tid: Option<CowStr<'a>>,
+    pub tid: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct PutDraftOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PutDraftOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Data<'a>,
+    pub value: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -70,18 +91,19 @@ pub struct PutDraftOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PutDraftError<'a> {
+pub enum PutDraftError {
     #[serde(rename = "DraftNotFound")]
-    DraftNotFound(Option<CowStr<'a>>),
+    DraftNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for PutDraftError<'_> {
+impl core::fmt::Display for PutDraftError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::DraftNotFound(msg) => {
@@ -91,12 +113,18 @@ impl core::fmt::Display for PutDraftError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
-impl<'a> LexiconSchema for DraftView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DraftView<S> {
     fn nsid() -> &'static str {
         "at.unthread.document.putDraft"
     }
@@ -116,11 +144,12 @@ pub struct PutDraftResponse;
 impl jacquard_common::xrpc::XrpcResp for PutDraftResponse {
     const NSID: &'static str = "at.unthread.document.putDraft";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PutDraftOutput<'de>;
-    type Err<'de> = PutDraftError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PutDraftOutput<S>;
+    type Err = PutDraftError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for PutDraft<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for PutDraft<S> {
     const NSID: &'static str = "at.unthread.document.putDraft";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -135,7 +164,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for PutDraftRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = PutDraft<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = PutDraft<S>;
     type Response = PutDraftResponse;
 }
 
@@ -150,78 +179,73 @@ pub mod draft_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type UpdatedAt;
-        type Content;
-        type CreatedAt;
         type Tid;
+        type CreatedAt;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type UpdatedAt = Unset;
-        type Content = Unset;
-        type CreatedAt = Unset;
         type Tid = Unset;
+        type CreatedAt = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
         type UpdatedAt = Set<members::updated_at>;
-        type Content = S::Content;
+        type Tid = S::Tid;
         type CreatedAt = S::CreatedAt;
-        type Tid = S::Tid;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
-        type Tid = S::Tid;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Content = S::Content;
-        type CreatedAt = Set<members::created_at>;
-        type Tid = S::Tid;
     }
     ///State transition - sets the `tid` field to Set
     pub struct SetTid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTid<S> {}
     impl<S: State> State for SetTid<S> {
         type UpdatedAt = S::UpdatedAt;
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
         type Tid = Set<members::tid>;
+        type CreatedAt = S::CreatedAt;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Tid = S::Tid;
+        type CreatedAt = Set<members::created_at>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Tid = S::Tid;
+        type CreatedAt = S::CreatedAt;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
-        ///Marker type for the `content` field
-        pub struct content(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `tid` field
         pub struct tid(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DraftViewBuilder<'a, S: draft_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<S>, Option<Datetime>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -251,7 +275,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DraftViewBuilder<'a, draft_view_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         DraftViewBuilder {
@@ -289,7 +313,7 @@ where
     /// Set the `tid` field (required)
     pub fn tid(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DraftViewBuilder<'a, draft_view_state::SetTid<S>> {
         self._fields.2 = Option::Some(value.into());
         DraftViewBuilder {
@@ -323,9 +347,9 @@ impl<'a, S> DraftViewBuilder<'a, S>
 where
     S: draft_view_state::State,
     S::UpdatedAt: draft_view_state::IsSet,
-    S::Content: draft_view_state::IsSet,
-    S::CreatedAt: draft_view_state::IsSet,
     S::Tid: draft_view_state::IsSet,
+    S::CreatedAt: draft_view_state::IsSet,
+    S::Content: draft_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DraftView<'a> {
@@ -340,7 +364,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DraftView<'a> {
         DraftView {
             content: self._fields.0.unwrap(),

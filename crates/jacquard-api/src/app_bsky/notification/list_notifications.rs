@@ -10,13 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -29,10 +30,16 @@ use crate::app_bsky::notification::list_notifications;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListNotifications<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListNotifications<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -41,57 +48,64 @@ pub struct ListNotifications<'a> {
     pub priority: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub reasons: Option<Vec<CowStr<'a>>>,
+    pub reasons: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub seen_at: Option<Datetime>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListNotificationsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListNotificationsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub notifications: Vec<list_notifications::Notification<'a>>,
+    pub cursor: Option<S>,
+    pub notifications: Vec<list_notifications::Notification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub priority: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub seen_at: Option<Datetime>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Notification<'a> {
-    #[serde(borrow)]
-    pub author: ProfileView<'a>,
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Notification<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub author: ProfileView<S>,
+    pub cid: Cid<S>,
     pub indexed_at: Datetime,
     pub is_read: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<Vec<Label<'a>>>,
+    pub labels: Option<Vec<Label<S>>>,
     ///The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.
-    #[serde(borrow)]
-    pub reason: NotificationReason<'a>,
+    pub reason: NotificationReason<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reason_subject: Option<AtUri<'a>>,
-    #[serde(borrow)]
-    pub record: Data<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub reason_subject: Option<AtUri<S>>,
+    pub record: Data<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The reason why this notification was delivered - e.g. your post was liked, or you received a new follower.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum NotificationReason<'a> {
+pub enum NotificationReason<S: Bos<str> + AsRef<str> = DefaultStr> {
     Like,
     Repost,
     Follow,
@@ -105,10 +119,10 @@ pub enum NotificationReason<'a> {
     RepostViaRepost,
     SubscribedPost,
     ContactMatch,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> NotificationReason<'a> {
+impl<S: Bos<str> + AsRef<str>> NotificationReason<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Like => "like",
@@ -127,11 +141,9 @@ impl<'a> NotificationReason<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for NotificationReason<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "like" => Self::Like,
             "repost" => Self::Repost,
             "follow" => Self::Follow,
@@ -145,74 +157,51 @@ impl<'a> From<&'a str> for NotificationReason<'a> {
             "repost-via-repost" => Self::RepostViaRepost,
             "subscribed-post" => Self::SubscribedPost,
             "contact-match" => Self::ContactMatch,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for NotificationReason<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "like" => Self::Like,
-            "repost" => Self::Repost,
-            "follow" => Self::Follow,
-            "mention" => Self::Mention,
-            "reply" => Self::Reply,
-            "quote" => Self::Quote,
-            "starterpack-joined" => Self::StarterpackJoined,
-            "verified" => Self::Verified,
-            "unverified" => Self::Unverified,
-            "like-via-repost" => Self::LikeViaRepost,
-            "repost-via-repost" => Self::RepostViaRepost,
-            "subscribed-post" => Self::SubscribedPost,
-            "contact-match" => Self::ContactMatch,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for NotificationReason<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for NotificationReason<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for NotificationReason<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for NotificationReason<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for NotificationReason<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for NotificationReason<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for NotificationReason<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for NotificationReason<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for NotificationReason<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for NotificationReason<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for NotificationReason<'_> {
-    type Output = NotificationReason<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for NotificationReason<S> {
+    type Output = NotificationReason<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             NotificationReason::Like => NotificationReason::Like,
@@ -240,11 +229,12 @@ pub struct ListNotificationsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListNotificationsResponse {
     const NSID: &'static str = "app.bsky.notification.listNotifications";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListNotificationsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListNotificationsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListNotifications<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListNotifications<S> {
     const NSID: &'static str = "app.bsky.notification.listNotifications";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListNotificationsResponse;
@@ -255,11 +245,11 @@ pub struct ListNotificationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListNotificationsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.notification.listNotifications";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListNotifications<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListNotifications<S>;
     type Response = ListNotificationsResponse;
 }
 
-impl<'a> LexiconSchema for Notification<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Notification<S> {
     fn nsid() -> &'static str {
         "app.bsky.notification.listNotifications"
     }
@@ -300,13 +290,7 @@ pub mod list_notifications_state {
 /// Builder for constructing an instance of this type
 pub struct ListNotificationsBuilder<'a, S: list_notifications_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<bool>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<S>, Option<i64>, Option<bool>, Option<Vec<S>>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -330,12 +314,12 @@ impl<'a> ListNotificationsBuilder<'a, list_notifications_state::Empty> {
 
 impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -369,12 +353,12 @@ impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
 
 impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
     /// Set the `reasons` field (optional)
-    pub fn reasons(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn reasons(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `reasons` field to an Option value (optional)
-    pub fn maybe_reasons(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_reasons(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -419,127 +403,127 @@ pub mod notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Author;
-        type Record;
-        type IsRead;
         type IndexedAt;
-        type Cid;
+        type Author;
         type Reason;
+        type Record;
+        type Uri;
+        type Cid;
+        type IsRead;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Author = Unset;
-        type Record = Unset;
-        type IsRead = Unset;
         type IndexedAt = Unset;
-        type Cid = Unset;
+        type Author = Unset;
         type Reason = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Author = S::Author;
-        type Record = S::Record;
-        type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Uri = S::Uri;
-        type Author = Set<members::author>;
-        type Record = S::Record;
-        type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Record = Set<members::record>;
-        type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `is_read` field to Set
-    pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsRead<S> {}
-    impl<S: State> State for SetIsRead<S> {
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Record = S::Record;
-        type IsRead = Set<members::is_read>;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Reason = S::Reason;
+        type Record = Unset;
+        type Uri = Unset;
+        type Cid = Unset;
+        type IsRead = Unset;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Record = S::Record;
-        type IsRead = S::IsRead;
         type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
         type Author = S::Author;
-        type Record = S::Record;
-        type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
         type Reason = S::Reason;
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type IndexedAt = S::IndexedAt;
+        type Author = Set<members::author>;
+        type Reason = S::Reason;
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IsRead = S::IsRead;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReason<S> {}
     impl<S: State> State for SetReason<S> {
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Record = S::Record;
-        type IsRead = S::IsRead;
         type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
+        type Author = S::Author;
         type Reason = Set<members::reason>;
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type IndexedAt = S::IndexedAt;
+        type Author = S::Author;
+        type Reason = S::Reason;
+        type Record = Set<members::record>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type IndexedAt = S::IndexedAt;
+        type Author = S::Author;
+        type Reason = S::Reason;
+        type Record = S::Record;
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type IndexedAt = S::IndexedAt;
+        type Author = S::Author;
+        type Reason = S::Reason;
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `is_read` field to Set
+    pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsRead<S> {}
+    impl<S: State> State for SetIsRead<S> {
+        type IndexedAt = S::IndexedAt;
+        type Author = S::Author;
+        type Reason = S::Reason;
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IsRead = Set<members::is_read>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `is_read` field
-        pub struct is_read(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
         ///Marker type for the `reason` field
         pub struct reason(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `is_read` field
+        pub struct is_read(());
     }
 }
 
@@ -547,15 +531,15 @@ pub mod notification_state {
 pub struct NotificationBuilder<'a, S: notification_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ProfileView<'a>>,
-        Option<Cid<'a>>,
+        Option<ProfileView<S>>,
+        Option<Cid<S>>,
         Option<Datetime>,
         Option<bool>,
-        Option<Vec<Label<'a>>>,
-        Option<NotificationReason<'a>>,
-        Option<AtUri<'a>>,
-        Option<Data<'a>>,
-        Option<AtUri<'a>>,
+        Option<Vec<Label<S>>>,
+        Option<NotificationReason<S>>,
+        Option<AtUri<S>>,
+        Option<Data<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -586,7 +570,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<ProfileView<'a>>,
+        value: impl Into<ProfileView<S>>,
     ) -> NotificationBuilder<'a, notification_state::SetAuthor<S>> {
         self._fields.0 = Option::Some(value.into());
         NotificationBuilder {
@@ -605,7 +589,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> NotificationBuilder<'a, notification_state::SetCid<S>> {
         self._fields.1 = Option::Some(value.into());
         NotificationBuilder {
@@ -656,12 +640,12 @@ where
 
 impl<'a, S: notification_state::State> NotificationBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<Vec<Label<'a>>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<Vec<Label<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<Vec<Label<'a>>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<Vec<Label<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -675,7 +659,7 @@ where
     /// Set the `reason` field (required)
     pub fn reason(
         mut self,
-        value: impl Into<NotificationReason<'a>>,
+        value: impl Into<NotificationReason<S>>,
     ) -> NotificationBuilder<'a, notification_state::SetReason<S>> {
         self._fields.5 = Option::Some(value.into());
         NotificationBuilder {
@@ -688,12 +672,12 @@ where
 
 impl<'a, S: notification_state::State> NotificationBuilder<'a, S> {
     /// Set the `reasonSubject` field (optional)
-    pub fn reason_subject(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn reason_subject(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `reasonSubject` field to an Option value (optional)
-    pub fn maybe_reason_subject(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_reason_subject(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -707,7 +691,7 @@ where
     /// Set the `record` field (required)
     pub fn record(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> NotificationBuilder<'a, notification_state::SetRecord<S>> {
         self._fields.7 = Option::Some(value.into());
         NotificationBuilder {
@@ -726,7 +710,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> NotificationBuilder<'a, notification_state::SetUri<S>> {
         self._fields.8 = Option::Some(value.into());
         NotificationBuilder {
@@ -740,13 +724,13 @@ where
 impl<'a, S> NotificationBuilder<'a, S>
 where
     S: notification_state::State,
-    S::Uri: notification_state::IsSet,
-    S::Author: notification_state::IsSet,
-    S::Record: notification_state::IsSet,
-    S::IsRead: notification_state::IsSet,
     S::IndexedAt: notification_state::IsSet,
-    S::Cid: notification_state::IsSet,
+    S::Author: notification_state::IsSet,
     S::Reason: notification_state::IsSet,
+    S::Record: notification_state::IsSet,
+    S::Uri: notification_state::IsSet,
+    S::Cid: notification_state::IsSet,
+    S::IsRead: notification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Notification<'a> {
@@ -766,7 +750,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Notification<'a> {
         Notification {
             author: self._fields.0.unwrap(),

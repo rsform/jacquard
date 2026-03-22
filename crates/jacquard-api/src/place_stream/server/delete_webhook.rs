@@ -10,30 +10,48 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteWebhook<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteWebhook<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The ID of the webhook to delete.
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteWebhookOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteWebhookOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether the webhook was successfully deleted.
     pub success: bool,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -42,22 +60,23 @@ pub struct DeleteWebhookOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteWebhookError<'a> {
+pub enum DeleteWebhookError {
     /// The specified webhook was not found.
     #[serde(rename = "WebhookNotFound")]
-    WebhookNotFound(Option<CowStr<'a>>),
+    WebhookNotFound(Option<SmolStr>),
     /// The authenticated user does not have access to this webhook.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(Option<CowStr<'a>>),
+    Unauthorized(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for DeleteWebhookError<'_> {
+impl core::fmt::Display for DeleteWebhookError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::WebhookNotFound(msg) => {
@@ -74,7 +93,13 @@ impl core::fmt::Display for DeleteWebhookError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -84,11 +109,12 @@ pub struct DeleteWebhookResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteWebhookResponse {
     const NSID: &'static str = "place.stream.server.deleteWebhook";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeleteWebhookOutput<'de>;
-    type Err<'de> = DeleteWebhookError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DeleteWebhookOutput<S>;
+    type Err = DeleteWebhookError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteWebhook<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DeleteWebhook<S> {
     const NSID: &'static str = "place.stream.server.deleteWebhook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -103,6 +129,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteWebhookRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DeleteWebhook<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DeleteWebhook<S>;
     type Response = DeleteWebhookResponse;
 }

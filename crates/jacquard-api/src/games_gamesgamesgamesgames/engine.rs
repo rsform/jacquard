@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,53 +31,53 @@ use crate::games_gamesgamesgamesgames::MediaItem;
 use crate::games_gamesgamesgamesgames::Website;
 /// A game engine.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "games.gamesgamesgamesgames.engine",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Engine<'a> {
+pub struct Engine<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub companies: Option<Vec<AtUri<'a>>>,
+    pub companies: Option<Vec<AtUri<S>>>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub media: Option<Vec<MediaItem<'a>>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub media: Option<Vec<MediaItem<S>>>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub platforms: Option<Vec<AtUri<'a>>>,
+    pub platforms: Option<Vec<AtUri<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub websites: Option<Vec<Website<'a>>>,
+    pub websites: Option<Vec<Website<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EngineGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EngineGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Engine<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Engine<S>,
 }
 
-impl<'a> Engine<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, EngineRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Engine<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, EngineRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -86,18 +88,17 @@ pub struct EngineRecord;
 impl XrpcResp for EngineRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.engine";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = EngineGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = EngineGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<EngineGetRecordOutput<'_>> for Engine<'_> {
-    fn from(output: EngineGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<EngineGetRecordOutput<S>> for Engine<S> {
+    fn from(output: EngineGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Engine<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Engine<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.engine";
     type Record = EngineRecord;
 }
@@ -107,7 +108,7 @@ impl Collection for EngineRecord {
     type Record = EngineRecord;
 }
 
-impl<'a> LexiconSchema for Engine<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Engine<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.engine"
     }
@@ -132,37 +133,37 @@ pub mod engine_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -170,13 +171,13 @@ pub mod engine_state {
 pub struct EngineBuilder<'a, S: engine_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<AtUri<'a>>>,
+        Option<Vec<AtUri<S>>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Vec<MediaItem<'a>>>,
-        Option<CowStr<'a>>,
-        Option<Vec<AtUri<'a>>>,
-        Option<Vec<Website<'a>>>,
+        Option<S>,
+        Option<Vec<MediaItem<S>>>,
+        Option<S>,
+        Option<Vec<AtUri<S>>>,
+        Option<Vec<Website<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -201,12 +202,12 @@ impl<'a> EngineBuilder<'a, engine_state::Empty> {
 
 impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
     /// Set the `companies` field (optional)
-    pub fn companies(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn companies(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `companies` field to an Option value (optional)
-    pub fn maybe_companies(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_companies(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -233,12 +234,12 @@ where
 
 impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -246,12 +247,12 @@ impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
 
 impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
     /// Set the `media` field (optional)
-    pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<'a>>>>) -> Self {
+    pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `media` field to an Option value (optional)
-    pub fn maybe_media(mut self, value: Option<Vec<MediaItem<'a>>>) -> Self {
+    pub fn maybe_media(mut self, value: Option<Vec<MediaItem<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -265,7 +266,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EngineBuilder<'a, engine_state::SetName<S>> {
         self._fields.4 = Option::Some(value.into());
         EngineBuilder {
@@ -278,12 +279,12 @@ where
 
 impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
     /// Set the `platforms` field (optional)
-    pub fn platforms(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn platforms(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `platforms` field to an Option value (optional)
-    pub fn maybe_platforms(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_platforms(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -291,12 +292,12 @@ impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
 
 impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
     /// Set the `websites` field (optional)
-    pub fn websites(mut self, value: impl Into<Option<Vec<Website<'a>>>>) -> Self {
+    pub fn websites(mut self, value: impl Into<Option<Vec<Website<S>>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `websites` field to an Option value (optional)
-    pub fn maybe_websites(mut self, value: Option<Vec<Website<'a>>>) -> Self {
+    pub fn maybe_websites(mut self, value: Option<Vec<Website<S>>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -305,8 +306,8 @@ impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
 impl<'a, S> EngineBuilder<'a, S>
 where
     S: engine_state::State,
-    S::Name: engine_state::IsSet,
     S::CreatedAt: engine_state::IsSet,
+    S::Name: engine_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Engine<'a> {
@@ -322,13 +323,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Engine<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Engine<'a> {
         Engine {
             companies: self._fields.0,
             created_at: self._fields.1.unwrap(),

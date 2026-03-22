@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,71 +29,80 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::org_user_intents::demo::declaration;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Intent<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Intent<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///indicates user intent for reuse. Note that this field is optional, and thus tri-state (true, false, undefined)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow: Option<bool>,
     ///
     pub updated_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// TODO
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.user-intents.demo.declaration",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Declaration<'a> {
+pub struct Declaration<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Inclusion of account data in bulk 'snapshot' datasets which are publicly redistributed, even if only for a fixed time period
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub bulk_dataset: Option<declaration::Intent<'a>>,
+    pub bulk_dataset: Option<declaration::Intent<S>>,
     ///Bridging account data or interactions into distinct social web protocol ecosystems
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub protocol_bridging: Option<declaration::Intent<'a>>,
+    pub protocol_bridging: Option<declaration::Intent<S>>,
     ///Public access to or replay of account data as part of archiving and preservation efforts
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub public_access_archive: Option<declaration::Intent<'a>>,
+    pub public_access_archive: Option<declaration::Intent<S>>,
     ///Use of account data as input to machine learning models which could be used to generate synthetic content or interactions
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub synthetic_content_generation: Option<declaration::Intent<'a>>,
+    pub synthetic_content_generation: Option<declaration::Intent<S>>,
     ///
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DeclarationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeclarationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Declaration<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Declaration<S>,
 }
 
-impl<'a> Declaration<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DeclarationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Declaration<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DeclarationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Intent<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Intent<S> {
     fn nsid() -> &'static str {
         "org.user-intents.demo.declaration"
     }
@@ -113,18 +124,17 @@ pub struct DeclarationRecord;
 impl XrpcResp for DeclarationRecord {
     const NSID: &'static str = "org.user-intents.demo.declaration";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeclarationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DeclarationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
-    fn from(output: DeclarationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DeclarationGetRecordOutput<S>> for Declaration<S> {
+    fn from(output: DeclarationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Declaration<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Declaration<S> {
     const NSID: &'static str = "org.user-intents.demo.declaration";
     type Record = DeclarationRecord;
 }
@@ -134,7 +144,7 @@ impl Collection for DeclarationRecord {
     type Record = DeclarationRecord;
 }
 
-impl<'a> LexiconSchema for Declaration<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Declaration<S> {
     fn nsid() -> &'static str {
         "org.user-intents.demo.declaration"
     }
@@ -252,13 +262,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Intent<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Intent<'a> {
         Intent {
             allow: self._fields.0,
             updated_at: self._fields.1.unwrap(),
@@ -384,10 +388,10 @@ pub mod declaration_state {
 pub struct DeclarationBuilder<'a, S: declaration_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<declaration::Intent<'a>>,
-        Option<declaration::Intent<'a>>,
-        Option<declaration::Intent<'a>>,
-        Option<declaration::Intent<'a>>,
+        Option<declaration::Intent<S>>,
+        Option<declaration::Intent<S>>,
+        Option<declaration::Intent<S>>,
+        Option<declaration::Intent<S>>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -415,13 +419,13 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `bulkDataset` field (optional)
     pub fn bulk_dataset(
         mut self,
-        value: impl Into<Option<declaration::Intent<'a>>>,
+        value: impl Into<Option<declaration::Intent<S>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `bulkDataset` field to an Option value (optional)
-    pub fn maybe_bulk_dataset(mut self, value: Option<declaration::Intent<'a>>) -> Self {
+    pub fn maybe_bulk_dataset(mut self, value: Option<declaration::Intent<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -431,7 +435,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `protocolBridging` field (optional)
     pub fn protocol_bridging(
         mut self,
-        value: impl Into<Option<declaration::Intent<'a>>>,
+        value: impl Into<Option<declaration::Intent<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -439,7 +443,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `protocolBridging` field to an Option value (optional)
     pub fn maybe_protocol_bridging(
         mut self,
-        value: Option<declaration::Intent<'a>>,
+        value: Option<declaration::Intent<S>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -450,7 +454,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `publicAccessArchive` field (optional)
     pub fn public_access_archive(
         mut self,
-        value: impl Into<Option<declaration::Intent<'a>>>,
+        value: impl Into<Option<declaration::Intent<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -458,7 +462,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `publicAccessArchive` field to an Option value (optional)
     pub fn maybe_public_access_archive(
         mut self,
-        value: Option<declaration::Intent<'a>>,
+        value: Option<declaration::Intent<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -469,7 +473,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `syntheticContentGeneration` field (optional)
     pub fn synthetic_content_generation(
         mut self,
-        value: impl Into<Option<declaration::Intent<'a>>>,
+        value: impl Into<Option<declaration::Intent<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -477,7 +481,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `syntheticContentGeneration` field to an Option value (optional)
     pub fn maybe_synthetic_content_generation(
         mut self,
-        value: Option<declaration::Intent<'a>>,
+        value: Option<declaration::Intent<S>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -515,10 +519,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Declaration<'a> {
         Declaration {
             bulk_dataset: self._fields.0,

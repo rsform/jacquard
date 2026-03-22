@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,36 +29,45 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A star (like) on a container image repository. Stored in the starrer's PDS, similar to Bluesky likes. Subject is an AT URI pointing to the repo page record being starred.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "io.atcr.sailor.star", tag = "$type")]
-pub struct Star<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "io.atcr.sailor.star",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Star<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Star creation timestamp
     pub created_at: Datetime,
     ///AT URI of the repository page being starred (e.g., at://did:plc:abc/io.atcr.repo.page/myapp)
-    #[serde(borrow)]
-    pub subject: AtUri<'a>,
+    pub subject: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StarGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StarGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Star<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Star<S>,
 }
 
-impl<'a> Star<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, StarRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Star<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, StarRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -67,18 +78,17 @@ pub struct StarRecord;
 impl XrpcResp for StarRecord {
     const NSID: &'static str = "io.atcr.sailor.star";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StarGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StarGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<StarGetRecordOutput<'_>> for Star<'_> {
-    fn from(output: StarGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<StarGetRecordOutput<S>> for Star<S> {
+    fn from(output: StarGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Star<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Star<S> {
     const NSID: &'static str = "io.atcr.sailor.star";
     type Record = StarRecord;
 }
@@ -88,7 +98,7 @@ impl Collection for StarRecord {
     type Record = StarRecord;
 }
 
-impl<'a> LexiconSchema for Star<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Star<S> {
     fn nsid() -> &'static str {
         "io.atcr.sailor.star"
     }
@@ -150,7 +160,7 @@ pub mod star_state {
 /// Builder for constructing an instance of this type
 pub struct StarBuilder<'a, S: star_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<AtUri<'a>>),
+    _fields: (Option<Datetime>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -199,7 +209,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> StarBuilder<'a, star_state::SetSubject<S>> {
         self._fields.1 = Option::Some(value.into());
         StarBuilder {
@@ -225,13 +235,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Star<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Star<'a> {
         Star {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

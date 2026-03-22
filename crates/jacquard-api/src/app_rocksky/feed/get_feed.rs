@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -15,25 +15,45 @@ use crate::app_rocksky::feed::FeedView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetFeed<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetFeed<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     #[serde(borrow)]
-    pub feed: AtUri<'a>,
+    pub feed: AtUri<S>,
     ///(min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetFeedOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetFeedOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: FeedView<'a>,
+    pub value: FeedView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for app.rocksky.feed.getFeed
@@ -41,11 +61,12 @@ pub struct GetFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFeedResponse {
     const NSID: &'static str = "app.rocksky.feed.getFeed";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFeedOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetFeedOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetFeed<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetFeed<S> {
     const NSID: &'static str = "app.rocksky.feed.getFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetFeedResponse;
@@ -56,7 +77,7 @@ pub struct GetFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFeedRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.feed.getFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFeed<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetFeed<S>;
     type Response = GetFeedResponse;
 }
 
@@ -95,7 +116,7 @@ pub mod get_feed_state {
 /// Builder for constructing an instance of this type
 pub struct GetFeedBuilder<'a, S: get_feed_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<AtUri<S>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -119,12 +140,12 @@ impl<'a> GetFeedBuilder<'a, get_feed_state::Empty> {
 
 impl<'a, S: get_feed_state::State> GetFeedBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -138,7 +159,7 @@ where
     /// Set the `feed` field (required)
     pub fn feed(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetFeedBuilder<'a, get_feed_state::SetFeed<S>> {
         self._fields.1 = Option::Some(value.into());
         GetFeedBuilder {

@@ -10,32 +10,50 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::place_stream::multistream::TargetView;
 use crate::place_stream::multistream::target::Target;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateTarget<'a> {
-    #[serde(borrow)]
-    pub multistream_target: Target<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateTarget<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub multistream_target: Target<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateTargetOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateTargetOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: TargetView<'a>,
+    pub value: TargetView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -44,19 +62,20 @@ pub struct CreateTargetOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateTargetError<'a> {
+pub enum CreateTargetError {
     /// The provided target URL is invalid or unreachable.
     #[serde(rename = "InvalidTargetUrl")]
-    InvalidTargetUrl(Option<CowStr<'a>>),
+    InvalidTargetUrl(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for CreateTargetError<'_> {
+impl core::fmt::Display for CreateTargetError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidTargetUrl(msg) => {
@@ -66,7 +85,13 @@ impl core::fmt::Display for CreateTargetError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -76,11 +101,12 @@ pub struct CreateTargetResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateTargetResponse {
     const NSID: &'static str = "place.stream.multistream.createTarget";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateTargetOutput<'de>;
-    type Err<'de> = CreateTargetError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CreateTargetOutput<S>;
+    type Err = CreateTargetError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateTarget<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CreateTarget<S> {
     const NSID: &'static str = "place.stream.multistream.createTarget";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -95,7 +121,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateTargetRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CreateTarget<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CreateTarget<S>;
     type Response = CreateTargetResponse;
 }
 
@@ -134,7 +160,7 @@ pub mod create_target_state {
 /// Builder for constructing an instance of this type
 pub struct CreateTargetBuilder<'a, S: create_target_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Target<'a>>,),
+    _fields: (Option<Target<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -164,7 +190,7 @@ where
     /// Set the `multistreamTarget` field (required)
     pub fn multistream_target(
         mut self,
-        value: impl Into<Target<'a>>,
+        value: impl Into<Target<S>>,
     ) -> CreateTargetBuilder<'a, create_target_state::SetMultistreamTarget<S>> {
         self._fields.0 = Option::Some(value.into());
         CreateTargetBuilder {
@@ -190,10 +216,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CreateTarget<'a> {
         CreateTarget {
             multistream_target: self._fields.0.unwrap(),

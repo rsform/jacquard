@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,39 +29,43 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Record declaring a savefile of Webfishing.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "dev.regnault.webfishing.savefile",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Savefile<'a> {
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+pub struct Savefile<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub name: S,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SavefileGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SavefileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Savefile<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Savefile<S>,
 }
 
-impl<'a> Savefile<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SavefileRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Savefile<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SavefileRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -70,18 +76,17 @@ pub struct SavefileRecord;
 impl XrpcResp for SavefileRecord {
     const NSID: &'static str = "dev.regnault.webfishing.savefile";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SavefileGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SavefileGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SavefileGetRecordOutput<'_>> for Savefile<'_> {
-    fn from(output: SavefileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SavefileGetRecordOutput<S>> for Savefile<S> {
+    fn from(output: SavefileGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Savefile<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Savefile<S> {
     const NSID: &'static str = "dev.regnault.webfishing.savefile";
     type Record = SavefileRecord;
 }
@@ -91,7 +96,7 @@ impl Collection for SavefileRecord {
     type Record = SavefileRecord;
 }
 
-impl<'a> LexiconSchema for Savefile<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Savefile<S> {
     fn nsid() -> &'static str {
         "dev.regnault.webfishing.savefile"
     }
@@ -153,7 +158,7 @@ pub mod savefile_state {
 /// Builder for constructing an instance of this type
 pub struct SavefileBuilder<'a, S: savefile_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -183,7 +188,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SavefileBuilder<'a, savefile_state::SetName<S>> {
         self._fields.0 = Option::Some(value.into());
         SavefileBuilder {
@@ -202,7 +207,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> SavefileBuilder<'a, savefile_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         SavefileBuilder {
@@ -230,10 +235,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Savefile<'a> {
         Savefile {
             name: self._fields.0.unwrap(),

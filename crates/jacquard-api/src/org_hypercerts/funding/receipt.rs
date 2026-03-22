@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,72 +30,69 @@ use serde::{Serialize, Deserialize};
 use crate::app_certified::Did;
 /// Records a funding receipt for a payment from one user to another user. It may be recorded by the recipient, by the sender, or by a third party. The sender may remain anonymous.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.hypercerts.funding.receipt",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Receipt<'a> {
+pub struct Receipt<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Amount of funding received as a numeric string (e.g. '1000.50').
-    #[serde(borrow)]
-    pub amount: CowStr<'a>,
+    pub amount: S,
     ///Client-declared timestamp when this receipt record was created.
     pub created_at: Datetime,
     ///Currency of the payment (e.g. EUR, USD, ETH).
-    #[serde(borrow)]
-    pub currency: CowStr<'a>,
+    pub currency: S,
     ///Optional reference to the activity, project, or organization this funding relates to.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#for: Option<AtUri<'a>>,
+    pub r#for: Option<AtUri<S>>,
     ///DID of the sender who transferred the funds. Leave empty if sender wants to stay anonymous.
-    #[serde(borrow)]
-    pub from: Did<'a>,
+    pub from: Did<S>,
     ///Optional notes or additional context for this funding receipt.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notes: Option<CowStr<'a>>,
+    pub notes: Option<S>,
     ///Timestamp when the payment occurred.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub occurred_at: Option<Datetime>,
     ///Optional network within the payment rail (e.g. arbitrum, ethereum, sepa, visa, paypal).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub payment_network: Option<CowStr<'a>>,
+    pub payment_network: Option<S>,
     ///How the funds were transferred (e.g. bank_transfer, credit_card, onchain, cash, check, payment_processor).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub payment_rail: Option<CowStr<'a>>,
+    pub payment_rail: Option<S>,
     ///The recipient of the funds. Can be identified by DID or a clear-text name.
-    #[serde(borrow)]
-    pub to: CowStr<'a>,
+    pub to: S,
     ///Identifier of the underlying payment transaction (e.g. bank reference, onchain transaction hash, or processor-specific ID). Use paymentNetwork to specify the network where applicable.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub transaction_id: Option<CowStr<'a>>,
+    pub transaction_id: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReceiptGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReceiptGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Receipt<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Receipt<S>,
 }
 
-impl<'a> Receipt<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ReceiptRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Receipt<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ReceiptRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -104,18 +103,17 @@ pub struct ReceiptRecord;
 impl XrpcResp for ReceiptRecord {
     const NSID: &'static str = "org.hypercerts.funding.receipt";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReceiptGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ReceiptGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ReceiptGetRecordOutput<'_>> for Receipt<'_> {
-    fn from(output: ReceiptGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ReceiptGetRecordOutput<S>> for Receipt<S> {
+    fn from(output: ReceiptGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Receipt<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Receipt<S> {
     const NSID: &'static str = "org.hypercerts.funding.receipt";
     type Record = ReceiptRecord;
 }
@@ -125,7 +123,7 @@ impl Collection for ReceiptRecord {
     type Record = ReceiptRecord;
 }
 
-impl<'a> LexiconSchema for Receipt<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Receipt<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.funding.receipt"
     }
@@ -223,85 +221,85 @@ pub mod receipt_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type From;
-        type Amount;
-        type To;
         type Currency;
+        type Amount;
         type CreatedAt;
+        type To;
+        type From;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type From = Unset;
-        type Amount = Unset;
-        type To = Unset;
         type Currency = Unset;
+        type Amount = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `from` field to Set
-    pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFrom<S> {}
-    impl<S: State> State for SetFrom<S> {
-        type From = Set<members::from>;
-        type Amount = S::Amount;
-        type To = S::To;
-        type Currency = S::Currency;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `amount` field to Set
-    pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAmount<S> {}
-    impl<S: State> State for SetAmount<S> {
-        type From = S::From;
-        type Amount = Set<members::amount>;
-        type To = S::To;
-        type Currency = S::Currency;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `to` field to Set
-    pub struct SetTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTo<S> {}
-    impl<S: State> State for SetTo<S> {
-        type From = S::From;
-        type Amount = S::Amount;
-        type To = Set<members::to>;
-        type Currency = S::Currency;
-        type CreatedAt = S::CreatedAt;
+        type To = Unset;
+        type From = Unset;
     }
     ///State transition - sets the `currency` field to Set
     pub struct SetCurrency<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCurrency<S> {}
     impl<S: State> State for SetCurrency<S> {
-        type From = S::From;
-        type Amount = S::Amount;
-        type To = S::To;
         type Currency = Set<members::currency>;
+        type Amount = S::Amount;
         type CreatedAt = S::CreatedAt;
+        type To = S::To;
+        type From = S::From;
+    }
+    ///State transition - sets the `amount` field to Set
+    pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAmount<S> {}
+    impl<S: State> State for SetAmount<S> {
+        type Currency = S::Currency;
+        type Amount = Set<members::amount>;
+        type CreatedAt = S::CreatedAt;
+        type To = S::To;
+        type From = S::From;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type From = S::From;
-        type Amount = S::Amount;
-        type To = S::To;
         type Currency = S::Currency;
+        type Amount = S::Amount;
         type CreatedAt = Set<members::created_at>;
+        type To = S::To;
+        type From = S::From;
+    }
+    ///State transition - sets the `to` field to Set
+    pub struct SetTo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTo<S> {}
+    impl<S: State> State for SetTo<S> {
+        type Currency = S::Currency;
+        type Amount = S::Amount;
+        type CreatedAt = S::CreatedAt;
+        type To = Set<members::to>;
+        type From = S::From;
+    }
+    ///State transition - sets the `from` field to Set
+    pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFrom<S> {}
+    impl<S: State> State for SetFrom<S> {
+        type Currency = S::Currency;
+        type Amount = S::Amount;
+        type CreatedAt = S::CreatedAt;
+        type To = S::To;
+        type From = Set<members::from>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `from` field
-        pub struct from(());
-        ///Marker type for the `amount` field
-        pub struct amount(());
-        ///Marker type for the `to` field
-        pub struct to(());
         ///Marker type for the `currency` field
         pub struct currency(());
+        ///Marker type for the `amount` field
+        pub struct amount(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `to` field
+        pub struct to(());
+        ///Marker type for the `from` field
+        pub struct from(());
     }
 }
 
@@ -309,17 +307,17 @@ pub mod receipt_state {
 pub struct ReceiptBuilder<'a, S: receipt_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<Did<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -350,7 +348,7 @@ where
     /// Set the `amount` field (required)
     pub fn amount(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReceiptBuilder<'a, receipt_state::SetAmount<S>> {
         self._fields.0 = Option::Some(value.into());
         ReceiptBuilder {
@@ -388,7 +386,7 @@ where
     /// Set the `currency` field (required)
     pub fn currency(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReceiptBuilder<'a, receipt_state::SetCurrency<S>> {
         self._fields.2 = Option::Some(value.into());
         ReceiptBuilder {
@@ -401,12 +399,12 @@ where
 
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `for` field (optional)
-    pub fn r#for(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn r#for(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `for` field to an Option value (optional)
-    pub fn maybe_for(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_for(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -420,7 +418,7 @@ where
     /// Set the `from` field (required)
     pub fn from(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ReceiptBuilder<'a, receipt_state::SetFrom<S>> {
         self._fields.4 = Option::Some(value.into());
         ReceiptBuilder {
@@ -433,12 +431,12 @@ where
 
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
-    pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_notes(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -459,12 +457,12 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
 
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `paymentNetwork` field (optional)
-    pub fn payment_network(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn payment_network(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `paymentNetwork` field to an Option value (optional)
-    pub fn maybe_payment_network(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_payment_network(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -472,12 +470,12 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
 
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `paymentRail` field (optional)
-    pub fn payment_rail(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn payment_rail(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `paymentRail` field to an Option value (optional)
-    pub fn maybe_payment_rail(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_payment_rail(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -491,7 +489,7 @@ where
     /// Set the `to` field (required)
     pub fn to(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReceiptBuilder<'a, receipt_state::SetTo<S>> {
         self._fields.9 = Option::Some(value.into());
         ReceiptBuilder {
@@ -504,12 +502,12 @@ where
 
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `transactionId` field (optional)
-    pub fn transaction_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn transaction_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `transactionId` field to an Option value (optional)
-    pub fn maybe_transaction_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_transaction_id(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -518,11 +516,11 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
 impl<'a, S> ReceiptBuilder<'a, S>
 where
     S: receipt_state::State,
-    S::From: receipt_state::IsSet,
-    S::Amount: receipt_state::IsSet,
-    S::To: receipt_state::IsSet,
     S::Currency: receipt_state::IsSet,
+    S::Amount: receipt_state::IsSet,
     S::CreatedAt: receipt_state::IsSet,
+    S::To: receipt_state::IsSet,
+    S::From: receipt_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Receipt<'a> {
@@ -544,10 +542,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Receipt<'a> {
         Receipt {
             amount: self._fields.0.unwrap(),

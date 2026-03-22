@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,38 +29,46 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Record linking a resource to a collection.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.nblr.feed.link", tag = "$type")]
-pub struct Link<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.nblr.feed.link",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Link<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The AT URI of the collection being linked to
-    #[serde(borrow)]
-    pub collection: AtUri<'a>,
+    pub collection: AtUri<S>,
     pub created_at: Datetime,
     ///The URI of the linked resource; a web URL or AT URI
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+    pub uri: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LinkGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LinkGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Link<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Link<S>,
 }
 
-impl<'a> Link<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LinkRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Link<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LinkRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -69,18 +79,17 @@ pub struct LinkRecord;
 impl XrpcResp for LinkRecord {
     const NSID: &'static str = "app.nblr.feed.link";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LinkGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LinkGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LinkGetRecordOutput<'_>> for Link<'_> {
-    fn from(output: LinkGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LinkGetRecordOutput<S>> for Link<S> {
+    fn from(output: LinkGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Link<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Link<S> {
     const NSID: &'static str = "app.nblr.feed.link";
     type Record = LinkRecord;
 }
@@ -90,7 +99,7 @@ impl Collection for LinkRecord {
     type Record = LinkRecord;
 }
 
-impl<'a> LexiconSchema for Link<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Link<S> {
     fn nsid() -> &'static str {
         "app.nblr.feed.link"
     }
@@ -115,49 +124,49 @@ pub mod link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
         type Uri;
+        type Collection;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
         type Uri = Unset;
+        type Collection = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Collection = S::Collection;
         type Uri = Set<members::uri>;
+        type Collection = S::Collection;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Uri = S::Uri;
+        type Collection = Set<members::collection>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Collection = S::Collection;
         type Uri = S::Uri;
+        type Collection = S::Collection;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -166,7 +175,7 @@ pub mod link_state {
 /// Builder for constructing an instance of this type
 pub struct LinkBuilder<'a, S: link_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<Datetime>, Option<UriValue<'a>>),
+    _fields: (Option<AtUri<S>>, Option<Datetime>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -196,7 +205,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> LinkBuilder<'a, link_state::SetCollection<S>> {
         self._fields.0 = Option::Some(value.into());
         LinkBuilder {
@@ -234,7 +243,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> LinkBuilder<'a, link_state::SetUri<S>> {
         self._fields.2 = Option::Some(value.into());
         LinkBuilder {
@@ -248,8 +257,8 @@ where
 impl<'a, S> LinkBuilder<'a, S>
 where
     S: link_state::State,
-    S::Collection: link_state::IsSet,
     S::Uri: link_state::IsSet,
+    S::Collection: link_state::IsSet,
     S::CreatedAt: link_state::IsSet,
 {
     /// Build the final struct
@@ -262,13 +271,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Link<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Link<'a> {
         Link {
             collection: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

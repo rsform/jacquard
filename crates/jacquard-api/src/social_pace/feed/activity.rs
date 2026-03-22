@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,10 +32,17 @@ use crate::social_pace::feed::ActivityType;
 use crate::social_pace::feed::Split;
 /// A recording of an activity. Like running, walking, lifting weights, etc. Helpful to create the rkey tid from the start time and clock id 23 so you can upsert easily.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.pace.feed.activity", tag = "$type")]
-pub struct Activity<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.pace.feed.activity",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Activity<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The number of active calories burned during the activity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
@@ -41,50 +50,48 @@ pub struct Activity<'a> {
     pub created_at: Datetime,
     ///The distance covered during the activity, if any. This is a string to allow for float values. pace.social support is in feet and meters.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub distance: Option<CowStr<'a>>,
+    pub distance: Option<S>,
     ///The units used for distance measurement.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub distance_units: Option<CowStr<'a>>,
+    pub distance_units: Option<S>,
     ///When the activity ended.
     pub ended_at: Datetime,
     ///An export of the route taken during the activity, if any. A GPX or TCX file. Reminder, all atproto blobs are public. And is recommended if you do this to trim start and end.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub route: Option<BlobRef<'a>>,
+    pub route: Option<BlobRef<S>>,
     ///Array of splits if any.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub splits: Option<Vec<Split<'a>>>,
+    pub splits: Option<Vec<Split<S>>>,
     ///When the activity was started.
     pub started_at: Datetime,
     ///The number of steps taken during the activity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub steps: Option<i64>,
-    #[serde(borrow)]
-    pub r#type: ActivityType<'a>,
+    pub r#type: ActivityType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ActivityGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ActivityGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Activity<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Activity<S>,
 }
 
-impl<'a> Activity<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ActivityRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Activity<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ActivityRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -95,18 +102,17 @@ pub struct ActivityRecord;
 impl XrpcResp for ActivityRecord {
     const NSID: &'static str = "social.pace.feed.activity";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ActivityGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ActivityGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ActivityGetRecordOutput<'_>> for Activity<'_> {
-    fn from(output: ActivityGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ActivityGetRecordOutput<S>> for Activity<S> {
+    fn from(output: ActivityGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Activity<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Activity<S> {
     const NSID: &'static str = "social.pace.feed.activity";
     type Record = ActivityRecord;
 }
@@ -116,7 +122,7 @@ impl Collection for ActivityRecord {
     type Record = ActivityRecord;
 }
 
-impl<'a> LexiconSchema for Activity<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Activity<S> {
     fn nsid() -> &'static str {
         "social.pace.feed.activity"
     }
@@ -183,67 +189,67 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EndedAt;
-        type StartedAt;
         type Type;
         type CreatedAt;
+        type EndedAt;
+        type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EndedAt = Unset;
-        type StartedAt = Unset;
         type Type = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `ended_at` field to Set
-    pub struct SetEndedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndedAt<S> {}
-    impl<S: State> State for SetEndedAt<S> {
-        type EndedAt = Set<members::ended_at>;
-        type StartedAt = S::StartedAt;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type EndedAt = S::EndedAt;
-        type StartedAt = Set<members::started_at>;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
+        type EndedAt = Unset;
+        type StartedAt = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type EndedAt = S::EndedAt;
-        type StartedAt = S::StartedAt;
         type Type = Set<members::r#type>;
         type CreatedAt = S::CreatedAt;
+        type EndedAt = S::EndedAt;
+        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type EndedAt = S::EndedAt;
-        type StartedAt = S::StartedAt;
         type Type = S::Type;
         type CreatedAt = Set<members::created_at>;
+        type EndedAt = S::EndedAt;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `ended_at` field to Set
+    pub struct SetEndedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEndedAt<S> {}
+    impl<S: State> State for SetEndedAt<S> {
+        type Type = S::Type;
+        type CreatedAt = S::CreatedAt;
+        type EndedAt = Set<members::ended_at>;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type Type = S::Type;
+        type CreatedAt = S::CreatedAt;
+        type EndedAt = S::EndedAt;
+        type StartedAt = Set<members::started_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ended_at` field
-        pub struct ended_at(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `ended_at` field
+        pub struct ended_at(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
     }
 }
 
@@ -253,14 +259,14 @@ pub struct ActivityBuilder<'a, S: activity_state::State> {
     _fields: (
         Option<i64>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
-        Option<BlobRef<'a>>,
-        Option<Vec<Split<'a>>>,
+        Option<BlobRef<S>>,
+        Option<Vec<Split<S>>>,
         Option<Datetime>,
         Option<i64>,
-        Option<ActivityType<'a>>,
+        Option<ActivityType<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -317,12 +323,12 @@ where
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `distance` field (optional)
-    pub fn distance(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn distance(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `distance` field to an Option value (optional)
-    pub fn maybe_distance(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_distance(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -330,12 +336,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `distanceUnits` field (optional)
-    pub fn distance_units(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn distance_units(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `distanceUnits` field to an Option value (optional)
-    pub fn maybe_distance_units(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_distance_units(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -362,12 +368,12 @@ where
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `route` field (optional)
-    pub fn route(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn route(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `route` field to an Option value (optional)
-    pub fn maybe_route(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_route(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -375,12 +381,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `splits` field (optional)
-    pub fn splits(mut self, value: impl Into<Option<Vec<Split<'a>>>>) -> Self {
+    pub fn splits(mut self, value: impl Into<Option<Vec<Split<S>>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `splits` field to an Option value (optional)
-    pub fn maybe_splits(mut self, value: Option<Vec<Split<'a>>>) -> Self {
+    pub fn maybe_splits(mut self, value: Option<Vec<Split<S>>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -426,7 +432,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<ActivityType<'a>>,
+        value: impl Into<ActivityType<S>>,
     ) -> ActivityBuilder<'a, activity_state::SetType<S>> {
         self._fields.9 = Option::Some(value.into());
         ActivityBuilder {
@@ -440,10 +446,10 @@ where
 impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
-    S::EndedAt: activity_state::IsSet,
-    S::StartedAt: activity_state::IsSet,
     S::Type: activity_state::IsSet,
     S::CreatedAt: activity_state::IsSet,
+    S::EndedAt: activity_state::IsSet,
+    S::StartedAt: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
@@ -464,10 +470,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Activity<'a> {
         Activity {
             calories: self._fields.0,

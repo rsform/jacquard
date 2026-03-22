@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,50 +29,53 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "io.kich.recipe.collectionitem",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Collectionitem<'a> {
+pub struct Collectionitem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reference (AT-URI) to the collection record (io.kich.recipe.collection)
-    #[serde(borrow)]
-    pub collection: AtUri<'a>,
+    pub collection: AtUri<S>,
     ///When this item was added to the collection
     pub created_at: Datetime,
     ///Optional group/section name for organizing recipes within the collection
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub group: Option<CowStr<'a>>,
+    pub group: Option<S>,
     ///Optional position for ordering items within the collection
     #[serde(skip_serializing_if = "Option::is_none")]
     pub position: Option<i64>,
     ///Reference to the recipe (io.kich.recipe.recipe) included in the collection
-    #[serde(borrow)]
-    pub subject: StrongRef<'a>,
+    pub subject: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionitemGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollectionitemGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Collectionitem<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Collectionitem<S>,
 }
 
-impl<'a> Collectionitem<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CollectionitemRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Collectionitem<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CollectionitemRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -81,18 +86,18 @@ pub struct CollectionitemRecord;
 impl XrpcResp for CollectionitemRecord {
     const NSID: &'static str = "io.kich.recipe.collectionitem";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollectionitemGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CollectionitemGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CollectionitemGetRecordOutput<'_>> for Collectionitem<'_> {
-    fn from(output: CollectionitemGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CollectionitemGetRecordOutput<S>>
+for Collectionitem<S> {
+    fn from(output: CollectionitemGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Collectionitem<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Collectionitem<S> {
     const NSID: &'static str = "io.kich.recipe.collectionitem";
     type Record = CollectionitemRecord;
 }
@@ -102,7 +107,7 @@ impl Collection for CollectionitemRecord {
     type Record = CollectionitemRecord;
 }
 
-impl<'a> LexiconSchema for Collectionitem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Collectionitem<S> {
     fn nsid() -> &'static str {
         "io.kich.recipe.collectionitem"
     }
@@ -128,50 +133,50 @@ pub mod collectionitem_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Collection;
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Collection = Unset;
-        type CreatedAt = Unset;
         type Subject = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
         type Collection = Set<members::collection>;
+        type Subject = S::Subject;
         type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Collection = S::Collection;
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
         type Collection = S::Collection;
-        type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Collection = S::Collection;
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `collection` field
         pub struct collection(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -179,11 +184,11 @@ pub mod collectionitem_state {
 pub struct CollectionitemBuilder<'a, S: collectionitem_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtUri<'a>>,
+        Option<AtUri<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
-        Option<StrongRef<'a>>,
+        Option<StrongRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -214,7 +219,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> CollectionitemBuilder<'a, collectionitem_state::SetCollection<S>> {
         self._fields.0 = Option::Some(value.into());
         CollectionitemBuilder {
@@ -246,12 +251,12 @@ where
 
 impl<'a, S: collectionitem_state::State> CollectionitemBuilder<'a, S> {
     /// Set the `group` field (optional)
-    pub fn group(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn group(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `group` field to an Option value (optional)
-    pub fn maybe_group(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_group(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -278,7 +283,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> CollectionitemBuilder<'a, collectionitem_state::SetSubject<S>> {
         self._fields.4 = Option::Some(value.into());
         CollectionitemBuilder {
@@ -293,8 +298,8 @@ impl<'a, S> CollectionitemBuilder<'a, S>
 where
     S: collectionitem_state::State,
     S::Collection: collectionitem_state::IsSet,
-    S::CreatedAt: collectionitem_state::IsSet,
     S::Subject: collectionitem_state::IsSet,
+    S::CreatedAt: collectionitem_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Collectionitem<'a> {
@@ -310,10 +315,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Collectionitem<'a> {
         Collectionitem {
             collection: self._fields.0.unwrap(),

@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,15 +30,19 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::app_fitsky::workout;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CardioDetails<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CardioDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cardio_zones: Option<workout::CardioZoneData<'a>>,
+    pub cardio_zones: Option<workout::CardioZoneData<S>>,
     ///Distance in meters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub distance_meters: Option<i64>,
@@ -44,28 +50,32 @@ pub struct CardioDetails<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub elevation_gain_meters: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate: Option<workout::HeartRateData<'a>>,
+    pub heart_rate: Option<workout::HeartRateData<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate_samples: Option<Vec<workout::HeartRateSample<'a>>>,
+    pub heart_rate_samples: Option<Vec<workout::HeartRateSample<S>>>,
     ///Pace in seconds per kilometer
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pace_seconds_per_km: Option<i64>,
     ///GPS route points recorded during the workout
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub route_points: Option<Vec<workout::RoutePoint<'a>>>,
+    pub route_points: Option<Vec<workout::RoutePoint<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub steps: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Time in seconds spent in each heart rate zone
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CardioZoneData<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CardioZoneData<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub zone1_rest: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -76,66 +86,83 @@ pub struct CardioZoneData<'a> {
     pub zone4_threshold: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub zone5_max: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Exercise<'a> {
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
-    #[serde(borrow)]
-    pub sets: Vec<workout::ExerciseSet<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Exercise<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub name: S,
+    pub sets: Vec<workout::ExerciseSet<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ExerciseSet<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExerciseSet<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reps: Option<i64>,
     ///Weight in grams
     #[serde(skip_serializing_if = "Option::is_none")]
     pub weight_grams: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct FlexibilityDetails<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FlexibilityDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cardio_zones: Option<workout::CardioZoneData<'a>>,
+    pub cardio_zones: Option<workout::CardioZoneData<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate: Option<workout::HeartRateData<'a>>,
+    pub heart_rate: Option<workout::HeartRateData<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate_samples: Option<Vec<workout::HeartRateSample<'a>>>,
+    pub heart_rate_samples: Option<Vec<workout::HeartRateSample<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub intensity: Option<FlexibilityDetailsIntensity<'a>>,
+    pub intensity: Option<FlexibilityDetailsIntensity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub movements: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub steps: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum FlexibilityDetailsIntensity<'a> {
+pub enum FlexibilityDetailsIntensity<S: Bos<str> + AsRef<str> = DefaultStr> {
     Light,
     Moderate,
     Intense,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> FlexibilityDetailsIntensity<'a> {
+impl<S: Bos<str> + AsRef<str>> FlexibilityDetailsIntensity<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Light => "light",
@@ -144,72 +171,57 @@ impl<'a> FlexibilityDetailsIntensity<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for FlexibilityDetailsIntensity<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "light" => Self::Light,
             "moderate" => Self::Moderate,
             "intense" => Self::Intense,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for FlexibilityDetailsIntensity<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "light" => Self::Light,
-            "moderate" => Self::Moderate,
-            "intense" => Self::Intense,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for FlexibilityDetailsIntensity<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for FlexibilityDetailsIntensity<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for FlexibilityDetailsIntensity<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for FlexibilityDetailsIntensity<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for FlexibilityDetailsIntensity<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for FlexibilityDetailsIntensity<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for FlexibilityDetailsIntensity<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for FlexibilityDetailsIntensity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for FlexibilityDetailsIntensity<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for FlexibilityDetailsIntensity<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for FlexibilityDetailsIntensity<'_> {
-    type Output = FlexibilityDetailsIntensity<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for FlexibilityDetailsIntensity<S> {
+    type Output = FlexibilityDetailsIntensity<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             FlexibilityDetailsIntensity::Light => FlexibilityDetailsIntensity::Light,
@@ -225,10 +237,15 @@ impl jacquard_common::IntoStatic for FlexibilityDetailsIntensity<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct HeartRateData<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct HeartRateData<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avg: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -237,39 +254,49 @@ pub struct HeartRateData<'a> {
     pub min: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub resting: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct HeartRateSample<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct HeartRateSample<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub bpm: i64,
     pub timestamp: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct HiitSportsDetails<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct HiitSportsDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cardio_zones: Option<workout::CardioZoneData<'a>>,
+    pub cardio_zones: Option<workout::CardioZoneData<S>>,
     ///Distance in meters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub distance_meters: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate: Option<workout::HeartRateData<'a>>,
+    pub heart_rate: Option<workout::HeartRateData<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate_samples: Option<Vec<workout::HeartRateSample<'a>>>,
+    pub heart_rate_samples: Option<Vec<workout::HeartRateSample<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub intensity: Option<HiitSportsDetailsIntensity<'a>>,
+    pub intensity: Option<HiitSportsDetailsIntensity<S>>,
     ///Pace in seconds per kilometer
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pace_seconds_per_km: Option<i64>,
@@ -277,25 +304,25 @@ pub struct HiitSportsDetails<'a> {
     pub rounds: Option<i64>,
     ///GPS route points recorded during the workout
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub route_points: Option<Vec<workout::RoutePoint<'a>>>,
+    pub route_points: Option<Vec<workout::RoutePoint<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sport: Option<CowStr<'a>>,
+    pub sport: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub steps: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum HiitSportsDetailsIntensity<'a> {
+pub enum HiitSportsDetailsIntensity<S: Bos<str> + AsRef<str> = DefaultStr> {
     Light,
     Moderate,
     Intense,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> HiitSportsDetailsIntensity<'a> {
+impl<S: Bos<str> + AsRef<str>> HiitSportsDetailsIntensity<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Light => "light",
@@ -304,72 +331,57 @@ impl<'a> HiitSportsDetailsIntensity<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for HiitSportsDetailsIntensity<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "light" => Self::Light,
             "moderate" => Self::Moderate,
             "intense" => Self::Intense,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for HiitSportsDetailsIntensity<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "light" => Self::Light,
-            "moderate" => Self::Moderate,
-            "intense" => Self::Intense,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for HiitSportsDetailsIntensity<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for HiitSportsDetailsIntensity<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for HiitSportsDetailsIntensity<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for HiitSportsDetailsIntensity<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for HiitSportsDetailsIntensity<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for HiitSportsDetailsIntensity<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for HiitSportsDetailsIntensity<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for HiitSportsDetailsIntensity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for HiitSportsDetailsIntensity<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for HiitSportsDetailsIntensity<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for HiitSportsDetailsIntensity<'_> {
-    type Output = HiitSportsDetailsIntensity<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for HiitSportsDetailsIntensity<S> {
+    type Output = HiitSportsDetailsIntensity<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             HiitSportsDetailsIntensity::Light => HiitSportsDetailsIntensity::Light,
@@ -384,72 +396,78 @@ impl jacquard_common::IntoStatic for HiitSportsDetailsIntensity<'_> {
 
 /// A fitness workout record
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.fitsky.workout", tag = "$type")]
-pub struct Workout<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.fitsky.workout",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Workout<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub details: Option<WorkoutDetails<'a>>,
+    pub details: Option<WorkoutDetails<S>>,
     ///Duration in seconds
     pub duration: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ended_at: Option<Datetime>,
     ///Progress milestones for linear workouts
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub milestones: Option<Vec<workout::Milestone<'a>>>,
+    pub milestones: Option<Vec<workout::Milestone<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notes: Option<CowStr<'a>>,
+    pub notes: Option<S>,
     ///Open Graph preview image for social sharing
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub og_image: Option<BlobRef<'a>>,
+    pub og_image: Option<BlobRef<S>>,
     ///Reference to the workoutPlan used, if any
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub plan_uri: Option<AtUri<'a>>,
+    pub plan_uri: Option<AtUri<S>>,
     pub started_at: Datetime,
     ///Whether the workout is in progress or finished. Omitted for legacy workouts (treat as completed).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<WorkoutStatus<'a>>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
-    #[serde(borrow)]
-    pub r#type: WorkoutType<'a>,
+    pub status: Option<WorkoutStatus<S>>,
+    pub title: S,
+    pub r#type: WorkoutType<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub visibility: Option<workout::VisibilitySettings<'a>>,
+    pub visibility: Option<workout::VisibilitySettings<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum WorkoutDetails<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum WorkoutDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.fitsky.workout#cardioDetails")]
-    CardioDetails(Box<workout::CardioDetails<'a>>),
+    CardioDetails(Box<workout::CardioDetails<S>>),
     #[serde(rename = "app.fitsky.workout#strengthDetails")]
-    StrengthDetails(Box<workout::StrengthDetails<'a>>),
+    StrengthDetails(Box<workout::StrengthDetails<S>>),
     #[serde(rename = "app.fitsky.workout#flexibilityDetails")]
-    FlexibilityDetails(Box<workout::FlexibilityDetails<'a>>),
+    FlexibilityDetails(Box<workout::FlexibilityDetails<S>>),
     #[serde(rename = "app.fitsky.workout#hiitSportsDetails")]
-    HiitSportsDetails(Box<workout::HiitSportsDetails<'a>>),
+    HiitSportsDetails(Box<workout::HiitSportsDetails<S>>),
 }
 
 /// Whether the workout is in progress or finished. Omitted for legacy workouts (treat as completed).
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WorkoutStatus<'a> {
+pub enum WorkoutStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Active,
     Completed,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> WorkoutStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> WorkoutStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Active => "active",
@@ -457,70 +475,56 @@ impl<'a> WorkoutStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for WorkoutStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "active" => Self::Active,
             "completed" => Self::Completed,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for WorkoutStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "active" => Self::Active,
-            "completed" => Self::Completed,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WorkoutStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WorkoutStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for WorkoutStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for WorkoutStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for WorkoutStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for WorkoutStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for WorkoutStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for WorkoutStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for WorkoutStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for WorkoutStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for WorkoutStatus<'_> {
-    type Output = WorkoutStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for WorkoutStatus<S> {
+    type Output = WorkoutStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             WorkoutStatus::Active => WorkoutStatus::Active,
@@ -532,7 +536,7 @@ impl jacquard_common::IntoStatic for WorkoutStatus<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WorkoutType<'a> {
+pub enum WorkoutType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Running,
     Cycling,
     Swimming,
@@ -544,10 +548,10 @@ pub enum WorkoutType<'a> {
     Sports,
     Stretching,
     Hiking,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> WorkoutType<'a> {
+impl<S: Bos<str> + AsRef<str>> WorkoutType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Running => "running",
@@ -564,11 +568,9 @@ impl<'a> WorkoutType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for WorkoutType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "running" => Self::Running,
             "cycling" => Self::Cycling,
             "swimming" => Self::Swimming,
@@ -580,72 +582,51 @@ impl<'a> From<&'a str> for WorkoutType<'a> {
             "sports" => Self::Sports,
             "stretching" => Self::Stretching,
             "hiking" => Self::Hiking,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for WorkoutType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "running" => Self::Running,
-            "cycling" => Self::Cycling,
-            "swimming" => Self::Swimming,
-            "walking" => Self::Walking,
-            "weightlifting" => Self::Weightlifting,
-            "bodyweight" => Self::Bodyweight,
-            "yoga" => Self::Yoga,
-            "hiit" => Self::Hiit,
-            "sports" => Self::Sports,
-            "stretching" => Self::Stretching,
-            "hiking" => Self::Hiking,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WorkoutType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WorkoutType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for WorkoutType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for WorkoutType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for WorkoutType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for WorkoutType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for WorkoutType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for WorkoutType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for WorkoutType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for WorkoutType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for WorkoutType<'_> {
-    type Output = WorkoutType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for WorkoutType<S> {
+    type Output = WorkoutType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             WorkoutType::Running => WorkoutType::Running,
@@ -667,43 +648,51 @@ impl jacquard_common::IntoStatic for WorkoutType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct WorkoutGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct WorkoutGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Workout<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Workout<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Milestone<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Milestone<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub note: Option<CowStr<'a>>,
+    pub note: Option<S>,
     pub timestamp: Datetime,
-    #[serde(borrow)]
-    pub r#type: MilestoneType<'a>,
+    pub r#type: MilestoneType<S>,
     ///Milestone value in meters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value_meters: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MilestoneType<'a> {
+pub enum MilestoneType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Distance,
     Lap,
     Note,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> MilestoneType<'a> {
+impl<S: Bos<str> + AsRef<str>> MilestoneType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Distance => "distance",
@@ -712,72 +701,57 @@ impl<'a> MilestoneType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for MilestoneType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "distance" => Self::Distance,
             "lap" => Self::Lap,
             "note" => Self::Note,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for MilestoneType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "distance" => Self::Distance,
-            "lap" => Self::Lap,
-            "note" => Self::Note,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for MilestoneType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for MilestoneType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for MilestoneType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for MilestoneType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for MilestoneType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for MilestoneType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for MilestoneType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for MilestoneType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for MilestoneType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for MilestoneType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for MilestoneType<'_> {
-    type Output = MilestoneType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for MilestoneType<S> {
+    type Output = MilestoneType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             MilestoneType::Distance => MilestoneType::Distance,
@@ -789,75 +763,86 @@ impl jacquard_common::IntoStatic for MilestoneType<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RoutePoint<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RoutePoint<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Latitude in microdegrees (degrees * 1,000,000)
     pub lat_e6: i64,
     ///Longitude in microdegrees (degrees * 1,000,000)
     pub lng_e6: i64,
     pub timestamp: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct StrengthDetails<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StrengthDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cardio_zones: Option<workout::CardioZoneData<'a>>,
+    pub cardio_zones: Option<workout::CardioZoneData<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub exercises: Option<Vec<workout::Exercise<'a>>>,
+    pub exercises: Option<Vec<workout::Exercise<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate: Option<workout::HeartRateData<'a>>,
+    pub heart_rate: Option<workout::HeartRateData<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate_samples: Option<Vec<workout::HeartRateSample<'a>>>,
+    pub heart_rate_samples: Option<Vec<workout::HeartRateSample<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub steps: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Controls which fields are visible to other users in the Fitsky UI. Note: ATProto repos are public — this is UI-level privacy only.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct VisibilitySettings<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct VisibilitySettings<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub calories: Option<VisibilitySettingsCalories<'a>>,
+    pub calories: Option<VisibilitySettingsCalories<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cardio_zones: Option<VisibilitySettingsCardioZones<'a>>,
+    pub cardio_zones: Option<VisibilitySettingsCardioZones<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub details: Option<VisibilitySettingsDetails<'a>>,
+    pub details: Option<VisibilitySettingsDetails<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub heart_rate: Option<VisibilitySettingsHeartRate<'a>>,
+    pub heart_rate: Option<VisibilitySettingsHeartRate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notes: Option<VisibilitySettingsNotes<'a>>,
+    pub notes: Option<VisibilitySettingsNotes<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub steps: Option<VisibilitySettingsSteps<'a>>,
+    pub steps: Option<VisibilitySettingsSteps<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsCalories<'a> {
+pub enum VisibilitySettingsCalories<S: Bos<str> + AsRef<str> = DefaultStr> {
     Public,
     Private,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> VisibilitySettingsCalories<'a> {
+impl<S: Bos<str> + AsRef<str>> VisibilitySettingsCalories<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -865,70 +850,56 @@ impl<'a> VisibilitySettingsCalories<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsCalories<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for VisibilitySettingsCalories<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsCalories<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VisibilitySettingsCalories<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for VisibilitySettingsCalories<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for VisibilitySettingsCalories<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for VisibilitySettingsCalories<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsCalories<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsCalories<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for VisibilitySettingsCalories<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for VisibilitySettingsCalories<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for VisibilitySettingsCalories<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for VisibilitySettingsCalories<'_> {
-    type Output = VisibilitySettingsCalories<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsCalories<S> {
+    type Output = VisibilitySettingsCalories<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsCalories::Public => VisibilitySettingsCalories::Public,
@@ -942,13 +913,13 @@ impl jacquard_common::IntoStatic for VisibilitySettingsCalories<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsCardioZones<'a> {
+pub enum VisibilitySettingsCardioZones<S: Bos<str> + AsRef<str> = DefaultStr> {
     Public,
     Private,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> VisibilitySettingsCardioZones<'a> {
+impl<S: Bos<str> + AsRef<str>> VisibilitySettingsCardioZones<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -956,70 +927,56 @@ impl<'a> VisibilitySettingsCardioZones<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsCardioZones<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for VisibilitySettingsCardioZones<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsCardioZones<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VisibilitySettingsCardioZones<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for VisibilitySettingsCardioZones<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for VisibilitySettingsCardioZones<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for VisibilitySettingsCardioZones<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsCardioZones<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsCardioZones<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for VisibilitySettingsCardioZones<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for VisibilitySettingsCardioZones<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for VisibilitySettingsCardioZones<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for VisibilitySettingsCardioZones<'_> {
-    type Output = VisibilitySettingsCardioZones<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsCardioZones<S> {
+    type Output = VisibilitySettingsCardioZones<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsCardioZones::Public => {
@@ -1037,13 +994,13 @@ impl jacquard_common::IntoStatic for VisibilitySettingsCardioZones<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsDetails<'a> {
+pub enum VisibilitySettingsDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
     Public,
     Private,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> VisibilitySettingsDetails<'a> {
+impl<S: Bos<str> + AsRef<str>> VisibilitySettingsDetails<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -1051,70 +1008,56 @@ impl<'a> VisibilitySettingsDetails<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsDetails<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for VisibilitySettingsDetails<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsDetails<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VisibilitySettingsDetails<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for VisibilitySettingsDetails<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for VisibilitySettingsDetails<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for VisibilitySettingsDetails<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsDetails<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsDetails<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for VisibilitySettingsDetails<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for VisibilitySettingsDetails<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for VisibilitySettingsDetails<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for VisibilitySettingsDetails<'_> {
-    type Output = VisibilitySettingsDetails<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsDetails<S> {
+    type Output = VisibilitySettingsDetails<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsDetails::Public => VisibilitySettingsDetails::Public,
@@ -1128,13 +1071,13 @@ impl jacquard_common::IntoStatic for VisibilitySettingsDetails<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsHeartRate<'a> {
+pub enum VisibilitySettingsHeartRate<S: Bos<str> + AsRef<str> = DefaultStr> {
     Public,
     Private,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> VisibilitySettingsHeartRate<'a> {
+impl<S: Bos<str> + AsRef<str>> VisibilitySettingsHeartRate<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -1142,70 +1085,56 @@ impl<'a> VisibilitySettingsHeartRate<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsHeartRate<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for VisibilitySettingsHeartRate<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsHeartRate<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VisibilitySettingsHeartRate<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for VisibilitySettingsHeartRate<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for VisibilitySettingsHeartRate<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for VisibilitySettingsHeartRate<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsHeartRate<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsHeartRate<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for VisibilitySettingsHeartRate<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for VisibilitySettingsHeartRate<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for VisibilitySettingsHeartRate<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for VisibilitySettingsHeartRate<'_> {
-    type Output = VisibilitySettingsHeartRate<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsHeartRate<S> {
+    type Output = VisibilitySettingsHeartRate<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsHeartRate::Public => VisibilitySettingsHeartRate::Public,
@@ -1219,13 +1148,13 @@ impl jacquard_common::IntoStatic for VisibilitySettingsHeartRate<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsNotes<'a> {
+pub enum VisibilitySettingsNotes<S: Bos<str> + AsRef<str> = DefaultStr> {
     Public,
     Private,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> VisibilitySettingsNotes<'a> {
+impl<S: Bos<str> + AsRef<str>> VisibilitySettingsNotes<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -1233,70 +1162,56 @@ impl<'a> VisibilitySettingsNotes<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsNotes<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for VisibilitySettingsNotes<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsNotes<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VisibilitySettingsNotes<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for VisibilitySettingsNotes<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for VisibilitySettingsNotes<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for VisibilitySettingsNotes<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsNotes<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsNotes<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for VisibilitySettingsNotes<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for VisibilitySettingsNotes<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for VisibilitySettingsNotes<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for VisibilitySettingsNotes<'_> {
-    type Output = VisibilitySettingsNotes<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsNotes<S> {
+    type Output = VisibilitySettingsNotes<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsNotes::Public => VisibilitySettingsNotes::Public,
@@ -1310,13 +1225,13 @@ impl jacquard_common::IntoStatic for VisibilitySettingsNotes<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsSteps<'a> {
+pub enum VisibilitySettingsSteps<S: Bos<str> + AsRef<str> = DefaultStr> {
     Public,
     Private,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> VisibilitySettingsSteps<'a> {
+impl<S: Bos<str> + AsRef<str>> VisibilitySettingsSteps<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -1324,70 +1239,56 @@ impl<'a> VisibilitySettingsSteps<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for VisibilitySettingsSteps<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "public" => Self::Public,
             "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for VisibilitySettingsSteps<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "private" => Self::Private,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VisibilitySettingsSteps<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VisibilitySettingsSteps<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for VisibilitySettingsSteps<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for VisibilitySettingsSteps<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for VisibilitySettingsSteps<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsSteps<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for VisibilitySettingsSteps<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for VisibilitySettingsSteps<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for VisibilitySettingsSteps<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for VisibilitySettingsSteps<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for VisibilitySettingsSteps<'_> {
-    type Output = VisibilitySettingsSteps<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsSteps<S> {
+    type Output = VisibilitySettingsSteps<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsSteps::Public => VisibilitySettingsSteps::Public,
@@ -1399,15 +1300,13 @@ impl jacquard_common::IntoStatic for VisibilitySettingsSteps<'_> {
     }
 }
 
-impl<'a> Workout<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, WorkoutRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Workout<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, WorkoutRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for CardioDetails<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardioDetails<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1449,7 +1348,7 @@ impl<'a> LexiconSchema for CardioDetails<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CardioZoneData<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardioZoneData<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1464,7 +1363,7 @@ impl<'a> LexiconSchema for CardioZoneData<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Exercise<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Exercise<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1490,7 +1389,7 @@ impl<'a> LexiconSchema for Exercise<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ExerciseSet<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExerciseSet<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1514,7 +1413,7 @@ impl<'a> LexiconSchema for ExerciseSet<'a> {
     }
 }
 
-impl<'a> LexiconSchema for FlexibilityDetails<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FlexibilityDetails<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1539,7 +1438,7 @@ impl<'a> LexiconSchema for FlexibilityDetails<'a> {
     }
 }
 
-impl<'a> LexiconSchema for HeartRateData<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for HeartRateData<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1554,7 +1453,7 @@ impl<'a> LexiconSchema for HeartRateData<'a> {
     }
 }
 
-impl<'a> LexiconSchema for HeartRateSample<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for HeartRateSample<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1569,7 +1468,7 @@ impl<'a> LexiconSchema for HeartRateSample<'a> {
     }
 }
 
-impl<'a> LexiconSchema for HiitSportsDetails<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for HiitSportsDetails<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1629,18 +1528,17 @@ pub struct WorkoutRecord;
 impl XrpcResp for WorkoutRecord {
     const NSID: &'static str = "app.fitsky.workout";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = WorkoutGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = WorkoutGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<WorkoutGetRecordOutput<'_>> for Workout<'_> {
-    fn from(output: WorkoutGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<WorkoutGetRecordOutput<S>> for Workout<S> {
+    fn from(output: WorkoutGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Workout<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Workout<S> {
     const NSID: &'static str = "app.fitsky.workout";
     type Record = WorkoutRecord;
 }
@@ -1650,7 +1548,7 @@ impl Collection for WorkoutRecord {
     type Record = WorkoutRecord;
 }
 
-impl<'a> LexiconSchema for Workout<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Workout<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1758,7 +1656,7 @@ impl<'a> LexiconSchema for Workout<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Milestone<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Milestone<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1803,7 +1701,7 @@ impl<'a> LexiconSchema for Milestone<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RoutePoint<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RoutePoint<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1818,7 +1716,7 @@ impl<'a> LexiconSchema for RoutePoint<'a> {
     }
 }
 
-impl<'a> LexiconSchema for StrengthDetails<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for StrengthDetails<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1833,7 +1731,7 @@ impl<'a> LexiconSchema for StrengthDetails<'a> {
     }
 }
 
-impl<'a> LexiconSchema for VisibilitySettings<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for VisibilitySettings<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -2705,7 +2603,7 @@ pub mod exercise_state {
 /// Builder for constructing an instance of this type
 pub struct ExerciseBuilder<'a, S: exercise_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Vec<workout::ExerciseSet<'a>>>),
+    _fields: (Option<S>, Option<Vec<workout::ExerciseSet<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -2735,7 +2633,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ExerciseBuilder<'a, exercise_state::SetName<S>> {
         self._fields.0 = Option::Some(value.into());
         ExerciseBuilder {
@@ -2754,7 +2652,7 @@ where
     /// Set the `sets` field (required)
     pub fn sets(
         mut self,
-        value: impl Into<Vec<workout::ExerciseSet<'a>>>,
+        value: impl Into<Vec<workout::ExerciseSet<S>>>,
     ) -> ExerciseBuilder<'a, exercise_state::SetSets<S>> {
         self._fields.1 = Option::Some(value.into());
         ExerciseBuilder {
@@ -2782,10 +2680,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Exercise<'a> {
         Exercise {
             name: self._fields.0.unwrap(),
@@ -2919,10 +2814,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> HeartRateSample<'a> {
         HeartRateSample {
             bpm: self._fields.0.unwrap(),
@@ -2943,84 +2835,84 @@ pub mod workout_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Type;
-        type Duration;
-        type CreatedAt;
-        type StartedAt;
         type Title;
+        type CreatedAt;
+        type Duration;
+        type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Type = Unset;
-        type Duration = Unset;
-        type CreatedAt = Unset;
-        type StartedAt = Unset;
         type Title = Unset;
+        type CreatedAt = Unset;
+        type Duration = Unset;
+        type StartedAt = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
         type Type = Set<members::r#type>;
-        type Duration = S::Duration;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
-        type StartedAt = S::StartedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type Type = S::Type;
-        type Duration = Set<members::duration>;
-        type CreatedAt = S::CreatedAt;
-        type StartedAt = S::StartedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Type = S::Type;
         type Duration = S::Duration;
-        type CreatedAt = Set<members::created_at>;
         type StartedAt = S::StartedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type Type = S::Type;
-        type Duration = S::Duration;
-        type CreatedAt = S::CreatedAt;
-        type StartedAt = Set<members::started_at>;
-        type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Type = S::Type;
-        type Duration = S::Duration;
-        type CreatedAt = S::CreatedAt;
-        type StartedAt = S::StartedAt;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+        type Duration = S::Duration;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Type = S::Type;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
+        type Duration = S::Duration;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type Type = S::Type;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Duration = Set<members::duration>;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type Type = S::Type;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Duration = S::Duration;
+        type StartedAt = Set<members::started_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
     }
 }
 
@@ -3029,18 +2921,18 @@ pub struct WorkoutBuilder<'a, S: workout_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<WorkoutDetails<'a>>,
+        Option<WorkoutDetails<S>>,
         Option<i64>,
         Option<Datetime>,
-        Option<Vec<workout::Milestone<'a>>>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<AtUri<'a>>,
+        Option<Vec<workout::Milestone<S>>>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<AtUri<S>>,
         Option<Datetime>,
-        Option<WorkoutStatus<'a>>,
-        Option<CowStr<'a>>,
-        Option<WorkoutType<'a>>,
-        Option<workout::VisibilitySettings<'a>>,
+        Option<WorkoutStatus<S>>,
+        Option<S>,
+        Option<WorkoutType<S>>,
+        Option<workout::VisibilitySettings<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -3098,12 +2990,12 @@ where
 
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `details` field (optional)
-    pub fn details(mut self, value: impl Into<Option<WorkoutDetails<'a>>>) -> Self {
+    pub fn details(mut self, value: impl Into<Option<WorkoutDetails<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `details` field to an Option value (optional)
-    pub fn maybe_details(mut self, value: Option<WorkoutDetails<'a>>) -> Self {
+    pub fn maybe_details(mut self, value: Option<WorkoutDetails<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -3145,7 +3037,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `milestones` field (optional)
     pub fn milestones(
         mut self,
-        value: impl Into<Option<Vec<workout::Milestone<'a>>>>,
+        value: impl Into<Option<Vec<workout::Milestone<S>>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
@@ -3153,7 +3045,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `milestones` field to an Option value (optional)
     pub fn maybe_milestones(
         mut self,
-        value: Option<Vec<workout::Milestone<'a>>>,
+        value: Option<Vec<workout::Milestone<S>>>,
     ) -> Self {
         self._fields.4 = value;
         self
@@ -3162,12 +3054,12 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
 
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
-    pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_notes(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -3175,12 +3067,12 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
 
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `ogImage` field (optional)
-    pub fn og_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn og_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `ogImage` field to an Option value (optional)
-    pub fn maybe_og_image(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_og_image(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -3188,12 +3080,12 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
 
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `planUri` field (optional)
-    pub fn plan_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn plan_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `planUri` field to an Option value (optional)
-    pub fn maybe_plan_uri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_plan_uri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -3220,12 +3112,12 @@ where
 
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<WorkoutStatus<'a>>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<WorkoutStatus<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<WorkoutStatus<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<WorkoutStatus<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -3239,7 +3131,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> WorkoutBuilder<'a, workout_state::SetTitle<S>> {
         self._fields.10 = Option::Some(value.into());
         WorkoutBuilder {
@@ -3258,7 +3150,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<WorkoutType<'a>>,
+        value: impl Into<WorkoutType<S>>,
     ) -> WorkoutBuilder<'a, workout_state::SetType<S>> {
         self._fields.11 = Option::Some(value.into());
         WorkoutBuilder {
@@ -3273,7 +3165,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `visibility` field (optional)
     pub fn visibility(
         mut self,
-        value: impl Into<Option<workout::VisibilitySettings<'a>>>,
+        value: impl Into<Option<workout::VisibilitySettings<S>>>,
     ) -> Self {
         self._fields.12 = value.into();
         self
@@ -3281,7 +3173,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `visibility` field to an Option value (optional)
     pub fn maybe_visibility(
         mut self,
-        value: Option<workout::VisibilitySettings<'a>>,
+        value: Option<workout::VisibilitySettings<S>>,
     ) -> Self {
         self._fields.12 = value;
         self
@@ -3292,10 +3184,10 @@ impl<'a, S> WorkoutBuilder<'a, S>
 where
     S: workout_state::State,
     S::Type: workout_state::IsSet,
-    S::Duration: workout_state::IsSet,
-    S::CreatedAt: workout_state::IsSet,
-    S::StartedAt: workout_state::IsSet,
     S::Title: workout_state::IsSet,
+    S::CreatedAt: workout_state::IsSet,
+    S::Duration: workout_state::IsSet,
+    S::StartedAt: workout_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workout<'a> {
@@ -3319,10 +3211,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Workout<'a> {
         Workout {
             created_at: self._fields.0.unwrap(),
@@ -3390,12 +3279,7 @@ pub mod milestone_state {
 /// Builder for constructing an instance of this type
 pub struct MilestoneBuilder<'a, S: milestone_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-        Option<MilestoneType<'a>>,
-        Option<i64>,
-    ),
+    _fields: (Option<S>, Option<Datetime>, Option<MilestoneType<S>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -3419,12 +3303,12 @@ impl<'a> MilestoneBuilder<'a, milestone_state::Empty> {
 
 impl<'a, S: milestone_state::State> MilestoneBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -3457,7 +3341,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<MilestoneType<'a>>,
+        value: impl Into<MilestoneType<S>>,
     ) -> MilestoneBuilder<'a, milestone_state::SetType<S>> {
         self._fields.2 = Option::Some(value.into());
         MilestoneBuilder {
@@ -3500,10 +3384,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Milestone<'a> {
         Milestone {
             note: self._fields.0,
@@ -3525,49 +3406,49 @@ pub mod route_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LatE6;
         type LngE6;
+        type LatE6;
         type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LatE6 = Unset;
         type LngE6 = Unset;
+        type LatE6 = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `lat_e6` field to Set
-    pub struct SetLatE6<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLatE6<S> {}
-    impl<S: State> State for SetLatE6<S> {
-        type LatE6 = Set<members::lat_e6>;
-        type LngE6 = S::LngE6;
-        type Timestamp = S::Timestamp;
     }
     ///State transition - sets the `lng_e6` field to Set
     pub struct SetLngE6<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLngE6<S> {}
     impl<S: State> State for SetLngE6<S> {
-        type LatE6 = S::LatE6;
         type LngE6 = Set<members::lng_e6>;
+        type LatE6 = S::LatE6;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `lat_e6` field to Set
+    pub struct SetLatE6<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLatE6<S> {}
+    impl<S: State> State for SetLatE6<S> {
+        type LngE6 = S::LngE6;
+        type LatE6 = Set<members::lat_e6>;
         type Timestamp = S::Timestamp;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type LatE6 = S::LatE6;
         type LngE6 = S::LngE6;
+        type LatE6 = S::LatE6;
         type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lat_e6` field
-        pub struct lat_e6(());
         ///Marker type for the `lng_e6` field
         pub struct lng_e6(());
+        ///Marker type for the `lat_e6` field
+        pub struct lat_e6(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
     }
@@ -3658,8 +3539,8 @@ where
 impl<'a, S> RoutePointBuilder<'a, S>
 where
     S: route_point_state::State,
-    S::LatE6: route_point_state::IsSet,
     S::LngE6: route_point_state::IsSet,
+    S::LatE6: route_point_state::IsSet,
     S::Timestamp: route_point_state::IsSet,
 {
     /// Build the final struct
@@ -3674,10 +3555,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RoutePoint<'a> {
         RoutePoint {
             lat_e6: self._fields.0.unwrap(),

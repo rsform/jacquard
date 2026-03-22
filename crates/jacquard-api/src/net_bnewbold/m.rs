@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,36 +29,46 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// it's a kind of fungus
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "net.bnewbold.m", tag = "$type")]
-pub struct M<'a> {
-    #[serde(borrow)]
-    pub common_name: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "net.bnewbold.m",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct M<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub common_name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub edible: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub species: Option<CowStr<'a>>,
+    pub species: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: M<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: M<S>,
 }
 
-impl<'a> M<'a> {
-    pub fn uri(uri: impl Into<CowStr<'a>>) -> Result<RecordUri<'a, MRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> M<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, MRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -67,18 +79,17 @@ pub struct MRecord;
 impl XrpcResp for MRecord {
     const NSID: &'static str = "net.bnewbold.m";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<MGetRecordOutput<'_>> for M<'_> {
-    fn from(output: MGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<MGetRecordOutput<S>> for M<S> {
+    fn from(output: MGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for M<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for M<S> {
     const NSID: &'static str = "net.bnewbold.m";
     type Record = MRecord;
 }
@@ -88,7 +99,7 @@ impl Collection for MRecord {
     type Record = MRecord;
 }
 
-impl<'a> LexiconSchema for M<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for M<S> {
     fn nsid() -> &'static str {
         "net.bnewbold.m"
     }
@@ -184,7 +195,7 @@ pub mod m_state {
 /// Builder for constructing an instance of this type
 pub struct MBuilder<'a, S: m_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<bool>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<bool>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -214,7 +225,7 @@ where
     /// Set the `commonName` field (required)
     pub fn common_name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MBuilder<'a, m_state::SetCommonName<S>> {
         self._fields.0 = Option::Some(value.into());
         MBuilder {
@@ -240,12 +251,12 @@ impl<'a, S: m_state::State> MBuilder<'a, S> {
 
 impl<'a, S: m_state::State> MBuilder<'a, S> {
     /// Set the `species` field (optional)
-    pub fn species(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn species(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `species` field to an Option value (optional)
-    pub fn maybe_species(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_species(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -266,13 +277,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> M<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> M<'a> {
         M {
             common_name: self._fields.0.unwrap(),
             edible: self._fields.1,

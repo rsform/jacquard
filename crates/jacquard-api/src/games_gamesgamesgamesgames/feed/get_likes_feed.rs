@@ -10,19 +10,27 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::GameFeedViewItem;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetLikesFeed<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetLikesFeed<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     #[serde(borrow)]
-    pub did: CowStr<'a>,
+    pub did: S,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -30,15 +38,22 @@ pub struct GetLikesFeed<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetLikesFeedOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetLikesFeedOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub feed: Vec<GameFeedViewItem<'a>>,
+    pub cursor: Option<S>,
+    pub feed: Vec<GameFeedViewItem<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for games.gamesgamesgamesgames.feed.getLikesFeed
@@ -46,11 +61,12 @@ pub struct GetLikesFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLikesFeedResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getLikesFeed";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetLikesFeedOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetLikesFeedOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetLikesFeed<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetLikesFeed<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getLikesFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLikesFeedResponse;
@@ -61,7 +77,7 @@ pub struct GetLikesFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLikesFeedRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getLikesFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetLikesFeed<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetLikesFeed<S>;
     type Response = GetLikesFeedResponse;
 }
 
@@ -104,7 +120,7 @@ pub mod get_likes_feed_state {
 /// Builder for constructing an instance of this type
 pub struct GetLikesFeedBuilder<'a, S: get_likes_feed_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -128,12 +144,12 @@ impl<'a> GetLikesFeedBuilder<'a, get_likes_feed_state::Empty> {
 
 impl<'a, S: get_likes_feed_state::State> GetLikesFeedBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -147,7 +163,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetLikesFeedBuilder<'a, get_likes_feed_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         GetLikesFeedBuilder {

@@ -14,10 +14,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::ident::AtIdentifier;
@@ -35,165 +36,162 @@ use serde::{Serialize, Deserialize};
 use crate::app_rocksky::song::SongViewBasic;
 /// A declaration of a playlist.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.rocksky.playlist", tag = "$type")]
-pub struct Playlist<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.rocksky.playlist",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Playlist<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The Apple Music link of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub apple_music_link: Option<CowStr<'a>>,
+    pub apple_music_link: Option<S>,
     ///The date the playlist was created.
     pub created_at: Datetime,
     ///The playlist description.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The name of the playlist.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///The picture of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub picture: Option<BlobRef<'a>>,
+    pub picture: Option<BlobRef<S>>,
     ///The Spotify link of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spotify_link: Option<CowStr<'a>>,
+    pub spotify_link: Option<S>,
     ///The Tidal link of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tidal_link: Option<CowStr<'a>>,
+    pub tidal_link: Option<S>,
     ///The tracks in the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tracks: Option<Vec<Data<'a>>>,
+    pub tracks: Option<Vec<Data<S>>>,
     ///The YouTube link of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub youtube_link: Option<CowStr<'a>>,
+    pub youtube_link: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PlaylistGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PlaylistGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Playlist<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Playlist<S>,
 }
 
 /// Basic view of a playlist, including its metadata
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct PlaylistViewBasic<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PlaylistViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The URL of the cover image for the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cover_image_url: Option<UriValue<'a>>,
+    pub cover_image_url: Option<UriValue<S>>,
     ///The date and time when the playlist was created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///The URL of the avatar image of the curator.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub curator_avatar_url: Option<UriValue<'a>>,
+    pub curator_avatar_url: Option<UriValue<S>>,
     ///The DID of the curator of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub curator_did: Option<AtIdentifier<'a>>,
+    pub curator_did: Option<AtIdentifier<S>>,
     ///The handle of the curator of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub curator_handle: Option<AtIdentifier<'a>>,
+    pub curator_handle: Option<AtIdentifier<S>>,
     ///The name of the curator of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub curator_name: Option<CowStr<'a>>,
+    pub curator_name: Option<S>,
     ///A description of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The unique identifier of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///The title of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     ///The number of tracks in the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub track_count: Option<i64>,
     ///The URI of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Detailed view of a playlist, including its tracks and metadata
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct PlaylistViewDetailed<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PlaylistViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The URL of the cover image for the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cover_image_url: Option<UriValue<'a>>,
+    pub cover_image_url: Option<UriValue<S>>,
     ///The date and time when the playlist was created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///The URL of the avatar image of the curator.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub curator_avatar_url: Option<UriValue<'a>>,
+    pub curator_avatar_url: Option<UriValue<S>>,
     ///The DID of the curator of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub curator_did: Option<AtIdentifier<'a>>,
+    pub curator_did: Option<AtIdentifier<S>>,
     ///The handle of the curator of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub curator_handle: Option<AtIdentifier<'a>>,
+    pub curator_handle: Option<AtIdentifier<S>>,
     ///The name of the curator of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub curator_name: Option<CowStr<'a>>,
+    pub curator_name: Option<S>,
     ///A description of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The unique identifier of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///The title of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     ///A list of tracks in the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tracks: Option<Vec<SongViewBasic<'a>>>,
+    pub tracks: Option<Vec<SongViewBasic<S>>>,
     ///The URI of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Playlist<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PlaylistRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Playlist<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PlaylistRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -204,18 +202,17 @@ pub struct PlaylistRecord;
 impl XrpcResp for PlaylistRecord {
     const NSID: &'static str = "app.rocksky.playlist";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PlaylistGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PlaylistGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PlaylistGetRecordOutput<'_>> for Playlist<'_> {
-    fn from(output: PlaylistGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PlaylistGetRecordOutput<S>> for Playlist<S> {
+    fn from(output: PlaylistGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Playlist<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Playlist<S> {
     const NSID: &'static str = "app.rocksky.playlist";
     type Record = PlaylistRecord;
 }
@@ -225,7 +222,7 @@ impl Collection for PlaylistRecord {
     type Record = PlaylistRecord;
 }
 
-impl<'a> LexiconSchema for Playlist<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Playlist<S> {
     fn nsid() -> &'static str {
         "app.rocksky.playlist"
     }
@@ -322,7 +319,7 @@ impl<'a> LexiconSchema for Playlist<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PlaylistViewBasic<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlaylistViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.playlist.defs"
     }
@@ -346,7 +343,7 @@ impl<'a> LexiconSchema for PlaylistViewBasic<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PlaylistViewDetailed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlaylistViewDetailed<S> {
     fn nsid() -> &'static str {
         "app.rocksky.playlist.defs"
     }
@@ -371,37 +368,37 @@ pub mod playlist_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -409,15 +406,15 @@ pub mod playlist_state {
 pub struct PlaylistBuilder<'a, S: playlist_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<Data<'a>>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<S>,
+        Option<Vec<Data<S>>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -442,12 +439,12 @@ impl<'a> PlaylistBuilder<'a, playlist_state::Empty> {
 
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `appleMusicLink` field (optional)
-    pub fn apple_music_link(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn apple_music_link(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `appleMusicLink` field to an Option value (optional)
-    pub fn maybe_apple_music_link(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_apple_music_link(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -474,12 +471,12 @@ where
 
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -493,7 +490,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PlaylistBuilder<'a, playlist_state::SetName<S>> {
         self._fields.3 = Option::Some(value.into());
         PlaylistBuilder {
@@ -506,12 +503,12 @@ where
 
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `picture` field (optional)
-    pub fn picture(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn picture(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `picture` field to an Option value (optional)
-    pub fn maybe_picture(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_picture(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -519,12 +516,12 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `spotifyLink` field (optional)
-    pub fn spotify_link(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn spotify_link(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `spotifyLink` field to an Option value (optional)
-    pub fn maybe_spotify_link(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_spotify_link(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -532,12 +529,12 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `tidalLink` field (optional)
-    pub fn tidal_link(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn tidal_link(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `tidalLink` field to an Option value (optional)
-    pub fn maybe_tidal_link(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_tidal_link(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -545,12 +542,12 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `tracks` field (optional)
-    pub fn tracks(mut self, value: impl Into<Option<Vec<Data<'a>>>>) -> Self {
+    pub fn tracks(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `tracks` field to an Option value (optional)
-    pub fn maybe_tracks(mut self, value: Option<Vec<Data<'a>>>) -> Self {
+    pub fn maybe_tracks(mut self, value: Option<Vec<Data<S>>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -558,12 +555,12 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `youtubeLink` field (optional)
-    pub fn youtube_link(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn youtube_link(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `youtubeLink` field to an Option value (optional)
-    pub fn maybe_youtube_link(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_youtube_link(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -572,8 +569,8 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 impl<'a, S> PlaylistBuilder<'a, S>
 where
     S: playlist_state::State,
-    S::Name: playlist_state::IsSet,
     S::CreatedAt: playlist_state::IsSet,
+    S::Name: playlist_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Playlist<'a> {
@@ -593,7 +590,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Playlist<'a> {
         Playlist {
             apple_music_link: self._fields.0,

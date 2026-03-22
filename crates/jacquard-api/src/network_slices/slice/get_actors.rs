@@ -10,13 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,60 +26,77 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::get_actors;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Actor<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Actor<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Decentralized identifier of the actor
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///Human-readable handle of the actor
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub handle: Option<Handle<'a>>,
+    pub handle: Option<Handle<S>>,
     ///When this actor was indexed
     pub indexed_at: Datetime,
     ///AT-URI of the slice this actor is indexed in
-    #[serde(borrow)]
-    pub slice_uri: CowStr<'a>,
+    pub slice_uri: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetActors<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetActors<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Pagination cursor from previous response
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Maximum number of actors to return  Defaults to `50`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_get_actors_limit")]
     pub limit: Option<i64>,
     ///AT-URI of the slice to query
-    #[serde(borrow)]
-    pub slice: CowStr<'a>,
+    pub slice: S,
     ///Flexible filtering conditions for querying actors
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#where: Option<Data<'a>>,
+    pub r#where: Option<Data<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetActorsOutput<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<get_actors::Actor<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetActorsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub actors: Vec<get_actors::Actor<S>>,
     ///Pagination cursor for next page
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Actor<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Actor<S> {
     fn nsid() -> &'static str {
         "network.slices.slice.getActors"
     }
@@ -98,11 +116,12 @@ pub struct GetActorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorsResponse {
     const NSID: &'static str = "network.slices.slice.getActors";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetActorsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetActors<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetActors<S> {
     const NSID: &'static str = "network.slices.slice.getActors";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -117,7 +136,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = GetActors<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetActors<S>;
     type Response = GetActorsResponse;
 }
 
@@ -131,49 +150,49 @@ pub mod actor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SliceUri;
         type Did;
+        type SliceUri;
         type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SliceUri = Unset;
         type Did = Unset;
+        type SliceUri = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `slice_uri` field to Set
-    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
-    impl<S: State> State for SetSliceUri<S> {
-        type SliceUri = Set<members::slice_uri>;
-        type Did = S::Did;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type SliceUri = S::SliceUri;
         type Did = Set<members::did>;
+        type SliceUri = S::SliceUri;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `slice_uri` field to Set
+    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
+    impl<S: State> State for SetSliceUri<S> {
+        type Did = S::Did;
+        type SliceUri = Set<members::slice_uri>;
         type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type SliceUri = S::SliceUri;
         type Did = S::Did;
+        type SliceUri = S::SliceUri;
         type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slice_uri` field
-        pub struct slice_uri(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `slice_uri` field
+        pub struct slice_uri(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
     }
@@ -182,7 +201,7 @@ pub mod actor_state {
 /// Builder for constructing an instance of this type
 pub struct ActorBuilder<'a, S: actor_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<Handle<'a>>, Option<Datetime>, Option<CowStr<'a>>),
+    _fields: (Option<Did<S>>, Option<Handle<S>>, Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -212,7 +231,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ActorBuilder<'a, actor_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         ActorBuilder {
@@ -225,12 +244,12 @@ where
 
 impl<'a, S: actor_state::State> ActorBuilder<'a, S> {
     /// Set the `handle` field (optional)
-    pub fn handle(mut self, value: impl Into<Option<Handle<'a>>>) -> Self {
+    pub fn handle(mut self, value: impl Into<Option<Handle<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `handle` field to an Option value (optional)
-    pub fn maybe_handle(mut self, value: Option<Handle<'a>>) -> Self {
+    pub fn maybe_handle(mut self, value: Option<Handle<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -263,7 +282,7 @@ where
     /// Set the `sliceUri` field (required)
     pub fn slice_uri(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ActorBuilder<'a, actor_state::SetSliceUri<S>> {
         self._fields.3 = Option::Some(value.into());
         ActorBuilder {
@@ -277,8 +296,8 @@ where
 impl<'a, S> ActorBuilder<'a, S>
 where
     S: actor_state::State,
-    S::SliceUri: actor_state::IsSet,
     S::Did: actor_state::IsSet,
+    S::SliceUri: actor_state::IsSet,
     S::IndexedAt: actor_state::IsSet,
 {
     /// Build the final struct
@@ -292,10 +311,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Actor<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Actor<'a> {
         Actor {
             did: self._fields.0.unwrap(),
             handle: self._fields.1,

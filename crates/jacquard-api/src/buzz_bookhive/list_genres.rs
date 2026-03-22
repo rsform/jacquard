@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,15 +25,21 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::buzz_bookhive::list_genres;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GenreWithCount<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GenreWithCount<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Number of books in this genre
     pub count: i64,
     ///Genre name
-    #[serde(borrow)]
-    pub genre: CowStr<'a>,
+    pub genre: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
@@ -51,18 +59,26 @@ pub struct ListGenres {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListGenresOutput<'a> {
-    #[serde(borrow)]
-    pub genres: Vec<list_genres::GenreWithCount<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListGenresOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub genres: Vec<list_genres::GenreWithCount<S>>,
     ///Next offset for pagination
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i64>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for GenreWithCount<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for GenreWithCount<S> {
     fn nsid() -> &'static str {
         "buzz.bookhive.listGenres"
     }
@@ -82,8 +98,8 @@ pub struct ListGenresResponse;
 impl jacquard_common::xrpc::XrpcResp for ListGenresResponse {
     const NSID: &'static str = "buzz.bookhive.listGenres";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListGenresOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListGenresOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for ListGenres {
@@ -97,7 +113,7 @@ pub struct ListGenresRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListGenresRequest {
     const PATH: &'static str = "/xrpc/buzz.bookhive.listGenres";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListGenres;
+    type Request<S: Bos<str> + AsRef<str>> = ListGenres;
     type Response = ListGenresResponse;
 }
 
@@ -148,7 +164,7 @@ pub mod genre_with_count_state {
 /// Builder for constructing an instance of this type
 pub struct GenreWithCountBuilder<'a, S: genre_with_count_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -197,7 +213,7 @@ where
     /// Set the `genre` field (required)
     pub fn genre(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GenreWithCountBuilder<'a, genre_with_count_state::SetGenre<S>> {
         self._fields.1 = Option::Some(value.into());
         GenreWithCountBuilder {
@@ -225,10 +241,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> GenreWithCount<'a> {
         GenreWithCount {
             count: self._fields.0.unwrap(),

@@ -10,27 +10,34 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ForkSync<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ForkSync<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Branch to sync
-    #[serde(borrow)]
-    pub branch: CowStr<'a>,
+    pub branch: S,
     ///DID of the fork owner
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///Name of the forked repository
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///AT-URI of the source repository
-    #[serde(borrow)]
-    pub source: AtUri<'a>,
+    pub source: AtUri<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.tangled.repo.forkSync
@@ -38,11 +45,12 @@ pub struct ForkSyncResponse;
 impl jacquard_common::xrpc::XrpcResp for ForkSyncResponse {
     const NSID: &'static str = "sh.tangled.repo.forkSync";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ForkSync<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ForkSync<S> {
     const NSID: &'static str = "sh.tangled.repo.forkSync";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -57,7 +65,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ForkSyncRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = ForkSync<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ForkSync<S>;
     type Response = ForkSyncResponse;
 }
 
@@ -71,79 +79,74 @@ pub mod fork_sync_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Branch;
-        type Source;
         type Name;
         type Did;
+        type Source;
+        type Branch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Branch = Unset;
-        type Source = Unset;
         type Name = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranch<S> {}
-    impl<S: State> State for SetBranch<S> {
-        type Branch = Set<members::branch>;
-        type Source = S::Source;
-        type Name = S::Name;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type Branch = S::Branch;
-        type Source = Set<members::source>;
-        type Name = S::Name;
-        type Did = S::Did;
+        type Source = Unset;
+        type Branch = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Branch = S::Branch;
-        type Source = S::Source;
         type Name = Set<members::name>;
         type Did = S::Did;
+        type Source = S::Source;
+        type Branch = S::Branch;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Branch = S::Branch;
-        type Source = S::Source;
         type Name = S::Name;
         type Did = Set<members::did>;
+        type Source = S::Source;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSource<S> {}
+    impl<S: State> State for SetSource<S> {
+        type Name = S::Name;
+        type Did = S::Did;
+        type Source = Set<members::source>;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranch<S> {}
+    impl<S: State> State for SetBranch<S> {
+        type Name = S::Name;
+        type Did = S::Did;
+        type Source = S::Source;
+        type Branch = Set<members::branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `branch` field
-        pub struct branch(());
-        ///Marker type for the `source` field
-        pub struct source(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `source` field
+        pub struct source(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ForkSyncBuilder<'a, S: fork_sync_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-    ),
+    _fields: (Option<S>, Option<Did<S>>, Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -173,7 +176,7 @@ where
     /// Set the `branch` field (required)
     pub fn branch(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ForkSyncBuilder<'a, fork_sync_state::SetBranch<S>> {
         self._fields.0 = Option::Some(value.into());
         ForkSyncBuilder {
@@ -192,7 +195,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ForkSyncBuilder<'a, fork_sync_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         ForkSyncBuilder {
@@ -211,7 +214,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ForkSyncBuilder<'a, fork_sync_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         ForkSyncBuilder {
@@ -230,7 +233,7 @@ where
     /// Set the `source` field (required)
     pub fn source(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ForkSyncBuilder<'a, fork_sync_state::SetSource<S>> {
         self._fields.3 = Option::Some(value.into());
         ForkSyncBuilder {
@@ -244,10 +247,10 @@ where
 impl<'a, S> ForkSyncBuilder<'a, S>
 where
     S: fork_sync_state::State,
-    S::Branch: fork_sync_state::IsSet,
-    S::Source: fork_sync_state::IsSet,
     S::Name: fork_sync_state::IsSet,
     S::Did: fork_sync_state::IsSet,
+    S::Source: fork_sync_state::IsSet,
+    S::Branch: fork_sync_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ForkSync<'a> {
@@ -262,10 +265,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ForkSync<'a> {
         ForkSync {
             branch: self._fields.0.unwrap(),

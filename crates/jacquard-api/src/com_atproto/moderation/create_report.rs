@@ -10,13 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -28,77 +29,104 @@ use crate::com_atproto::moderation::ReasonType;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::com_atproto::moderation::create_report;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateReport<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateReport<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mod_tool: Option<create_report::ModTool<'a>>,
+    pub mod_tool: Option<create_report::ModTool<S>>,
     ///Additional context about the content and violation.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reason: Option<CowStr<'a>>,
+    pub reason: Option<S>,
     ///Indicates the broad category of violation the report is for.
-    #[serde(borrow)]
-    pub reason_type: ReasonType<'a>,
-    #[serde(borrow)]
-    pub subject: CreateReportSubject<'a>,
+    pub reason_type: ReasonType<S>,
+    pub subject: CreateReportSubject<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum CreateReportSubject<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum CreateReportSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    RepoRef(Box<RepoRef<'a>>),
+    RepoRef(Box<RepoRef<S>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<StrongRef<'a>>),
+    StrongRef(Box<StrongRef<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateReportOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateReportOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     pub id: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reason: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub reason_type: ReasonType<'a>,
-    #[serde(borrow)]
-    pub reported_by: Did<'a>,
-    #[serde(borrow)]
-    pub subject: CreateReportOutputSubject<'a>,
+    pub reason: Option<S>,
+    pub reason_type: ReasonType<S>,
+    pub reported_by: Did<S>,
+    pub subject: CreateReportOutputSubject<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum CreateReportOutputSubject<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum CreateReportOutputSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    RepoRef(Box<RepoRef<'a>>),
+    RepoRef(Box<RepoRef<S>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<StrongRef<'a>>),
+    StrongRef(Box<StrongRef<S>>),
 }
 
 /// Moderation tool information for tracing the source of the action
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ModTool<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ModTool<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Additional arbitrary metadata about the source
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub meta: Option<Data<'a>>,
+    pub meta: Option<Data<S>>,
     ///Name/identifier of the source (e.g., 'bsky-app/android', 'bsky-web/chrome')
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.atproto.moderation.createReport
@@ -106,11 +134,12 @@ pub struct CreateReportResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateReportResponse {
     const NSID: &'static str = "com.atproto.moderation.createReport";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateReportOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CreateReportOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateReport<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CreateReport<S> {
     const NSID: &'static str = "com.atproto.moderation.createReport";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -125,11 +154,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateReportRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CreateReport<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CreateReport<S>;
     type Response = CreateReportResponse;
 }
 
-impl<'a> LexiconSchema for ModTool<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ModTool<S> {
     fn nsid() -> &'static str {
         "com.atproto.moderation.createReport"
     }
@@ -192,10 +221,10 @@ pub mod create_report_state {
 pub struct CreateReportBuilder<'a, S: create_report_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<create_report::ModTool<'a>>,
-        Option<CowStr<'a>>,
-        Option<ReasonType<'a>>,
-        Option<CreateReportSubject<'a>>,
+        Option<create_report::ModTool<S>>,
+        Option<S>,
+        Option<ReasonType<S>>,
+        Option<CreateReportSubject<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -222,13 +251,13 @@ impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
     /// Set the `modTool` field (optional)
     pub fn mod_tool(
         mut self,
-        value: impl Into<Option<create_report::ModTool<'a>>>,
+        value: impl Into<Option<create_report::ModTool<S>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `modTool` field to an Option value (optional)
-    pub fn maybe_mod_tool(mut self, value: Option<create_report::ModTool<'a>>) -> Self {
+    pub fn maybe_mod_tool(mut self, value: Option<create_report::ModTool<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -236,12 +265,12 @@ impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
 
 impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
     /// Set the `reason` field (optional)
-    pub fn reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `reason` field to an Option value (optional)
-    pub fn maybe_reason(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_reason(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -255,7 +284,7 @@ where
     /// Set the `reasonType` field (required)
     pub fn reason_type(
         mut self,
-        value: impl Into<ReasonType<'a>>,
+        value: impl Into<ReasonType<S>>,
     ) -> CreateReportBuilder<'a, create_report_state::SetReasonType<S>> {
         self._fields.2 = Option::Some(value.into());
         CreateReportBuilder {
@@ -274,7 +303,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<CreateReportSubject<'a>>,
+        value: impl Into<CreateReportSubject<S>>,
     ) -> CreateReportBuilder<'a, create_report_state::SetSubject<S>> {
         self._fields.3 = Option::Some(value.into());
         CreateReportBuilder {
@@ -304,7 +333,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CreateReport<'a> {
         CreateReport {
             mod_tool: self._fields.0,

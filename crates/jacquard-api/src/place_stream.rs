@@ -28,12 +28,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -44,40 +46,55 @@ use crate::app_bsky::actor::ProfileViewBasic;
 use crate::app_bsky::graph::block::Block;
 use crate::place_stream;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BlockView<'a> {
-    #[serde(borrow)]
-    pub blocker: ProfileViewBasic<'a>,
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BlockView<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub blocker: ProfileViewBasic<S>,
+    pub cid: Cid<S>,
     pub indexed_at: Datetime,
-    #[serde(borrow)]
-    pub record: Block<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub record: Block<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Rendition<'a> {
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Rendition<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Renditions<'a> {
-    #[serde(borrow)]
-    pub renditions: Vec<place_stream::Rendition<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Renditions<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub renditions: Vec<place_stream::Rendition<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for BlockView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BlockView<S> {
     fn nsid() -> &'static str {
         "place.stream.defs"
     }
@@ -92,7 +109,7 @@ impl<'a> LexiconSchema for BlockView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Rendition<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Rendition<S> {
     fn nsid() -> &'static str {
         "place.stream.defs"
     }
@@ -107,7 +124,7 @@ impl<'a> LexiconSchema for Rendition<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Renditions<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Renditions<S> {
     fn nsid() -> &'static str {
         "place.stream.defs"
     }
@@ -132,85 +149,85 @@ pub mod block_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
-        type Uri;
-        type IndexedAt;
-        type Cid;
         type Blocker;
+        type Cid;
+        type Uri;
+        type Record;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
-        type Uri = Unset;
-        type IndexedAt = Unset;
-        type Cid = Unset;
         type Blocker = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Blocker = S::Blocker;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Record = S::Record;
-        type Uri = Set<members::uri>;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Blocker = S::Blocker;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Record = S::Record;
-        type Uri = S::Uri;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
-        type Blocker = S::Blocker;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Record = S::Record;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
-        type Blocker = S::Blocker;
+        type Cid = Unset;
+        type Uri = Unset;
+        type Record = Unset;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `blocker` field to Set
     pub struct SetBlocker<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlocker<S> {}
     impl<S: State> State for SetBlocker<S> {
-        type Record = S::Record;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Blocker = Set<members::blocker>;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Blocker = S::Blocker;
+        type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Blocker = S::Blocker;
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Blocker = S::Blocker;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Record = Set<members::record>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Blocker = S::Blocker;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `blocker` field
         pub struct blocker(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
@@ -218,11 +235,11 @@ pub mod block_view_state {
 pub struct BlockViewBuilder<'a, S: block_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ProfileViewBasic<'a>>,
-        Option<Cid<'a>>,
+        Option<ProfileViewBasic<S>>,
+        Option<Cid<S>>,
         Option<Datetime>,
-        Option<Block<'a>>,
-        Option<AtUri<'a>>,
+        Option<Block<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -253,7 +270,7 @@ where
     /// Set the `blocker` field (required)
     pub fn blocker(
         mut self,
-        value: impl Into<ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<S>>,
     ) -> BlockViewBuilder<'a, block_view_state::SetBlocker<S>> {
         self._fields.0 = Option::Some(value.into());
         BlockViewBuilder {
@@ -272,7 +289,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> BlockViewBuilder<'a, block_view_state::SetCid<S>> {
         self._fields.1 = Option::Some(value.into());
         BlockViewBuilder {
@@ -310,7 +327,7 @@ where
     /// Set the `record` field (required)
     pub fn record(
         mut self,
-        value: impl Into<Block<'a>>,
+        value: impl Into<Block<S>>,
     ) -> BlockViewBuilder<'a, block_view_state::SetRecord<S>> {
         self._fields.3 = Option::Some(value.into());
         BlockViewBuilder {
@@ -329,7 +346,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> BlockViewBuilder<'a, block_view_state::SetUri<S>> {
         self._fields.4 = Option::Some(value.into());
         BlockViewBuilder {
@@ -343,11 +360,11 @@ where
 impl<'a, S> BlockViewBuilder<'a, S>
 where
     S: block_view_state::State,
-    S::Record: block_view_state::IsSet,
-    S::Uri: block_view_state::IsSet,
-    S::IndexedAt: block_view_state::IsSet,
-    S::Cid: block_view_state::IsSet,
     S::Blocker: block_view_state::IsSet,
+    S::Cid: block_view_state::IsSet,
+    S::Uri: block_view_state::IsSet,
+    S::Record: block_view_state::IsSet,
+    S::IndexedAt: block_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlockView<'a> {
@@ -363,10 +380,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BlockView<'a> {
         BlockView {
             blocker: self._fields.0.unwrap(),
@@ -524,7 +538,7 @@ pub mod renditions_state {
 /// Builder for constructing an instance of this type
 pub struct RenditionsBuilder<'a, S: renditions_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<place_stream::Rendition<'a>>>,),
+    _fields: (Option<Vec<place_stream::Rendition<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -554,7 +568,7 @@ where
     /// Set the `renditions` field (required)
     pub fn renditions(
         mut self,
-        value: impl Into<Vec<place_stream::Rendition<'a>>>,
+        value: impl Into<Vec<place_stream::Rendition<S>>>,
     ) -> RenditionsBuilder<'a, renditions_state::SetRenditions<S>> {
         self._fields.0 = Option::Some(value.into());
         RenditionsBuilder {
@@ -580,10 +594,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Renditions<'a> {
         Renditions {
             renditions: self._fields.0.unwrap(),

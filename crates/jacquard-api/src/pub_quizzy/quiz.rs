@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, Language};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,14 +31,20 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::pub_quizzy::quiz;
 /// A quiz containing one or more rounds of questions
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "pub.quizzy.quiz", tag = "$type")]
-pub struct Quiz<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "pub.quizzy.quiz",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Quiz<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///A short description about the quiz, and what to expect from it
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///This quiz includes questions with audio, eg. a music round  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_quiz_has_audio")]
@@ -49,70 +57,80 @@ pub struct Quiz<'a> {
     pub locales: Vec<Language>,
     ///If this is an edit or revision of a previous quiz, link that previous version here.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub revision_of: Option<StrongRef<'a>>,
+    pub revision_of: Option<StrongRef<S>>,
     ///Ordered list of rounds in this quiz
-    #[serde(borrow)]
-    pub rounds: Vec<quiz::Round<'a>>,
+    pub rounds: Vec<quiz::Round<S>>,
     ///When this quiz was created
     pub timestamp: Datetime,
     ///A title for the quiz
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct QuizGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct QuizGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Quiz<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Quiz<S>,
 }
 
 /// Reference to a question with its point value
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct QuestionRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct QuestionRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///A custom name for this question, as opposed to its number
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///Points awarded for complete correctness  Defaults to `1`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_question_ref_points")]
     pub points: Option<i64>,
-    #[serde(borrow)]
-    pub question: StrongRef<'a>,
+    pub question: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A round within a quiz
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Round<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Round<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Ordered list of questions in this round
-    #[serde(borrow)]
-    pub questions: Vec<quiz::QuestionRef<'a>>,
+    pub questions: Vec<quiz::QuestionRef<S>>,
     ///Optional title for this round (requires locale if set)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Quiz<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, QuizRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Quiz<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, QuizRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -123,18 +141,17 @@ pub struct QuizRecord;
 impl XrpcResp for QuizRecord {
     const NSID: &'static str = "pub.quizzy.quiz";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = QuizGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = QuizGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<QuizGetRecordOutput<'_>> for Quiz<'_> {
-    fn from(output: QuizGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<QuizGetRecordOutput<S>> for Quiz<S> {
+    fn from(output: QuizGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Quiz<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Quiz<S> {
     const NSID: &'static str = "pub.quizzy.quiz";
     type Record = QuizRecord;
 }
@@ -144,7 +161,7 @@ impl Collection for QuizRecord {
     type Record = QuizRecord;
 }
 
-impl<'a> LexiconSchema for Quiz<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Quiz<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.quiz"
     }
@@ -225,7 +242,7 @@ impl<'a> LexiconSchema for Quiz<'a> {
     }
 }
 
-impl<'a> LexiconSchema for QuestionRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for QuestionRef<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.quiz"
     }
@@ -271,7 +288,7 @@ impl<'a> LexiconSchema for QuestionRef<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Round<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Round<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.quiz"
     }
@@ -348,65 +365,65 @@ pub mod quiz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Locales;
-        type Rounds;
         type Title;
+        type Rounds;
+        type Locales;
         type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Locales = Unset;
-        type Rounds = Unset;
         type Title = Unset;
+        type Rounds = Unset;
+        type Locales = Unset;
         type Timestamp = Unset;
     }
-    ///State transition - sets the `locales` field to Set
-    pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocales<S> {}
-    impl<S: State> State for SetLocales<S> {
-        type Locales = Set<members::locales>;
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
         type Rounds = S::Rounds;
-        type Title = S::Title;
+        type Locales = S::Locales;
         type Timestamp = S::Timestamp;
     }
     ///State transition - sets the `rounds` field to Set
     pub struct SetRounds<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRounds<S> {}
     impl<S: State> State for SetRounds<S> {
-        type Locales = S::Locales;
-        type Rounds = Set<members::rounds>;
         type Title = S::Title;
+        type Rounds = Set<members::rounds>;
+        type Locales = S::Locales;
         type Timestamp = S::Timestamp;
     }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Locales = S::Locales;
+    ///State transition - sets the `locales` field to Set
+    pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocales<S> {}
+    impl<S: State> State for SetLocales<S> {
+        type Title = S::Title;
         type Rounds = S::Rounds;
-        type Title = Set<members::title>;
+        type Locales = Set<members::locales>;
         type Timestamp = S::Timestamp;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type Locales = S::Locales;
-        type Rounds = S::Rounds;
         type Title = S::Title;
+        type Rounds = S::Rounds;
+        type Locales = S::Locales;
         type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `locales` field
-        pub struct locales(());
-        ///Marker type for the `rounds` field
-        pub struct rounds(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `rounds` field
+        pub struct rounds(());
+        ///Marker type for the `locales` field
+        pub struct locales(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
     }
@@ -416,14 +433,14 @@ pub mod quiz_state {
 pub struct QuizBuilder<'a, S: quiz_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<bool>,
         Option<bool>,
         Option<Vec<Language>>,
-        Option<StrongRef<'a>>,
-        Option<Vec<quiz::Round<'a>>>,
+        Option<StrongRef<S>>,
+        Option<Vec<quiz::Round<S>>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -448,12 +465,12 @@ impl<'a> QuizBuilder<'a, quiz_state::Empty> {
 
 impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -506,12 +523,12 @@ where
 
 impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
     /// Set the `revisionOf` field (optional)
-    pub fn revision_of(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn revision_of(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `revisionOf` field to an Option value (optional)
-    pub fn maybe_revision_of(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_revision_of(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -525,7 +542,7 @@ where
     /// Set the `rounds` field (required)
     pub fn rounds(
         mut self,
-        value: impl Into<Vec<quiz::Round<'a>>>,
+        value: impl Into<Vec<quiz::Round<S>>>,
     ) -> QuizBuilder<'a, quiz_state::SetRounds<S>> {
         self._fields.5 = Option::Some(value.into());
         QuizBuilder {
@@ -563,7 +580,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> QuizBuilder<'a, quiz_state::SetTitle<S>> {
         self._fields.7 = Option::Some(value.into());
         QuizBuilder {
@@ -577,9 +594,9 @@ where
 impl<'a, S> QuizBuilder<'a, S>
 where
     S: quiz_state::State,
-    S::Locales: quiz_state::IsSet,
-    S::Rounds: quiz_state::IsSet,
     S::Title: quiz_state::IsSet,
+    S::Rounds: quiz_state::IsSet,
+    S::Locales: quiz_state::IsSet,
     S::Timestamp: quiz_state::IsSet,
 {
     /// Build the final struct
@@ -597,13 +614,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Quiz<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Quiz<'a> {
         Quiz {
             description: self._fields.0,
             has_audio: self._fields.1.or_else(|| Some(false)),
@@ -868,7 +879,7 @@ pub mod question_ref_state {
 /// Builder for constructing an instance of this type
 pub struct QuestionRefBuilder<'a, S: question_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<StrongRef<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -892,12 +903,12 @@ impl<'a> QuestionRefBuilder<'a, question_ref_state::Empty> {
 
 impl<'a, S: question_ref_state::State> QuestionRefBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -924,7 +935,7 @@ where
     /// Set the `question` field (required)
     pub fn question(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> QuestionRefBuilder<'a, question_ref_state::SetQuestion<S>> {
         self._fields.2 = Option::Some(value.into());
         QuestionRefBuilder {
@@ -952,10 +963,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> QuestionRef<'a> {
         QuestionRef {
             name: self._fields.0,
@@ -1001,7 +1009,7 @@ pub mod round_state {
 /// Builder for constructing an instance of this type
 pub struct RoundBuilder<'a, S: round_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<quiz::QuestionRef<'a>>>, Option<CowStr<'a>>),
+    _fields: (Option<Vec<quiz::QuestionRef<S>>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1031,7 +1039,7 @@ where
     /// Set the `questions` field (required)
     pub fn questions(
         mut self,
-        value: impl Into<Vec<quiz::QuestionRef<'a>>>,
+        value: impl Into<Vec<quiz::QuestionRef<S>>>,
     ) -> RoundBuilder<'a, round_state::SetQuestions<S>> {
         self._fields.0 = Option::Some(value.into());
         RoundBuilder {
@@ -1044,12 +1052,12 @@ where
 
 impl<'a, S: round_state::State> RoundBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1069,13 +1077,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Round<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Round<'a> {
         Round {
             questions: self._fields.0.unwrap(),
             title: self._fields.1,

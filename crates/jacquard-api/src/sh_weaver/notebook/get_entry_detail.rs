@@ -10,41 +10,53 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetEntryDetail<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetEntryDetail<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub entry: AtUri<'a>,
+    pub entry: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub notebook_context: Option<AtUri<'a>>,
+    pub notebook_context: Option<AtUri<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetEntryDetailOutput<'a> {
-    #[serde(borrow)]
-    pub entry: EntryView<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetEntryDetailOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub entry: EntryView<S>,
     pub notebook_count: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notebooks: Option<Vec<NotebookView<'a>>>,
-    #[serde(borrow)]
-    pub record: Data<'a>,
+    pub notebooks: Option<Vec<NotebookView<S>>>,
+    pub record: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -53,18 +65,19 @@ pub struct GetEntryDetailOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetEntryDetailError<'a> {
+pub enum GetEntryDetailError {
     #[serde(rename = "EntryNotFound")]
-    EntryNotFound(Option<CowStr<'a>>),
+    EntryNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetEntryDetailError<'_> {
+impl core::fmt::Display for GetEntryDetailError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::EntryNotFound(msg) => {
@@ -74,7 +87,13 @@ impl core::fmt::Display for GetEntryDetailError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -84,11 +103,12 @@ pub struct GetEntryDetailResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryDetailResponse {
     const NSID: &'static str = "sh.weaver.notebook.getEntryDetail";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetEntryDetailOutput<'de>;
-    type Err<'de> = GetEntryDetailError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetEntryDetailOutput<S>;
+    type Err = GetEntryDetailError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryDetail<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetEntryDetail<S> {
     const NSID: &'static str = "sh.weaver.notebook.getEntryDetail";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEntryDetailResponse;
@@ -99,7 +119,7 @@ pub struct GetEntryDetailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryDetailRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryDetail";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetEntryDetail<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetEntryDetail<S>;
     type Response = GetEntryDetailResponse;
 }
 
@@ -138,7 +158,7 @@ pub mod get_entry_detail_state {
 /// Builder for constructing an instance of this type
 pub struct GetEntryDetailBuilder<'a, S: get_entry_detail_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<AtUri<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -168,7 +188,7 @@ where
     /// Set the `entry` field (required)
     pub fn entry(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetEntryDetailBuilder<'a, get_entry_detail_state::SetEntry<S>> {
         self._fields.0 = Option::Some(value.into());
         GetEntryDetailBuilder {
@@ -181,12 +201,12 @@ where
 
 impl<'a, S: get_entry_detail_state::State> GetEntryDetailBuilder<'a, S> {
     /// Set the `notebookContext` field (optional)
-    pub fn notebook_context(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn notebook_context(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `notebookContext` field to an Option value (optional)
-    pub fn maybe_notebook_context(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_notebook_context(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.1 = value;
         self
     }

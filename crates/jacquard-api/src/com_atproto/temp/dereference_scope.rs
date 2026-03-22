@@ -10,29 +10,44 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DereferenceScope<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DereferenceScope<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub scope: CowStr<'a>,
+    pub scope: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DereferenceScopeOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DereferenceScopeOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The full oauth permission scope
-    #[serde(borrow)]
-    pub scope: CowStr<'a>,
+    pub scope: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -41,19 +56,20 @@ pub struct DereferenceScopeOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DereferenceScopeError<'a> {
+pub enum DereferenceScopeError {
     /// An invalid scope reference was provided.
     #[serde(rename = "InvalidScopeReference")]
-    InvalidScopeReference(Option<CowStr<'a>>),
+    InvalidScopeReference(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for DereferenceScopeError<'_> {
+impl core::fmt::Display for DereferenceScopeError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidScopeReference(msg) => {
@@ -63,7 +79,13 @@ impl core::fmt::Display for DereferenceScopeError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -73,11 +95,12 @@ pub struct DereferenceScopeResponse;
 impl jacquard_common::xrpc::XrpcResp for DereferenceScopeResponse {
     const NSID: &'static str = "com.atproto.temp.dereferenceScope";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DereferenceScopeOutput<'de>;
-    type Err<'de> = DereferenceScopeError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DereferenceScopeOutput<S>;
+    type Err = DereferenceScopeError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DereferenceScope<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DereferenceScope<S> {
     const NSID: &'static str = "com.atproto.temp.dereferenceScope";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = DereferenceScopeResponse;
@@ -88,7 +111,7 @@ pub struct DereferenceScopeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DereferenceScopeRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.dereferenceScope";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = DereferenceScope<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DereferenceScope<S>;
     type Response = DereferenceScopeResponse;
 }
 
@@ -127,7 +150,7 @@ pub mod dereference_scope_state {
 /// Builder for constructing an instance of this type
 pub struct DereferenceScopeBuilder<'a, S: dereference_scope_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -157,7 +180,7 @@ where
     /// Set the `scope` field (required)
     pub fn scope(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DereferenceScopeBuilder<'a, dereference_scope_state::SetScope<S>> {
         self._fields.0 = Option::Some(value.into());
         DereferenceScopeBuilder {

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,34 +29,43 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A declaration of a favorite client.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blue.atplane.favClient", tag = "$type")]
-pub struct FavClient<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "blue.atplane.favClient",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FavClient<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Set to your favorite client.
-    #[serde(borrow)]
-    pub fav_client: CowStr<'a>,
+    pub fav_client: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct FavClientGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FavClientGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: FavClient<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: FavClient<S>,
 }
 
-impl<'a> FavClient<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, FavClientRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> FavClient<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, FavClientRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -65,18 +76,17 @@ pub struct FavClientRecord;
 impl XrpcResp for FavClientRecord {
     const NSID: &'static str = "blue.atplane.favClient";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = FavClientGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = FavClientGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<FavClientGetRecordOutput<'_>> for FavClient<'_> {
-    fn from(output: FavClientGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<FavClientGetRecordOutput<S>> for FavClient<S> {
+    fn from(output: FavClientGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for FavClient<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for FavClient<S> {
     const NSID: &'static str = "blue.atplane.favClient";
     type Record = FavClientRecord;
 }
@@ -86,7 +96,7 @@ impl Collection for FavClientRecord {
     type Record = FavClientRecord;
 }
 
-impl<'a> LexiconSchema for FavClient<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FavClient<S> {
     fn nsid() -> &'static str {
         "blue.atplane.favClient"
     }
@@ -147,7 +157,7 @@ pub mod fav_client_state {
 /// Builder for constructing an instance of this type
 pub struct FavClientBuilder<'a, S: fav_client_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -177,7 +187,7 @@ where
     /// Set the `favClient` field (required)
     pub fn fav_client(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> FavClientBuilder<'a, fav_client_state::SetFavClient<S>> {
         self._fields.0 = Option::Some(value.into());
         FavClientBuilder {
@@ -203,10 +213,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> FavClient<'a> {
         FavClient {
             fav_client: self._fields.0.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,61 +30,81 @@ use serde::{Serialize, Deserialize};
 use crate::my_skylights::Item;
 use crate::my_skylights::rel;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "my.skylights.rel", tag = "$type")]
-pub struct Rel<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "my.skylights.rel",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Rel<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finished_at: Option<Vec<Datetime>>,
-    #[serde(borrow)]
-    pub item: Item<'a>,
+    pub item: Item<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub note: Option<rel::Note<'a>>,
+    pub note: Option<rel::Note<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rating: Option<rel::Rating<'a>>,
+    pub rating: Option<rel::Rating<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RelGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RelGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Rel<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Rel<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Note<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Note<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     pub updated_at: Datetime,
-    #[serde(borrow)]
-    pub value: CowStr<'a>,
+    pub value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Rating<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Rating<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     pub value: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Rel<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, RelRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Rel<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, RelRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -93,18 +115,17 @@ pub struct RelRecord;
 impl XrpcResp for RelRecord {
     const NSID: &'static str = "my.skylights.rel";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RelGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RelGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<RelGetRecordOutput<'_>> for Rel<'_> {
-    fn from(output: RelGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<RelGetRecordOutput<S>> for Rel<S> {
+    fn from(output: RelGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Rel<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Rel<S> {
     const NSID: &'static str = "my.skylights.rel";
     type Record = RelRecord;
 }
@@ -114,7 +135,7 @@ impl Collection for RelRecord {
     type Record = RelRecord;
 }
 
-impl<'a> LexiconSchema for Rel<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Rel<S> {
     fn nsid() -> &'static str {
         "my.skylights.rel"
     }
@@ -129,7 +150,7 @@ impl<'a> LexiconSchema for Rel<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Note<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Note<S> {
     fn nsid() -> &'static str {
         "my.skylights.rel"
     }
@@ -144,7 +165,7 @@ impl<'a> LexiconSchema for Note<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Rating<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Rating<S> {
     fn nsid() -> &'static str {
         "my.skylights.rel"
     }
@@ -216,9 +237,9 @@ pub struct RelBuilder<'a, S: rel_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Vec<Datetime>>,
-        Option<Item<'a>>,
-        Option<rel::Note<'a>>,
-        Option<rel::Rating<'a>>,
+        Option<Item<S>>,
+        Option<rel::Note<S>>,
+        Option<rel::Rating<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -262,7 +283,7 @@ where
     /// Set the `item` field (required)
     pub fn item(
         mut self,
-        value: impl Into<Item<'a>>,
+        value: impl Into<Item<S>>,
     ) -> RelBuilder<'a, rel_state::SetItem<S>> {
         self._fields.1 = Option::Some(value.into());
         RelBuilder {
@@ -275,12 +296,12 @@ where
 
 impl<'a, S: rel_state::State> RelBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<rel::Note<'a>>>) -> Self {
+    pub fn note(mut self, value: impl Into<Option<rel::Note<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<rel::Note<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<rel::Note<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -288,12 +309,12 @@ impl<'a, S: rel_state::State> RelBuilder<'a, S> {
 
 impl<'a, S: rel_state::State> RelBuilder<'a, S> {
     /// Set the `rating` field (optional)
-    pub fn rating(mut self, value: impl Into<Option<rel::Rating<'a>>>) -> Self {
+    pub fn rating(mut self, value: impl Into<Option<rel::Rating<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `rating` field to an Option value (optional)
-    pub fn maybe_rating(mut self, value: Option<rel::Rating<'a>>) -> Self {
+    pub fn maybe_rating(mut self, value: Option<rel::Rating<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -315,13 +336,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Rel<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Rel<'a> {
         Rel {
             finished_at: self._fields.0,
             item: self._fields.1.unwrap(),
@@ -524,7 +539,7 @@ pub mod note_state {
 /// Builder for constructing an instance of this type
 pub struct NoteBuilder<'a, S: note_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Datetime>, Option<CowStr<'a>>),
+    _fields: (Option<Datetime>, Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -592,7 +607,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> NoteBuilder<'a, note_state::SetValue<S>> {
         self._fields.2 = Option::Some(value.into());
         NoteBuilder {
@@ -620,13 +635,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Note<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Note<'a> {
         Note {
             created_at: self._fields.0.unwrap(),
             updated_at: self._fields.1.unwrap(),
@@ -646,37 +655,37 @@ pub mod rating_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Value;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Value = S::Value;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type CreatedAt = S::CreatedAt;
         type Value = Set<members::value>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Value = S::Value;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -746,8 +755,8 @@ where
 impl<'a, S> RatingBuilder<'a, S>
 where
     S: rating_state::State,
-    S::CreatedAt: rating_state::IsSet,
     S::Value: rating_state::IsSet,
+    S::CreatedAt: rating_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rating<'a> {
@@ -758,13 +767,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Rating<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Rating<'a> {
         Rating {
             created_at: self._fields.0.unwrap(),
             value: self._fields.1.unwrap(),

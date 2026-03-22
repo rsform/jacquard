@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -33,60 +35,60 @@ use crate::org_hypercerts::claim::activity::ContributorIdentity;
 use crate::org_hyperboards::board;
 /// Visual configuration for a hyperboard's background, colors, and layout.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct BoardConfig<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BoardConfig<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Display aspect ratio of the board.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<BoardConfigAspectRatio<'a>>,
+    pub aspect_ratio: Option<BoardConfigAspectRatio<S>>,
     ///Background color as a hex string (e.g. '#ffffff').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub background_color: Option<CowStr<'a>>,
+    pub background_color: Option<S>,
     ///Whether the background is rendered in grayscale. Default: true.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub background_grayscale: Option<bool>,
     ///URI of the background iframe.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub background_iframe_url: Option<UriValue<'a>>,
+    pub background_iframe_url: Option<UriValue<S>>,
     ///Background image as a URI or image blob.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub background_image: Option<BoardConfigBackgroundImage<'a>>,
+    pub background_image: Option<BoardConfigBackgroundImage<S>>,
     ///Background opacity as a percentage (0–100).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub background_opacity: Option<i64>,
     ///Type of background content.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub background_type: Option<BoardConfigBackgroundType<'a>>,
+    pub background_type: Option<BoardConfigBackgroundType<S>>,
     ///Border color as a hex string (e.g. '#000000').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub border_color: Option<CowStr<'a>>,
+    pub border_color: Option<S>,
     ///Whether contributor images are rendered in grayscale. Default: false.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub grayscale_images: Option<bool>,
     ///Shape used to crop contributor images on this board.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image_shape: Option<BoardConfigImageShape<'a>>,
+    pub image_shape: Option<BoardConfigImageShape<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Display aspect ratio of the board.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum BoardConfigAspectRatio<'a> {
+pub enum BoardConfigAspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
     _169,
     _43,
     _11,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> BoardConfigAspectRatio<'a> {
+impl<S: Bos<str> + AsRef<str>> BoardConfigAspectRatio<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::_169 => "16:9",
@@ -95,72 +97,57 @@ impl<'a> BoardConfigAspectRatio<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for BoardConfigAspectRatio<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "16:9" => Self::_169,
             "4:3" => Self::_43,
             "1:1" => Self::_11,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for BoardConfigAspectRatio<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "16:9" => Self::_169,
-            "4:3" => Self::_43,
-            "1:1" => Self::_11,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for BoardConfigAspectRatio<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for BoardConfigAspectRatio<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for BoardConfigAspectRatio<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for BoardConfigAspectRatio<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for BoardConfigAspectRatio<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for BoardConfigAspectRatio<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for BoardConfigAspectRatio<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for BoardConfigAspectRatio<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for BoardConfigAspectRatio<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for BoardConfigAspectRatio<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for BoardConfigAspectRatio<'_> {
-    type Output = BoardConfigAspectRatio<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for BoardConfigAspectRatio<S> {
+    type Output = BoardConfigAspectRatio<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             BoardConfigAspectRatio::_169 => BoardConfigAspectRatio::_169,
@@ -176,24 +163,30 @@ impl jacquard_common::IntoStatic for BoardConfigAspectRatio<'_> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum BoardConfigBackgroundImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum BoardConfigBackgroundImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallImage")]
-    SmallImage(Box<SmallImage<'a>>),
+    SmallImage(Box<SmallImage<S>>),
 }
 
 /// Type of background content.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum BoardConfigBackgroundType<'a> {
+pub enum BoardConfigBackgroundType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Image,
     Iframe,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> BoardConfigBackgroundType<'a> {
+impl<S: Bos<str> + AsRef<str>> BoardConfigBackgroundType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Image => "image",
@@ -201,70 +194,56 @@ impl<'a> BoardConfigBackgroundType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for BoardConfigBackgroundType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "image" => Self::Image,
             "iframe" => Self::Iframe,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for BoardConfigBackgroundType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "image" => Self::Image,
-            "iframe" => Self::Iframe,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for BoardConfigBackgroundType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for BoardConfigBackgroundType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for BoardConfigBackgroundType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for BoardConfigBackgroundType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for BoardConfigBackgroundType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for BoardConfigBackgroundType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for BoardConfigBackgroundType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for BoardConfigBackgroundType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for BoardConfigBackgroundType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for BoardConfigBackgroundType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for BoardConfigBackgroundType<'_> {
-    type Output = BoardConfigBackgroundType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for BoardConfigBackgroundType<S> {
+    type Output = BoardConfigBackgroundType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             BoardConfigBackgroundType::Image => BoardConfigBackgroundType::Image,
@@ -279,13 +258,13 @@ impl jacquard_common::IntoStatic for BoardConfigBackgroundType<'_> {
 /// Shape used to crop contributor images on this board.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum BoardConfigImageShape<'a> {
+pub enum BoardConfigImageShape<S: Bos<str> + AsRef<str> = DefaultStr> {
     Circular,
     Square,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> BoardConfigImageShape<'a> {
+impl<S: Bos<str> + AsRef<str>> BoardConfigImageShape<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Circular => "circular",
@@ -293,70 +272,56 @@ impl<'a> BoardConfigImageShape<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for BoardConfigImageShape<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "circular" => Self::Circular,
             "square" => Self::Square,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for BoardConfigImageShape<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "circular" => Self::Circular,
-            "square" => Self::Square,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for BoardConfigImageShape<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for BoardConfigImageShape<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for BoardConfigImageShape<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for BoardConfigImageShape<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for BoardConfigImageShape<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for BoardConfigImageShape<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for BoardConfigImageShape<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for BoardConfigImageShape<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for BoardConfigImageShape<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for BoardConfigImageShape<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for BoardConfigImageShape<'_> {
-    type Output = BoardConfigImageShape<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for BoardConfigImageShape<S> {
+    type Output = BoardConfigImageShape<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             BoardConfigImageShape::Circular => BoardConfigImageShape::Circular,
@@ -370,130 +335,161 @@ impl jacquard_common::IntoStatic for BoardConfigImageShape<'_> {
 
 /// Configuration for a specific contributor within a board. Values serve as fallbacks when the contributor has not defined them on their profile. It can also be used to override contributor settings on this board without changing their global profile.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ContributorConfig<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ContributorConfig<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Identifies the contributor being styled. A strong reference to an org.hypercerts.claim.contributorInformation record, or a contributorIdentity (DID or identifier string) for contributors without a dedicated record.
-    #[serde(borrow)]
-    pub contributor: ContributorConfigContributor<'a>,
+    pub contributor: ContributorConfigContributor<S>,
     ///Display name for this contributor on this board.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     ///Iframe overlay shown when hovering over this contributor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub hover_iframe_url: Option<UriValue<'a>>,
+    pub hover_iframe_url: Option<UriValue<S>>,
     ///Image overlay shown when hovering over this contributor, as a URI or image blob.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub hover_image: Option<ContributorConfigHoverImage<'a>>,
+    pub hover_image: Option<ContributorConfigHoverImage<S>>,
     ///Avatar or face image for this contributor on this board, as a URI or image blob.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<ContributorConfigImage<'a>>,
+    pub image: Option<ContributorConfigImage<S>>,
     ///When true, these values take precedence over the contributor's own profile and display settings. When false or omitted, they are only used as fallbacks if the contributor has not set their own settings.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#override: Option<bool>,
     ///Click-through link URL for this contributor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<UriValue<'a>>,
+    pub url: Option<UriValue<S>>,
     ///Video for this contributor, as a URI (embed/direct link) or uploaded video blob.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub video: Option<ContributorConfigVideo<'a>>,
+    pub video: Option<ContributorConfigVideo<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ContributorConfigContributor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ContributorConfigContributor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<StrongRef<'a>>),
+    StrongRef(Box<StrongRef<S>>),
     #[serde(rename = "org.hypercerts.claim.activity#contributorIdentity")]
-    ActivityContributorIdentity(Box<ContributorIdentity<'a>>),
+    ActivityContributorIdentity(Box<ContributorIdentity<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ContributorConfigHoverImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ContributorConfigHoverImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallImage")]
-    SmallImage(Box<SmallImage<'a>>),
+    SmallImage(Box<SmallImage<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ContributorConfigImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ContributorConfigImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallImage")]
-    SmallImage(Box<SmallImage<'a>>),
+    SmallImage(Box<SmallImage<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ContributorConfigVideo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ContributorConfigVideo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallVideo")]
-    SmallVideo(Box<SmallVideo<'a>>),
+    SmallVideo(Box<SmallVideo<S>>),
 }
 
 /// Configuration record for a hyperboard, wrapping an underlying activity or collection with visual presentation settings. Stored in the creator's PDS.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "org.hyperboards.board", tag = "$type")]
-pub struct Board<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.hyperboards.board",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Board<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Board-level visual configuration (background, colors, aspect ratio).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub config: Option<board::BoardConfig<'a>>,
+    pub config: Option<board::BoardConfig<S>>,
     ///Per-contributor configuration entries for this board.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contributor_configs: Option<Vec<board::ContributorConfig<'a>>>,
+    pub contributor_configs: Option<Vec<board::ContributorConfig<S>>>,
     ///Client-declared timestamp when this record was originally created.
     pub created_at: Datetime,
     ///Reference to the org.hypercerts.claim.activity or org.hypercerts.claim.collection this board visualizes.
-    #[serde(borrow)]
-    pub subject: StrongRef<'a>,
+    pub subject: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BoardGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BoardGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Board<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Board<S>,
 }
 
-impl<'a> Board<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, BoardRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Board<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, BoardRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for BoardConfig<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BoardConfig<S> {
     fn nsid() -> &'static str {
         "org.hyperboards.board"
     }
@@ -586,7 +582,7 @@ impl<'a> LexiconSchema for BoardConfig<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ContributorConfig<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ContributorConfig<S> {
     fn nsid() -> &'static str {
         "org.hyperboards.board"
     }
@@ -650,18 +646,17 @@ pub struct BoardRecord;
 impl XrpcResp for BoardRecord {
     const NSID: &'static str = "org.hyperboards.board";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BoardGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BoardGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<BoardGetRecordOutput<'_>> for Board<'_> {
-    fn from(output: BoardGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<BoardGetRecordOutput<S>> for Board<S> {
+    fn from(output: BoardGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Board<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Board<S> {
     const NSID: &'static str = "org.hyperboards.board";
     type Record = BoardRecord;
 }
@@ -671,7 +666,7 @@ impl Collection for BoardRecord {
     type Record = BoardRecord;
 }
 
-impl<'a> LexiconSchema for Board<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Board<S> {
     fn nsid() -> &'static str {
         "org.hyperboards.board"
     }
@@ -1056,14 +1051,14 @@ pub mod contributor_config_state {
 pub struct ContributorConfigBuilder<'a, S: contributor_config_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ContributorConfigContributor<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<ContributorConfigHoverImage<'a>>,
-        Option<ContributorConfigImage<'a>>,
+        Option<ContributorConfigContributor<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<ContributorConfigHoverImage<S>>,
+        Option<ContributorConfigImage<S>>,
         Option<bool>,
-        Option<UriValue<'a>>,
-        Option<ContributorConfigVideo<'a>>,
+        Option<UriValue<S>>,
+        Option<ContributorConfigVideo<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1094,7 +1089,7 @@ where
     /// Set the `contributor` field (required)
     pub fn contributor(
         mut self,
-        value: impl Into<ContributorConfigContributor<'a>>,
+        value: impl Into<ContributorConfigContributor<S>>,
     ) -> ContributorConfigBuilder<'a, contributor_config_state::SetContributor<S>> {
         self._fields.0 = Option::Some(value.into());
         ContributorConfigBuilder {
@@ -1107,12 +1102,12 @@ where
 
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1120,12 +1115,12 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
 
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `hoverIframeUrl` field (optional)
-    pub fn hover_iframe_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn hover_iframe_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `hoverIframeUrl` field to an Option value (optional)
-    pub fn maybe_hover_iframe_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_hover_iframe_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1135,7 +1130,7 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `hoverImage` field (optional)
     pub fn hover_image(
         mut self,
-        value: impl Into<Option<ContributorConfigHoverImage<'a>>>,
+        value: impl Into<Option<ContributorConfigHoverImage<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -1143,7 +1138,7 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `hoverImage` field to an Option value (optional)
     pub fn maybe_hover_image(
         mut self,
-        value: Option<ContributorConfigHoverImage<'a>>,
+        value: Option<ContributorConfigHoverImage<S>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -1152,15 +1147,12 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
 
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(
-        mut self,
-        value: impl Into<Option<ContributorConfigImage<'a>>>,
-    ) -> Self {
+    pub fn image(mut self, value: impl Into<Option<ContributorConfigImage<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<ContributorConfigImage<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<ContributorConfigImage<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1181,12 +1173,12 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
 
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -1194,15 +1186,12 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
 
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `video` field (optional)
-    pub fn video(
-        mut self,
-        value: impl Into<Option<ContributorConfigVideo<'a>>>,
-    ) -> Self {
+    pub fn video(mut self, value: impl Into<Option<ContributorConfigVideo<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
-    pub fn maybe_video(mut self, value: Option<ContributorConfigVideo<'a>>) -> Self {
+    pub fn maybe_video(mut self, value: Option<ContributorConfigVideo<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -1230,10 +1219,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ContributorConfig<'a> {
         ContributorConfig {
             contributor: self._fields.0.unwrap(),
@@ -1297,10 +1283,10 @@ pub mod board_state {
 pub struct BoardBuilder<'a, S: board_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<board::BoardConfig<'a>>,
-        Option<Vec<board::ContributorConfig<'a>>>,
+        Option<board::BoardConfig<S>>,
+        Option<Vec<board::ContributorConfig<S>>>,
         Option<Datetime>,
-        Option<StrongRef<'a>>,
+        Option<StrongRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1325,12 +1311,12 @@ impl<'a> BoardBuilder<'a, board_state::Empty> {
 
 impl<'a, S: board_state::State> BoardBuilder<'a, S> {
     /// Set the `config` field (optional)
-    pub fn config(mut self, value: impl Into<Option<board::BoardConfig<'a>>>) -> Self {
+    pub fn config(mut self, value: impl Into<Option<board::BoardConfig<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `config` field to an Option value (optional)
-    pub fn maybe_config(mut self, value: Option<board::BoardConfig<'a>>) -> Self {
+    pub fn maybe_config(mut self, value: Option<board::BoardConfig<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1340,7 +1326,7 @@ impl<'a, S: board_state::State> BoardBuilder<'a, S> {
     /// Set the `contributorConfigs` field (optional)
     pub fn contributor_configs(
         mut self,
-        value: impl Into<Option<Vec<board::ContributorConfig<'a>>>>,
+        value: impl Into<Option<Vec<board::ContributorConfig<S>>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -1348,7 +1334,7 @@ impl<'a, S: board_state::State> BoardBuilder<'a, S> {
     /// Set the `contributorConfigs` field to an Option value (optional)
     pub fn maybe_contributor_configs(
         mut self,
-        value: Option<Vec<board::ContributorConfig<'a>>>,
+        value: Option<Vec<board::ContributorConfig<S>>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -1382,7 +1368,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> BoardBuilder<'a, board_state::SetSubject<S>> {
         self._fields.3 = Option::Some(value.into());
         BoardBuilder {
@@ -1410,13 +1396,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Board<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Board<'a> {
         Board {
             config: self._fields.0,
             contributor_configs: self._fields.1,

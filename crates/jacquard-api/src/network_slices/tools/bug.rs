@@ -15,13 +15,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -33,49 +35,49 @@ use serde::{Serialize, Deserialize};
 use crate::network_slices::tools::Images;
 use crate::network_slices::tools::richtext::facet::Facet;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "network.slices.tools.bug", tag = "$type")]
-pub struct Bug<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "network.slices.tools.bug",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Bug<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub app_used: Option<CowStr<'a>>,
+    pub app_used: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub attachments: Option<Images<'a>>,
+    pub attachments: Option<Images<S>>,
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub description: CowStr<'a>,
+    pub description: S,
     ///Annotations of description (mentions and links)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description_facets: Option<Vec<Facet<'a>>>,
+    pub description_facets: Option<Vec<Facet<S>>>,
     ///Target namespace like 'social.grain' or 'app.bsky'
-    #[serde(borrow)]
-    pub namespace: CowStr<'a>,
-    #[serde(borrow)]
-    pub severity: BugSeverity<'a>,
-    #[serde(borrow)]
-    pub steps_to_reproduce: CowStr<'a>,
+    pub namespace: S,
+    pub severity: BugSeverity<S>,
+    pub steps_to_reproduce: S,
     ///Annotations of steps to reproduce (mentions and links)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub steps_to_reproduce_facets: Option<Vec<Facet<'a>>>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub steps_to_reproduce_facets: Option<Vec<Facet<S>>>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum BugSeverity<'a> {
+pub enum BugSeverity<S: Bos<str> + AsRef<str> = DefaultStr> {
     Cosmetic,
     Annoying,
     Broken,
     Unusable,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> BugSeverity<'a> {
+impl<S: Bos<str> + AsRef<str>> BugSeverity<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Cosmetic => "cosmetic",
@@ -85,74 +87,58 @@ impl<'a> BugSeverity<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for BugSeverity<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "cosmetic" => Self::Cosmetic,
             "annoying" => Self::Annoying,
             "broken" => Self::Broken,
             "unusable" => Self::Unusable,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for BugSeverity<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "cosmetic" => Self::Cosmetic,
-            "annoying" => Self::Annoying,
-            "broken" => Self::Broken,
-            "unusable" => Self::Unusable,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for BugSeverity<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for BugSeverity<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for BugSeverity<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for BugSeverity<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for BugSeverity<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for BugSeverity<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for BugSeverity<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for BugSeverity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for BugSeverity<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for BugSeverity<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for BugSeverity<'_> {
-    type Output = BugSeverity<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for BugSeverity<S> {
+    type Output = BugSeverity<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             BugSeverity::Cosmetic => BugSeverity::Cosmetic,
@@ -167,22 +153,23 @@ impl jacquard_common::IntoStatic for BugSeverity<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BugGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BugGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Bug<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Bug<S>,
 }
 
-impl<'a> Bug<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, BugRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Bug<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, BugRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -193,18 +180,17 @@ pub struct BugRecord;
 impl XrpcResp for BugRecord {
     const NSID: &'static str = "network.slices.tools.bug";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BugGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BugGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<BugGetRecordOutput<'_>> for Bug<'_> {
-    fn from(output: BugGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<BugGetRecordOutput<S>> for Bug<S> {
+    fn from(output: BugGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Bug<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Bug<S> {
     const NSID: &'static str = "network.slices.tools.bug";
     type Record = BugRecord;
 }
@@ -214,7 +200,7 @@ impl Collection for BugRecord {
     type Record = BugRecord;
 }
 
-impl<'a> LexiconSchema for Bug<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bug<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.bug"
     }
@@ -321,105 +307,105 @@ pub mod bug_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StepsToReproduce;
-        type Title;
         type Namespace;
-        type Description;
         type Severity;
+        type StepsToReproduce;
+        type Description;
         type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StepsToReproduce = Unset;
-        type Title = Unset;
         type Namespace = Unset;
-        type Description = Unset;
         type Severity = Unset;
+        type StepsToReproduce = Unset;
+        type Description = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `steps_to_reproduce` field to Set
-    pub struct SetStepsToReproduce<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStepsToReproduce<S> {}
-    impl<S: State> State for SetStepsToReproduce<S> {
-        type StepsToReproduce = Set<members::steps_to_reproduce>;
-        type Title = S::Title;
-        type Namespace = S::Namespace;
-        type Description = S::Description;
-        type Severity = S::Severity;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type StepsToReproduce = S::StepsToReproduce;
-        type Title = Set<members::title>;
-        type Namespace = S::Namespace;
-        type Description = S::Description;
-        type Severity = S::Severity;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
     }
     ///State transition - sets the `namespace` field to Set
     pub struct SetNamespace<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNamespace<S> {}
     impl<S: State> State for SetNamespace<S> {
-        type StepsToReproduce = S::StepsToReproduce;
-        type Title = S::Title;
         type Namespace = Set<members::namespace>;
-        type Description = S::Description;
         type Severity = S::Severity;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
         type StepsToReproduce = S::StepsToReproduce;
-        type Title = S::Title;
-        type Namespace = S::Namespace;
-        type Description = Set<members::description>;
-        type Severity = S::Severity;
+        type Description = S::Description;
         type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
     }
     ///State transition - sets the `severity` field to Set
     pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeverity<S> {}
     impl<S: State> State for SetSeverity<S> {
-        type StepsToReproduce = S::StepsToReproduce;
-        type Title = S::Title;
         type Namespace = S::Namespace;
-        type Description = S::Description;
         type Severity = Set<members::severity>;
+        type StepsToReproduce = S::StepsToReproduce;
+        type Description = S::Description;
         type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `steps_to_reproduce` field to Set
+    pub struct SetStepsToReproduce<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStepsToReproduce<S> {}
+    impl<S: State> State for SetStepsToReproduce<S> {
+        type Namespace = S::Namespace;
+        type Severity = S::Severity;
+        type StepsToReproduce = Set<members::steps_to_reproduce>;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Namespace = S::Namespace;
+        type Severity = S::Severity;
+        type StepsToReproduce = S::StepsToReproduce;
+        type Description = Set<members::description>;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type StepsToReproduce = S::StepsToReproduce;
-        type Title = S::Title;
         type Namespace = S::Namespace;
-        type Description = S::Description;
         type Severity = S::Severity;
+        type StepsToReproduce = S::StepsToReproduce;
+        type Description = S::Description;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Namespace = S::Namespace;
+        type Severity = S::Severity;
+        type StepsToReproduce = S::StepsToReproduce;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `steps_to_reproduce` field
-        pub struct steps_to_reproduce(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `namespace` field
         pub struct namespace(());
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `severity` field
         pub struct severity(());
+        ///Marker type for the `steps_to_reproduce` field
+        pub struct steps_to_reproduce(());
+        ///Marker type for the `description` field
+        pub struct description(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -427,16 +413,16 @@ pub mod bug_state {
 pub struct BugBuilder<'a, S: bug_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<Images<'a>>,
+        Option<S>,
+        Option<Images<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<CowStr<'a>>,
-        Option<BugSeverity<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<S>,
+        Option<BugSeverity<S>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -461,12 +447,12 @@ impl<'a> BugBuilder<'a, bug_state::Empty> {
 
 impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     /// Set the `appUsed` field (optional)
-    pub fn app_used(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn app_used(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `appUsed` field to an Option value (optional)
-    pub fn maybe_app_used(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_app_used(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -474,12 +460,12 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
 
 impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     /// Set the `attachments` field (optional)
-    pub fn attachments(mut self, value: impl Into<Option<Images<'a>>>) -> Self {
+    pub fn attachments(mut self, value: impl Into<Option<Images<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `attachments` field to an Option value (optional)
-    pub fn maybe_attachments(mut self, value: Option<Images<'a>>) -> Self {
+    pub fn maybe_attachments(mut self, value: Option<Images<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -512,7 +498,7 @@ where
     /// Set the `description` field (required)
     pub fn description(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BugBuilder<'a, bug_state::SetDescription<S>> {
         self._fields.3 = Option::Some(value.into());
         BugBuilder {
@@ -527,13 +513,13 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
-        value: impl Into<Option<Vec<Facet<'a>>>>,
+        value: impl Into<Option<Vec<Facet<S>>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
-    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -547,7 +533,7 @@ where
     /// Set the `namespace` field (required)
     pub fn namespace(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BugBuilder<'a, bug_state::SetNamespace<S>> {
         self._fields.5 = Option::Some(value.into());
         BugBuilder {
@@ -566,7 +552,7 @@ where
     /// Set the `severity` field (required)
     pub fn severity(
         mut self,
-        value: impl Into<BugSeverity<'a>>,
+        value: impl Into<BugSeverity<S>>,
     ) -> BugBuilder<'a, bug_state::SetSeverity<S>> {
         self._fields.6 = Option::Some(value.into());
         BugBuilder {
@@ -585,7 +571,7 @@ where
     /// Set the `stepsToReproduce` field (required)
     pub fn steps_to_reproduce(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BugBuilder<'a, bug_state::SetStepsToReproduce<S>> {
         self._fields.7 = Option::Some(value.into());
         BugBuilder {
@@ -600,7 +586,7 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     /// Set the `stepsToReproduceFacets` field (optional)
     pub fn steps_to_reproduce_facets(
         mut self,
-        value: impl Into<Option<Vec<Facet<'a>>>>,
+        value: impl Into<Option<Vec<Facet<S>>>>,
     ) -> Self {
         self._fields.8 = value.into();
         self
@@ -608,7 +594,7 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     /// Set the `stepsToReproduceFacets` field to an Option value (optional)
     pub fn maybe_steps_to_reproduce_facets(
         mut self,
-        value: Option<Vec<Facet<'a>>>,
+        value: Option<Vec<Facet<S>>>,
     ) -> Self {
         self._fields.8 = value;
         self
@@ -623,7 +609,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BugBuilder<'a, bug_state::SetTitle<S>> {
         self._fields.9 = Option::Some(value.into());
         BugBuilder {
@@ -637,12 +623,12 @@ where
 impl<'a, S> BugBuilder<'a, S>
 where
     S: bug_state::State,
-    S::StepsToReproduce: bug_state::IsSet,
-    S::Title: bug_state::IsSet,
     S::Namespace: bug_state::IsSet,
-    S::Description: bug_state::IsSet,
     S::Severity: bug_state::IsSet,
+    S::StepsToReproduce: bug_state::IsSet,
+    S::Description: bug_state::IsSet,
     S::CreatedAt: bug_state::IsSet,
+    S::Title: bug_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Bug<'a> {
@@ -661,13 +647,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Bug<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Bug<'a> {
         Bug {
             app_used: self._fields.0,
             attachments: self._fields.1,

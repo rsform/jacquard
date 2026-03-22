@@ -10,8 +10,10 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -24,12 +26,20 @@ pub struct GetSuggestedAuthors {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSuggestedAuthorsOutput<'a> {
-    #[serde(borrow)]
-    pub authors: Vec<Data<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSuggestedAuthorsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub authors: Vec<Data<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.actor.getSuggestedAuthors
@@ -37,8 +47,8 @@ pub struct GetSuggestedAuthorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedAuthorsResponse {
     const NSID: &'static str = "sh.weaver.actor.getSuggestedAuthors";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestedAuthorsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetSuggestedAuthorsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetSuggestedAuthors {
@@ -52,7 +62,7 @@ pub struct GetSuggestedAuthorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedAuthorsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.actor.getSuggestedAuthors";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSuggestedAuthors;
+    type Request<S: Bos<str> + AsRef<str>> = GetSuggestedAuthors;
     type Response = GetSuggestedAuthorsResponse;
 }
 

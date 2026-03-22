@@ -7,17 +7,23 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Log<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Log<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -26,11 +32,11 @@ pub struct Log<'a> {
     #[serde(default = "_default_path")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub path: Option<CowStr<'a>>,
+    pub path: Option<S>,
     #[serde(borrow)]
-    pub r#ref: CowStr<'a>,
+    pub r#ref: S,
     #[serde(borrow)]
-    pub repo: CowStr<'a>,
+    pub repo: S,
 }
 
 
@@ -41,7 +47,6 @@ pub struct LogOutput {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -50,28 +55,32 @@ pub struct LogOutput {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum LogError<'a> {
+pub enum LogError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(Option<CowStr<'a>>),
+    RefNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Path not found in repository
     #[serde(rename = "PathNotFound")]
-    PathNotFound(Option<CowStr<'a>>),
+    PathNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for LogError<'_> {
+impl core::fmt::Display for LogError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -102,7 +111,13 @@ impl core::fmt::Display for LogError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -112,18 +127,22 @@ pub struct LogResponse;
 impl jacquard_common::xrpc::XrpcResp for LogResponse {
     const NSID: &'static str = "sh.tangled.repo.log";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = LogOutput;
-    type Err<'de> = LogError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = LogOutput;
+    type Err = LogError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(LogOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -131,7 +150,8 @@ impl jacquard_common::xrpc::XrpcResp for LogResponse {
     }
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Log<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Log<S> {
     const NSID: &'static str = "sh.tangled.repo.log";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = LogResponse;
@@ -142,7 +162,7 @@ pub struct LogRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LogRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.log";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Log<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Log<S>;
     type Response = LogResponse;
 }
 
@@ -201,13 +221,7 @@ pub mod log_state {
 /// Builder for constructing an instance of this type
 pub struct LogBuilder<'a, S: log_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<i64>, Option<S>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -231,12 +245,12 @@ impl<'a> LogBuilder<'a, log_state::Empty> {
 
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -257,12 +271,12 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
 
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `path` field (optional)
-    pub fn path(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn path(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `path` field to an Option value (optional)
-    pub fn maybe_path(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_path(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -274,10 +288,7 @@ where
     S::Ref: log_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(
-        mut self,
-        value: impl Into<CowStr<'a>>,
-    ) -> LogBuilder<'a, log_state::SetRef<S>> {
+    pub fn r#ref(mut self, value: impl Into<S>) -> LogBuilder<'a, log_state::SetRef<S>> {
         self._fields.3 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
@@ -293,10 +304,7 @@ where
     S::Repo: log_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<CowStr<'a>>,
-    ) -> LogBuilder<'a, log_state::SetRepo<S>> {
+    pub fn repo(mut self, value: impl Into<S>) -> LogBuilder<'a, log_state::SetRepo<S>> {
         self._fields.4 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,

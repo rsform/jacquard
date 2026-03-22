@@ -10,7 +10,10 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::Label;
 
@@ -26,12 +29,20 @@ pub struct FetchLabels {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct FetchLabelsOutput<'a> {
-    #[serde(borrow)]
-    pub labels: Vec<Label<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FetchLabelsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub labels: Vec<Label<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.atproto.temp.fetchLabels
@@ -39,8 +50,8 @@ pub struct FetchLabelsResponse;
 impl jacquard_common::xrpc::XrpcResp for FetchLabelsResponse {
     const NSID: &'static str = "com.atproto.temp.fetchLabels";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = FetchLabelsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = FetchLabelsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for FetchLabels {
@@ -54,7 +65,7 @@ pub struct FetchLabelsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for FetchLabelsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.fetchLabels";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = FetchLabels;
+    type Request<S: Bos<str> + AsRef<str>> = FetchLabels;
     type Response = FetchLabelsResponse;
 }
 

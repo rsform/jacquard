@@ -10,19 +10,37 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteUserData<'a> {}
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteUserData<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
 
-#[lexicon]
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteUserDataOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteUserDataOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether the user's crew record was deleted (false if user is captain)
     pub crew_deleted: bool,
     ///Number of layer records deleted
@@ -31,10 +49,13 @@ pub struct DeleteUserDataOutput<'a> {
     pub stats_deleted: i64,
     ///Whether the deletion completed successfully
     pub success: bool,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -43,20 +64,21 @@ pub struct DeleteUserDataOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteUserDataError<'a> {
+pub enum DeleteUserDataError {
     #[serde(rename = "AuthRequired")]
-    AuthRequired(Option<CowStr<'a>>),
+    AuthRequired(Option<SmolStr>),
     #[serde(rename = "DeletionFailed")]
-    DeletionFailed(Option<CowStr<'a>>),
+    DeletionFailed(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for DeleteUserDataError<'_> {
+impl core::fmt::Display for DeleteUserDataError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::AuthRequired(msg) => {
@@ -73,7 +95,13 @@ impl core::fmt::Display for DeleteUserDataError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -83,11 +111,12 @@ pub struct DeleteUserDataResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteUserDataResponse {
     const NSID: &'static str = "io.atcr.hold.deleteUserData";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeleteUserDataOutput<'de>;
-    type Err<'de> = DeleteUserDataError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DeleteUserDataOutput<S>;
+    type Err = DeleteUserDataError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteUserData<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DeleteUserData<S> {
     const NSID: &'static str = "io.atcr.hold.deleteUserData";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -102,6 +131,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteUserDataRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DeleteUserData<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DeleteUserData<S>;
     type Response = DeleteUserDataResponse;
 }

@@ -21,16 +21,18 @@ impl core::fmt::Display for ArrowTensor {
 /// Array serialization format identifier for NDArray fields in sample schemas. Known values correspond to token definitions in this Lexicon. Each format has versioned specifications maintained by alt.science at canonical URLs.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ArrayFormat<'a> {
+pub enum ArrayFormat<
+    S: jacquard_common::Bos<str> + AsRef<str> = jacquard_common::DefaultStr,
+> {
     NdarrayBytes,
     SparseBytes,
     StructuredBytes,
     ArrowTensor,
     Safetensors,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ArrayFormat<'a> {
+impl<S: jacquard_common::Bos<str> + AsRef<str>> ArrayFormat<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::NdarrayBytes => "ndarrayBytes",
@@ -41,70 +43,53 @@ impl<'a> ArrayFormat<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ArrayFormat<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "ndarrayBytes" => Self::NdarrayBytes,
             "sparseBytes" => Self::SparseBytes,
             "structuredBytes" => Self::StructuredBytes,
             "arrowTensor" => Self::ArrowTensor,
             "safetensors" => Self::Safetensors,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ArrayFormat<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "ndarrayBytes" => Self::NdarrayBytes,
-            "sparseBytes" => Self::SparseBytes,
-            "structuredBytes" => Self::StructuredBytes,
-            "arrowTensor" => Self::ArrowTensor,
-            "safetensors" => Self::Safetensors,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for ArrayFormat<'a> {
+impl<S: jacquard_common::Bos<str> + AsRef<str>> AsRef<str> for ArrayFormat<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for ArrayFormat<'a> {
+impl<S: jacquard_common::Bos<str> + AsRef<str>> core::fmt::Display for ArrayFormat<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for ArrayFormat<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: jacquard_common::Bos<str> + AsRef<str>> Serialize for ArrayFormat<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ArrayFormat<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + jacquard_common::Bos<str> + AsRef<str>> Deserialize<'de>
+for ArrayFormat<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for ArrayFormat<'_> {
-    type Output = ArrayFormat<'static>;
+impl<S: jacquard_common::Bos<str> + AsRef<str>> IntoStatic for ArrayFormat<S> {
+    type Output = ArrayFormat<jacquard_common::DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ArrayFormat::NdarrayBytes => ArrayFormat::NdarrayBytes,

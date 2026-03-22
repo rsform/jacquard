@@ -10,36 +10,51 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Store<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Store<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub additional: Option<S>,
+    pub text: S,
     ///The URI must include the logged-in user's DID in the format at://did...
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub visibility: CowStr<'a>,
+    pub uri: AtUri<S>,
+    pub visibility: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct StoreOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StoreOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     pub success: bool,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for uk.skyblur.post.store
@@ -47,11 +62,12 @@ pub struct StoreResponse;
 impl jacquard_common::xrpc::XrpcResp for StoreResponse {
     const NSID: &'static str = "uk.skyblur.post.store";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StoreOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StoreOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Store<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Store<S> {
     const NSID: &'static str = "uk.skyblur.post.store";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -66,7 +82,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for StoreRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Store<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Store<S>;
     type Response = StoreResponse;
 }
 
@@ -80,63 +96,58 @@ pub mod store_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Visibility;
-        type Text;
         type Uri;
+        type Text;
+        type Visibility;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Visibility = Unset;
-        type Text = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Visibility = Set<members::visibility>;
-        type Text = S::Text;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Visibility = S::Visibility;
-        type Text = Set<members::text>;
-        type Uri = S::Uri;
+        type Text = Unset;
+        type Visibility = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Visibility = S::Visibility;
-        type Text = S::Text;
         type Uri = Set<members::uri>;
+        type Text = S::Text;
+        type Visibility = S::Visibility;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Uri = S::Uri;
+        type Text = Set<members::text>;
+        type Visibility = S::Visibility;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type Uri = S::Uri;
+        type Text = S::Text;
+        type Visibility = Set<members::visibility>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StoreBuilder<'a, S: store_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<AtUri<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -160,12 +171,12 @@ impl<'a> StoreBuilder<'a, store_state::Empty> {
 
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `additional` field (optional)
-    pub fn additional(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn additional(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `additional` field to an Option value (optional)
-    pub fn maybe_additional(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_additional(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -179,7 +190,7 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> StoreBuilder<'a, store_state::SetText<S>> {
         self._fields.1 = Option::Some(value.into());
         StoreBuilder {
@@ -198,7 +209,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> StoreBuilder<'a, store_state::SetUri<S>> {
         self._fields.2 = Option::Some(value.into());
         StoreBuilder {
@@ -217,7 +228,7 @@ where
     /// Set the `visibility` field (required)
     pub fn visibility(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> StoreBuilder<'a, store_state::SetVisibility<S>> {
         self._fields.3 = Option::Some(value.into());
         StoreBuilder {
@@ -231,9 +242,9 @@ where
 impl<'a, S> StoreBuilder<'a, S>
 where
     S: store_state::State,
-    S::Visibility: store_state::IsSet,
-    S::Text: store_state::IsSet,
     S::Uri: store_state::IsSet,
+    S::Text: store_state::IsSet,
+    S::Visibility: store_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Store<'a> {
@@ -246,13 +257,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Store<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Store<'a> {
         Store {
             additional: self._fields.0,
             text: self._fields.1.unwrap(),

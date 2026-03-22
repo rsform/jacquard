@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,39 +29,47 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A mood entry from Aesthetic Computer
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "computer.aesthetic.mood", tag = "$type")]
-pub struct Mood<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "computer.aesthetic.mood",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Mood<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The mood text content
-    #[serde(borrow)]
-    pub mood: CowStr<'a>,
+    pub mood: S,
     ///Reference to source database record for bidirectional sync
-    #[serde(borrow)]
-    pub r#ref: CowStr<'a>,
+    pub r#ref: S,
     ///When the mood was created (ISO 8601)
     pub when: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MoodGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MoodGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Mood<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Mood<S>,
 }
 
-impl<'a> Mood<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, MoodRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Mood<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, MoodRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -70,18 +80,17 @@ pub struct MoodRecord;
 impl XrpcResp for MoodRecord {
     const NSID: &'static str = "computer.aesthetic.mood";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MoodGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MoodGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<MoodGetRecordOutput<'_>> for Mood<'_> {
-    fn from(output: MoodGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<MoodGetRecordOutput<S>> for Mood<S> {
+    fn from(output: MoodGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Mood<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Mood<S> {
     const NSID: &'static str = "computer.aesthetic.mood";
     type Record = MoodRecord;
 }
@@ -91,7 +100,7 @@ impl Collection for MoodRecord {
     type Record = MoodRecord;
 }
 
-impl<'a> LexiconSchema for Mood<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Mood<S> {
     fn nsid() -> &'static str {
         "computer.aesthetic.mood"
     }
@@ -127,58 +136,58 @@ pub mod mood_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Mood;
         type When;
         type Ref;
-        type Mood;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Mood = Unset;
         type When = Unset;
         type Ref = Unset;
-        type Mood = Unset;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type When = Set<members::when>;
-        type Ref = S::Ref;
-        type Mood = S::Mood;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type When = S::When;
-        type Ref = Set<members::r#ref>;
-        type Mood = S::Mood;
     }
     ///State transition - sets the `mood` field to Set
     pub struct SetMood<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMood<S> {}
     impl<S: State> State for SetMood<S> {
+        type Mood = Set<members::mood>;
         type When = S::When;
         type Ref = S::Ref;
-        type Mood = Set<members::mood>;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Mood = S::Mood;
+        type When = Set<members::when>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Mood = S::Mood;
+        type When = S::When;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `mood` field
+        pub struct mood(());
         ///Marker type for the `when` field
         pub struct when(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
-        ///Marker type for the `mood` field
-        pub struct mood(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MoodBuilder<'a, S: mood_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _fields: (Option<S>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -208,7 +217,7 @@ where
     /// Set the `mood` field (required)
     pub fn mood(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MoodBuilder<'a, mood_state::SetMood<S>> {
         self._fields.0 = Option::Some(value.into());
         MoodBuilder {
@@ -227,7 +236,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MoodBuilder<'a, mood_state::SetRef<S>> {
         self._fields.1 = Option::Some(value.into());
         MoodBuilder {
@@ -260,9 +269,9 @@ where
 impl<'a, S> MoodBuilder<'a, S>
 where
     S: mood_state::State,
+    S::Mood: mood_state::IsSet,
     S::When: mood_state::IsSet,
     S::Ref: mood_state::IsSet,
-    S::Mood: mood_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Mood<'a> {
@@ -274,13 +283,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Mood<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Mood<'a> {
         Mood {
             mood: self._fields.0.unwrap(),
             r#ref: self._fields.1.unwrap(),

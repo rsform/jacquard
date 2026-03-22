@@ -10,41 +10,56 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::social_clippr::feed::TagView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchTags<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchTags<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub actor: Option<AtIdentifier<'a>>,
+    pub actor: Option<AtIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(borrow)]
-    pub q: CowStr<'a>,
+    pub q: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchTagsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchTagsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///A parameter to paginate results
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///A list of tags and their associated details
-    #[serde(borrow)]
-    pub tags: Vec<TagView<'a>>,
+    pub tags: Vec<TagView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for social.clippr.actor.searchTags
@@ -52,11 +67,12 @@ pub struct SearchTagsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchTagsResponse {
     const NSID: &'static str = "social.clippr.actor.searchTags";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchTagsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SearchTagsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchTags<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SearchTags<S> {
     const NSID: &'static str = "social.clippr.actor.searchTags";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchTagsResponse;
@@ -67,7 +83,7 @@ pub struct SearchTagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchTagsRequest {
     const PATH: &'static str = "/xrpc/social.clippr.actor.searchTags";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchTags<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SearchTags<S>;
     type Response = SearchTagsResponse;
 }
 
@@ -110,12 +126,7 @@ pub mod search_tags_state {
 /// Builder for constructing an instance of this type
 pub struct SearchTagsBuilder<'a, S: search_tags_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<AtIdentifier<'a>>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -139,12 +150,12 @@ impl<'a> SearchTagsBuilder<'a, search_tags_state::Empty> {
 
 impl<'a, S: search_tags_state::State> SearchTagsBuilder<'a, S> {
     /// Set the `actor` field (optional)
-    pub fn actor(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
+    pub fn actor(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
-    pub fn maybe_actor(mut self, value: Option<AtIdentifier<'a>>) -> Self {
+    pub fn maybe_actor(mut self, value: Option<AtIdentifier<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -152,12 +163,12 @@ impl<'a, S: search_tags_state::State> SearchTagsBuilder<'a, S> {
 
 impl<'a, S: search_tags_state::State> SearchTagsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -184,7 +195,7 @@ where
     /// Set the `q` field (required)
     pub fn q(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SearchTagsBuilder<'a, search_tags_state::SetQ<S>> {
         self._fields.3 = Option::Some(value.into());
         SearchTagsBuilder {

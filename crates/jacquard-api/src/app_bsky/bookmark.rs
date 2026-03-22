@@ -15,11 +15,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -32,43 +35,60 @@ use crate::app_bsky::feed::PostView;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Object used to store bookmark data in stash.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Bookmark<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Bookmark<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///A strong ref to the record to be bookmarked. Currently, only `app.bsky.feed.post` records are supported.
-    #[serde(borrow)]
-    pub subject: StrongRef<'a>,
+    pub subject: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BookmarkView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BookmarkView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    #[serde(borrow)]
-    pub item: BookmarkViewItem<'a>,
+    pub item: BookmarkViewItem<S>,
     ///A strong ref to the bookmarked record.
-    #[serde(borrow)]
-    pub subject: StrongRef<'a>,
+    pub subject: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum BookmarkViewItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum BookmarkViewItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.feed.defs#blockedPost")]
-    BlockedPost(Box<BlockedPost<'a>>),
+    BlockedPost(Box<BlockedPost<S>>),
     #[serde(rename = "app.bsky.feed.defs#notFoundPost")]
-    NotFoundPost(Box<NotFoundPost<'a>>),
+    NotFoundPost(Box<NotFoundPost<S>>),
     #[serde(rename = "app.bsky.feed.defs#postView")]
-    PostView(Box<PostView<'a>>),
+    PostView(Box<PostView<S>>),
 }
 
-impl<'a> LexiconSchema for Bookmark<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bookmark<S> {
     fn nsid() -> &'static str {
         "app.bsky.bookmark.defs"
     }
@@ -83,7 +103,7 @@ impl<'a> LexiconSchema for Bookmark<'a> {
     }
 }
 
-impl<'a> LexiconSchema for BookmarkView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BookmarkView<S> {
     fn nsid() -> &'static str {
         "app.bsky.bookmark.defs"
     }
@@ -133,7 +153,7 @@ pub mod bookmark_state {
 /// Builder for constructing an instance of this type
 pub struct BookmarkBuilder<'a, S: bookmark_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>,),
+    _fields: (Option<StrongRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -163,7 +183,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> BookmarkBuilder<'a, bookmark_state::SetSubject<S>> {
         self._fields.0 = Option::Some(value.into());
         BookmarkBuilder {
@@ -189,10 +209,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Bookmark<'a> {
         Bookmark {
             subject: self._fields.0.unwrap(),
@@ -327,7 +344,7 @@ pub mod bookmark_view_state {
 /// Builder for constructing an instance of this type
 pub struct BookmarkViewBuilder<'a, S: bookmark_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<BookmarkViewItem<'a>>, Option<StrongRef<'a>>),
+    _fields: (Option<Datetime>, Option<BookmarkViewItem<S>>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -370,7 +387,7 @@ where
     /// Set the `item` field (required)
     pub fn item(
         mut self,
-        value: impl Into<BookmarkViewItem<'a>>,
+        value: impl Into<BookmarkViewItem<S>>,
     ) -> BookmarkViewBuilder<'a, bookmark_view_state::SetItem<S>> {
         self._fields.1 = Option::Some(value.into());
         BookmarkViewBuilder {
@@ -389,7 +406,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> BookmarkViewBuilder<'a, bookmark_view_state::SetSubject<S>> {
         self._fields.2 = Option::Some(value.into());
         BookmarkViewBuilder {
@@ -418,10 +435,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BookmarkView<'a> {
         BookmarkView {
             created_at: self._fields.0,

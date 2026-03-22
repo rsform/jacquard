@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,57 +29,62 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.pmsky.vote", tag = "$type")]
-pub struct Vote<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.pmsky.vote",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Vote<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The persistent, anonymous identifier for the user casting the vote.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aid: Option<CowStr<'a>>,
+    pub aid: Option<S>,
     ///Optionally, CID specifying the specific version of 'uri' resource this vote applies to.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
+    pub cid: Option<Cid<S>>,
     ///Timestamp when this vote was created.
     pub cts: Datetime,
     ///An optional array of predefined reasons justifying the vote.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reasons: Option<Vec<CowStr<'a>>>,
+    pub reasons: Option<Vec<S>>,
     ///Signature of dag-cbor encoded vote.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
     pub sig: Option<Bytes>,
     ///the account creating the vote, not necessarily the same as the user who voted
-    #[serde(borrow)]
-    pub src: Did<'a>,
+    pub src: Did<S>,
     ///AT URI of the record, repository (account), or other resource that this vote applies to.
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+    pub uri: UriValue<S>,
     ///The value of the vote. The exact meaning depends on what is being voted on, but generally '+1' means 'approval', -1 means 'disapproval', and 0 indicates 'neutrality'.
     pub val: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct VoteGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct VoteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Vote<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Vote<S>,
 }
 
-impl<'a> Vote<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, VoteRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Vote<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, VoteRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -88,18 +95,17 @@ pub struct VoteRecord;
 impl XrpcResp for VoteRecord {
     const NSID: &'static str = "social.pmsky.vote";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = VoteGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = VoteGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<VoteGetRecordOutput<'_>> for Vote<'_> {
-    fn from(output: VoteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<VoteGetRecordOutput<S>> for Vote<S> {
+    fn from(output: VoteGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Vote<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Vote<S> {
     const NSID: &'static str = "social.pmsky.vote";
     type Record = VoteRecord;
 }
@@ -109,7 +115,7 @@ impl Collection for VoteRecord {
     type Record = VoteRecord;
 }
 
-impl<'a> LexiconSchema for Vote<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Vote<S> {
     fn nsid() -> &'static str {
         "social.pmsky.vote"
     }
@@ -134,67 +140,67 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cts;
         type Uri;
-        type Src;
         type Val;
+        type Src;
+        type Cts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cts = Unset;
         type Uri = Unset;
-        type Src = Unset;
         type Val = Unset;
-    }
-    ///State transition - sets the `cts` field to Set
-    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCts<S> {}
-    impl<S: State> State for SetCts<S> {
-        type Cts = Set<members::cts>;
-        type Uri = S::Uri;
-        type Src = S::Src;
-        type Val = S::Val;
+        type Src = Unset;
+        type Cts = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cts = S::Cts;
         type Uri = Set<members::uri>;
+        type Val = S::Val;
         type Src = S::Src;
-        type Val = S::Val;
-    }
-    ///State transition - sets the `src` field to Set
-    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrc<S> {}
-    impl<S: State> State for SetSrc<S> {
         type Cts = S::Cts;
-        type Uri = S::Uri;
-        type Src = Set<members::src>;
-        type Val = S::Val;
     }
     ///State transition - sets the `val` field to Set
     pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVal<S> {}
     impl<S: State> State for SetVal<S> {
-        type Cts = S::Cts;
         type Uri = S::Uri;
-        type Src = S::Src;
         type Val = Set<members::val>;
+        type Src = S::Src;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Src = Set<members::src>;
+        type Cts = S::Cts;
+    }
+    ///State transition - sets the `cts` field to Set
+    pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCts<S> {}
+    impl<S: State> State for SetCts<S> {
+        type Uri = S::Uri;
+        type Val = S::Val;
+        type Src = S::Src;
+        type Cts = Set<members::cts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cts` field
-        pub struct cts(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `src` field
-        pub struct src(());
         ///Marker type for the `val` field
         pub struct val(());
+        ///Marker type for the `src` field
+        pub struct src(());
+        ///Marker type for the `cts` field
+        pub struct cts(());
     }
 }
 
@@ -202,13 +208,13 @@ pub mod vote_state {
 pub struct VoteBuilder<'a, S: vote_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<Cid<'a>>,
+        Option<S>,
+        Option<Cid<S>>,
         Option<Datetime>,
-        Option<Vec<CowStr<'a>>>,
+        Option<Vec<S>>,
         Option<Bytes>,
-        Option<Did<'a>>,
-        Option<UriValue<'a>>,
+        Option<Did<S>>,
+        Option<UriValue<S>>,
         Option<i64>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -234,12 +240,12 @@ impl<'a> VoteBuilder<'a, vote_state::Empty> {
 
 impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
     /// Set the `aid` field (optional)
-    pub fn aid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn aid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `aid` field to an Option value (optional)
-    pub fn maybe_aid(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_aid(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -247,12 +253,12 @@ impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
 
 impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
     /// Set the `cid` field (optional)
-    pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
+    pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
-    pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
+    pub fn maybe_cid(mut self, value: Option<Cid<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -279,12 +285,12 @@ where
 
 impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
     /// Set the `reasons` field (optional)
-    pub fn reasons(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn reasons(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `reasons` field to an Option value (optional)
-    pub fn maybe_reasons(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_reasons(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -311,7 +317,7 @@ where
     /// Set the `src` field (required)
     pub fn src(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> VoteBuilder<'a, vote_state::SetSrc<S>> {
         self._fields.5 = Option::Some(value.into());
         VoteBuilder {
@@ -330,7 +336,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> VoteBuilder<'a, vote_state::SetUri<S>> {
         self._fields.6 = Option::Some(value.into());
         VoteBuilder {
@@ -363,10 +369,10 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
-    S::Cts: vote_state::IsSet,
     S::Uri: vote_state::IsSet,
-    S::Src: vote_state::IsSet,
     S::Val: vote_state::IsSet,
+    S::Src: vote_state::IsSet,
+    S::Cts: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -383,13 +389,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Vote<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Vote<'a> {
         Vote {
             aid: self._fields.0,
             cid: self._fields.1,

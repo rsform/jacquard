@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
@@ -15,23 +15,42 @@ use crate::com_atproto::identity::IdentityInfo;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ResolveIdentity<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResolveIdentity<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub identifier: AtIdentifier<'a>,
+    pub identifier: AtIdentifier<S>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ResolveIdentityOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResolveIdentityOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: IdentityInfo<'a>,
+    pub value: IdentityInfo<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -40,25 +59,29 @@ pub struct ResolveIdentityOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ResolveIdentityError<'a> {
+pub enum ResolveIdentityError {
     /// The resolution process confirmed that the handle does not resolve to any DID.
     #[serde(rename = "HandleNotFound")]
-    HandleNotFound(Option<CowStr<'a>>),
+    HandleNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// The DID resolution process confirmed that there is no current DID.
     #[serde(rename = "DidNotFound")]
-    DidNotFound(Option<CowStr<'a>>),
+    DidNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// The DID previously existed, but has been deactivated.
     #[serde(rename = "DidDeactivated")]
-    DidDeactivated(Option<CowStr<'a>>),
+    DidDeactivated(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for ResolveIdentityError<'_> {
+impl core::fmt::Display for ResolveIdentityError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::HandleNotFound(msg) => {
@@ -82,7 +105,13 @@ impl core::fmt::Display for ResolveIdentityError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -92,11 +121,12 @@ pub struct ResolveIdentityResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveIdentityResponse {
     const NSID: &'static str = "com.atproto.identity.resolveIdentity";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveIdentityOutput<'de>;
-    type Err<'de> = ResolveIdentityError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ResolveIdentityOutput<S>;
+    type Err = ResolveIdentityError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveIdentity<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ResolveIdentity<S> {
     const NSID: &'static str = "com.atproto.identity.resolveIdentity";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveIdentityResponse;
@@ -107,7 +137,7 @@ pub struct ResolveIdentityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveIdentityRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.resolveIdentity";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ResolveIdentity<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ResolveIdentity<S>;
     type Response = ResolveIdentityResponse;
 }
 
@@ -146,7 +176,7 @@ pub mod resolve_identity_state {
 /// Builder for constructing an instance of this type
 pub struct ResolveIdentityBuilder<'a, S: resolve_identity_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>,),
+    _fields: (Option<AtIdentifier<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -176,7 +206,7 @@ where
     /// Set the `identifier` field (required)
     pub fn identifier(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> ResolveIdentityBuilder<'a, resolve_identity_state::SetIdentifier<S>> {
         self._fields.0 = Option::Some(value.into());
         ResolveIdentityBuilder {

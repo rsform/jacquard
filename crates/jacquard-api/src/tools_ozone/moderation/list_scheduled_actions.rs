@@ -10,20 +10,26 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Datetime};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::ScheduledActionView;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListScheduledActions<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListScheduledActions<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Cursor for pagination
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Filter actions scheduled to execute before this time
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ends_before: Option<Datetime>,
@@ -35,25 +41,34 @@ pub struct ListScheduledActions<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub starts_after: Option<Datetime>,
     ///Filter actions by status
-    #[serde(borrow)]
-    pub statuses: Vec<CowStr<'a>>,
+    pub statuses: Vec<S>,
     ///Filter actions for specific DID subjects
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subjects: Option<Vec<Did<'a>>>,
+    pub subjects: Option<Vec<Did<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListScheduledActionsOutput<'a> {
-    #[serde(borrow)]
-    pub actions: Vec<ScheduledActionView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListScheduledActionsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub actions: Vec<ScheduledActionView<S>>,
     ///Cursor for next page of results
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for tools.ozone.moderation.listScheduledActions
@@ -61,11 +76,12 @@ pub struct ListScheduledActionsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListScheduledActionsResponse {
     const NSID: &'static str = "tools.ozone.moderation.listScheduledActions";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListScheduledActionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListScheduledActionsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListScheduledActions<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListScheduledActions<S> {
     const NSID: &'static str = "tools.ozone.moderation.listScheduledActions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -80,7 +96,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListScheduledActionsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = ListScheduledActions<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListScheduledActions<S>;
     type Response = ListScheduledActionsResponse;
 }
 
@@ -124,12 +140,12 @@ pub mod list_scheduled_actions_state {
 pub struct ListScheduledActionsBuilder<'a, S: list_scheduled_actions_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
         Option<i64>,
         Option<Datetime>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<Did<'a>>>,
+        Option<Vec<S>>,
+        Option<Vec<Did<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -157,12 +173,12 @@ impl<'a> ListScheduledActionsBuilder<'a, list_scheduled_actions_state::Empty> {
 
 impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -215,7 +231,7 @@ where
     /// Set the `statuses` field (required)
     pub fn statuses(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> ListScheduledActionsBuilder<'a, list_scheduled_actions_state::SetStatuses<S>> {
         self._fields.4 = Option::Some(value.into());
         ListScheduledActionsBuilder {
@@ -228,12 +244,12 @@ where
 
 impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a, S> {
     /// Set the `subjects` field (optional)
-    pub fn subjects(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
+    pub fn subjects(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `subjects` field to an Option value (optional)
-    pub fn maybe_subjects(mut self, value: Option<Vec<Did<'a>>>) -> Self {
+    pub fn maybe_subjects(mut self, value: Option<Vec<Did<S>>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -259,10 +275,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ListScheduledActions<'a> {
         ListScheduledActions {
             cursor: self._fields.0,

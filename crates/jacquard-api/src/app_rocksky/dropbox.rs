@@ -10,12 +10,17 @@ pub mod get_files;
 pub mod get_metadata;
 pub mod get_temporary_link;
 
-use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Datetime, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,57 +29,72 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::dropbox;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct FileListView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FileListView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///A list of files in the Dropbox.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub files: Option<Vec<dropbox::FileView<'a>>>,
+    pub files: Option<Vec<dropbox::FileView<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct FileView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FileView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The last modified date and time of the file on the client.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_modified: Option<Datetime>,
     ///The unique identifier of the file.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///The name of the file.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///The display path of the file.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub path_display: Option<CowStr<'a>>,
+    pub path_display: Option<S>,
     ///The lowercased path of the file.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub path_lower: Option<CowStr<'a>>,
+    pub path_lower: Option<S>,
     ///The last modified date and time of the file on the server.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub server_modified: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct TemporaryLinkView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TemporaryLinkView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The temporary link to access the file.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub link: Option<UriValue<'a>>,
+    pub link: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for FileListView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FileListView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.dropbox.defs"
     }
@@ -89,7 +109,7 @@ impl<'a> LexiconSchema for FileListView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for FileView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FileView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.dropbox.defs"
     }
@@ -104,7 +124,7 @@ impl<'a> LexiconSchema for FileView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TemporaryLinkView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TemporaryLinkView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.dropbox.defs"
     }

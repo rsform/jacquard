@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::types::string::{Did, Tid};
 use jacquard_derive::{IntoStatic, open_union};
@@ -15,9 +15,15 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRepo<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRepo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub since: Option<Tid>,
 }
@@ -30,7 +36,6 @@ pub struct GetRepoOutput {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -39,24 +44,28 @@ pub struct GetRepoOutput {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRepoError<'a> {
+pub enum GetRepoError {
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     #[serde(rename = "RepoTakendown")]
-    RepoTakendown(Option<CowStr<'a>>),
+    RepoTakendown(Option<jacquard_common::deps::smol_str::SmolStr>),
     #[serde(rename = "RepoSuspended")]
-    RepoSuspended(Option<CowStr<'a>>),
+    RepoSuspended(Option<jacquard_common::deps::smol_str::SmolStr>),
     #[serde(rename = "RepoDeactivated")]
-    RepoDeactivated(Option<CowStr<'a>>),
+    RepoDeactivated(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for GetRepoError<'_> {
+impl core::fmt::Display for GetRepoError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -87,7 +96,13 @@ impl core::fmt::Display for GetRepoError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -97,18 +112,22 @@ pub struct GetRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRepoResponse {
     const NSID: &'static str = "com.atproto.sync.getRepo";
     const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<'de> = GetRepoOutput;
-    type Err<'de> = GetRepoError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = GetRepoOutput;
+    type Err = GetRepoError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(GetRepoOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -116,7 +135,8 @@ impl jacquard_common::xrpc::XrpcResp for GetRepoResponse {
     }
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepo<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetRepo<S> {
     const NSID: &'static str = "com.atproto.sync.getRepo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRepoResponse;
@@ -127,7 +147,7 @@ pub struct GetRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRepoRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getRepo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRepo<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetRepo<S>;
     type Response = GetRepoResponse;
 }
 
@@ -166,7 +186,7 @@ pub mod get_repo_state {
 /// Builder for constructing an instance of this type
 pub struct GetRepoBuilder<'a, S: get_repo_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<Tid>),
+    _fields: (Option<Did<S>>, Option<Tid>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -196,7 +216,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetRepoBuilder<'a, get_repo_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetRepoBuilder {

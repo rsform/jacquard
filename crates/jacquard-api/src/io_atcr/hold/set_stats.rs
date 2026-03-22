@@ -10,15 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Datetime};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SetStats<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SetStats<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///RFC3339 timestamp of last pull
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_pull: Option<Datetime>,
@@ -26,8 +33,7 @@ pub struct SetStats<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_push: Option<Datetime>,
     ///DID of the repository owner
-    #[serde(borrow)]
-    pub owner_did: Did<'a>,
+    pub owner_did: Did<S>,
     ///Absolute pull count to set
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pull_count: Option<i64>,
@@ -35,21 +41,32 @@ pub struct SetStats<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub push_count: Option<i64>,
     ///Repository name
-    #[serde(borrow)]
-    pub repository: CowStr<'a>,
+    pub repository: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SetStatsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SetStatsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether the stats were successfully updated
     pub success: bool,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -58,20 +75,21 @@ pub struct SetStatsOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SetStatsError<'a> {
+pub enum SetStatsError {
     #[serde(rename = "InvalidOwner")]
-    InvalidOwner(Option<CowStr<'a>>),
+    InvalidOwner(Option<SmolStr>),
     #[serde(rename = "InvalidRepository")]
-    InvalidRepository(Option<CowStr<'a>>),
+    InvalidRepository(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for SetStatsError<'_> {
+impl core::fmt::Display for SetStatsError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidOwner(msg) => {
@@ -88,7 +106,13 @@ impl core::fmt::Display for SetStatsError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -98,11 +122,12 @@ pub struct SetStatsResponse;
 impl jacquard_common::xrpc::XrpcResp for SetStatsResponse {
     const NSID: &'static str = "io.atcr.hold.setStats";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SetStatsOutput<'de>;
-    type Err<'de> = SetStatsError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SetStatsOutput<S>;
+    type Err = SetStatsError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SetStats<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SetStats<S> {
     const NSID: &'static str = "io.atcr.hold.setStats";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -117,7 +142,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SetStatsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = SetStats<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SetStats<S>;
     type Response = SetStatsResponse;
 }
 
@@ -131,37 +156,37 @@ pub mod set_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type OwnerDid;
         type Repository;
+        type OwnerDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type OwnerDid = Unset;
         type Repository = Unset;
-    }
-    ///State transition - sets the `owner_did` field to Set
-    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
-    impl<S: State> State for SetOwnerDid<S> {
-        type OwnerDid = Set<members::owner_did>;
-        type Repository = S::Repository;
+        type OwnerDid = Unset;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepository<S> {}
     impl<S: State> State for SetRepository<S> {
-        type OwnerDid = S::OwnerDid;
         type Repository = Set<members::repository>;
+        type OwnerDid = S::OwnerDid;
+    }
+    ///State transition - sets the `owner_did` field to Set
+    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
+    impl<S: State> State for SetOwnerDid<S> {
+        type Repository = S::Repository;
+        type OwnerDid = Set<members::owner_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `owner_did` field
-        pub struct owner_did(());
         ///Marker type for the `repository` field
         pub struct repository(());
+        ///Marker type for the `owner_did` field
+        pub struct owner_did(());
     }
 }
 
@@ -171,10 +196,10 @@ pub struct SetStatsBuilder<'a, S: set_stats_state::State> {
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
-        Option<Did<'a>>,
+        Option<Did<S>>,
         Option<i64>,
         Option<i64>,
-        Option<CowStr<'a>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -231,7 +256,7 @@ where
     /// Set the `ownerDid` field (required)
     pub fn owner_did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> SetStatsBuilder<'a, set_stats_state::SetOwnerDid<S>> {
         self._fields.2 = Option::Some(value.into());
         SetStatsBuilder {
@@ -276,7 +301,7 @@ where
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SetStatsBuilder<'a, set_stats_state::SetRepository<S>> {
         self._fields.5 = Option::Some(value.into());
         SetStatsBuilder {
@@ -290,8 +315,8 @@ where
 impl<'a, S> SetStatsBuilder<'a, S>
 where
     S: set_stats_state::State,
-    S::OwnerDid: set_stats_state::IsSet,
     S::Repository: set_stats_state::IsSet,
+    S::OwnerDid: set_stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SetStats<'a> {
@@ -308,10 +333,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SetStats<'a> {
         SetStats {
             last_pull: self._fields.0,

@@ -10,13 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Nsid, Cid, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,69 +26,83 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::get_slice_records;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct IndexedRecord<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct IndexedRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Content identifier of the record
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///NSID of the collection this record belongs to
-    #[serde(borrow)]
-    pub collection: Nsid<'a>,
+    pub collection: Nsid<S>,
     ///DID of the record creator
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///When this record was indexed
     pub indexed_at: Datetime,
     ///AT-URI of the record
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
     ///The record value/content
-    #[serde(borrow)]
-    pub value: Data<'a>,
+    pub value: Data<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSliceRecords<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSliceRecords<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Pagination cursor from previous response
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Maximum number of records to return  Defaults to `50`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_get_slice_records_limit")]
     pub limit: Option<i64>,
     ///AT-URI of the slice to query
-    #[serde(borrow)]
-    pub slice: CowStr<'a>,
+    pub slice: S,
     ///Sorting configuration for result ordering
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sort_by: Option<Data<'a>>,
+    pub sort_by: Option<Data<S>>,
     ///Flexible filtering conditions for querying records
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#where: Option<Data<'a>>,
+    pub r#where: Option<Data<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSliceRecordsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSliceRecordsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Pagination cursor for next page
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub records: Vec<get_slice_records::IndexedRecord<'a>>,
+    pub cursor: Option<S>,
+    pub records: Vec<get_slice_records::IndexedRecord<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for IndexedRecord<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for IndexedRecord<S> {
     fn nsid() -> &'static str {
         "network.slices.slice.getSliceRecords"
     }
@@ -107,11 +122,12 @@ pub struct GetSliceRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSliceRecordsResponse {
     const NSID: &'static str = "network.slices.slice.getSliceRecords";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSliceRecordsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetSliceRecordsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSliceRecords<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetSliceRecords<S> {
     const NSID: &'static str = "network.slices.slice.getSliceRecords";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -126,7 +142,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSliceRecordsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = GetSliceRecords<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetSliceRecords<S>;
     type Response = GetSliceRecordsResponse;
 }
 
@@ -140,105 +156,105 @@ pub mod indexed_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type IndexedAt;
-        type Cid;
         type Collection;
         type Value;
+        type IndexedAt;
+        type Cid;
         type Did;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type IndexedAt = Unset;
-        type Cid = Unset;
         type Collection = Unset;
         type Value = Unset;
+        type IndexedAt = Unset;
+        type Cid = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Collection = S::Collection;
-        type Value = S::Value;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Uri = S::Uri;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
-        type Collection = S::Collection;
-        type Value = S::Value;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
-        type Collection = S::Collection;
-        type Value = S::Value;
-        type Did = S::Did;
+        type Uri = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Collection = Set<members::collection>;
         type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
         type Did = S::Did;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Collection = S::Collection;
         type Value = Set<members::value>;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
         type Did = S::Did;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Collection = S::Collection;
+        type Value = S::Value;
+        type IndexedAt = Set<members::indexed_at>;
+        type Cid = S::Cid;
+        type Did = S::Did;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Collection = S::Collection;
+        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+        type Cid = Set<members::cid>;
+        type Did = S::Did;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Collection = S::Collection;
         type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
         type Did = Set<members::did>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Collection = S::Collection;
+        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+        type Did = S::Did;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -246,12 +262,12 @@ pub mod indexed_record_state {
 pub struct IndexedRecordBuilder<'a, S: indexed_record_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Cid<'a>>,
-        Option<Nsid<'a>>,
-        Option<Did<'a>>,
+        Option<Cid<S>>,
+        Option<Nsid<S>>,
+        Option<Did<S>>,
         Option<Datetime>,
-        Option<AtUri<'a>>,
-        Option<Data<'a>>,
+        Option<AtUri<S>>,
+        Option<Data<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -282,7 +298,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> IndexedRecordBuilder<'a, indexed_record_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         IndexedRecordBuilder {
@@ -301,7 +317,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<Nsid<'a>>,
+        value: impl Into<Nsid<S>>,
     ) -> IndexedRecordBuilder<'a, indexed_record_state::SetCollection<S>> {
         self._fields.1 = Option::Some(value.into());
         IndexedRecordBuilder {
@@ -320,7 +336,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> IndexedRecordBuilder<'a, indexed_record_state::SetDid<S>> {
         self._fields.2 = Option::Some(value.into());
         IndexedRecordBuilder {
@@ -358,7 +374,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> IndexedRecordBuilder<'a, indexed_record_state::SetUri<S>> {
         self._fields.4 = Option::Some(value.into());
         IndexedRecordBuilder {
@@ -377,7 +393,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> IndexedRecordBuilder<'a, indexed_record_state::SetValue<S>> {
         self._fields.5 = Option::Some(value.into());
         IndexedRecordBuilder {
@@ -391,12 +407,12 @@ where
 impl<'a, S> IndexedRecordBuilder<'a, S>
 where
     S: indexed_record_state::State,
-    S::Uri: indexed_record_state::IsSet,
-    S::IndexedAt: indexed_record_state::IsSet,
-    S::Cid: indexed_record_state::IsSet,
     S::Collection: indexed_record_state::IsSet,
     S::Value: indexed_record_state::IsSet,
+    S::IndexedAt: indexed_record_state::IsSet,
+    S::Cid: indexed_record_state::IsSet,
     S::Did: indexed_record_state::IsSet,
+    S::Uri: indexed_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IndexedRecord<'a> {
@@ -413,7 +429,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> IndexedRecord<'a> {
         IndexedRecord {
             cid: self._fields.0.unwrap(),

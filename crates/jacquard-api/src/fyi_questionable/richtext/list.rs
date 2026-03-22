@@ -10,10 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,30 +26,42 @@ use serde::{Serialize, Deserialize};
 use crate::fyi_questionable::richtext::text::Text;
 use crate::fyi_questionable::richtext::list;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct List<'a> {
-    #[serde(borrow)]
-    pub items: Vec<ListItemsItem<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct List<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub items: Vec<ListItemsItem<S>>,
     /// Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_list_ordered")]
     pub ordered: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ListItemsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ListItemsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "fyi.questionable.richtext.text")]
-    Text(Box<Text<'a>>),
+    Text(Box<Text<S>>),
     #[serde(rename = "fyi.questionable.richtext.list")]
-    List(Box<list::List<'a>>),
+    List(Box<list::List<S>>),
 }
 
-impl<'a> LexiconSchema for List<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for List<S> {
     fn nsid() -> &'static str {
         "fyi.questionable.richtext.list"
     }
@@ -100,7 +115,7 @@ pub mod list_state {
 /// Builder for constructing an instance of this type
 pub struct ListBuilder<'a, S: list_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<ListItemsItem<'a>>>, Option<bool>),
+    _fields: (Option<Vec<ListItemsItem<S>>>, Option<bool>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -130,7 +145,7 @@ where
     /// Set the `items` field (required)
     pub fn items(
         mut self,
-        value: impl Into<Vec<ListItemsItem<'a>>>,
+        value: impl Into<Vec<ListItemsItem<S>>>,
     ) -> ListBuilder<'a, list_state::SetItems<S>> {
         self._fields.0 = Option::Some(value.into());
         ListBuilder {
@@ -168,13 +183,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> List<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> List<'a> {
         List {
             items: self._fields.0.unwrap(),
             ordered: self._fields.1.or_else(|| Some(false)),

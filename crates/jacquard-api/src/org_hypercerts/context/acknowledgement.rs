@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,61 +31,70 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_hypercerts::Uri;
 /// Acknowledges a record (subject) or its relationship in a context. Created in the acknowledging actor's repo to form a bidirectional link. Examples: a contributor acknowledging inclusion in an activity, an activity owner acknowledging inclusion in a collection, or a record owner acknowledging an evaluation.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.hypercerts.context.acknowledgement",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Acknowledgement<'a> {
+pub struct Acknowledgement<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether the relationship is acknowledged (true) or rejected (false).
     pub acknowledged: bool,
     ///Optional plain-text comment providing additional context or reasoning.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<CowStr<'a>>,
+    pub comment: Option<S>,
     ///Context for the acknowledgement (e.g. the collection that includes an activity, or the activity that includes a contributor). A URI for a lightweight reference or a strong reference for content-hash verification.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub context: Option<AcknowledgementContext<'a>>,
+    pub context: Option<AcknowledgementContext<S>>,
     ///Client-declared timestamp when this record was originally created.
     pub created_at: Datetime,
     ///The record being acknowledged (e.g. an activity, a contributor information record, an evaluation).
-    #[serde(borrow)]
-    pub subject: StrongRef<'a>,
+    pub subject: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum AcknowledgementContext<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum AcknowledgementContext<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<StrongRef<'a>>),
+    StrongRef(Box<StrongRef<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AcknowledgementGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AcknowledgementGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Acknowledgement<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Acknowledgement<S>,
 }
 
-impl<'a> Acknowledgement<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AcknowledgementRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Acknowledgement<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AcknowledgementRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -94,18 +105,18 @@ pub struct AcknowledgementRecord;
 impl XrpcResp for AcknowledgementRecord {
     const NSID: &'static str = "org.hypercerts.context.acknowledgement";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AcknowledgementGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AcknowledgementGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AcknowledgementGetRecordOutput<'_>> for Acknowledgement<'_> {
-    fn from(output: AcknowledgementGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AcknowledgementGetRecordOutput<S>>
+for Acknowledgement<S> {
+    fn from(output: AcknowledgementGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Acknowledgement<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Acknowledgement<S> {
     const NSID: &'static str = "org.hypercerts.context.acknowledgement";
     type Record = AcknowledgementRecord;
 }
@@ -115,7 +126,7 @@ impl Collection for AcknowledgementRecord {
     type Record = AcknowledgementRecord;
 }
 
-impl<'a> LexiconSchema for Acknowledgement<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Acknowledgement<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.context.acknowledgement"
     }
@@ -162,51 +173,51 @@ pub mod acknowledgement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
         type Acknowledged;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
         type Acknowledged = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
-        type Acknowledged = S::Acknowledged;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
         type Acknowledged = S::Acknowledged;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `acknowledged` field to Set
     pub struct SetAcknowledged<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAcknowledged<S> {}
     impl<S: State> State for SetAcknowledged<S> {
-        type CreatedAt = S::CreatedAt;
         type Subject = S::Subject;
         type Acknowledged = Set<members::acknowledged>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type Acknowledged = S::Acknowledged;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `acknowledged` field
         pub struct acknowledged(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -215,10 +226,10 @@ pub struct AcknowledgementBuilder<'a, S: acknowledgement_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<bool>,
-        Option<CowStr<'a>>,
-        Option<AcknowledgementContext<'a>>,
+        Option<S>,
+        Option<AcknowledgementContext<S>>,
         Option<Datetime>,
-        Option<StrongRef<'a>>,
+        Option<StrongRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -262,12 +273,12 @@ where
 
 impl<'a, S: acknowledgement_state::State> AcknowledgementBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_comment(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -277,13 +288,13 @@ impl<'a, S: acknowledgement_state::State> AcknowledgementBuilder<'a, S> {
     /// Set the `context` field (optional)
     pub fn context(
         mut self,
-        value: impl Into<Option<AcknowledgementContext<'a>>>,
+        value: impl Into<Option<AcknowledgementContext<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `context` field to an Option value (optional)
-    pub fn maybe_context(mut self, value: Option<AcknowledgementContext<'a>>) -> Self {
+    pub fn maybe_context(mut self, value: Option<AcknowledgementContext<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -316,7 +327,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> AcknowledgementBuilder<'a, acknowledgement_state::SetSubject<S>> {
         self._fields.4 = Option::Some(value.into());
         AcknowledgementBuilder {
@@ -330,9 +341,9 @@ where
 impl<'a, S> AcknowledgementBuilder<'a, S>
 where
     S: acknowledgement_state::State,
-    S::CreatedAt: acknowledgement_state::IsSet,
     S::Subject: acknowledgement_state::IsSet,
     S::Acknowledged: acknowledgement_state::IsSet,
+    S::CreatedAt: acknowledgement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Acknowledgement<'a> {
@@ -348,10 +359,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Acknowledgement<'a> {
         Acknowledgement {
             acknowledged: self._fields.0.unwrap(),

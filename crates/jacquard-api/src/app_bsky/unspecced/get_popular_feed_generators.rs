@@ -10,36 +10,51 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::GeneratorView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPopularFeedGenerators<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPopularFeedGenerators<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub query: Option<CowStr<'a>>,
+    pub query: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPopularFeedGeneratorsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPopularFeedGeneratorsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub feeds: Vec<GeneratorView<'a>>,
+    pub cursor: Option<S>,
+    pub feeds: Vec<GeneratorView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.unspecced.getPopularFeedGenerators
@@ -47,11 +62,12 @@ pub struct GetPopularFeedGeneratorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPopularFeedGeneratorsResponse {
     const NSID: &'static str = "app.bsky.unspecced.getPopularFeedGenerators";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPopularFeedGeneratorsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetPopularFeedGeneratorsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPopularFeedGenerators<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetPopularFeedGenerators<S> {
     const NSID: &'static str = "app.bsky.unspecced.getPopularFeedGenerators";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPopularFeedGeneratorsResponse;
@@ -62,7 +78,7 @@ pub struct GetPopularFeedGeneratorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPopularFeedGeneratorsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getPopularFeedGenerators";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPopularFeedGenerators<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetPopularFeedGenerators<S>;
     type Response = GetPopularFeedGeneratorsResponse;
 }
 
@@ -95,7 +111,7 @@ pub struct GetPopularFeedGeneratorsBuilder<
     S: get_popular_feed_generators_state::State,
 > {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -125,12 +141,12 @@ impl<
     S: get_popular_feed_generators_state::State,
 > GetPopularFeedGeneratorsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -157,12 +173,12 @@ impl<
     S: get_popular_feed_generators_state::State,
 > GetPopularFeedGeneratorsBuilder<'a, S> {
     /// Set the `query` field (optional)
-    pub fn query(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn query(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `query` field to an Option value (optional)
-    pub fn maybe_query(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_query(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }

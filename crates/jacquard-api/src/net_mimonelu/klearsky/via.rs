@@ -5,6 +5,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 /// Client application name and version that created the post. Used as an extension field in app.bsky.feed.post records.
-pub type Via<'a> = CowStr<'a>;
+pub type Via<'a> = S;

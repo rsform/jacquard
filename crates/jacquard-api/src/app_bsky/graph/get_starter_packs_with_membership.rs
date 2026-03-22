@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -28,12 +30,18 @@ use crate::app_bsky::graph::get_starter_packs_with_membership;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetStarterPacksWithMembership<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetStarterPacksWithMembership<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub actor: AtIdentifier<'a>,
+    pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -41,30 +49,42 @@ pub struct GetStarterPacksWithMembership<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetStarterPacksWithMembershipOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetStarterPacksWithMembershipOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
+    pub cursor: Option<S>,
     pub starter_packs_with_membership: Vec<
-        get_starter_packs_with_membership::StarterPackWithMembership<'a>,
+        get_starter_packs_with_membership::StarterPackWithMembership<S>,
     >,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A starter pack and an optional list item indicating membership of a target user to that starter pack.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StarterPackWithMembership<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StarterPackWithMembership<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub list_item: Option<ListItemView<'a>>,
-    #[serde(borrow)]
-    pub starter_pack: StarterPackView<'a>,
+    pub list_item: Option<ListItemView<S>>,
+    pub starter_pack: StarterPackView<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.graph.getStarterPacksWithMembership
@@ -72,11 +92,12 @@ pub struct GetStarterPacksWithMembershipResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStarterPacksWithMembershipResponse {
     const NSID: &'static str = "app.bsky.graph.getStarterPacksWithMembership";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetStarterPacksWithMembershipOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetStarterPacksWithMembershipOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetStarterPacksWithMembership<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetStarterPacksWithMembership<S> {
     const NSID: &'static str = "app.bsky.graph.getStarterPacksWithMembership";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetStarterPacksWithMembershipResponse;
@@ -87,11 +108,11 @@ pub struct GetStarterPacksWithMembershipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksWithMembershipRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.getStarterPacksWithMembership";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetStarterPacksWithMembership<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetStarterPacksWithMembership<S>;
     type Response = GetStarterPacksWithMembershipResponse;
 }
 
-impl<'a> LexiconSchema for StarterPackWithMembership<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for StarterPackWithMembership<S> {
     fn nsid() -> &'static str {
         "app.bsky.graph.getStarterPacksWithMembership"
     }
@@ -148,7 +169,7 @@ pub struct GetStarterPacksWithMembershipBuilder<
     S: get_starter_packs_with_membership_state::State,
 > {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -186,7 +207,7 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetStarterPacksWithMembershipBuilder<
         'a,
         get_starter_packs_with_membership_state::SetActor<S>,
@@ -205,12 +226,12 @@ impl<
     S: get_starter_packs_with_membership_state::State,
 > GetStarterPacksWithMembershipBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -285,7 +306,7 @@ pub struct StarterPackWithMembershipBuilder<
     S: starter_pack_with_membership_state::State,
 > {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<ListItemView<'a>>, Option<StarterPackView<'a>>),
+    _fields: (Option<ListItemView<S>>, Option<StarterPackView<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -317,12 +338,12 @@ impl<
     S: starter_pack_with_membership_state::State,
 > StarterPackWithMembershipBuilder<'a, S> {
     /// Set the `listItem` field (optional)
-    pub fn list_item(mut self, value: impl Into<Option<ListItemView<'a>>>) -> Self {
+    pub fn list_item(mut self, value: impl Into<Option<ListItemView<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `listItem` field to an Option value (optional)
-    pub fn maybe_list_item(mut self, value: Option<ListItemView<'a>>) -> Self {
+    pub fn maybe_list_item(mut self, value: Option<ListItemView<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -336,7 +357,7 @@ where
     /// Set the `starterPack` field (required)
     pub fn starter_pack(
         mut self,
-        value: impl Into<StarterPackView<'a>>,
+        value: impl Into<StarterPackView<S>>,
     ) -> StarterPackWithMembershipBuilder<
         'a,
         starter_pack_with_membership_state::SetStarterPack<S>,
@@ -366,10 +387,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> StarterPackWithMembership<'a> {
         StarterPackWithMembership {
             list_item: self._fields.0,

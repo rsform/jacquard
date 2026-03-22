@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -34,47 +36,59 @@ use crate::app_offprint::block::ordered_list::OrderedList;
 use crate::app_offprint::block::task_list::TaskList;
 use crate::app_offprint::block::text::Text;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Content<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Content<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of content blocks
-    #[serde(borrow)]
-    pub items: Vec<ContentItemsItem<'a>>,
+    pub items: Vec<ContentItemsItem<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ContentItemsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ContentItemsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.offprint.block.text")]
-    Text(Box<Text<'a>>),
+    Text(Box<Text<S>>),
     #[serde(rename = "app.offprint.block.heading")]
-    Heading(Box<Heading<'a>>),
+    Heading(Box<Heading<S>>),
     #[serde(rename = "app.offprint.block.blockquote")]
-    Blockquote(Box<Blockquote<'a>>),
+    Blockquote(Box<Blockquote<S>>),
     #[serde(rename = "app.offprint.block.callout")]
-    Callout(Box<Callout<'a>>),
+    Callout(Box<Callout<S>>),
     #[serde(rename = "app.offprint.block.bulletList")]
-    BulletList(Box<BulletList<'a>>),
+    BulletList(Box<BulletList<S>>),
     #[serde(rename = "app.offprint.block.orderedList")]
-    OrderedList(Box<OrderedList<'a>>),
+    OrderedList(Box<OrderedList<S>>),
     #[serde(rename = "app.offprint.block.taskList")]
-    TaskList(Box<TaskList<'a>>),
+    TaskList(Box<TaskList<S>>),
     #[serde(rename = "app.offprint.block.codeBlock")]
-    CodeBlock(Box<CodeBlock<'a>>),
+    CodeBlock(Box<CodeBlock<S>>),
     #[serde(rename = "app.offprint.block.image")]
-    Image(Box<Image<'a>>),
+    Image(Box<Image<S>>),
     #[serde(rename = "app.offprint.block.imageGrid")]
-    ImageGrid(Box<ImageGrid<'a>>),
+    ImageGrid(Box<ImageGrid<S>>),
     #[serde(rename = "app.offprint.block.imageCarousel")]
-    ImageCarousel(Box<ImageCarousel<'a>>),
+    ImageCarousel(Box<ImageCarousel<S>>),
     #[serde(rename = "app.offprint.block.imageDiff")]
-    ImageDiff(Box<ImageDiff<'a>>),
+    ImageDiff(Box<ImageDiff<S>>),
 }
 
-impl<'a> LexiconSchema for Content<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Content<S> {
     fn nsid() -> &'static str {
         "app.offprint.content"
     }
@@ -124,7 +138,7 @@ pub mod content_state {
 /// Builder for constructing an instance of this type
 pub struct ContentBuilder<'a, S: content_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<ContentItemsItem<'a>>>,),
+    _fields: (Option<Vec<ContentItemsItem<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -154,7 +168,7 @@ where
     /// Set the `items` field (required)
     pub fn items(
         mut self,
-        value: impl Into<Vec<ContentItemsItem<'a>>>,
+        value: impl Into<Vec<ContentItemsItem<S>>>,
     ) -> ContentBuilder<'a, content_state::SetItems<S>> {
         self._fields.0 = Option::Some(value.into());
         ContentBuilder {
@@ -180,7 +194,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Content<'a> {
         Content {
             items: self._fields.0.unwrap(),

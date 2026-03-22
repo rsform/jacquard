@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::types::string::{Did, Nsid, RecordKey, Rkey};
 use jacquard_derive::{IntoStatic, open_union};
@@ -15,13 +15,19 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRecord<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub collection: Nsid<'a>,
+    pub collection: Nsid<S>,
     #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     #[serde(borrow)]
-    pub rkey: RecordKey<Rkey<'a>>,
+    pub rkey: RecordKey<Rkey<S>>,
 }
 
 
@@ -32,7 +38,6 @@ pub struct GetRecordOutput {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -41,26 +46,30 @@ pub struct GetRecordOutput {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRecordError<'a> {
+pub enum GetRecordError {
     #[serde(rename = "RecordNotFound")]
-    RecordNotFound(Option<CowStr<'a>>),
+    RecordNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     #[serde(rename = "RepoTakendown")]
-    RepoTakendown(Option<CowStr<'a>>),
+    RepoTakendown(Option<jacquard_common::deps::smol_str::SmolStr>),
     #[serde(rename = "RepoSuspended")]
-    RepoSuspended(Option<CowStr<'a>>),
+    RepoSuspended(Option<jacquard_common::deps::smol_str::SmolStr>),
     #[serde(rename = "RepoDeactivated")]
-    RepoDeactivated(Option<CowStr<'a>>),
+    RepoDeactivated(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for GetRecordError<'_> {
+impl core::fmt::Display for GetRecordError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RecordNotFound(msg) => {
@@ -98,7 +107,13 @@ impl core::fmt::Display for GetRecordError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -108,18 +123,22 @@ pub struct GetRecordResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecordResponse {
     const NSID: &'static str = "com.atproto.sync.getRecord";
     const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<'de> = GetRecordOutput;
-    type Err<'de> = GetRecordError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = GetRecordOutput;
+    type Err = GetRecordError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(GetRecordOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -127,7 +146,8 @@ impl jacquard_common::xrpc::XrpcResp for GetRecordResponse {
     }
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecord<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetRecord<S> {
     const NSID: &'static str = "com.atproto.sync.getRecord";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecordResponse;
@@ -138,7 +158,7 @@ pub struct GetRecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecordRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getRecord";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRecord<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetRecord<S>;
     type Response = GetRecordResponse;
 }
 
@@ -203,7 +223,7 @@ pub mod get_record_state {
 /// Builder for constructing an instance of this type
 pub struct GetRecordBuilder<'a, S: get_record_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Nsid<'a>>, Option<Did<'a>>, Option<RecordKey<Rkey<'a>>>),
+    _fields: (Option<Nsid<S>>, Option<Did<S>>, Option<RecordKey<Rkey<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -233,7 +253,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<Nsid<'a>>,
+        value: impl Into<Nsid<S>>,
     ) -> GetRecordBuilder<'a, get_record_state::SetCollection<S>> {
         self._fields.0 = Option::Some(value.into());
         GetRecordBuilder {
@@ -252,7 +272,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetRecordBuilder<'a, get_record_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         GetRecordBuilder {
@@ -271,7 +291,7 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<RecordKey<Rkey<'a>>>,
+        value: impl Into<RecordKey<Rkey<S>>>,
     ) -> GetRecordBuilder<'a, get_record_state::SetRkey<S>> {
         self._fields.2 = Option::Some(value.into());
         GetRecordBuilder {

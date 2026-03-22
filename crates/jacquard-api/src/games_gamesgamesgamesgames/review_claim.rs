@@ -10,37 +10,44 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ReviewClaim<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReviewClaim<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub approved_games: Option<Vec<AtUri<'a>>>,
-    #[serde(borrow)]
-    pub claim: StrongRef<'a>,
+    pub approved_games: Option<Vec<AtUri<S>>>,
+    pub claim: StrongRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reason: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub status: ReviewClaimStatus<'a>,
+    pub reason: Option<S>,
+    pub status: ReviewClaimStatus<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReviewClaimStatus<'a> {
+pub enum ReviewClaimStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Approved,
     Denied,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ReviewClaimStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> ReviewClaimStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Approved => "approved",
@@ -48,70 +55,56 @@ impl<'a> ReviewClaimStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ReviewClaimStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "approved" => Self::Approved,
             "denied" => Self::Denied,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ReviewClaimStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "approved" => Self::Approved,
-            "denied" => Self::Denied,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ReviewClaimStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ReviewClaimStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ReviewClaimStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ReviewClaimStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ReviewClaimStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ReviewClaimStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ReviewClaimStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ReviewClaimStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ReviewClaimStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ReviewClaimStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ReviewClaimStatus<'_> {
-    type Output = ReviewClaimStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ReviewClaimStatus<S> {
+    type Output = ReviewClaimStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ReviewClaimStatus::Approved => ReviewClaimStatus::Approved,
@@ -122,12 +115,20 @@ impl jacquard_common::IntoStatic for ReviewClaimStatus<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ReviewClaimOutput<'a> {
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReviewClaimOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub uri: AtUri<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for games.gamesgamesgamesgames.reviewClaim
@@ -135,11 +136,12 @@ pub struct ReviewClaimResponse;
 impl jacquard_common::xrpc::XrpcResp for ReviewClaimResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.reviewClaim";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReviewClaimOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ReviewClaimOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ReviewClaim<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ReviewClaim<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.reviewClaim";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -154,7 +156,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ReviewClaimRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = ReviewClaim<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ReviewClaim<S>;
     type Response = ReviewClaimResponse;
 }
 
@@ -206,10 +208,10 @@ pub mod review_claim_state {
 pub struct ReviewClaimBuilder<'a, S: review_claim_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<AtUri<'a>>>,
-        Option<StrongRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<ReviewClaimStatus<'a>>,
+        Option<Vec<AtUri<S>>>,
+        Option<StrongRef<S>>,
+        Option<S>,
+        Option<ReviewClaimStatus<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -234,12 +236,12 @@ impl<'a> ReviewClaimBuilder<'a, review_claim_state::Empty> {
 
 impl<'a, S: review_claim_state::State> ReviewClaimBuilder<'a, S> {
     /// Set the `approvedGames` field (optional)
-    pub fn approved_games(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn approved_games(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `approvedGames` field to an Option value (optional)
-    pub fn maybe_approved_games(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_approved_games(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -253,7 +255,7 @@ where
     /// Set the `claim` field (required)
     pub fn claim(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> ReviewClaimBuilder<'a, review_claim_state::SetClaim<S>> {
         self._fields.1 = Option::Some(value.into());
         ReviewClaimBuilder {
@@ -266,12 +268,12 @@ where
 
 impl<'a, S: review_claim_state::State> ReviewClaimBuilder<'a, S> {
     /// Set the `reason` field (optional)
-    pub fn reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `reason` field to an Option value (optional)
-    pub fn maybe_reason(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_reason(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -285,7 +287,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<ReviewClaimStatus<'a>>,
+        value: impl Into<ReviewClaimStatus<S>>,
     ) -> ReviewClaimBuilder<'a, review_claim_state::SetStatus<S>> {
         self._fields.3 = Option::Some(value.into());
         ReviewClaimBuilder {
@@ -315,10 +317,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ReviewClaim<'a> {
         ReviewClaim {
             approved_games: self._fields.0,

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,56 +30,65 @@ use serde::{Serialize, Deserialize};
 use crate::blue_rito::label::auto::like::settings;
 /// Setting Like based auto labeling.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "blue.rito.label.auto.like.settings",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Settings<'a> {
+pub struct Settings<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The post to apply the label to
-    #[serde(borrow)]
-    pub apply: settings::PostRef<'a>,
+    pub apply: settings::PostRef<S>,
     pub created_at: Datetime,
     ///The post to remove the label from
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub delete: Option<settings::PostRef<'a>>,
+    pub delete: Option<settings::PostRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SettingsGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SettingsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Settings<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Settings<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PostRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PostRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///CID of the post
-    #[serde(borrow)]
-    pub cid: CowStr<'a>,
+    pub cid: S,
     ///URI of the post
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+    pub uri: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Settings<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SettingsRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Settings<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SettingsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -88,18 +99,17 @@ pub struct SettingsRecord;
 impl XrpcResp for SettingsRecord {
     const NSID: &'static str = "blue.rito.label.auto.like.settings";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SettingsGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SettingsGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SettingsGetRecordOutput<'_>> for Settings<'_> {
-    fn from(output: SettingsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SettingsGetRecordOutput<S>> for Settings<S> {
+    fn from(output: SettingsGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Settings<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Settings<S> {
     const NSID: &'static str = "blue.rito.label.auto.like.settings";
     type Record = SettingsRecord;
 }
@@ -109,7 +119,7 @@ impl Collection for SettingsRecord {
     type Record = SettingsRecord;
 }
 
-impl<'a> LexiconSchema for Settings<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Settings<S> {
     fn nsid() -> &'static str {
         "blue.rito.label.auto.like.settings"
     }
@@ -124,7 +134,7 @@ impl<'a> LexiconSchema for Settings<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PostRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PostRef<S> {
     fn nsid() -> &'static str {
         "blue.rito.label.auto.like.settings"
     }
@@ -149,37 +159,37 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Apply;
         type CreatedAt;
+        type Apply;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Apply = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `apply` field to Set
-    pub struct SetApply<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetApply<S> {}
-    impl<S: State> State for SetApply<S> {
-        type Apply = Set<members::apply>;
-        type CreatedAt = S::CreatedAt;
+        type Apply = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Apply = S::Apply;
         type CreatedAt = Set<members::created_at>;
+        type Apply = S::Apply;
+    }
+    ///State transition - sets the `apply` field to Set
+    pub struct SetApply<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetApply<S> {}
+    impl<S: State> State for SetApply<S> {
+        type CreatedAt = S::CreatedAt;
+        type Apply = Set<members::apply>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `apply` field
-        pub struct apply(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `apply` field
+        pub struct apply(());
     }
 }
 
@@ -187,9 +197,9 @@ pub mod settings_state {
 pub struct SettingsBuilder<'a, S: settings_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<settings::PostRef<'a>>,
+        Option<settings::PostRef<S>>,
         Option<Datetime>,
-        Option<settings::PostRef<'a>>,
+        Option<settings::PostRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -220,7 +230,7 @@ where
     /// Set the `apply` field (required)
     pub fn apply(
         mut self,
-        value: impl Into<settings::PostRef<'a>>,
+        value: impl Into<settings::PostRef<S>>,
     ) -> SettingsBuilder<'a, settings_state::SetApply<S>> {
         self._fields.0 = Option::Some(value.into());
         SettingsBuilder {
@@ -252,12 +262,12 @@ where
 
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `delete` field (optional)
-    pub fn delete(mut self, value: impl Into<Option<settings::PostRef<'a>>>) -> Self {
+    pub fn delete(mut self, value: impl Into<Option<settings::PostRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `delete` field to an Option value (optional)
-    pub fn maybe_delete(mut self, value: Option<settings::PostRef<'a>>) -> Self {
+    pub fn maybe_delete(mut self, value: Option<settings::PostRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -266,8 +276,8 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 impl<'a, S> SettingsBuilder<'a, S>
 where
     S: settings_state::State,
-    S::Apply: settings_state::IsSet,
     S::CreatedAt: settings_state::IsSet,
+    S::Apply: settings_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Settings<'a> {
@@ -281,10 +291,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Settings<'a> {
         Settings {
             apply: self._fields.0.unwrap(),
@@ -405,44 +412,44 @@ pub mod post_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PostRefBuilder<'a, S: post_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _fields: (Option<S>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -472,7 +479,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PostRefBuilder<'a, post_ref_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         PostRefBuilder {
@@ -491,7 +498,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> PostRefBuilder<'a, post_ref_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         PostRefBuilder {
@@ -505,8 +512,8 @@ where
 impl<'a, S> PostRefBuilder<'a, S>
 where
     S: post_ref_state::State,
-    S::Cid: post_ref_state::IsSet,
     S::Uri: post_ref_state::IsSet,
+    S::Cid: post_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PostRef<'a> {
@@ -519,10 +526,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PostRef<'a> {
         PostRef {
             cid: self._fields.0.unwrap(),

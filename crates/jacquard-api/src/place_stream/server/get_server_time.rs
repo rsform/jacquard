@@ -10,20 +10,32 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetServerTime;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetServerTimeOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetServerTimeOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Current server time in RFC3339 format
     pub server_time: Datetime,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for place.stream.server.getServerTime
@@ -31,8 +43,8 @@ pub struct GetServerTimeResponse;
 impl jacquard_common::xrpc::XrpcResp for GetServerTimeResponse {
     const NSID: &'static str = "place.stream.server.getServerTime";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetServerTimeOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetServerTimeOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetServerTime {
@@ -46,6 +58,6 @@ pub struct GetServerTimeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetServerTimeRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.getServerTime";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetServerTime;
+    type Request<S: Bos<str> + AsRef<str>> = GetServerTime;
     type Response = GetServerTimeResponse;
 }

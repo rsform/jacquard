@@ -26,13 +26,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -42,106 +43,128 @@ use serde::{Serialize, Deserialize};
 use crate::sh_tangled::git::temp;
 /// blob metadata. This object doesn't include the blob content
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Blob<'a> {
-    #[serde(borrow)]
-    pub last_commit: temp::Commit<'a>,
-    #[serde(borrow)]
-    pub mode: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Blob<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub last_commit: temp::Commit<S>,
+    pub mode: S,
     ///The file name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///File size in bytes
     pub size: i64,
     ///Submodule information if path is a submodule
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub submodule: Option<temp::Submodule<'a>>,
+    pub submodule: Option<temp::Submodule<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Branch<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Branch<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///hydrated commit object
-    #[serde(borrow)]
-    pub commit: temp::Commit<'a>,
+    pub commit: temp::Commit<S>,
     ///branch name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Commit<'a> {
-    #[serde(borrow)]
-    pub author: temp::Signature<'a>,
-    #[serde(borrow)]
-    pub committer: temp::Signature<'a>,
-    #[serde(borrow)]
-    pub hash: temp::Hash<'a>,
-    #[serde(borrow)]
-    pub message: CowStr<'a>,
-    #[serde(borrow)]
-    pub tree: temp::Hash<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Commit<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub author: temp::Signature<S>,
+    pub committer: temp::Signature<S>,
+    pub hash: temp::Hash<S>,
+    pub message: S,
+    pub tree: temp::Hash<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-pub type Hash<'a> = CowStr<'a>;
+pub type Hash<'a> = S;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Signature<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Signature<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Person email
-    #[serde(borrow)]
-    pub email: CowStr<'a>,
+    pub email: S,
     ///Person name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Timestamp of the signature
     pub when: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Submodule<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Submodule<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Branch to track in the submodule
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub branch: Option<CowStr<'a>>,
+    pub branch: Option<S>,
     ///Submodule name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Submodule repository URL
-    #[serde(borrow)]
-    pub url: CowStr<'a>,
+    pub url: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Tag<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     ///tag name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
-    #[serde(borrow)]
-    pub tagger: temp::Signature<'a>,
-    #[serde(borrow)]
-    pub target: Data<'a>,
+    pub name: S,
+    pub tagger: temp::Signature<S>,
+    pub target: Data<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Blob<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Blob<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.defs"
     }
@@ -156,7 +179,7 @@ impl<'a> LexiconSchema for Blob<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Branch<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Branch<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.defs"
     }
@@ -171,7 +194,7 @@ impl<'a> LexiconSchema for Branch<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Commit<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Commit<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.defs"
     }
@@ -186,7 +209,7 @@ impl<'a> LexiconSchema for Commit<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Signature<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Signature<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.defs"
     }
@@ -201,7 +224,7 @@ impl<'a> LexiconSchema for Signature<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Submodule<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Submodule<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.defs"
     }
@@ -216,7 +239,7 @@ impl<'a> LexiconSchema for Submodule<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Tag<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tag<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.defs"
     }
@@ -242,66 +265,66 @@ pub mod blob_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type LastCommit;
-        type Name;
         type Mode;
         type Size;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type LastCommit = Unset;
-        type Name = Unset;
         type Mode = Unset;
         type Size = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `last_commit` field to Set
     pub struct SetLastCommit<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLastCommit<S> {}
     impl<S: State> State for SetLastCommit<S> {
         type LastCommit = Set<members::last_commit>;
+        type Mode = S::Mode;
+        type Size = S::Size;
         type Name = S::Name;
-        type Mode = S::Mode;
-        type Size = S::Size;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type LastCommit = S::LastCommit;
-        type Name = Set<members::name>;
-        type Mode = S::Mode;
-        type Size = S::Size;
     }
     ///State transition - sets the `mode` field to Set
     pub struct SetMode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMode<S> {}
     impl<S: State> State for SetMode<S> {
         type LastCommit = S::LastCommit;
-        type Name = S::Name;
         type Mode = Set<members::mode>;
         type Size = S::Size;
+        type Name = S::Name;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSize<S> {}
     impl<S: State> State for SetSize<S> {
         type LastCommit = S::LastCommit;
-        type Name = S::Name;
         type Mode = S::Mode;
         type Size = Set<members::size>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type LastCommit = S::LastCommit;
+        type Mode = S::Mode;
+        type Size = S::Size;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `last_commit` field
         pub struct last_commit(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `mode` field
         pub struct mode(());
         ///Marker type for the `size` field
         pub struct size(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -309,11 +332,11 @@ pub mod blob_state {
 pub struct BlobBuilder<'a, S: blob_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<temp::Commit<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<temp::Commit<S>>,
+        Option<S>,
+        Option<S>,
         Option<i64>,
-        Option<temp::Submodule<'a>>,
+        Option<temp::Submodule<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -344,7 +367,7 @@ where
     /// Set the `lastCommit` field (required)
     pub fn last_commit(
         mut self,
-        value: impl Into<temp::Commit<'a>>,
+        value: impl Into<temp::Commit<S>>,
     ) -> BlobBuilder<'a, blob_state::SetLastCommit<S>> {
         self._fields.0 = Option::Some(value.into());
         BlobBuilder {
@@ -363,7 +386,7 @@ where
     /// Set the `mode` field (required)
     pub fn mode(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BlobBuilder<'a, blob_state::SetMode<S>> {
         self._fields.1 = Option::Some(value.into());
         BlobBuilder {
@@ -382,7 +405,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BlobBuilder<'a, blob_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         BlobBuilder {
@@ -414,12 +437,12 @@ where
 
 impl<'a, S: blob_state::State> BlobBuilder<'a, S> {
     /// Set the `submodule` field (optional)
-    pub fn submodule(mut self, value: impl Into<Option<temp::Submodule<'a>>>) -> Self {
+    pub fn submodule(mut self, value: impl Into<Option<temp::Submodule<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `submodule` field to an Option value (optional)
-    pub fn maybe_submodule(mut self, value: Option<temp::Submodule<'a>>) -> Self {
+    pub fn maybe_submodule(mut self, value: Option<temp::Submodule<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -429,9 +452,9 @@ impl<'a, S> BlobBuilder<'a, S>
 where
     S: blob_state::State,
     S::LastCommit: blob_state::IsSet,
-    S::Name: blob_state::IsSet,
     S::Mode: blob_state::IsSet,
     S::Size: blob_state::IsSet,
+    S::Name: blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Blob<'a> {
@@ -445,10 +468,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Blob<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Blob<'a> {
         Blob {
             last_commit: self._fields.0.unwrap(),
             mode: self._fields.1.unwrap(),
@@ -780,7 +800,7 @@ pub mod branch_state {
 /// Builder for constructing an instance of this type
 pub struct BranchBuilder<'a, S: branch_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<temp::Commit<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<temp::Commit<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -810,7 +830,7 @@ where
     /// Set the `commit` field (required)
     pub fn commit(
         mut self,
-        value: impl Into<temp::Commit<'a>>,
+        value: impl Into<temp::Commit<S>>,
     ) -> BranchBuilder<'a, branch_state::SetCommit<S>> {
         self._fields.0 = Option::Some(value.into());
         BranchBuilder {
@@ -829,7 +849,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BranchBuilder<'a, branch_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         BranchBuilder {
@@ -855,10 +875,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Branch<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Branch<'a> {
         Branch {
             commit: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -880,8 +897,8 @@ pub mod commit_state {
         type Author;
         type Committer;
         type Hash;
-        type Message;
         type Tree;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -890,8 +907,8 @@ pub mod commit_state {
         type Author = Unset;
         type Committer = Unset;
         type Hash = Unset;
-        type Message = Unset;
         type Tree = Unset;
+        type Message = Unset;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
@@ -900,8 +917,8 @@ pub mod commit_state {
         type Author = Set<members::author>;
         type Committer = S::Committer;
         type Hash = S::Hash;
-        type Message = S::Message;
         type Tree = S::Tree;
+        type Message = S::Message;
     }
     ///State transition - sets the `committer` field to Set
     pub struct SetCommitter<S: State = Empty>(PhantomData<fn() -> S>);
@@ -910,8 +927,8 @@ pub mod commit_state {
         type Author = S::Author;
         type Committer = Set<members::committer>;
         type Hash = S::Hash;
-        type Message = S::Message;
         type Tree = S::Tree;
+        type Message = S::Message;
     }
     ///State transition - sets the `hash` field to Set
     pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
@@ -920,18 +937,8 @@ pub mod commit_state {
         type Author = S::Author;
         type Committer = S::Committer;
         type Hash = Set<members::hash>;
+        type Tree = S::Tree;
         type Message = S::Message;
-        type Tree = S::Tree;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Author = S::Author;
-        type Committer = S::Committer;
-        type Hash = S::Hash;
-        type Message = Set<members::message>;
-        type Tree = S::Tree;
     }
     ///State transition - sets the `tree` field to Set
     pub struct SetTree<S: State = Empty>(PhantomData<fn() -> S>);
@@ -940,8 +947,18 @@ pub mod commit_state {
         type Author = S::Author;
         type Committer = S::Committer;
         type Hash = S::Hash;
-        type Message = S::Message;
         type Tree = Set<members::tree>;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Author = S::Author;
+        type Committer = S::Committer;
+        type Hash = S::Hash;
+        type Tree = S::Tree;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -952,10 +969,10 @@ pub mod commit_state {
         pub struct committer(());
         ///Marker type for the `hash` field
         pub struct hash(());
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `tree` field
         pub struct tree(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
@@ -963,11 +980,11 @@ pub mod commit_state {
 pub struct CommitBuilder<'a, S: commit_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<temp::Signature<'a>>,
-        Option<temp::Signature<'a>>,
-        Option<temp::Hash<'a>>,
-        Option<CowStr<'a>>,
-        Option<temp::Hash<'a>>,
+        Option<temp::Signature<S>>,
+        Option<temp::Signature<S>>,
+        Option<temp::Hash<S>>,
+        Option<S>,
+        Option<temp::Hash<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -998,7 +1015,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<temp::Signature<'a>>,
+        value: impl Into<temp::Signature<S>>,
     ) -> CommitBuilder<'a, commit_state::SetAuthor<S>> {
         self._fields.0 = Option::Some(value.into());
         CommitBuilder {
@@ -1017,7 +1034,7 @@ where
     /// Set the `committer` field (required)
     pub fn committer(
         mut self,
-        value: impl Into<temp::Signature<'a>>,
+        value: impl Into<temp::Signature<S>>,
     ) -> CommitBuilder<'a, commit_state::SetCommitter<S>> {
         self._fields.1 = Option::Some(value.into());
         CommitBuilder {
@@ -1036,7 +1053,7 @@ where
     /// Set the `hash` field (required)
     pub fn hash(
         mut self,
-        value: impl Into<temp::Hash<'a>>,
+        value: impl Into<temp::Hash<S>>,
     ) -> CommitBuilder<'a, commit_state::SetHash<S>> {
         self._fields.2 = Option::Some(value.into());
         CommitBuilder {
@@ -1055,7 +1072,7 @@ where
     /// Set the `message` field (required)
     pub fn message(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CommitBuilder<'a, commit_state::SetMessage<S>> {
         self._fields.3 = Option::Some(value.into());
         CommitBuilder {
@@ -1074,7 +1091,7 @@ where
     /// Set the `tree` field (required)
     pub fn tree(
         mut self,
-        value: impl Into<temp::Hash<'a>>,
+        value: impl Into<temp::Hash<S>>,
     ) -> CommitBuilder<'a, commit_state::SetTree<S>> {
         self._fields.4 = Option::Some(value.into());
         CommitBuilder {
@@ -1091,8 +1108,8 @@ where
     S::Author: commit_state::IsSet,
     S::Committer: commit_state::IsSet,
     S::Hash: commit_state::IsSet,
-    S::Message: commit_state::IsSet,
     S::Tree: commit_state::IsSet,
+    S::Message: commit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Commit<'a> {
@@ -1106,10 +1123,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Commit<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Commit<'a> {
         Commit {
             author: self._fields.0.unwrap(),
             committer: self._fields.1.unwrap(),
@@ -1131,58 +1145,58 @@ pub mod signature_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type When;
         type Name;
         type Email;
+        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type When = Unset;
         type Name = Unset;
         type Email = Unset;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type When = Set<members::when>;
-        type Name = S::Name;
-        type Email = S::Email;
+        type When = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type When = S::When;
         type Name = Set<members::name>;
         type Email = S::Email;
+        type When = S::When;
     }
     ///State transition - sets the `email` field to Set
     pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEmail<S> {}
     impl<S: State> State for SetEmail<S> {
-        type When = S::When;
         type Name = S::Name;
         type Email = Set<members::email>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Name = S::Name;
+        type Email = S::Email;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `when` field
-        pub struct when(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `email` field
         pub struct email(());
+        ///Marker type for the `when` field
+        pub struct when(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SignatureBuilder<'a, S: signature_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _fields: (Option<S>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1212,7 +1226,7 @@ where
     /// Set the `email` field (required)
     pub fn email(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SignatureBuilder<'a, signature_state::SetEmail<S>> {
         self._fields.0 = Option::Some(value.into());
         SignatureBuilder {
@@ -1231,7 +1245,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SignatureBuilder<'a, signature_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         SignatureBuilder {
@@ -1264,9 +1278,9 @@ where
 impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
-    S::When: signature_state::IsSet,
     S::Name: signature_state::IsSet,
     S::Email: signature_state::IsSet,
+    S::When: signature_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Signature<'a> {
@@ -1280,7 +1294,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Signature<'a> {
         Signature {
             email: self._fields.0.unwrap(),
@@ -1301,63 +1315,58 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Target;
         type Name;
         type Tagger;
-        type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Target = Unset;
         type Name = Unset;
         type Tagger = Unset;
-        type Target = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Tagger = S::Tagger;
-        type Target = S::Target;
-    }
-    ///State transition - sets the `tagger` field to Set
-    pub struct SetTagger<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTagger<S> {}
-    impl<S: State> State for SetTagger<S> {
-        type Name = S::Name;
-        type Tagger = Set<members::tagger>;
-        type Target = S::Target;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTarget<S> {}
     impl<S: State> State for SetTarget<S> {
+        type Target = Set<members::target>;
         type Name = S::Name;
         type Tagger = S::Tagger;
-        type Target = Set<members::target>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Target = S::Target;
+        type Name = Set<members::name>;
+        type Tagger = S::Tagger;
+    }
+    ///State transition - sets the `tagger` field to Set
+    pub struct SetTagger<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTagger<S> {}
+    impl<S: State> State for SetTagger<S> {
+        type Target = S::Target;
+        type Name = S::Name;
+        type Tagger = Set<members::tagger>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `target` field
+        pub struct target(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `tagger` field
         pub struct tagger(());
-        ///Marker type for the `target` field
-        pub struct target(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TagBuilder<'a, S: tag_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<temp::Signature<'a>>,
-        Option<Data<'a>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<temp::Signature<S>>, Option<Data<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1381,12 +1390,12 @@ impl<'a> TagBuilder<'a, tag_state::Empty> {
 
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
-    pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_message(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1398,10 +1407,7 @@ where
     S::Name: tag_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<CowStr<'a>>,
-    ) -> TagBuilder<'a, tag_state::SetName<S>> {
+    pub fn name(mut self, value: impl Into<S>) -> TagBuilder<'a, tag_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
@@ -1419,7 +1425,7 @@ where
     /// Set the `tagger` field (required)
     pub fn tagger(
         mut self,
-        value: impl Into<temp::Signature<'a>>,
+        value: impl Into<temp::Signature<S>>,
     ) -> TagBuilder<'a, tag_state::SetTagger<S>> {
         self._fields.2 = Option::Some(value.into());
         TagBuilder {
@@ -1438,7 +1444,7 @@ where
     /// Set the `target` field (required)
     pub fn target(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> TagBuilder<'a, tag_state::SetTarget<S>> {
         self._fields.3 = Option::Some(value.into());
         TagBuilder {
@@ -1452,9 +1458,9 @@ where
 impl<'a, S> TagBuilder<'a, S>
 where
     S: tag_state::State,
+    S::Target: tag_state::IsSet,
     S::Name: tag_state::IsSet,
     S::Tagger: tag_state::IsSet,
-    S::Target: tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tag<'a> {
@@ -1467,10 +1473,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Tag<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Tag<'a> {
         Tag {
             message: self._fields.0,
             name: self._fields.1.unwrap(),

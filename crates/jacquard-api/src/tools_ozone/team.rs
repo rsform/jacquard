@@ -16,12 +16,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Datetime};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -30,39 +32,42 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewDetailed;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Member<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Member<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub last_updated_by: Option<CowStr<'a>>,
+    pub last_updated_by: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub profile: Option<ProfileViewDetailed<'a>>,
-    #[serde(borrow)]
-    pub role: MemberRole<'a>,
+    pub profile: Option<ProfileViewDetailed<S>>,
+    pub role: MemberRole<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MemberRole<'a> {
+pub enum MemberRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     RoleAdmin,
     RoleModerator,
     RoleTriage,
     RoleVerifier,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> MemberRole<'a> {
+impl<S: Bos<str> + AsRef<str>> MemberRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::RoleAdmin => "tools.ozone.team.defs#roleAdmin",
@@ -72,74 +77,58 @@ impl<'a> MemberRole<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for MemberRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
             "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
             "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
             "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for MemberRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
-            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
-            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
-            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for MemberRole<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for MemberRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for MemberRole<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for MemberRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for MemberRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for MemberRole<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for MemberRole<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for MemberRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for MemberRole<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for MemberRole<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for MemberRole<'_> {
-    type Output = MemberRole<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for MemberRole<S> {
+    type Output = MemberRole<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             MemberRole::RoleAdmin => MemberRole::RoleAdmin,
@@ -191,7 +180,7 @@ impl core::fmt::Display for RoleVerifier {
     }
 }
 
-impl<'a> LexiconSchema for Member<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Member<S> {
     fn nsid() -> &'static str {
         "tools.ozone.team.defs"
     }
@@ -216,37 +205,37 @@ pub mod member_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Role;
         type Did;
+        type Role;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Role = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type Role = Set<members::role>;
-        type Did = S::Did;
+        type Role = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Role = S::Role;
         type Did = Set<members::did>;
+        type Role = S::Role;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRole<S> {}
+    impl<S: State> State for SetRole<S> {
+        type Did = S::Did;
+        type Role = Set<members::role>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `role` field
-        pub struct role(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `role` field
+        pub struct role(());
     }
 }
 
@@ -255,11 +244,11 @@ pub struct MemberBuilder<'a, S: member_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<Did<'a>>,
+        Option<Did<S>>,
         Option<bool>,
-        Option<CowStr<'a>>,
-        Option<ProfileViewDetailed<'a>>,
-        Option<MemberRole<'a>>,
+        Option<S>,
+        Option<ProfileViewDetailed<S>>,
+        Option<MemberRole<S>>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -304,7 +293,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> MemberBuilder<'a, member_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         MemberBuilder {
@@ -330,12 +319,12 @@ impl<'a, S: member_state::State> MemberBuilder<'a, S> {
 
 impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     /// Set the `lastUpdatedBy` field (optional)
-    pub fn last_updated_by(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn last_updated_by(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `lastUpdatedBy` field to an Option value (optional)
-    pub fn maybe_last_updated_by(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_last_updated_by(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -343,12 +332,12 @@ impl<'a, S: member_state::State> MemberBuilder<'a, S> {
 
 impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     /// Set the `profile` field (optional)
-    pub fn profile(mut self, value: impl Into<Option<ProfileViewDetailed<'a>>>) -> Self {
+    pub fn profile(mut self, value: impl Into<Option<ProfileViewDetailed<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `profile` field to an Option value (optional)
-    pub fn maybe_profile(mut self, value: Option<ProfileViewDetailed<'a>>) -> Self {
+    pub fn maybe_profile(mut self, value: Option<ProfileViewDetailed<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -362,7 +351,7 @@ where
     /// Set the `role` field (required)
     pub fn role(
         mut self,
-        value: impl Into<MemberRole<'a>>,
+        value: impl Into<MemberRole<S>>,
     ) -> MemberBuilder<'a, member_state::SetRole<S>> {
         self._fields.5 = Option::Some(value.into());
         MemberBuilder {
@@ -389,8 +378,8 @@ impl<'a, S: member_state::State> MemberBuilder<'a, S> {
 impl<'a, S> MemberBuilder<'a, S>
 where
     S: member_state::State,
-    S::Role: member_state::IsSet,
     S::Did: member_state::IsSet,
+    S::Role: member_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Member<'a> {
@@ -406,13 +395,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Member<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Member<'a> {
         Member {
             created_at: self._fields.0,
             did: self._fields.1.unwrap(),

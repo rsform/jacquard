@@ -10,13 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,47 +26,53 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::get_job_logs;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LogEntry<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LogEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When the log entry was created
     pub created_at: Datetime,
     ///Log entry ID
     pub id: i64,
     ///UUID of related job if applicable
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub job_id: Option<CowStr<'a>>,
+    pub job_id: Option<S>,
     ///Log level
-    #[serde(borrow)]
-    pub level: CowStr<'a>,
+    pub level: S,
     ///Type of log entry
-    #[serde(borrow)]
-    pub log_type: CowStr<'a>,
+    pub log_type: S,
     ///Log message
-    #[serde(borrow)]
-    pub message: CowStr<'a>,
+    pub message: S,
     ///Additional metadata associated with the log entry
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub metadata: Option<Data<'a>>,
+    pub metadata: Option<Data<S>>,
     ///AT-URI of related slice if applicable
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub slice_uri: Option<CowStr<'a>>,
+    pub slice_uri: Option<S>,
     ///DID of related user if applicable
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub user_did: Option<Did<'a>>,
+    pub user_did: Option<Did<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetJobLogs<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetJobLogs<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub job_id: CowStr<'a>,
+    pub job_id: S,
     ///Defaults to `100`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,15 +80,23 @@ pub struct GetJobLogs<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetJobLogsOutput<'a> {
-    #[serde(borrow)]
-    pub logs: Vec<get_job_logs::LogEntry<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetJobLogsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub logs: Vec<get_job_logs::LogEntry<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for LogEntry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LogEntry<S> {
     fn nsid() -> &'static str {
         "network.slices.slice.getJobLogs"
     }
@@ -101,11 +116,12 @@ pub struct GetJobLogsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJobLogsResponse {
     const NSID: &'static str = "network.slices.slice.getJobLogs";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetJobLogsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetJobLogsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetJobLogs<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetJobLogs<S> {
     const NSID: &'static str = "network.slices.slice.getJobLogs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetJobLogsResponse;
@@ -116,7 +132,7 @@ pub struct GetJobLogsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJobLogsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getJobLogs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetJobLogs<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetJobLogs<S>;
     type Response = GetJobLogsResponse;
 }
 
@@ -130,85 +146,85 @@ pub mod log_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
-        type CreatedAt;
-        type Message;
         type Id;
         type LogType;
+        type Message;
+        type Level;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
-        type CreatedAt = Unset;
-        type Message = Unset;
         type Id = Unset;
         type LogType = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Level = Set<members::level>;
-        type CreatedAt = S::CreatedAt;
-        type Message = S::Message;
-        type Id = S::Id;
-        type LogType = S::LogType;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Level = S::Level;
-        type CreatedAt = Set<members::created_at>;
-        type Message = S::Message;
-        type Id = S::Id;
-        type LogType = S::LogType;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
-        type Message = Set<members::message>;
-        type Id = S::Id;
-        type LogType = S::LogType;
+        type Message = Unset;
+        type Level = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
-        type Message = S::Message;
         type Id = Set<members::id>;
         type LogType = S::LogType;
+        type Message = S::Message;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `log_type` field to Set
     pub struct SetLogType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLogType<S> {}
     impl<S: State> State for SetLogType<S> {
-        type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
-        type Message = S::Message;
         type Id = S::Id;
         type LogType = Set<members::log_type>;
+        type Message = S::Message;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Id = S::Id;
+        type LogType = S::LogType;
+        type Message = Set<members::message>;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type Id = S::Id;
+        type LogType = S::LogType;
+        type Message = S::Message;
+        type Level = Set<members::level>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Id = S::Id;
+        type LogType = S::LogType;
+        type Message = S::Message;
+        type Level = S::Level;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `log_type` field
         pub struct log_type(());
+        ///Marker type for the `message` field
+        pub struct message(());
+        ///Marker type for the `level` field
+        pub struct level(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -218,13 +234,13 @@ pub struct LogEntryBuilder<'a, S: log_entry_state::State> {
     _fields: (
         Option<Datetime>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Data<'a>>,
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Data<S>>,
+        Option<S>,
+        Option<Did<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -287,12 +303,12 @@ where
 
 impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
     /// Set the `jobId` field (optional)
-    pub fn job_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn job_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `jobId` field to an Option value (optional)
-    pub fn maybe_job_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_job_id(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -306,7 +322,7 @@ where
     /// Set the `level` field (required)
     pub fn level(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LogEntryBuilder<'a, log_entry_state::SetLevel<S>> {
         self._fields.3 = Option::Some(value.into());
         LogEntryBuilder {
@@ -325,7 +341,7 @@ where
     /// Set the `logType` field (required)
     pub fn log_type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LogEntryBuilder<'a, log_entry_state::SetLogType<S>> {
         self._fields.4 = Option::Some(value.into());
         LogEntryBuilder {
@@ -344,7 +360,7 @@ where
     /// Set the `message` field (required)
     pub fn message(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LogEntryBuilder<'a, log_entry_state::SetMessage<S>> {
         self._fields.5 = Option::Some(value.into());
         LogEntryBuilder {
@@ -357,12 +373,12 @@ where
 
 impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
     /// Set the `metadata` field (optional)
-    pub fn metadata(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn metadata(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
-    pub fn maybe_metadata(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_metadata(mut self, value: Option<Data<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -370,12 +386,12 @@ impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
 
 impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
     /// Set the `sliceUri` field (optional)
-    pub fn slice_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn slice_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `sliceUri` field to an Option value (optional)
-    pub fn maybe_slice_uri(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_slice_uri(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -383,12 +399,12 @@ impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
 
 impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
     /// Set the `userDid` field (optional)
-    pub fn user_did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn user_did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `userDid` field to an Option value (optional)
-    pub fn maybe_user_did(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_user_did(mut self, value: Option<Did<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -397,11 +413,11 @@ impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
 impl<'a, S> LogEntryBuilder<'a, S>
 where
     S: log_entry_state::State,
-    S::Level: log_entry_state::IsSet,
-    S::CreatedAt: log_entry_state::IsSet,
-    S::Message: log_entry_state::IsSet,
     S::Id: log_entry_state::IsSet,
     S::LogType: log_entry_state::IsSet,
+    S::Message: log_entry_state::IsSet,
+    S::Level: log_entry_state::IsSet,
+    S::CreatedAt: log_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LogEntry<'a> {
@@ -421,7 +437,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LogEntry<'a> {
         LogEntry {
             created_at: self._fields.0.unwrap(),
@@ -614,7 +630,7 @@ pub mod get_job_logs_state {
 /// Builder for constructing an instance of this type
 pub struct GetJobLogsBuilder<'a, S: get_job_logs_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -644,7 +660,7 @@ where
     /// Set the `jobId` field (required)
     pub fn job_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetJobLogsBuilder<'a, get_job_logs_state::SetJobId<S>> {
         self._fields.0 = Option::Some(value.into());
         GetJobLogsBuilder {

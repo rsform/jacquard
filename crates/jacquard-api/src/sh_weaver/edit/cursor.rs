@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,103 +29,147 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::edit::cursor;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ContainerId<'a> {
-    #[serde(borrow)]
-    pub value: ContainerIdValue<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ContainerId<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub value: ContainerIdValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ContainerIdValue<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ContainerIdValue<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "sh.weaver.edit.cursor#normalContainerId")]
-    NormalContainerId(Box<cursor::NormalContainerId<'a>>),
+    NormalContainerId(Box<cursor::NormalContainerId<S>>),
     #[serde(rename = "sh.weaver.edit.cursor#rootContainerId")]
-    RootContainerId(Box<cursor::RootContainerId<'a>>),
+    RootContainerId(Box<cursor::RootContainerId<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CursorSide<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CursorSide<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The side of an item the cursor is on (left = -1, right = 1, middle = 0)
     pub value: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Id<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Id<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub counter: i64,
     pub peer: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// An edit record for a notebook.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.weaver.edit.cursor", tag = "$type")]
-pub struct Cursor<'a> {
-    #[serde(borrow)]
-    pub container: cursor::ContainerId<'a>,
-    #[serde(borrow)]
-    pub id: cursor::Id<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.weaver.edit.cursor",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Cursor<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub container: cursor::ContainerId<S>,
+    pub id: cursor::Id<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub side: Option<cursor::CursorSide<'a>>,
+    pub side: Option<cursor::CursorSide<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CursorGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CursorGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Cursor<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Cursor<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct NormalContainerId<'a> {
-    #[serde(borrow)]
-    pub container_type: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct NormalContainerId<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub container_type: S,
     pub counter: i64,
     pub peer: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct RootContainerId<'a> {
-    #[serde(borrow)]
-    pub container_type: CowStr<'a>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RootContainerId<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub container_type: S,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Cursor<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CursorRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Cursor<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CursorRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for ContainerId<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ContainerId<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
@@ -138,7 +184,7 @@ impl<'a> LexiconSchema for ContainerId<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CursorSide<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CursorSide<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
@@ -153,7 +199,7 @@ impl<'a> LexiconSchema for CursorSide<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Id<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Id<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
@@ -175,18 +221,17 @@ pub struct CursorRecord;
 impl XrpcResp for CursorRecord {
     const NSID: &'static str = "sh.weaver.edit.cursor";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CursorGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CursorGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CursorGetRecordOutput<'_>> for Cursor<'_> {
-    fn from(output: CursorGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CursorGetRecordOutput<S>> for Cursor<S> {
+    fn from(output: CursorGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Cursor<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Cursor<S> {
     const NSID: &'static str = "sh.weaver.edit.cursor";
     type Record = CursorRecord;
 }
@@ -196,7 +241,7 @@ impl Collection for CursorRecord {
     type Record = CursorRecord;
 }
 
-impl<'a> LexiconSchema for Cursor<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Cursor<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
@@ -211,7 +256,7 @@ impl<'a> LexiconSchema for Cursor<'a> {
     }
 }
 
-impl<'a> LexiconSchema for NormalContainerId<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for NormalContainerId<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
@@ -226,7 +271,7 @@ impl<'a> LexiconSchema for NormalContainerId<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RootContainerId<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RootContainerId<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
@@ -276,7 +321,7 @@ pub mod container_id_state {
 /// Builder for constructing an instance of this type
 pub struct ContainerIdBuilder<'a, S: container_id_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<ContainerIdValue<'a>>,),
+    _fields: (Option<ContainerIdValue<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -306,7 +351,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<ContainerIdValue<'a>>,
+        value: impl Into<ContainerIdValue<S>>,
     ) -> ContainerIdBuilder<'a, container_id_state::SetValue<S>> {
         self._fields.0 = Option::Some(value.into());
         ContainerIdBuilder {
@@ -332,10 +377,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ContainerId<'a> {
         ContainerId {
             value: self._fields.0.unwrap(),
@@ -619,10 +661,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CursorSide<'a> {
         CursorSide {
             value: self._fields.0.unwrap(),
@@ -750,13 +789,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Id<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Id<'a> {
         Id {
             counter: self._fields.0.unwrap(),
             peer: self._fields.1.unwrap(),
@@ -775,37 +808,37 @@ pub mod cursor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Container;
         type Id;
+        type Container;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Container = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `container` field to Set
-    pub struct SetContainer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContainer<S> {}
-    impl<S: State> State for SetContainer<S> {
-        type Container = Set<members::container>;
-        type Id = S::Id;
+        type Container = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Container = S::Container;
         type Id = Set<members::id>;
+        type Container = S::Container;
+    }
+    ///State transition - sets the `container` field to Set
+    pub struct SetContainer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContainer<S> {}
+    impl<S: State> State for SetContainer<S> {
+        type Id = S::Id;
+        type Container = Set<members::container>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `container` field
-        pub struct container(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `container` field
+        pub struct container(());
     }
 }
 
@@ -813,9 +846,9 @@ pub mod cursor_state {
 pub struct CursorBuilder<'a, S: cursor_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<cursor::ContainerId<'a>>,
-        Option<cursor::Id<'a>>,
-        Option<cursor::CursorSide<'a>>,
+        Option<cursor::ContainerId<S>>,
+        Option<cursor::Id<S>>,
+        Option<cursor::CursorSide<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -846,7 +879,7 @@ where
     /// Set the `container` field (required)
     pub fn container(
         mut self,
-        value: impl Into<cursor::ContainerId<'a>>,
+        value: impl Into<cursor::ContainerId<S>>,
     ) -> CursorBuilder<'a, cursor_state::SetContainer<S>> {
         self._fields.0 = Option::Some(value.into());
         CursorBuilder {
@@ -865,7 +898,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<cursor::Id<'a>>,
+        value: impl Into<cursor::Id<S>>,
     ) -> CursorBuilder<'a, cursor_state::SetId<S>> {
         self._fields.1 = Option::Some(value.into());
         CursorBuilder {
@@ -878,12 +911,12 @@ where
 
 impl<'a, S: cursor_state::State> CursorBuilder<'a, S> {
     /// Set the `side` field (optional)
-    pub fn side(mut self, value: impl Into<Option<cursor::CursorSide<'a>>>) -> Self {
+    pub fn side(mut self, value: impl Into<Option<cursor::CursorSide<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `side` field to an Option value (optional)
-    pub fn maybe_side(mut self, value: Option<cursor::CursorSide<'a>>) -> Self {
+    pub fn maybe_side(mut self, value: Option<cursor::CursorSide<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -892,8 +925,8 @@ impl<'a, S: cursor_state::State> CursorBuilder<'a, S> {
 impl<'a, S> CursorBuilder<'a, S>
 where
     S: cursor_state::State,
-    S::Container: cursor_state::IsSet,
     S::Id: cursor_state::IsSet,
+    S::Container: cursor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cursor<'a> {
@@ -905,13 +938,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Cursor<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Cursor<'a> {
         Cursor {
             container: self._fields.0.unwrap(),
             id: self._fields.1.unwrap(),
@@ -982,7 +1009,7 @@ pub mod normal_container_id_state {
 /// Builder for constructing an instance of this type
 pub struct NormalContainerIdBuilder<'a, S: normal_container_id_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<i64>),
+    _fields: (Option<S>, Option<i64>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1012,7 +1039,7 @@ where
     /// Set the `container_type` field (required)
     pub fn container_type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> NormalContainerIdBuilder<'a, normal_container_id_state::SetContainerType<S>> {
         self._fields.0 = Option::Some(value.into());
         NormalContainerIdBuilder {
@@ -1080,10 +1107,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> NormalContainerId<'a> {
         NormalContainerId {
             container_type: self._fields.0.unwrap(),

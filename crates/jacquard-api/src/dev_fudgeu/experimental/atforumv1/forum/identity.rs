@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,43 +29,46 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Defines what the forum is - name, description, etc.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "dev.fudgeu.experimental.atforumv1.forum.identity",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Identity<'a> {
+pub struct Identity<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accent: Option<CowStr<'a>>,
+    pub accent: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub description: Option<S>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct IdentityGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct IdentityGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Identity<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Identity<S>,
 }
 
-impl<'a> Identity<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, IdentityRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Identity<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, IdentityRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -74,18 +79,17 @@ pub struct IdentityRecord;
 impl XrpcResp for IdentityRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.identity";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = IdentityGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = IdentityGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<IdentityGetRecordOutput<'_>> for Identity<'_> {
-    fn from(output: IdentityGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<IdentityGetRecordOutput<S>> for Identity<S> {
+    fn from(output: IdentityGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Identity<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Identity<S> {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.identity";
     type Record = IdentityRecord;
 }
@@ -95,7 +99,7 @@ impl Collection for IdentityRecord {
     type Record = IdentityRecord;
 }
 
-impl<'a> LexiconSchema for Identity<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Identity<S> {
     fn nsid() -> &'static str {
         "dev.fudgeu.experimental.atforumv1.forum.identity"
     }
@@ -186,7 +190,7 @@ pub mod identity_state {
 /// Builder for constructing an instance of this type
 pub struct IdentityBuilder<'a, S: identity_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -210,12 +214,12 @@ impl<'a> IdentityBuilder<'a, identity_state::Empty> {
 
 impl<'a, S: identity_state::State> IdentityBuilder<'a, S> {
     /// Set the `accent` field (optional)
-    pub fn accent(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn accent(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `accent` field to an Option value (optional)
-    pub fn maybe_accent(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_accent(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -223,12 +227,12 @@ impl<'a, S: identity_state::State> IdentityBuilder<'a, S> {
 
 impl<'a, S: identity_state::State> IdentityBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -242,7 +246,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> IdentityBuilder<'a, identity_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         IdentityBuilder {
@@ -270,10 +274,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Identity<'a> {
         Identity {
             accent: self._fields.0,

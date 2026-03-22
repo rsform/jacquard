@@ -157,6 +157,8 @@ impl<'c> CodeGenerator<'c> {
                 imports.common.insert(CommonType::CowStr);
             }
         }
+        imports.external.insert(ExternalImport::Bos);
+        imports.external.insert(ExternalImport::DefaultStr);
         imports
     }
 
@@ -254,6 +256,12 @@ impl<'c> CodeGenerator<'c> {
         imports.common.insert(CommonType::CowStr);
         imports.common.insert(CommonType::AtUri);
 
+        // All parameterised types need Bos, DefaultStr, SmolStr, and Data for extra_data field.
+        imports.external.insert(ExternalImport::Bos);
+        imports.external.insert(ExternalImport::DefaultStr);
+        imports.common.insert(CommonType::SmolStr);
+        imports.common.insert(CommonType::Data);
+
         // All records generate Collection trait impl and RecordError for the marker struct.
         imports.common.insert(CommonType::Collection);
         imports.common.insert(CommonType::RecordError);
@@ -304,12 +312,19 @@ impl<'c> CodeGenerator<'c> {
         imports.external.insert(ExternalImport::Serialize);
         imports.external.insert(ExternalImport::Deserialize);
         imports.external.insert(ExternalImport::IntoStatic);
-        imports.external.insert(ExternalImport::LexiconAttr);
 
-        // PhantomData and BTreeMap are only needed when a builder is generated.
+        // All parameterised types need Bos, DefaultStr, SmolStr, Data, and BTreeMap for extra_data.
+        imports.external.insert(ExternalImport::Bos);
+        imports.external.insert(ExternalImport::DefaultStr);
+        imports.common.insert(CommonType::SmolStr);
+        imports.common.insert(CommonType::Data);
+        imports.external.insert(ExternalImport::BTreeMap);
+
+        // PhantomData is only needed when a builder is generated.
         let needs_builder = match type_name {
             Some(name) => {
-                let decision = crate::codegen::builder_heuristics::should_generate_builder(name, obj);
+                let decision =
+                    crate::codegen::builder_heuristics::should_generate_builder(name, obj);
                 decision.has_builder
             }
             // Conservative: include them when we don't know the type name.
@@ -317,7 +332,6 @@ impl<'c> CodeGenerator<'c> {
         };
         if needs_builder {
             imports.external.insert(ExternalImport::PhantomData);
-            imports.external.insert(ExternalImport::BTreeMap);
         }
 
         // Walk all properties in the object.
@@ -500,6 +514,8 @@ impl<'c> CodeGenerator<'c> {
                 }
             }
         }
+        imports.external.insert(ExternalImport::Bos);
+        imports.external.insert(ExternalImport::DefaultStr);
         imports
     }
 
@@ -578,6 +594,8 @@ impl<'c> CodeGenerator<'c> {
                 }
             }
         }
+        imports.external.insert(ExternalImport::Bos);
+        imports.external.insert(ExternalImport::DefaultStr);
         imports
     }
 

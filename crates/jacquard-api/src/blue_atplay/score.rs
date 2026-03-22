@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,22 +27,28 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Attestation signature proving a score was submitted through ATPlay SDK
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Attestation<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Attestation<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when the attestation was created (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attested_at: Option<Datetime>,
     ///DID key reference for verifying the signature
-    #[serde(borrow)]
-    pub key: CowStr<'a>,
+    pub key: S,
     ///ES256 signature over the score record CID
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub signature: Bytes,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Attestation<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Attestation<S> {
     fn nsid() -> &'static str {
         "blue.atplay.score.defs"
     }
@@ -113,7 +121,7 @@ pub mod attestation_state {
 /// Builder for constructing an instance of this type
 pub struct AttestationBuilder<'a, S: attestation_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<Bytes>),
+    _fields: (Option<Datetime>, Option<S>, Option<Bytes>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -156,7 +164,7 @@ where
     /// Set the `key` field (required)
     pub fn key(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AttestationBuilder<'a, attestation_state::SetKey<S>> {
         self._fields.1 = Option::Some(value.into());
         AttestationBuilder {
@@ -204,10 +212,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Attestation<'a> {
         Attestation {
             attested_at: self._fields.0,

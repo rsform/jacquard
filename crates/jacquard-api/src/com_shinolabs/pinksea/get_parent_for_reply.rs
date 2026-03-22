@@ -10,31 +10,46 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetParentForReply<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetParentForReply<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: AtIdentifier<'a>,
+    pub did: AtIdentifier<S>,
     #[serde(borrow)]
-    pub rkey: CowStr<'a>,
+    pub rkey: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetParentForReplyOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetParentForReplyOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The DID of the author.
-    #[serde(borrow)]
-    pub did: AtIdentifier<'a>,
+    pub did: AtIdentifier<S>,
     ///The record key.
-    #[serde(borrow)]
-    pub rkey: CowStr<'a>,
+    pub rkey: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.shinolabs.pinksea.getParentForReply
@@ -42,11 +57,12 @@ pub struct GetParentForReplyResponse;
 impl jacquard_common::xrpc::XrpcResp for GetParentForReplyResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getParentForReply";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetParentForReplyOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetParentForReplyOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetParentForReply<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetParentForReply<S> {
     const NSID: &'static str = "com.shinolabs.pinksea.getParentForReply";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetParentForReplyResponse;
@@ -57,7 +73,7 @@ pub struct GetParentForReplyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetParentForReplyRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getParentForReply";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetParentForReply<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetParentForReply<S>;
     type Response = GetParentForReplyResponse;
 }
 
@@ -108,7 +124,7 @@ pub mod get_parent_for_reply_state {
 /// Builder for constructing an instance of this type
 pub struct GetParentForReplyBuilder<'a, S: get_parent_for_reply_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<AtIdentifier<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -138,7 +154,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetParentForReplyBuilder<'a, get_parent_for_reply_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetParentForReplyBuilder {
@@ -157,7 +173,7 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetParentForReplyBuilder<'a, get_parent_for_reply_state::SetRkey<S>> {
         self._fields.1 = Option::Some(value.into());
         GetParentForReplyBuilder {

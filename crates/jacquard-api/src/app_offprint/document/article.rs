@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,38 +29,43 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.offprint.document.article",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Article<'a> {
+pub struct Article<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Strong reference to a `site.standard.document` compatible record.
-    #[serde(borrow)]
-    pub document: StrongRef<'a>,
+    pub document: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ArticleGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ArticleGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Article<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Article<S>,
 }
 
-impl<'a> Article<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ArticleRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Article<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ArticleRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -69,18 +76,17 @@ pub struct ArticleRecord;
 impl XrpcResp for ArticleRecord {
     const NSID: &'static str = "app.offprint.document.article";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ArticleGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ArticleGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ArticleGetRecordOutput<'_>> for Article<'_> {
-    fn from(output: ArticleGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ArticleGetRecordOutput<S>> for Article<S> {
+    fn from(output: ArticleGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Article<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Article<S> {
     const NSID: &'static str = "app.offprint.document.article";
     type Record = ArticleRecord;
 }
@@ -90,7 +96,7 @@ impl Collection for ArticleRecord {
     type Record = ArticleRecord;
 }
 
-impl<'a> LexiconSchema for Article<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Article<S> {
     fn nsid() -> &'static str {
         "app.offprint.document.article"
     }
@@ -140,7 +146,7 @@ pub mod article_state {
 /// Builder for constructing an instance of this type
 pub struct ArticleBuilder<'a, S: article_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>,),
+    _fields: (Option<StrongRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -170,7 +176,7 @@ where
     /// Set the `document` field (required)
     pub fn document(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> ArticleBuilder<'a, article_state::SetDocument<S>> {
         self._fields.0 = Option::Some(value.into());
         ArticleBuilder {
@@ -196,10 +202,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Article<'a> {
         Article {
             document: self._fields.0.unwrap(),

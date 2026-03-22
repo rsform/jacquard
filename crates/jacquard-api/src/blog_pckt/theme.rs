@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,49 +26,55 @@ use serde::{Serialize, Deserialize};
 use crate::blog_pckt::theme;
 /// Theme configuration for a blog publication
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Theme<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Theme<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Dark mode color palette
-    #[serde(borrow)]
-    pub dark: theme::Palette<'a>,
+    pub dark: theme::Palette<S>,
     ///Font family name (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub font: Option<CowStr<'a>>,
+    pub font: Option<S>,
     ///Light mode color palette
-    #[serde(borrow)]
-    pub light: theme::Palette<'a>,
+    pub light: theme::Palette<S>,
     ///Content background transparency percentage (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub transparency: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Color palette with CSS hex values
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Palette<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Palette<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Accent color (hex value)
-    #[serde(borrow)]
-    pub accent: CowStr<'a>,
+    pub accent: S,
     ///Background color (hex value)
-    #[serde(borrow)]
-    pub background: CowStr<'a>,
+    pub background: S,
     ///Link color (hex value)
-    #[serde(borrow)]
-    pub link: CowStr<'a>,
+    pub link: S,
     ///Surface hover color (hex value)
-    #[serde(borrow)]
-    pub surface_hover: CowStr<'a>,
+    pub surface_hover: S,
     ///Primary text color (hex value)
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Theme<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Theme<S> {
     fn nsid() -> &'static str {
         "blog.pckt.theme"
     }
@@ -109,7 +117,7 @@ impl<'a> LexiconSchema for Theme<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Palette<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Palette<S> {
     fn nsid() -> &'static str {
         "blog.pckt.theme"
     }
@@ -227,9 +235,9 @@ pub mod theme_state {
 pub struct ThemeBuilder<'a, S: theme_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<theme::Palette<'a>>,
-        Option<CowStr<'a>>,
-        Option<theme::Palette<'a>>,
+        Option<theme::Palette<S>>,
+        Option<S>,
+        Option<theme::Palette<S>>,
         Option<i64>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -261,7 +269,7 @@ where
     /// Set the `dark` field (required)
     pub fn dark(
         mut self,
-        value: impl Into<theme::Palette<'a>>,
+        value: impl Into<theme::Palette<S>>,
     ) -> ThemeBuilder<'a, theme_state::SetDark<S>> {
         self._fields.0 = Option::Some(value.into());
         ThemeBuilder {
@@ -274,12 +282,12 @@ where
 
 impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
     /// Set the `font` field (optional)
-    pub fn font(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn font(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `font` field to an Option value (optional)
-    pub fn maybe_font(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_font(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -293,7 +301,7 @@ where
     /// Set the `light` field (required)
     pub fn light(
         mut self,
-        value: impl Into<theme::Palette<'a>>,
+        value: impl Into<theme::Palette<S>>,
     ) -> ThemeBuilder<'a, theme_state::SetLight<S>> {
         self._fields.2 = Option::Some(value.into());
         ThemeBuilder {
@@ -334,13 +342,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Theme<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Theme<'a> {
         Theme {
             dark: self._fields.0.unwrap(),
             font: self._fields.1,

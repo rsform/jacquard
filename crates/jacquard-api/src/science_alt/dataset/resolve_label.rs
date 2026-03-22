@@ -10,43 +10,56 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::science_alt::dataset::label::Label;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ResolveLabel<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResolveLabel<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub handle: CowStr<'a>,
+    pub handle: S,
     #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///(max length: 50)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub version: Option<CowStr<'a>>,
+    pub version: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ResolveLabelOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResolveLabelOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///CID of the resolved dataset entry
-    #[serde(borrow)]
-    pub cid: CowStr<'a>,
+    pub cid: S,
     ///The label record that was resolved
-    #[serde(borrow)]
-    pub label: Label<'a>,
+    pub label: Label<S>,
     ///AT-URI of the resolved dataset entry
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -55,19 +68,20 @@ pub struct ResolveLabelOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ResolveLabelError<'a> {
+pub enum ResolveLabelError {
     /// No label found with the given name
     #[serde(rename = "LabelNotFound")]
-    LabelNotFound(Option<CowStr<'a>>),
+    LabelNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for ResolveLabelError<'_> {
+impl core::fmt::Display for ResolveLabelError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::LabelNotFound(msg) => {
@@ -77,7 +91,13 @@ impl core::fmt::Display for ResolveLabelError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -87,11 +107,12 @@ pub struct ResolveLabelResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveLabelResponse {
     const NSID: &'static str = "science.alt.dataset.resolveLabel";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveLabelOutput<'de>;
-    type Err<'de> = ResolveLabelError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ResolveLabelOutput<S>;
+    type Err = ResolveLabelError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveLabel<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ResolveLabel<S> {
     const NSID: &'static str = "science.alt.dataset.resolveLabel";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveLabelResponse;
@@ -102,7 +123,7 @@ pub struct ResolveLabelRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveLabelRequest {
     const PATH: &'static str = "/xrpc/science.alt.dataset.resolveLabel";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ResolveLabel<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ResolveLabel<S>;
     type Response = ResolveLabelResponse;
 }
 
@@ -153,7 +174,7 @@ pub mod resolve_label_state {
 /// Builder for constructing an instance of this type
 pub struct ResolveLabelBuilder<'a, S: resolve_label_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -183,7 +204,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ResolveLabelBuilder<'a, resolve_label_state::SetHandle<S>> {
         self._fields.0 = Option::Some(value.into());
         ResolveLabelBuilder {
@@ -202,7 +223,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ResolveLabelBuilder<'a, resolve_label_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         ResolveLabelBuilder {
@@ -215,12 +236,12 @@ where
 
 impl<'a, S: resolve_label_state::State> ResolveLabelBuilder<'a, S> {
     /// Set the `version` field (optional)
-    pub fn version(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn version(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
-    pub fn maybe_version(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_version(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }

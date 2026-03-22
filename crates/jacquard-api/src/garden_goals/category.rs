@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,39 +29,47 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A category for organizing goals.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "garden.goals.category", tag = "$type")]
-pub struct Category<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "garden.goals.category",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Category<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Unique identifier for the category (UUID)
-    #[serde(borrow)]
-    pub category_id: CowStr<'a>,
+    pub category_id: S,
     ///Timestamp when the category was created
     pub created_at: Datetime,
     ///Display name of the category
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CategoryGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CategoryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Category<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Category<S>,
 }
 
-impl<'a> Category<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CategoryRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Category<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CategoryRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -70,18 +80,17 @@ pub struct CategoryRecord;
 impl XrpcResp for CategoryRecord {
     const NSID: &'static str = "garden.goals.category";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CategoryGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CategoryGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CategoryGetRecordOutput<'_>> for Category<'_> {
-    fn from(output: CategoryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CategoryGetRecordOutput<S>> for Category<S> {
+    fn from(output: CategoryGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Category<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Category<S> {
     const NSID: &'static str = "garden.goals.category";
     type Record = CategoryRecord;
 }
@@ -91,7 +100,7 @@ impl Collection for CategoryRecord {
     type Record = CategoryRecord;
 }
 
-impl<'a> LexiconSchema for Category<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Category<S> {
     fn nsid() -> &'static str {
         "garden.goals.category"
     }
@@ -138,58 +147,58 @@ pub mod category_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type CreatedAt;
         type CategoryId;
+        type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type CreatedAt = Unset;
         type CategoryId = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type CategoryId = S::CategoryId;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
-        type CategoryId = S::CategoryId;
+        type CreatedAt = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `category_id` field to Set
     pub struct SetCategoryId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCategoryId<S> {}
     impl<S: State> State for SetCategoryId<S> {
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type CategoryId = Set<members::category_id>;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CategoryId = S::CategoryId;
+        type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CategoryId = S::CategoryId;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `category_id` field
         pub struct category_id(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CategoryBuilder<'a, S: category_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Datetime>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -219,7 +228,7 @@ where
     /// Set the `categoryId` field (required)
     pub fn category_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CategoryBuilder<'a, category_state::SetCategoryId<S>> {
         self._fields.0 = Option::Some(value.into());
         CategoryBuilder {
@@ -257,7 +266,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CategoryBuilder<'a, category_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         CategoryBuilder {
@@ -271,9 +280,9 @@ where
 impl<'a, S> CategoryBuilder<'a, S>
 where
     S: category_state::State,
-    S::Name: category_state::IsSet,
-    S::CreatedAt: category_state::IsSet,
     S::CategoryId: category_state::IsSet,
+    S::CreatedAt: category_state::IsSet,
+    S::Name: category_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Category<'a> {
@@ -287,10 +296,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Category<'a> {
         Category {
             category_id: self._fields.0.unwrap(),

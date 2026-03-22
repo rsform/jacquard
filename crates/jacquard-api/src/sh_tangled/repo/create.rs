@@ -10,25 +10,33 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct Create<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Create<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Default branch to push to
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub default_branch: Option<CowStr<'a>>,
+    pub default_branch: Option<S>,
     ///Rkey of the repository record
-    #[serde(borrow)]
-    pub rkey: CowStr<'a>,
+    pub rkey: S,
     ///A source URL to clone from, populate this when forking or importing a repository.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source: Option<CowStr<'a>>,
+    pub source: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.tangled.repo.create
@@ -36,11 +44,12 @@ pub struct CreateResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateResponse {
     const NSID: &'static str = "sh.tangled.repo.create";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Create<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Create<S> {
     const NSID: &'static str = "sh.tangled.repo.create";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -55,6 +64,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Create<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Create<S>;
     type Response = CreateResponse;
 }

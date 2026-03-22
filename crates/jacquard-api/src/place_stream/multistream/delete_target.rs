@@ -10,26 +10,47 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{RecordKey, Rkey};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteTarget<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteTarget<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The Record Key of the target to delete.
-    #[serde(borrow)]
-    pub rkey: RecordKey<Rkey<'a>>,
+    pub rkey: RecordKey<Rkey<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteTargetOutput<'a> {}
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteTargetOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
 
-#[jacquard_derive::open_union]
+
 #[derive(
     Serialize,
     Deserialize,
@@ -38,17 +59,26 @@ pub struct DeleteTargetOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteTargetError<'a> {}
-impl core::fmt::Display for DeleteTargetError<'_> {
+pub enum DeleteTargetError {
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
+}
+
+impl core::fmt::Display for DeleteTargetError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -58,11 +88,12 @@ pub struct DeleteTargetResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteTargetResponse {
     const NSID: &'static str = "place.stream.multistream.deleteTarget";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeleteTargetOutput<'de>;
-    type Err<'de> = DeleteTargetError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DeleteTargetOutput<S>;
+    type Err = DeleteTargetError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteTarget<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DeleteTarget<S> {
     const NSID: &'static str = "place.stream.multistream.deleteTarget";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -77,7 +108,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteTargetRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DeleteTarget<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DeleteTarget<S>;
     type Response = DeleteTargetResponse;
 }
 
@@ -116,7 +147,7 @@ pub mod delete_target_state {
 /// Builder for constructing an instance of this type
 pub struct DeleteTargetBuilder<'a, S: delete_target_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<RecordKey<Rkey<'a>>>,),
+    _fields: (Option<RecordKey<Rkey<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -146,7 +177,7 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<RecordKey<Rkey<'a>>>,
+        value: impl Into<RecordKey<Rkey<S>>>,
     ) -> DeleteTargetBuilder<'a, delete_target_state::SetRkey<S>> {
         self._fields.0 = Option::Some(value.into());
         DeleteTargetBuilder {
@@ -172,10 +203,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DeleteTarget<'a> {
         DeleteTarget {
             rkey: self._fields.0.unwrap(),

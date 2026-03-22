@@ -10,21 +10,30 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct EnableAccountInvites<'a> {
-    #[serde(borrow)]
-    pub account: Did<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EnableAccountInvites<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub account: Did<S>,
     ///Optional reason for enabled invites.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub note: Option<CowStr<'a>>,
+    pub note: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.atproto.admin.enableAccountInvites
@@ -32,11 +41,12 @@ pub struct EnableAccountInvitesResponse;
 impl jacquard_common::xrpc::XrpcResp for EnableAccountInvitesResponse {
     const NSID: &'static str = "com.atproto.admin.enableAccountInvites";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for EnableAccountInvites<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for EnableAccountInvites<S> {
     const NSID: &'static str = "com.atproto.admin.enableAccountInvites";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -51,7 +61,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for EnableAccountInvitesRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = EnableAccountInvites<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = EnableAccountInvites<S>;
     type Response = EnableAccountInvitesResponse;
 }
 
@@ -90,7 +100,7 @@ pub mod enable_account_invites_state {
 /// Builder for constructing an instance of this type
 pub struct EnableAccountInvitesBuilder<'a, S: enable_account_invites_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Did<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -123,7 +133,7 @@ where
     /// Set the `account` field (required)
     pub fn account(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> EnableAccountInvitesBuilder<'a, enable_account_invites_state::SetAccount<S>> {
         self._fields.0 = Option::Some(value.into());
         EnableAccountInvitesBuilder {
@@ -136,12 +146,12 @@ where
 
 impl<'a, S: enable_account_invites_state::State> EnableAccountInvitesBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -163,10 +173,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> EnableAccountInvites<'a> {
         EnableAccountInvites {
             account: self._fields.0.unwrap(),

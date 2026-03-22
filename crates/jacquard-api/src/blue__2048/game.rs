@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,10 +30,17 @@ use serde::{Serialize, Deserialize};
 use crate::blue__2048::SyncStatus;
 /// A declaration of an instance of a at://2048 game
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blue.2048.game", tag = "$type")]
-pub struct Game<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "blue.2048.game",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Game<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The player no longer has any moves left  Defaults to `false`.
     #[serde(default = "_default_game_completed")]
     pub completed: bool,
@@ -40,35 +49,36 @@ pub struct Game<'a> {
     #[serde(default = "_default_game_current_score")]
     pub current_score: i64,
     ///This is the recording of the game. Like chess notation, but for 2048
-    #[serde(borrow)]
-    pub seeded_recording: CowStr<'a>,
+    pub seeded_recording: S,
     ///The sync status of this record with the users AT Protocol repo.
-    #[serde(borrow)]
-    pub sync_status: SyncStatus<'a>,
+    pub sync_status: SyncStatus<S>,
     ///The player has found a 2048 tile (they have won)  Defaults to `false`.
     #[serde(default = "_default_game_won")]
     pub won: bool,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GameGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GameGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Game<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Game<S>,
 }
 
-impl<'a> Game<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, GameRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Game<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, GameRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -79,18 +89,17 @@ pub struct GameRecord;
 impl XrpcResp for GameRecord {
     const NSID: &'static str = "blue.2048.game";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GameGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GameGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<GameGetRecordOutput<'_>> for Game<'_> {
-    fn from(output: GameGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<GameGetRecordOutput<S>> for Game<S> {
+    fn from(output: GameGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Game<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Game<S> {
     const NSID: &'static str = "blue.2048.game";
     type Record = GameRecord;
 }
@@ -100,7 +109,7 @@ impl Collection for GameRecord {
     type Record = GameRecord;
 }
 
-impl<'a> LexiconSchema for Game<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Game<S> {
     fn nsid() -> &'static str {
         "blue.2048.game"
     }
@@ -137,105 +146,105 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Won;
         type SeededRecording;
-        type Completed;
+        type Won;
         type SyncStatus;
         type CurrentScore;
         type CreatedAt;
+        type Completed;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Won = Unset;
         type SeededRecording = Unset;
-        type Completed = Unset;
+        type Won = Unset;
         type SyncStatus = Unset;
         type CurrentScore = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `won` field to Set
-    pub struct SetWon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWon<S> {}
-    impl<S: State> State for SetWon<S> {
-        type Won = Set<members::won>;
-        type SeededRecording = S::SeededRecording;
-        type Completed = S::Completed;
-        type SyncStatus = S::SyncStatus;
-        type CurrentScore = S::CurrentScore;
-        type CreatedAt = S::CreatedAt;
+        type Completed = Unset;
     }
     ///State transition - sets the `seeded_recording` field to Set
     pub struct SetSeededRecording<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeededRecording<S> {}
     impl<S: State> State for SetSeededRecording<S> {
-        type Won = S::Won;
         type SeededRecording = Set<members::seeded_recording>;
-        type Completed = S::Completed;
-        type SyncStatus = S::SyncStatus;
-        type CurrentScore = S::CurrentScore;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `completed` field to Set
-    pub struct SetCompleted<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCompleted<S> {}
-    impl<S: State> State for SetCompleted<S> {
         type Won = S::Won;
-        type SeededRecording = S::SeededRecording;
-        type Completed = Set<members::completed>;
         type SyncStatus = S::SyncStatus;
         type CurrentScore = S::CurrentScore;
         type CreatedAt = S::CreatedAt;
+        type Completed = S::Completed;
+    }
+    ///State transition - sets the `won` field to Set
+    pub struct SetWon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWon<S> {}
+    impl<S: State> State for SetWon<S> {
+        type SeededRecording = S::SeededRecording;
+        type Won = Set<members::won>;
+        type SyncStatus = S::SyncStatus;
+        type CurrentScore = S::CurrentScore;
+        type CreatedAt = S::CreatedAt;
+        type Completed = S::Completed;
     }
     ///State transition - sets the `sync_status` field to Set
     pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
     impl<S: State> State for SetSyncStatus<S> {
-        type Won = S::Won;
         type SeededRecording = S::SeededRecording;
-        type Completed = S::Completed;
+        type Won = S::Won;
         type SyncStatus = Set<members::sync_status>;
         type CurrentScore = S::CurrentScore;
         type CreatedAt = S::CreatedAt;
+        type Completed = S::Completed;
     }
     ///State transition - sets the `current_score` field to Set
     pub struct SetCurrentScore<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCurrentScore<S> {}
     impl<S: State> State for SetCurrentScore<S> {
-        type Won = S::Won;
         type SeededRecording = S::SeededRecording;
-        type Completed = S::Completed;
+        type Won = S::Won;
         type SyncStatus = S::SyncStatus;
         type CurrentScore = Set<members::current_score>;
         type CreatedAt = S::CreatedAt;
+        type Completed = S::Completed;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Won = S::Won;
         type SeededRecording = S::SeededRecording;
-        type Completed = S::Completed;
+        type Won = S::Won;
         type SyncStatus = S::SyncStatus;
         type CurrentScore = S::CurrentScore;
         type CreatedAt = Set<members::created_at>;
+        type Completed = S::Completed;
+    }
+    ///State transition - sets the `completed` field to Set
+    pub struct SetCompleted<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCompleted<S> {}
+    impl<S: State> State for SetCompleted<S> {
+        type SeededRecording = S::SeededRecording;
+        type Won = S::Won;
+        type SyncStatus = S::SyncStatus;
+        type CurrentScore = S::CurrentScore;
+        type CreatedAt = S::CreatedAt;
+        type Completed = Set<members::completed>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `won` field
-        pub struct won(());
         ///Marker type for the `seeded_recording` field
         pub struct seeded_recording(());
-        ///Marker type for the `completed` field
-        pub struct completed(());
+        ///Marker type for the `won` field
+        pub struct won(());
         ///Marker type for the `sync_status` field
         pub struct sync_status(());
         ///Marker type for the `current_score` field
         pub struct current_score(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `completed` field
+        pub struct completed(());
     }
 }
 
@@ -246,8 +255,8 @@ pub struct GameBuilder<'a, S: game_state::State> {
         Option<bool>,
         Option<Datetime>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<SyncStatus<'a>>,
+        Option<S>,
+        Option<SyncStatus<S>>,
         Option<bool>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -336,7 +345,7 @@ where
     /// Set the `seededRecording` field (required)
     pub fn seeded_recording(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GameBuilder<'a, game_state::SetSeededRecording<S>> {
         self._fields.3 = Option::Some(value.into());
         GameBuilder {
@@ -355,7 +364,7 @@ where
     /// Set the `syncStatus` field (required)
     pub fn sync_status(
         mut self,
-        value: impl Into<SyncStatus<'a>>,
+        value: impl Into<SyncStatus<S>>,
     ) -> GameBuilder<'a, game_state::SetSyncStatus<S>> {
         self._fields.4 = Option::Some(value.into());
         GameBuilder {
@@ -388,12 +397,12 @@ where
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::Won: game_state::IsSet,
     S::SeededRecording: game_state::IsSet,
-    S::Completed: game_state::IsSet,
+    S::Won: game_state::IsSet,
     S::SyncStatus: game_state::IsSet,
     S::CurrentScore: game_state::IsSet,
     S::CreatedAt: game_state::IsSet,
+    S::Completed: game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Game<'a> {
@@ -408,13 +417,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Game<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Game<'a> {
         Game {
             completed: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

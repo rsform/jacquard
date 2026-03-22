@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,33 +28,52 @@ use crate::games_gamesgamesgamesgames::search_slugs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchSlugs<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchSlugs<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `10`. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(borrow)]
-    pub slug: CowStr<'a>,
+    pub slug: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchSlugsOutput<'a> {
-    #[serde(borrow)]
-    pub slugs: Vec<search_slugs::SlugResult<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchSlugsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub slugs: Vec<search_slugs::SlugResult<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SlugResult<'a> {
-    #[serde(borrow)]
-    pub r#ref: AtUri<'a>,
-    #[serde(borrow)]
-    pub slug: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SlugResult<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub r#ref: AtUri<S>,
+    pub slug: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for games.gamesgamesgamesgames.searchSlugs
@@ -60,11 +81,12 @@ pub struct SearchSlugsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchSlugsResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.searchSlugs";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchSlugsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SearchSlugsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchSlugs<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SearchSlugs<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.searchSlugs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchSlugsResponse;
@@ -75,11 +97,11 @@ pub struct SearchSlugsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchSlugsRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.searchSlugs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchSlugs<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SearchSlugs<S>;
     type Response = SearchSlugsResponse;
 }
 
-impl<'a> LexiconSchema for SlugResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SlugResult<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.searchSlugs"
     }
@@ -133,7 +155,7 @@ pub mod search_slugs_state {
 /// Builder for constructing an instance of this type
 pub struct SearchSlugsBuilder<'a, S: search_slugs_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -176,7 +198,7 @@ where
     /// Set the `slug` field (required)
     pub fn slug(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SearchSlugsBuilder<'a, search_slugs_state::SetSlug<S>> {
         self._fields.1 = Option::Some(value.into());
         SearchSlugsBuilder {
@@ -211,44 +233,44 @@ pub mod slug_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
         type Ref;
+        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Slug = Set<members::slug>;
-        type Ref = S::Ref;
+        type Slug = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Slug = S::Slug;
         type Ref = Set<members::r#ref>;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Ref = S::Ref;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SlugResultBuilder<'a, S: slug_result_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<AtUri<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -278,7 +300,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> SlugResultBuilder<'a, slug_result_state::SetRef<S>> {
         self._fields.0 = Option::Some(value.into());
         SlugResultBuilder {
@@ -297,7 +319,7 @@ where
     /// Set the `slug` field (required)
     pub fn slug(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SlugResultBuilder<'a, slug_result_state::SetSlug<S>> {
         self._fields.1 = Option::Some(value.into());
         SlugResultBuilder {
@@ -311,8 +333,8 @@ where
 impl<'a, S> SlugResultBuilder<'a, S>
 where
     S: slug_result_state::State,
-    S::Slug: slug_result_state::IsSet,
     S::Ref: slug_result_state::IsSet,
+    S::Slug: slug_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SlugResult<'a> {
@@ -325,10 +347,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SlugResult<'a> {
         SlugResult {
             r#ref: self._fields.0.unwrap(),

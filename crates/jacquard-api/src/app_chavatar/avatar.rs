@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,34 +30,43 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// An individual avatar image record.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.chavatar.avatar", tag = "$type")]
-pub struct Avatar<'a> {
-    #[serde(borrow)]
-    pub avatar: BlobRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.chavatar.avatar",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Avatar<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub avatar: BlobRef<S>,
     pub created_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AvatarGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AvatarGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Avatar<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Avatar<S>,
 }
 
-impl<'a> Avatar<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AvatarRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Avatar<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AvatarRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -66,18 +77,17 @@ pub struct AvatarRecord;
 impl XrpcResp for AvatarRecord {
     const NSID: &'static str = "app.chavatar.avatar";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AvatarGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AvatarGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AvatarGetRecordOutput<'_>> for Avatar<'_> {
-    fn from(output: AvatarGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AvatarGetRecordOutput<S>> for Avatar<S> {
+    fn from(output: AvatarGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Avatar<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Avatar<S> {
     const NSID: &'static str = "app.chavatar.avatar";
     type Record = AvatarRecord;
 }
@@ -87,7 +97,7 @@ impl Collection for AvatarRecord {
     type Record = AvatarRecord;
 }
 
-impl<'a> LexiconSchema for Avatar<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Avatar<S> {
     fn nsid() -> &'static str {
         "app.chavatar.avatar"
     }
@@ -155,44 +165,44 @@ pub mod avatar_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Avatar;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Avatar = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Avatar = S::Avatar;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `avatar` field to Set
     pub struct SetAvatar<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAvatar<S> {}
     impl<S: State> State for SetAvatar<S> {
-        type CreatedAt = S::CreatedAt;
         type Avatar = Set<members::avatar>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Avatar = S::Avatar;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `avatar` field
         pub struct avatar(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AvatarBuilder<'a, S: avatar_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>, Option<Datetime>),
+    _fields: (Option<BlobRef<S>>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -222,7 +232,7 @@ where
     /// Set the `avatar` field (required)
     pub fn avatar(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> AvatarBuilder<'a, avatar_state::SetAvatar<S>> {
         self._fields.0 = Option::Some(value.into());
         AvatarBuilder {
@@ -255,8 +265,8 @@ where
 impl<'a, S> AvatarBuilder<'a, S>
 where
     S: avatar_state::State,
-    S::CreatedAt: avatar_state::IsSet,
     S::Avatar: avatar_state::IsSet,
+    S::CreatedAt: avatar_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Avatar<'a> {
@@ -267,13 +277,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Avatar<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Avatar<'a> {
         Avatar {
             avatar: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

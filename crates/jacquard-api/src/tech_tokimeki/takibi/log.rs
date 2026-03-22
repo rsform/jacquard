@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,49 +31,64 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::tech_tokimeki::takibi::log;
 /// A log record - adding wood to the fire. Implicitly records visible sparks as a form of 'silent appreciation'.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "tech.tokimeki.takibi.log", tag = "$type")]
-pub struct Log<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "tech.tokimeki.takibi.log",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Log<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///Sparks visible at the moment of adding wood, with elapsed time for decay scoring
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub visible_sparks: Option<Vec<log::SparkRef<'a>>>,
+    pub visible_sparks: Option<Vec<log::SparkRef<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LogGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LogGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Log<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Log<S>,
 }
 
 /// Reference to a visible spark with timing information
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SparkRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SparkRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Milliseconds since the spark appeared on screen (0-10000)
     pub elapsed: i64,
     ///Strong reference to the spark record
-    #[serde(borrow)]
-    pub spark: StrongRef<'a>,
+    pub spark: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Log<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LogRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Log<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LogRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -82,18 +99,17 @@ pub struct LogRecord;
 impl XrpcResp for LogRecord {
     const NSID: &'static str = "tech.tokimeki.takibi.log";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LogGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LogGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LogGetRecordOutput<'_>> for Log<'_> {
-    fn from(output: LogGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LogGetRecordOutput<S>> for Log<S> {
+    fn from(output: LogGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Log<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Log<S> {
     const NSID: &'static str = "tech.tokimeki.takibi.log";
     type Record = LogRecord;
 }
@@ -103,7 +119,7 @@ impl Collection for LogRecord {
     type Record = LogRecord;
 }
 
-impl<'a> LexiconSchema for Log<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Log<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.takibi.log"
     }
@@ -128,7 +144,7 @@ impl<'a> LexiconSchema for Log<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SparkRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SparkRef<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.takibi.log"
     }
@@ -198,7 +214,7 @@ pub mod log_state {
 /// Builder for constructing an instance of this type
 pub struct LogBuilder<'a, S: log_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Vec<log::SparkRef<'a>>>),
+    _fields: (Option<Datetime>, Option<Vec<log::SparkRef<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -243,16 +259,13 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `visibleSparks` field (optional)
     pub fn visible_sparks(
         mut self,
-        value: impl Into<Option<Vec<log::SparkRef<'a>>>>,
+        value: impl Into<Option<Vec<log::SparkRef<S>>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `visibleSparks` field to an Option value (optional)
-    pub fn maybe_visible_sparks(
-        mut self,
-        value: Option<Vec<log::SparkRef<'a>>>,
-    ) -> Self {
+    pub fn maybe_visible_sparks(mut self, value: Option<Vec<log::SparkRef<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -272,13 +285,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Log<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Log<'a> {
         Log {
             created_at: self._fields.0.unwrap(),
             visible_sparks: self._fields.1,
@@ -430,7 +437,7 @@ pub mod spark_ref_state {
 /// Builder for constructing an instance of this type
 pub struct SparkRefBuilder<'a, S: spark_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<StrongRef<'a>>),
+    _fields: (Option<i64>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -479,7 +486,7 @@ where
     /// Set the `spark` field (required)
     pub fn spark(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> SparkRefBuilder<'a, spark_ref_state::SetSpark<S>> {
         self._fields.1 = Option::Some(value.into());
         SparkRefBuilder {
@@ -507,10 +514,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SparkRef<'a> {
         SparkRef {
             elapsed: self._fields.0.unwrap(),

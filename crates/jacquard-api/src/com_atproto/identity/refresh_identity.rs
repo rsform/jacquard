@@ -10,32 +10,50 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::identity::IdentityInfo;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct RefreshIdentity<'a> {
-    #[serde(borrow)]
-    pub identifier: AtIdentifier<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RefreshIdentity<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub identifier: AtIdentifier<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct RefreshIdentityOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RefreshIdentityOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: IdentityInfo<'a>,
+    pub value: IdentityInfo<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -44,25 +62,26 @@ pub struct RefreshIdentityOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum RefreshIdentityError<'a> {
+pub enum RefreshIdentityError {
     /// The resolution process confirmed that the handle does not resolve to any DID.
     #[serde(rename = "HandleNotFound")]
-    HandleNotFound(Option<CowStr<'a>>),
+    HandleNotFound(Option<SmolStr>),
     /// The DID resolution process confirmed that there is no current DID.
     #[serde(rename = "DidNotFound")]
-    DidNotFound(Option<CowStr<'a>>),
+    DidNotFound(Option<SmolStr>),
     /// The DID previously existed, but has been deactivated.
     #[serde(rename = "DidDeactivated")]
-    DidDeactivated(Option<CowStr<'a>>),
+    DidDeactivated(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for RefreshIdentityError<'_> {
+impl core::fmt::Display for RefreshIdentityError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::HandleNotFound(msg) => {
@@ -86,7 +105,13 @@ impl core::fmt::Display for RefreshIdentityError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -96,11 +121,12 @@ pub struct RefreshIdentityResponse;
 impl jacquard_common::xrpc::XrpcResp for RefreshIdentityResponse {
     const NSID: &'static str = "com.atproto.identity.refreshIdentity";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RefreshIdentityOutput<'de>;
-    type Err<'de> = RefreshIdentityError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RefreshIdentityOutput<S>;
+    type Err = RefreshIdentityError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for RefreshIdentity<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for RefreshIdentity<S> {
     const NSID: &'static str = "com.atproto.identity.refreshIdentity";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -115,7 +141,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for RefreshIdentityRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = RefreshIdentity<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = RefreshIdentity<S>;
     type Response = RefreshIdentityResponse;
 }
 
@@ -154,7 +180,7 @@ pub mod refresh_identity_state {
 /// Builder for constructing an instance of this type
 pub struct RefreshIdentityBuilder<'a, S: refresh_identity_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>,),
+    _fields: (Option<AtIdentifier<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -184,7 +210,7 @@ where
     /// Set the `identifier` field (required)
     pub fn identifier(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> RefreshIdentityBuilder<'a, refresh_identity_state::SetIdentifier<S>> {
         self._fields.0 = Option::Some(value.into());
         RefreshIdentityBuilder {
@@ -210,10 +236,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RefreshIdentity<'a> {
         RefreshIdentity {
             identifier: self._fields.0.unwrap(),

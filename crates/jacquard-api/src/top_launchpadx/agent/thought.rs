@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,48 +29,51 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Agent thought record.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "top.launchpadx.agent.thought",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Thought<'a> {
+pub struct Thought<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when the thought was recorded.
     pub created_at: Datetime,
     ///Additional context or details for the thought.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub note: Option<CowStr<'a>>,
+    pub note: Option<S>,
     ///URI of the content being processed by the agent.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_uri: Option<UriValue<'a>>,
+    pub subject_uri: Option<UriValue<S>>,
     ///Job type identifier the agent is thinking about.
-    #[serde(borrow)]
-    pub work_type: CowStr<'a>,
+    pub work_type: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ThoughtGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ThoughtGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Thought<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Thought<S>,
 }
 
-impl<'a> Thought<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ThoughtRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Thought<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ThoughtRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -79,18 +84,17 @@ pub struct ThoughtRecord;
 impl XrpcResp for ThoughtRecord {
     const NSID: &'static str = "top.launchpadx.agent.thought";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ThoughtGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ThoughtGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ThoughtGetRecordOutput<'_>> for Thought<'_> {
-    fn from(output: ThoughtGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ThoughtGetRecordOutput<S>> for Thought<S> {
+    fn from(output: ThoughtGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Thought<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Thought<S> {
     const NSID: &'static str = "top.launchpadx.agent.thought";
     type Record = ThoughtRecord;
 }
@@ -100,7 +104,7 @@ impl Collection for ThoughtRecord {
     type Record = ThoughtRecord;
 }
 
-impl<'a> LexiconSchema for Thought<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Thought<S> {
     fn nsid() -> &'static str {
         "top.launchpadx.agent.thought"
     }
@@ -125,49 +129,44 @@ pub mod thought_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type WorkType;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type WorkType = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type WorkType = S::WorkType;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `work_type` field to Set
     pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkType<S> {}
     impl<S: State> State for SetWorkType<S> {
-        type CreatedAt = S::CreatedAt;
         type WorkType = Set<members::work_type>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type WorkType = S::WorkType;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `work_type` field
         pub struct work_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ThoughtBuilder<'a, S: thought_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<UriValue<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -210,12 +209,12 @@ where
 
 impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -223,12 +222,12 @@ impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
 
 impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `subjectUri` field (optional)
-    pub fn subject_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn subject_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `subjectUri` field to an Option value (optional)
-    pub fn maybe_subject_uri(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_subject_uri(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -242,7 +241,7 @@ where
     /// Set the `workType` field (required)
     pub fn work_type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ThoughtBuilder<'a, thought_state::SetWorkType<S>> {
         self._fields.3 = Option::Some(value.into());
         ThoughtBuilder {
@@ -256,8 +255,8 @@ where
 impl<'a, S> ThoughtBuilder<'a, S>
 where
     S: thought_state::State,
-    S::CreatedAt: thought_state::IsSet,
     S::WorkType: thought_state::IsSet,
+    S::CreatedAt: thought_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Thought<'a> {
@@ -272,10 +271,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Thought<'a> {
         Thought {
             created_at: self._fields.0.unwrap(),

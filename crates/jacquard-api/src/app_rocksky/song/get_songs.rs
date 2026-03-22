@@ -10,17 +10,25 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::song::SongViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSongs<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSongs<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub genre: Option<CowStr<'a>>,
+    pub genre: Option<S>,
     ///(min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -30,13 +38,21 @@ pub struct GetSongs<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSongsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSongsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub songs: Option<Vec<SongViewBasic<'a>>>,
+    pub songs: Option<Vec<SongViewBasic<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.song.getSongs
@@ -44,11 +60,12 @@ pub struct GetSongsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSongsResponse {
     const NSID: &'static str = "app.rocksky.song.getSongs";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSongsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetSongsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSongs<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetSongs<S> {
     const NSID: &'static str = "app.rocksky.song.getSongs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSongsResponse;
@@ -59,7 +76,7 @@ pub struct GetSongsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSongsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.song.getSongs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSongs<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetSongs<S>;
     type Response = GetSongsResponse;
 }
 
@@ -85,7 +102,7 @@ pub mod get_songs_state {
 /// Builder for constructing an instance of this type
 pub struct GetSongsBuilder<'a, S: get_songs_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<i64>),
+    _fields: (Option<S>, Option<i64>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -109,12 +126,12 @@ impl<'a> GetSongsBuilder<'a, get_songs_state::Empty> {
 
 impl<'a, S: get_songs_state::State> GetSongsBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_genre(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }

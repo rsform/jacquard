@@ -10,29 +10,46 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::GameFeedViewItem;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSimilarGamesFeed<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSimilarGamesFeed<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `5`. Min: 1. Max: 10.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSimilarGamesFeedOutput<'a> {
-    #[serde(borrow)]
-    pub feed: Vec<GameFeedViewItem<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSimilarGamesFeedOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub feed: Vec<GameFeedViewItem<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for games.gamesgamesgamesgames.feed.getSimilarGamesFeed
@@ -40,11 +57,12 @@ pub struct GetSimilarGamesFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSimilarGamesFeedResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getSimilarGamesFeed";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSimilarGamesFeedOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetSimilarGamesFeedOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSimilarGamesFeed<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetSimilarGamesFeed<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getSimilarGamesFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSimilarGamesFeedResponse;
@@ -55,7 +73,7 @@ pub struct GetSimilarGamesFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSimilarGamesFeedRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getSimilarGamesFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSimilarGamesFeed<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetSimilarGamesFeed<S>;
     type Response = GetSimilarGamesFeedResponse;
 }
 
@@ -98,7 +116,7 @@ pub mod get_similar_games_feed_state {
 /// Builder for constructing an instance of this type
 pub struct GetSimilarGamesFeedBuilder<'a, S: get_similar_games_feed_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<AtUri<'a>>),
+    _fields: (Option<i64>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -141,7 +159,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetSimilarGamesFeedBuilder<'a, get_similar_games_feed_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         GetSimilarGamesFeedBuilder {

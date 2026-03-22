@@ -7,6 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::feed::FeedGeneratorsView;
@@ -20,13 +21,27 @@ pub struct GetFeedGenerators {
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetFeedGeneratorsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetFeedGeneratorsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: FeedGeneratorsView<'a>,
+    pub value: FeedGeneratorsView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for app.rocksky.feed.getFeedGenerators
@@ -34,8 +49,8 @@ pub struct GetFeedGeneratorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFeedGeneratorsResponse {
     const NSID: &'static str = "app.rocksky.feed.getFeedGenerators";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetFeedGeneratorsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetFeedGeneratorsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetFeedGenerators {
@@ -49,7 +64,7 @@ pub struct GetFeedGeneratorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.feed.getFeedGenerators";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetFeedGenerators;
+    type Request<S: Bos<str> + AsRef<str>> = GetFeedGenerators;
     type Response = GetFeedGeneratorsResponse;
 }
 

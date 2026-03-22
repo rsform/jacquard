@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -27,36 +29,54 @@ use crate::ooo_bsky::authfetch::fetch_records;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct FetchRecords<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FetchRecords<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub uris: Vec<AtUri<'a>>,
+    pub uris: Vec<AtUri<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct FetchRecordsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FetchRecordsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The results of the queries. Missing results indicate an error. For privacy, the error is not returned.
-    #[serde(borrow)]
-    pub results: Vec<fetch_records::FetchRecordsResult<'a>>,
+    pub results: Vec<fetch_records::FetchRecordsResult<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Successful result, with the record value.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct FetchRecordsResult<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FetchRecordsResult<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The stored private record value.
-    #[serde(borrow)]
-    pub record: Data<'a>,
+    pub record: Data<S>,
     ///The strategy used to authenticate fetch requests for this record.
-    #[serde(borrow)]
-    pub strategy: Strategy<'a>,
+    pub strategy: Strategy<S>,
     ///The AT URI of the record.
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for ooo.bsky.authfetch.fetchRecords
@@ -64,11 +84,12 @@ pub struct FetchRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for FetchRecordsResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.fetchRecords";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = FetchRecordsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = FetchRecordsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for FetchRecords<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for FetchRecords<S> {
     const NSID: &'static str = "ooo.bsky.authfetch.fetchRecords";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = FetchRecordsResponse;
@@ -79,11 +100,11 @@ pub struct FetchRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for FetchRecordsRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.fetchRecords";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = FetchRecords<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = FetchRecords<S>;
     type Response = FetchRecordsResponse;
 }
 
-impl<'a> LexiconSchema for FetchRecordsResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FetchRecordsResult<S> {
     fn nsid() -> &'static str {
         "ooo.bsky.authfetch.fetchRecords"
     }
@@ -133,7 +154,7 @@ pub mod fetch_records_state {
 /// Builder for constructing an instance of this type
 pub struct FetchRecordsBuilder<'a, S: fetch_records_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<AtUri<'a>>>,),
+    _fields: (Option<Vec<AtUri<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -163,7 +184,7 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<S>>>,
     ) -> FetchRecordsBuilder<'a, fetch_records_state::SetUris<S>> {
         self._fields.0 = Option::Some(value.into());
         FetchRecordsBuilder {
@@ -197,49 +218,49 @@ pub mod fetch_records_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Uri;
+        type Record;
         type Strategy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Uri = Unset;
+        type Record = Unset;
         type Strategy = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Uri = S::Uri;
-        type Strategy = S::Strategy;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Record = S::Record;
         type Uri = Set<members::uri>;
+        type Record = S::Record;
+        type Strategy = S::Strategy;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Uri = S::Uri;
+        type Record = Set<members::record>;
         type Strategy = S::Strategy;
     }
     ///State transition - sets the `strategy` field to Set
     pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStrategy<S> {}
     impl<S: State> State for SetStrategy<S> {
-        type Record = S::Record;
         type Uri = S::Uri;
+        type Record = S::Record;
         type Strategy = Set<members::strategy>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `strategy` field
         pub struct strategy(());
     }
@@ -248,7 +269,7 @@ pub mod fetch_records_result_state {
 /// Builder for constructing an instance of this type
 pub struct FetchRecordsResultBuilder<'a, S: fetch_records_result_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Data<'a>>, Option<Strategy<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<Data<S>>, Option<Strategy<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -278,7 +299,7 @@ where
     /// Set the `record` field (required)
     pub fn record(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> FetchRecordsResultBuilder<'a, fetch_records_result_state::SetRecord<S>> {
         self._fields.0 = Option::Some(value.into());
         FetchRecordsResultBuilder {
@@ -297,7 +318,7 @@ where
     /// Set the `strategy` field (required)
     pub fn strategy(
         mut self,
-        value: impl Into<Strategy<'a>>,
+        value: impl Into<Strategy<S>>,
     ) -> FetchRecordsResultBuilder<'a, fetch_records_result_state::SetStrategy<S>> {
         self._fields.1 = Option::Some(value.into());
         FetchRecordsResultBuilder {
@@ -316,7 +337,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> FetchRecordsResultBuilder<'a, fetch_records_result_state::SetUri<S>> {
         self._fields.2 = Option::Some(value.into());
         FetchRecordsResultBuilder {
@@ -330,8 +351,8 @@ where
 impl<'a, S> FetchRecordsResultBuilder<'a, S>
 where
     S: fetch_records_result_state::State,
-    S::Record: fetch_records_result_state::IsSet,
     S::Uri: fetch_records_result_state::IsSet,
+    S::Record: fetch_records_result_state::IsSet,
     S::Strategy: fetch_records_result_state::IsSet,
 {
     /// Build the final struct
@@ -346,7 +367,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> FetchRecordsResult<'a> {
         FetchRecordsResult {
             record: self._fields.0.unwrap(),

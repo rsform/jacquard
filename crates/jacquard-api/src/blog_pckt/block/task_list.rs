@@ -10,10 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -22,16 +25,22 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::blog_pckt::block::task_item::TaskItem;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TaskList<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TaskList<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of task items
-    #[serde(borrow)]
-    pub content: Vec<TaskItem<'a>>,
+    pub content: Vec<TaskItem<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for TaskList<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TaskList<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.taskList"
     }
@@ -81,7 +90,7 @@ pub mod task_list_state {
 /// Builder for constructing an instance of this type
 pub struct TaskListBuilder<'a, S: task_list_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<TaskItem<'a>>>,),
+    _fields: (Option<Vec<TaskItem<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -111,7 +120,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<Vec<TaskItem<'a>>>,
+        value: impl Into<Vec<TaskItem<S>>>,
     ) -> TaskListBuilder<'a, task_list_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         TaskListBuilder {
@@ -137,10 +146,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TaskList<'a> {
         TaskList {
             content: self._fields.0.unwrap(),

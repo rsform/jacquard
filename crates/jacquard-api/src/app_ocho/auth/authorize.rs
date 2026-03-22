@@ -10,28 +10,44 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Authorize<'a> {
-    #[serde(borrow)]
-    pub authorize_options: Data<'a>,
-    #[serde(borrow)]
-    pub input: CowStr<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Authorize<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub authorize_options: Data<S>,
+    pub input: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct AuthorizeOutput<'a> {
-    #[serde(borrow)]
-    pub url: CowStr<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AuthorizeOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub url: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.ocho.auth.authorize
@@ -39,11 +55,12 @@ pub struct AuthorizeResponse;
 impl jacquard_common::xrpc::XrpcResp for AuthorizeResponse {
     const NSID: &'static str = "app.ocho.auth.authorize";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AuthorizeOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AuthorizeOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Authorize<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Authorize<S> {
     const NSID: &'static str = "app.ocho.auth.authorize";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -58,7 +75,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for AuthorizeRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Authorize<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Authorize<S>;
     type Response = AuthorizeResponse;
 }
 
@@ -109,7 +126,7 @@ pub mod authorize_state {
 /// Builder for constructing an instance of this type
 pub struct AuthorizeBuilder<'a, S: authorize_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Data<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Data<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -139,7 +156,7 @@ where
     /// Set the `authorizeOptions` field (required)
     pub fn authorize_options(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> AuthorizeBuilder<'a, authorize_state::SetAuthorizeOptions<S>> {
         self._fields.0 = Option::Some(value.into());
         AuthorizeBuilder {
@@ -158,7 +175,7 @@ where
     /// Set the `input` field (required)
     pub fn input(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AuthorizeBuilder<'a, authorize_state::SetInput<S>> {
         self._fields.1 = Option::Some(value.into());
         AuthorizeBuilder {
@@ -186,7 +203,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Authorize<'a> {
         Authorize {
             authorize_options: self._fields.0.unwrap(),

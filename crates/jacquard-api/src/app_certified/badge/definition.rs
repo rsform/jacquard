@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,54 +31,55 @@ use serde::{Serialize, Deserialize};
 use crate::app_certified::Did;
 /// Defines a badge that can be awarded via badge award records to users, projects, or activity claims.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.certified.badge.definition",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Definition<'a> {
+pub struct Definition<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional allowlist of DIDs allowed to issue this badge. If omitted, anyone may issue it.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub allowed_issuers: Option<Vec<Did<'a>>>,
+    pub allowed_issuers: Option<Vec<Did<S>>>,
     ///Category of the badge (e.g. endorsement, participation, affiliation).
-    #[serde(borrow)]
-    pub badge_type: CowStr<'a>,
+    pub badge_type: S,
     ///Client-declared timestamp when this record was originally created
     pub created_at: Datetime,
     ///Optional short statement describing what the badge represents.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Icon representing the badge, stored as a blob for compact visual display.
-    #[serde(borrow)]
-    pub icon: BlobRef<'a>,
+    pub icon: BlobRef<S>,
     ///Human-readable title of the badge.
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DefinitionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DefinitionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Definition<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Definition<S>,
 }
 
-impl<'a> Definition<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DefinitionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Definition<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DefinitionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -87,18 +90,17 @@ pub struct DefinitionRecord;
 impl XrpcResp for DefinitionRecord {
     const NSID: &'static str = "app.certified.badge.definition";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DefinitionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DefinitionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DefinitionGetRecordOutput<'_>> for Definition<'_> {
-    fn from(output: DefinitionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DefinitionGetRecordOutput<S>> for Definition<S> {
+    fn from(output: DefinitionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Definition<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Definition<S> {
     const NSID: &'static str = "app.certified.badge.definition";
     type Record = DefinitionRecord;
 }
@@ -108,7 +110,7 @@ impl Collection for DefinitionRecord {
     type Record = DefinitionRecord;
 }
 
-impl<'a> LexiconSchema for Definition<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Definition<S> {
     fn nsid() -> &'static str {
         "app.certified.badge.definition"
     }
@@ -235,67 +237,67 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BadgeType;
         type Title;
-        type CreatedAt;
+        type BadgeType;
         type Icon;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BadgeType = Unset;
         type Title = Unset;
-        type CreatedAt = Unset;
+        type BadgeType = Unset;
         type Icon = Unset;
-    }
-    ///State transition - sets the `badge_type` field to Set
-    pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBadgeType<S> {}
-    impl<S: State> State for SetBadgeType<S> {
-        type BadgeType = Set<members::badge_type>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Icon = S::Icon;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type BadgeType = S::BadgeType;
         type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Icon = S::Icon;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type BadgeType = S::BadgeType;
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
         type Icon = S::Icon;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `badge_type` field to Set
+    pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBadgeType<S> {}
+    impl<S: State> State for SetBadgeType<S> {
+        type Title = S::Title;
+        type BadgeType = Set<members::badge_type>;
+        type Icon = S::Icon;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `icon` field to Set
     pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIcon<S> {}
     impl<S: State> State for SetIcon<S> {
-        type BadgeType = S::BadgeType;
         type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
+        type BadgeType = S::BadgeType;
         type Icon = Set<members::icon>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type BadgeType = S::BadgeType;
+        type Icon = S::Icon;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `badge_type` field
-        pub struct badge_type(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `badge_type` field
+        pub struct badge_type(());
         ///Marker type for the `icon` field
         pub struct icon(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -303,12 +305,12 @@ pub mod definition_state {
 pub struct DefinitionBuilder<'a, S: definition_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<Did<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<Did<S>>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -333,12 +335,12 @@ impl<'a> DefinitionBuilder<'a, definition_state::Empty> {
 
 impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
     /// Set the `allowedIssuers` field (optional)
-    pub fn allowed_issuers(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
+    pub fn allowed_issuers(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `allowedIssuers` field to an Option value (optional)
-    pub fn maybe_allowed_issuers(mut self, value: Option<Vec<Did<'a>>>) -> Self {
+    pub fn maybe_allowed_issuers(mut self, value: Option<Vec<Did<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -352,7 +354,7 @@ where
     /// Set the `badgeType` field (required)
     pub fn badge_type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DefinitionBuilder<'a, definition_state::SetBadgeType<S>> {
         self._fields.1 = Option::Some(value.into());
         DefinitionBuilder {
@@ -384,12 +386,12 @@ where
 
 impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -403,7 +405,7 @@ where
     /// Set the `icon` field (required)
     pub fn icon(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> DefinitionBuilder<'a, definition_state::SetIcon<S>> {
         self._fields.4 = Option::Some(value.into());
         DefinitionBuilder {
@@ -422,7 +424,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DefinitionBuilder<'a, definition_state::SetTitle<S>> {
         self._fields.5 = Option::Some(value.into());
         DefinitionBuilder {
@@ -436,10 +438,10 @@ where
 impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
-    S::BadgeType: definition_state::IsSet,
     S::Title: definition_state::IsSet,
-    S::CreatedAt: definition_state::IsSet,
+    S::BadgeType: definition_state::IsSet,
     S::Icon: definition_state::IsSet,
+    S::CreatedAt: definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Definition<'a> {
@@ -456,10 +458,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Definition<'a> {
         Definition {
             allowed_issuers: self._fields.0,

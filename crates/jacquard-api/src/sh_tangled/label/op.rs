@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,50 +29,64 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::sh_tangled::label::op;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.tangled.label.op", tag = "$type")]
-pub struct Op<'a> {
-    #[serde(borrow)]
-    pub add: Vec<op::Operand<'a>>,
-    #[serde(borrow)]
-    pub delete: Vec<op::Operand<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.tangled.label.op",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Op<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub add: Vec<op::Operand<S>>,
+    pub delete: Vec<op::Operand<S>>,
     pub performed_at: Datetime,
     ///The subject (task, pull or discussion) of this label. Appviews may apply a `scope` check and refuse this op.
-    #[serde(borrow)]
-    pub subject: AtUri<'a>,
+    pub subject: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct OpGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct OpGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Op<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Op<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Operand<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Operand<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///ATURI to the label definition
-    #[serde(borrow)]
-    pub key: AtUri<'a>,
+    pub key: AtUri<S>,
     ///Stringified value of the label. This is first unstringed by appviews and then interpreted as a concrete value.
-    #[serde(borrow)]
-    pub value: CowStr<'a>,
+    pub value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Op<'a> {
-    pub fn uri(uri: impl Into<CowStr<'a>>) -> Result<RecordUri<'a, OpRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Op<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, OpRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -81,18 +97,17 @@ pub struct OpRecord;
 impl XrpcResp for OpRecord {
     const NSID: &'static str = "sh.tangled.label.op";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = OpGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = OpGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<OpGetRecordOutput<'_>> for Op<'_> {
-    fn from(output: OpGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<OpGetRecordOutput<S>> for Op<S> {
+    fn from(output: OpGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Op<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Op<S> {
     const NSID: &'static str = "sh.tangled.label.op";
     type Record = OpRecord;
 }
@@ -102,7 +117,7 @@ impl Collection for OpRecord {
     type Record = OpRecord;
 }
 
-impl<'a> LexiconSchema for Op<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Op<S> {
     fn nsid() -> &'static str {
         "sh.tangled.label.op"
     }
@@ -117,7 +132,7 @@ impl<'a> LexiconSchema for Op<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Operand<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Operand<S> {
     fn nsid() -> &'static str {
         "sh.tangled.label.op"
     }
@@ -142,67 +157,67 @@ pub mod op_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Add;
+        type Delete;
         type PerformedAt;
         type Subject;
-        type Delete;
-        type Add;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Add = Unset;
+        type Delete = Unset;
         type PerformedAt = Unset;
         type Subject = Unset;
-        type Delete = Unset;
-        type Add = Unset;
-    }
-    ///State transition - sets the `performed_at` field to Set
-    pub struct SetPerformedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPerformedAt<S> {}
-    impl<S: State> State for SetPerformedAt<S> {
-        type PerformedAt = Set<members::performed_at>;
-        type Subject = S::Subject;
-        type Delete = S::Delete;
-        type Add = S::Add;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type PerformedAt = S::PerformedAt;
-        type Subject = Set<members::subject>;
-        type Delete = S::Delete;
-        type Add = S::Add;
-    }
-    ///State transition - sets the `delete` field to Set
-    pub struct SetDelete<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDelete<S> {}
-    impl<S: State> State for SetDelete<S> {
-        type PerformedAt = S::PerformedAt;
-        type Subject = S::Subject;
-        type Delete = Set<members::delete>;
-        type Add = S::Add;
     }
     ///State transition - sets the `add` field to Set
     pub struct SetAdd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAdd<S> {}
     impl<S: State> State for SetAdd<S> {
+        type Add = Set<members::add>;
+        type Delete = S::Delete;
         type PerformedAt = S::PerformedAt;
         type Subject = S::Subject;
+    }
+    ///State transition - sets the `delete` field to Set
+    pub struct SetDelete<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDelete<S> {}
+    impl<S: State> State for SetDelete<S> {
+        type Add = S::Add;
+        type Delete = Set<members::delete>;
+        type PerformedAt = S::PerformedAt;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `performed_at` field to Set
+    pub struct SetPerformedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPerformedAt<S> {}
+    impl<S: State> State for SetPerformedAt<S> {
+        type Add = S::Add;
         type Delete = S::Delete;
-        type Add = Set<members::add>;
+        type PerformedAt = Set<members::performed_at>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Add = S::Add;
+        type Delete = S::Delete;
+        type PerformedAt = S::PerformedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `add` field
+        pub struct add(());
+        ///Marker type for the `delete` field
+        pub struct delete(());
         ///Marker type for the `performed_at` field
         pub struct performed_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `delete` field
-        pub struct delete(());
-        ///Marker type for the `add` field
-        pub struct add(());
     }
 }
 
@@ -210,10 +225,10 @@ pub mod op_state {
 pub struct OpBuilder<'a, S: op_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<op::Operand<'a>>>,
-        Option<Vec<op::Operand<'a>>>,
+        Option<Vec<op::Operand<S>>>,
+        Option<Vec<op::Operand<S>>>,
         Option<Datetime>,
-        Option<AtUri<'a>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -244,7 +259,7 @@ where
     /// Set the `add` field (required)
     pub fn add(
         mut self,
-        value: impl Into<Vec<op::Operand<'a>>>,
+        value: impl Into<Vec<op::Operand<S>>>,
     ) -> OpBuilder<'a, op_state::SetAdd<S>> {
         self._fields.0 = Option::Some(value.into());
         OpBuilder {
@@ -263,7 +278,7 @@ where
     /// Set the `delete` field (required)
     pub fn delete(
         mut self,
-        value: impl Into<Vec<op::Operand<'a>>>,
+        value: impl Into<Vec<op::Operand<S>>>,
     ) -> OpBuilder<'a, op_state::SetDelete<S>> {
         self._fields.1 = Option::Some(value.into());
         OpBuilder {
@@ -301,7 +316,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> OpBuilder<'a, op_state::SetSubject<S>> {
         self._fields.3 = Option::Some(value.into());
         OpBuilder {
@@ -315,10 +330,10 @@ where
 impl<'a, S> OpBuilder<'a, S>
 where
     S: op_state::State,
+    S::Add: op_state::IsSet,
+    S::Delete: op_state::IsSet,
     S::PerformedAt: op_state::IsSet,
     S::Subject: op_state::IsSet,
-    S::Delete: op_state::IsSet,
-    S::Add: op_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Op<'a> {
@@ -331,13 +346,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Op<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Op<'a> {
         Op {
             add: self._fields.0.unwrap(),
             delete: self._fields.1.unwrap(),
@@ -507,7 +516,7 @@ pub mod operand_state {
 /// Builder for constructing an instance of this type
 pub struct OperandBuilder<'a, S: operand_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<AtUri<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -537,7 +546,7 @@ where
     /// Set the `key` field (required)
     pub fn key(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> OperandBuilder<'a, operand_state::SetKey<S>> {
         self._fields.0 = Option::Some(value.into());
         OperandBuilder {
@@ -556,7 +565,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> OperandBuilder<'a, operand_state::SetValue<S>> {
         self._fields.1 = Option::Some(value.into());
         OperandBuilder {
@@ -584,10 +593,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Operand<'a> {
         Operand {
             key: self._fields.0.unwrap(),

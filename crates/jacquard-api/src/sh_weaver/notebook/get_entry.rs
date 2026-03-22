@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
@@ -15,23 +15,42 @@ use crate::sh_weaver::notebook::EntryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetEntry<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetEntryOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetEntryOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: EntryView<'a>,
+    pub value: EntryView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -40,18 +59,22 @@ pub struct GetEntryOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetEntryError<'a> {
+pub enum GetEntryError {
     #[serde(rename = "EntryNotFound")]
-    EntryNotFound(Option<CowStr<'a>>),
+    EntryNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for GetEntryError<'_> {
+impl core::fmt::Display for GetEntryError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::EntryNotFound(msg) => {
@@ -61,7 +84,13 @@ impl core::fmt::Display for GetEntryError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -71,11 +100,12 @@ pub struct GetEntryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryResponse {
     const NSID: &'static str = "sh.weaver.notebook.getEntry";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetEntryOutput<'de>;
-    type Err<'de> = GetEntryError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetEntryOutput<S>;
+    type Err = GetEntryError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntry<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetEntry<S> {
     const NSID: &'static str = "sh.weaver.notebook.getEntry";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEntryResponse;
@@ -86,7 +116,7 @@ pub struct GetEntryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntry";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetEntry<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetEntry<S>;
     type Response = GetEntryResponse;
 }
 
@@ -125,7 +155,7 @@ pub mod get_entry_state {
 /// Builder for constructing an instance of this type
 pub struct GetEntryBuilder<'a, S: get_entry_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -155,7 +185,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetEntryBuilder<'a, get_entry_state::SetUri<S>> {
         self._fields.0 = Option::Some(value.into());
         GetEntryBuilder {

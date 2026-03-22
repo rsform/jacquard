@@ -7,28 +7,48 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::song::SongViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct MatchSong<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MatchSong<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub artist: CowStr<'a>,
+    pub artist: S,
     #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct MatchSongOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MatchSongOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: SongViewDetailed<'a>,
+    pub value: SongViewDetailed<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for app.rocksky.song.matchSong
@@ -36,11 +56,12 @@ pub struct MatchSongResponse;
 impl jacquard_common::xrpc::XrpcResp for MatchSongResponse {
     const NSID: &'static str = "app.rocksky.song.matchSong";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MatchSongOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MatchSongOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for MatchSong<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for MatchSong<S> {
     const NSID: &'static str = "app.rocksky.song.matchSong";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = MatchSongResponse;
@@ -51,7 +72,7 @@ pub struct MatchSongRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MatchSongRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.song.matchSong";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = MatchSong<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = MatchSong<S>;
     type Response = MatchSongResponse;
 }
 
@@ -102,7 +123,7 @@ pub mod match_song_state {
 /// Builder for constructing an instance of this type
 pub struct MatchSongBuilder<'a, S: match_song_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -132,7 +153,7 @@ where
     /// Set the `artist` field (required)
     pub fn artist(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MatchSongBuilder<'a, match_song_state::SetArtist<S>> {
         self._fields.0 = Option::Some(value.into());
         MatchSongBuilder {
@@ -151,7 +172,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MatchSongBuilder<'a, match_song_state::SetTitle<S>> {
         self._fields.1 = Option::Some(value.into());
         MatchSongBuilder {

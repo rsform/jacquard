@@ -27,8 +27,8 @@ pub struct ListVideosResponse;
 impl jacquard_common::xrpc::XrpcResp for ListVideosResponse {
     const NSID: &'static str = "com.5jiji.test.listVideos";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListVideosOutput;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ListVideosOutput;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for ListVideos {
@@ -42,6 +42,6 @@ pub struct ListVideosRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListVideosRequest {
     const PATH: &'static str = "/xrpc/com.5jiji.test.listVideos";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListVideos;
+    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = ListVideos;
     type Response = ListVideosResponse;
 }

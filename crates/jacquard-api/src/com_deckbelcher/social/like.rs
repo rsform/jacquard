@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,73 +32,100 @@ use crate::com_deckbelcher::CardRef;
 use crate::com_deckbelcher::social::like;
 /// Subject for liking a card.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CardSubject<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CardSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reference to the card.
-    #[serde(borrow)]
-    pub r#ref: CardRef<'a>,
+    pub r#ref: CardRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Record declaring a 'like' of a piece of content (card, deck, reply, etc).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "com.deckbelcher.social.like", tag = "$type")]
-pub struct Like<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "com.deckbelcher.social.like",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Like<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when the like was created.
     pub created_at: Datetime,
     ///Reference to the content being liked.
-    #[serde(borrow)]
-    pub subject: LikeSubject<'a>,
+    pub subject: LikeSubject<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum LikeSubject<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum LikeSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.deckbelcher.social.like#cardSubject")]
-    CardSubject(Box<like::CardSubject<'a>>),
+    CardSubject(Box<like::CardSubject<S>>),
     #[serde(rename = "com.deckbelcher.social.like#recordSubject")]
-    RecordSubject(Box<like::RecordSubject<'a>>),
+    RecordSubject(Box<like::RecordSubject<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LikeGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LikeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Like<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Like<S>,
 }
 
 /// Subject for liking an ATProto record (deck, reply, etc).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordSubject<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RecordSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reference to the record.
-    #[serde(borrow)]
-    pub r#ref: StrongRef<'a>,
+    pub r#ref: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Like<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LikeRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Like<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LikeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for CardSubject<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardSubject<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.social.like"
     }
@@ -118,18 +147,17 @@ pub struct LikeRecord;
 impl XrpcResp for LikeRecord {
     const NSID: &'static str = "com.deckbelcher.social.like";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LikeGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LikeGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LikeGetRecordOutput<'_>> for Like<'_> {
-    fn from(output: LikeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LikeGetRecordOutput<S>> for Like<S> {
+    fn from(output: LikeGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Like<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Like<S> {
     const NSID: &'static str = "com.deckbelcher.social.like";
     type Record = LikeRecord;
 }
@@ -139,7 +167,7 @@ impl Collection for LikeRecord {
     type Record = LikeRecord;
 }
 
-impl<'a> LexiconSchema for Like<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Like<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.social.like"
     }
@@ -154,7 +182,7 @@ impl<'a> LexiconSchema for Like<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RecordSubject<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RecordSubject<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.social.like"
     }
@@ -204,7 +232,7 @@ pub mod card_subject_state {
 /// Builder for constructing an instance of this type
 pub struct CardSubjectBuilder<'a, S: card_subject_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CardRef<'a>>,),
+    _fields: (Option<CardRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -234,7 +262,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<CardRef<'a>>,
+        value: impl Into<CardRef<S>>,
     ) -> CardSubjectBuilder<'a, card_subject_state::SetRef<S>> {
         self._fields.0 = Option::Some(value.into());
         CardSubjectBuilder {
@@ -260,10 +288,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CardSubject<'a> {
         CardSubject {
             r#ref: self._fields.0.unwrap(),
@@ -391,44 +416,44 @@ pub mod like_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
         type CreatedAt = Set<members::created_at>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LikeBuilder<'a, S: like_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<LikeSubject<'a>>),
+    _fields: (Option<Datetime>, Option<LikeSubject<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -477,7 +502,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<LikeSubject<'a>>,
+        value: impl Into<LikeSubject<S>>,
     ) -> LikeBuilder<'a, like_state::SetSubject<S>> {
         self._fields.1 = Option::Some(value.into());
         LikeBuilder {
@@ -491,8 +516,8 @@ where
 impl<'a, S> LikeBuilder<'a, S>
 where
     S: like_state::State,
-    S::Subject: like_state::IsSet,
     S::CreatedAt: like_state::IsSet,
+    S::Subject: like_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Like<'a> {
@@ -503,13 +528,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Like<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Like<'a> {
         Like {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
@@ -553,7 +572,7 @@ pub mod record_subject_state {
 /// Builder for constructing an instance of this type
 pub struct RecordSubjectBuilder<'a, S: record_subject_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>,),
+    _fields: (Option<StrongRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -583,7 +602,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> RecordSubjectBuilder<'a, record_subject_state::SetRef<S>> {
         self._fields.0 = Option::Some(value.into());
         RecordSubjectBuilder {
@@ -609,10 +628,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RecordSubject<'a> {
         RecordSubject {
             r#ref: self._fields.0.unwrap(),

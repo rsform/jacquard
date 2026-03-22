@@ -10,10 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,27 +26,39 @@ use serde::{Serialize, Deserialize};
 use crate::app_offprint::block::heading::Heading;
 use crate::app_offprint::block::text::Text;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Blockquote<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Blockquote<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Nested content blocks within the blockquote
-    #[serde(borrow)]
-    pub content: Vec<BlockquoteContentItem<'a>>,
+    pub content: Vec<BlockquoteContentItem<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum BlockquoteContentItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum BlockquoteContentItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.offprint.block.text")]
-    Text(Box<Text<'a>>),
+    Text(Box<Text<S>>),
     #[serde(rename = "app.offprint.block.heading")]
-    Heading(Box<Heading<'a>>),
+    Heading(Box<Heading<S>>),
 }
 
-impl<'a> LexiconSchema for Blockquote<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Blockquote<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.blockquote"
     }
@@ -93,7 +108,7 @@ pub mod blockquote_state {
 /// Builder for constructing an instance of this type
 pub struct BlockquoteBuilder<'a, S: blockquote_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<BlockquoteContentItem<'a>>>,),
+    _fields: (Option<Vec<BlockquoteContentItem<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -123,7 +138,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<Vec<BlockquoteContentItem<'a>>>,
+        value: impl Into<Vec<BlockquoteContentItem<S>>>,
     ) -> BlockquoteBuilder<'a, blockquote_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         BlockquoteBuilder {
@@ -149,10 +164,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Blockquote<'a> {
         Blockquote {
             content: self._fields.0.unwrap(),

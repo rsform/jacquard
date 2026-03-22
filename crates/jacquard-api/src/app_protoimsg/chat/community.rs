@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,73 +30,89 @@ use serde::{Serialize, Deserialize};
 use crate::app_protoimsg::chat::community;
 /// A named group of community members.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CommunityGroup<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CommunityGroup<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether this is an inner circle group for presence visibility.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_community_group_is_inner_circle")]
     pub is_inner_circle: Option<bool>,
     ///DIDs of group members.
-    #[serde(borrow)]
-    pub members: Vec<community::CommunityMember<'a>>,
+    pub members: Vec<community::CommunityMember<S>>,
     ///Group label.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A member in a community group.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CommunityMember<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CommunityMember<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When this member was added.
     pub added_at: Datetime,
     ///The member's DID.
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The user's community list. Portable across any app implementing the Lexicon.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.protoimsg.chat.community",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Community<'a> {
+pub struct Community<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Named groups of community members, like AIM's buddy list categories.
-    #[serde(borrow)]
-    pub groups: Vec<community::CommunityGroup<'a>>,
+    pub groups: Vec<community::CommunityGroup<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CommunityGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CommunityGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Community<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Community<S>,
 }
 
-impl<'a> Community<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CommunityRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Community<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CommunityRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for CommunityGroup<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CommunityGroup<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.community"
     }
@@ -131,7 +149,7 @@ impl<'a> LexiconSchema for CommunityGroup<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CommunityMember<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CommunityMember<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.community"
     }
@@ -153,18 +171,17 @@ pub struct CommunityRecord;
 impl XrpcResp for CommunityRecord {
     const NSID: &'static str = "app.protoimsg.chat.community";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CommunityGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CommunityGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CommunityGetRecordOutput<'_>> for Community<'_> {
-    fn from(output: CommunityGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CommunityGetRecordOutput<S>> for Community<S> {
+    fn from(output: CommunityGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Community<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Community<S> {
     const NSID: &'static str = "app.protoimsg.chat.community";
     type Record = CommunityRecord;
 }
@@ -174,7 +191,7 @@ impl Collection for CommunityRecord {
     type Record = CommunityRecord;
 }
 
-impl<'a> LexiconSchema for Community<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Community<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.community"
     }
@@ -214,48 +231,44 @@ pub mod community_group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Members;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Members = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Members = S::Members;
+        type Name = Unset;
     }
     ///State transition - sets the `members` field to Set
     pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMembers<S> {}
     impl<S: State> State for SetMembers<S> {
-        type Name = S::Name;
         type Members = Set<members::members>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Members = S::Members;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `members` field
         pub struct members(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CommunityGroupBuilder<'a, S: community_group_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<bool>,
-        Option<Vec<community::CommunityMember<'a>>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<bool>, Option<Vec<community::CommunityMember<S>>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -298,7 +311,7 @@ where
     /// Set the `members` field (required)
     pub fn members(
         mut self,
-        value: impl Into<Vec<community::CommunityMember<'a>>>,
+        value: impl Into<Vec<community::CommunityMember<S>>>,
     ) -> CommunityGroupBuilder<'a, community_group_state::SetMembers<S>> {
         self._fields.1 = Option::Some(value.into());
         CommunityGroupBuilder {
@@ -317,7 +330,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CommunityGroupBuilder<'a, community_group_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         CommunityGroupBuilder {
@@ -331,8 +344,8 @@ where
 impl<'a, S> CommunityGroupBuilder<'a, S>
 where
     S: community_group_state::State,
-    S::Name: community_group_state::IsSet,
     S::Members: community_group_state::IsSet,
+    S::Name: community_group_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CommunityGroup<'a> {
@@ -346,10 +359,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CommunityGroup<'a> {
         CommunityGroup {
             is_inner_circle: self._fields.0.or_else(|| Some(false)),
@@ -540,7 +550,7 @@ pub mod community_member_state {
 /// Builder for constructing an instance of this type
 pub struct CommunityMemberBuilder<'a, S: community_member_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Did<'a>>),
+    _fields: (Option<Datetime>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -589,7 +599,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> CommunityMemberBuilder<'a, community_member_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         CommunityMemberBuilder {
@@ -617,10 +627,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CommunityMember<'a> {
         CommunityMember {
             added_at: self._fields.0.unwrap(),
@@ -665,7 +672,7 @@ pub mod community_state {
 /// Builder for constructing an instance of this type
 pub struct CommunityBuilder<'a, S: community_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<community::CommunityGroup<'a>>>,),
+    _fields: (Option<Vec<community::CommunityGroup<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -695,7 +702,7 @@ where
     /// Set the `groups` field (required)
     pub fn groups(
         mut self,
-        value: impl Into<Vec<community::CommunityGroup<'a>>>,
+        value: impl Into<Vec<community::CommunityGroup<S>>>,
     ) -> CommunityBuilder<'a, community_state::SetGroups<S>> {
         self._fields.0 = Option::Some(value.into());
         CommunityBuilder {
@@ -721,10 +728,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Community<'a> {
         Community {
             groups: self._fields.0.unwrap(),

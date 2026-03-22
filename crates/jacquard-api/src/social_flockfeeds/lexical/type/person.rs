@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -35,1506 +36,2309 @@ use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
 /// A person (alive, dead, undead, or fictional).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Embedded<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_name: Option<EmbeddedAdditionalName<'a>>,
+    pub additional_name: Option<EmbeddedAdditionalName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<EmbeddedAdditionalType<'a>>,
+    pub additional_type: Option<EmbeddedAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub address: Option<EmbeddedAddress<'a>>,
+    pub address: Option<EmbeddedAddress<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub affiliation: Option<EmbeddedAffiliation<'a>>,
+    pub affiliation: Option<EmbeddedAffiliation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub agent_interaction_statistic: Option<EmbeddedAgentInteractionStatistic<'a>>,
+    pub agent_interaction_statistic: Option<EmbeddedAgentInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<EmbeddedAlternateName<'a>>,
+    pub alternate_name: Option<EmbeddedAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alumni_of: Option<EmbeddedAlumniOf<'a>>,
+    pub alumni_of: Option<EmbeddedAlumniOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<EmbeddedAward<'a>>,
+    pub award: Option<EmbeddedAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<EmbeddedAwards<'a>>,
+    pub awards: Option<EmbeddedAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub birth_date: Option<EmbeddedBirthDate<'a>>,
+    pub birth_date: Option<EmbeddedBirthDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub birth_place: Option<EmbeddedBirthPlace<'a>>,
+    pub birth_place: Option<EmbeddedBirthPlace<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub brand: Option<EmbeddedBrand<'a>>,
+    pub brand: Option<EmbeddedBrand<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub call_sign: Option<EmbeddedCallSign<'a>>,
+    pub call_sign: Option<EmbeddedCallSign<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub children: Option<EmbeddedChildren<'a>>,
+    pub children: Option<EmbeddedChildren<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub colleague: Option<EmbeddedColleague<'a>>,
+    pub colleague: Option<EmbeddedColleague<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub colleagues: Option<EmbeddedColleagues<'a>>,
+    pub colleagues: Option<EmbeddedColleagues<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contact_point: Option<EmbeddedContactPoint<'a>>,
+    pub contact_point: Option<EmbeddedContactPoint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contact_points: Option<EmbeddedContactPoints<'a>>,
+    pub contact_points: Option<EmbeddedContactPoints<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub death_date: Option<EmbeddedDeathDate<'a>>,
+    pub death_date: Option<EmbeddedDeathDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub death_place: Option<EmbeddedDeathPlace<'a>>,
+    pub death_place: Option<EmbeddedDeathPlace<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<EmbeddedDescription<'a>>,
+    pub description: Option<EmbeddedDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub duns: Option<EmbeddedDuns<'a>>,
+    pub duns: Option<EmbeddedDuns<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub email: Option<EmbeddedEmail<'a>>,
+    pub email: Option<EmbeddedEmail<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub family_name: Option<EmbeddedFamilyName<'a>>,
+    pub family_name: Option<EmbeddedFamilyName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub fax_number: Option<EmbeddedFaxNumber<'a>>,
+    pub fax_number: Option<EmbeddedFaxNumber<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub follows: Option<EmbeddedFollows<'a>>,
+    pub follows: Option<EmbeddedFollows<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funder: Option<EmbeddedFunder<'a>>,
+    pub funder: Option<EmbeddedFunder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<EmbeddedFunding<'a>>,
+    pub funding: Option<EmbeddedFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gender: Option<EmbeddedGender<'a>>,
+    pub gender: Option<EmbeddedGender<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub given_name: Option<EmbeddedGivenName<'a>>,
+    pub given_name: Option<EmbeddedGivenName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub global_location_number: Option<EmbeddedGlobalLocationNumber<'a>>,
+    pub global_location_number: Option<EmbeddedGlobalLocationNumber<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_certification: Option<EmbeddedHasCertification<'a>>,
+    pub has_certification: Option<EmbeddedHasCertification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_credential: Option<EmbeddedHasCredential<'a>>,
+    pub has_credential: Option<EmbeddedHasCredential<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_occupation: Option<EmbeddedHasOccupation<'a>>,
+    pub has_occupation: Option<EmbeddedHasOccupation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_offer_catalog: Option<EmbeddedHasOfferCatalog<'a>>,
+    pub has_offer_catalog: Option<EmbeddedHasOfferCatalog<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_pos: Option<EmbeddedHasPos<'a>>,
+    pub has_pos: Option<EmbeddedHasPos<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub height: Option<EmbeddedHeight<'a>>,
+    pub height: Option<EmbeddedHeight<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub home_location: Option<EmbeddedHomeLocation<'a>>,
+    pub home_location: Option<EmbeddedHomeLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub honorific_prefix: Option<EmbeddedHonorificPrefix<'a>>,
+    pub honorific_prefix: Option<EmbeddedHonorificPrefix<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub honorific_suffix: Option<EmbeddedHonorificSuffix<'a>>,
+    pub honorific_suffix: Option<EmbeddedHonorificSuffix<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<EmbeddedIdentifier<'a>>,
+    pub identifier: Option<EmbeddedIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<EmbeddedImage<'a>>,
+    pub image: Option<EmbeddedImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interaction_statistic: Option<EmbeddedInteractionStatistic<'a>>,
+    pub interaction_statistic: Option<EmbeddedInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub isic_v4: Option<EmbeddedIsicV4<'a>>,
+    pub isic_v4: Option<EmbeddedIsicV4<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub job_title: Option<EmbeddedJobTitle<'a>>,
+    pub job_title: Option<EmbeddedJobTitle<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub knows: Option<EmbeddedKnows<'a>>,
+    pub knows: Option<EmbeddedKnows<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub knows_about: Option<EmbeddedKnowsAbout<'a>>,
+    pub knows_about: Option<EmbeddedKnowsAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub knows_language: Option<EmbeddedKnowsLanguage<'a>>,
+    pub knows_language: Option<EmbeddedKnowsLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub makes_offer: Option<EmbeddedMakesOffer<'a>>,
+    pub makes_offer: Option<EmbeddedMakesOffer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub member_of: Option<EmbeddedMemberOf<'a>>,
+    pub member_of: Option<EmbeddedMemberOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub naics: Option<EmbeddedNaics<'a>>,
+    pub naics: Option<EmbeddedNaics<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<EmbeddedName<'a>>,
+    pub name: Option<EmbeddedName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub nationality: Option<EmbeddedNationality<'a>>,
+    pub nationality: Option<EmbeddedNationality<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub net_worth: Option<EmbeddedNetWorth<'a>>,
+    pub net_worth: Option<EmbeddedNetWorth<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub owns: Option<EmbeddedOwns<'a>>,
+    pub owns: Option<EmbeddedOwns<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent: Option<EmbeddedParent<'a>>,
+    pub parent: Option<EmbeddedParent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parents: Option<EmbeddedParents<'a>>,
+    pub parents: Option<EmbeddedParents<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub performer_in: Option<EmbeddedPerformerIn<'a>>,
+    pub performer_in: Option<EmbeddedPerformerIn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<EmbeddedPotentialAction<'a>>,
+    pub potential_action: Option<EmbeddedPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pronouns: Option<EmbeddedPronouns<'a>>,
+    pub pronouns: Option<EmbeddedPronouns<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publishing_principles: Option<EmbeddedPublishingPrinciples<'a>>,
+    pub publishing_principles: Option<EmbeddedPublishingPrinciples<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub related_to: Option<EmbeddedRelatedTo<'a>>,
+    pub related_to: Option<EmbeddedRelatedTo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<EmbeddedSameAs<'a>>,
+    pub same_as: Option<EmbeddedSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub seeks: Option<EmbeddedSeeks<'a>>,
+    pub seeks: Option<EmbeddedSeeks<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sibling: Option<EmbeddedSibling<'a>>,
+    pub sibling: Option<EmbeddedSibling<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub siblings: Option<EmbeddedSiblings<'a>>,
+    pub siblings: Option<EmbeddedSiblings<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub skills: Option<EmbeddedSkills<'a>>,
+    pub skills: Option<EmbeddedSkills<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sponsor: Option<EmbeddedSponsor<'a>>,
+    pub sponsor: Option<EmbeddedSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spouse: Option<EmbeddedSpouse<'a>>,
+    pub spouse: Option<EmbeddedSpouse<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<EmbeddedSubjectOf<'a>>,
+    pub subject_of: Option<EmbeddedSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tax_id: Option<EmbeddedTaxId<'a>>,
+    pub tax_id: Option<EmbeddedTaxId<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub telephone: Option<EmbeddedTelephone<'a>>,
+    pub telephone: Option<EmbeddedTelephone<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<EmbeddedUrl<'a>>,
+    pub url: Option<EmbeddedUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub vat_id: Option<EmbeddedVatId<'a>>,
+    pub vat_id: Option<EmbeddedVatId<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub weight: Option<EmbeddedWeight<'a>>,
+    pub weight: Option<EmbeddedWeight<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_location: Option<EmbeddedWorkLocation<'a>>,
+    pub work_location: Option<EmbeddedWorkLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub works_for: Option<EmbeddedWorksFor<'a>>,
+    pub works_for: Option<EmbeddedWorksFor<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAdditionalName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAdditionalName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAddress<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAddress<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAffiliation<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAffiliation<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAgentInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAgentInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlumniOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlumniOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedBirthDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedBirthDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedBirthPlace<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedBirthPlace<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedBrand<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedBrand<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Brand#embedded")]
-    BrandEmbedded(Box<brand::Embedded<'a>>),
+    BrandEmbedded(Box<brand::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCallSign<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCallSign<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedChildren<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedChildren<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedColleague<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedColleague<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedColleagues<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedColleagues<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContactPoint<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContactPoint<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContactPoints<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContactPoints<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDeathDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDeathDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDeathPlace<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDeathPlace<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDuns<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDuns<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEmail<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEmail<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFamilyName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFamilyName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFaxNumber<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFaxNumber<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFollows<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFollows<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFunder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGender<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGender<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGivenName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGivenName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGlobalLocationNumber<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGlobalLocationNumber<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasCertification<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasCertification<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasCredential<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasCredential<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasOccupation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasOccupation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasOfferCatalog<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasOfferCatalog<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasPos<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasPos<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHeight<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHomeLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHomeLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHonorificPrefix<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHonorificPrefix<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHonorificSuffix<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHonorificSuffix<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsicV4<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsicV4<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedJobTitle<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedJobTitle<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedKnows<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedKnows<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedKnowsAbout<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedKnowsAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedKnowsLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedKnowsLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMakesOffer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMakesOffer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMemberOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMemberOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedNaics<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedNaics<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedNationality<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedNationality<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedNetWorth<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedNetWorth<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedOwns<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedOwns<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedParent<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedParent<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedParents<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedParents<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPerformerIn<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPerformerIn<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPronouns<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPronouns<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublishingPrinciples<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedRelatedTo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedRelatedTo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSeeks<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSeeks<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSibling<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSibling<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSiblings<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSiblings<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSkills<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSkills<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSponsor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSpouse<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSpouse<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTaxId<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTaxId<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTelephone<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTelephone<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedVatId<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedVatId<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWeight<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWorkLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWorkLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWorksFor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWorksFor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "social.flockfeeds.lexical.type.Person",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Person<'a> {
+pub struct Person<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_name: Option<PersonAdditionalName<'a>>,
+    pub additional_name: Option<PersonAdditionalName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<PersonAdditionalType<'a>>,
+    pub additional_type: Option<PersonAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub address: Option<PersonAddress<'a>>,
+    pub address: Option<PersonAddress<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub affiliation: Option<PersonAffiliation<'a>>,
+    pub affiliation: Option<PersonAffiliation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub agent_interaction_statistic: Option<PersonAgentInteractionStatistic<'a>>,
+    pub agent_interaction_statistic: Option<PersonAgentInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<PersonAlternateName<'a>>,
+    pub alternate_name: Option<PersonAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alumni_of: Option<PersonAlumniOf<'a>>,
+    pub alumni_of: Option<PersonAlumniOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<PersonAward<'a>>,
+    pub award: Option<PersonAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<PersonAwards<'a>>,
+    pub awards: Option<PersonAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub birth_date: Option<PersonBirthDate<'a>>,
+    pub birth_date: Option<PersonBirthDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub birth_place: Option<PersonBirthPlace<'a>>,
+    pub birth_place: Option<PersonBirthPlace<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub brand: Option<PersonBrand<'a>>,
+    pub brand: Option<PersonBrand<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub call_sign: Option<PersonCallSign<'a>>,
+    pub call_sign: Option<PersonCallSign<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub children: Option<PersonChildren<'a>>,
+    pub children: Option<PersonChildren<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub colleague: Option<PersonColleague<'a>>,
+    pub colleague: Option<PersonColleague<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub colleagues: Option<PersonColleagues<'a>>,
+    pub colleagues: Option<PersonColleagues<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contact_point: Option<PersonContactPoint<'a>>,
+    pub contact_point: Option<PersonContactPoint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contact_points: Option<PersonContactPoints<'a>>,
+    pub contact_points: Option<PersonContactPoints<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub death_date: Option<PersonDeathDate<'a>>,
+    pub death_date: Option<PersonDeathDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub death_place: Option<PersonDeathPlace<'a>>,
+    pub death_place: Option<PersonDeathPlace<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<PersonDescription<'a>>,
+    pub description: Option<PersonDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<PersonDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<PersonDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub duns: Option<PersonDuns<'a>>,
+    pub duns: Option<PersonDuns<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub email: Option<PersonEmail<'a>>,
+    pub email: Option<PersonEmail<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub family_name: Option<PersonFamilyName<'a>>,
+    pub family_name: Option<PersonFamilyName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub fax_number: Option<PersonFaxNumber<'a>>,
+    pub fax_number: Option<PersonFaxNumber<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub follows: Option<PersonFollows<'a>>,
+    pub follows: Option<PersonFollows<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funder: Option<PersonFunder<'a>>,
+    pub funder: Option<PersonFunder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<PersonFunding<'a>>,
+    pub funding: Option<PersonFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gender: Option<PersonGender<'a>>,
+    pub gender: Option<PersonGender<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub given_name: Option<PersonGivenName<'a>>,
+    pub given_name: Option<PersonGivenName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub global_location_number: Option<PersonGlobalLocationNumber<'a>>,
+    pub global_location_number: Option<PersonGlobalLocationNumber<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_certification: Option<PersonHasCertification<'a>>,
+    pub has_certification: Option<PersonHasCertification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_credential: Option<PersonHasCredential<'a>>,
+    pub has_credential: Option<PersonHasCredential<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_occupation: Option<PersonHasOccupation<'a>>,
+    pub has_occupation: Option<PersonHasOccupation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_offer_catalog: Option<PersonHasOfferCatalog<'a>>,
+    pub has_offer_catalog: Option<PersonHasOfferCatalog<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_pos: Option<PersonHasPos<'a>>,
+    pub has_pos: Option<PersonHasPos<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub height: Option<PersonHeight<'a>>,
+    pub height: Option<PersonHeight<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub home_location: Option<PersonHomeLocation<'a>>,
+    pub home_location: Option<PersonHomeLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub honorific_prefix: Option<PersonHonorificPrefix<'a>>,
+    pub honorific_prefix: Option<PersonHonorificPrefix<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub honorific_suffix: Option<PersonHonorificSuffix<'a>>,
+    pub honorific_suffix: Option<PersonHonorificSuffix<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<PersonIdentifier<'a>>,
+    pub identifier: Option<PersonIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<PersonImage<'a>>,
+    pub image: Option<PersonImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interaction_statistic: Option<PersonInteractionStatistic<'a>>,
+    pub interaction_statistic: Option<PersonInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub isic_v4: Option<PersonIsicV4<'a>>,
+    pub isic_v4: Option<PersonIsicV4<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub job_title: Option<PersonJobTitle<'a>>,
+    pub job_title: Option<PersonJobTitle<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub knows: Option<PersonKnows<'a>>,
+    pub knows: Option<PersonKnows<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub knows_about: Option<PersonKnowsAbout<'a>>,
+    pub knows_about: Option<PersonKnowsAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub knows_language: Option<PersonKnowsLanguage<'a>>,
+    pub knows_language: Option<PersonKnowsLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<PersonMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<PersonMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub makes_offer: Option<PersonMakesOffer<'a>>,
+    pub makes_offer: Option<PersonMakesOffer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub member_of: Option<PersonMemberOf<'a>>,
+    pub member_of: Option<PersonMemberOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub naics: Option<PersonNaics<'a>>,
+    pub naics: Option<PersonNaics<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<PersonName<'a>>,
+    pub name: Option<PersonName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub nationality: Option<PersonNationality<'a>>,
+    pub nationality: Option<PersonNationality<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub net_worth: Option<PersonNetWorth<'a>>,
+    pub net_worth: Option<PersonNetWorth<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub owns: Option<PersonOwns<'a>>,
+    pub owns: Option<PersonOwns<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent: Option<PersonParent<'a>>,
+    pub parent: Option<PersonParent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parents: Option<PersonParents<'a>>,
+    pub parents: Option<PersonParents<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub performer_in: Option<PersonPerformerIn<'a>>,
+    pub performer_in: Option<PersonPerformerIn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<PersonPotentialAction<'a>>,
+    pub potential_action: Option<PersonPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pronouns: Option<PersonPronouns<'a>>,
+    pub pronouns: Option<PersonPronouns<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publishing_principles: Option<PersonPublishingPrinciples<'a>>,
+    pub publishing_principles: Option<PersonPublishingPrinciples<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub related_to: Option<PersonRelatedTo<'a>>,
+    pub related_to: Option<PersonRelatedTo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<PersonSameAs<'a>>,
+    pub same_as: Option<PersonSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub seeks: Option<PersonSeeks<'a>>,
+    pub seeks: Option<PersonSeeks<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sibling: Option<PersonSibling<'a>>,
+    pub sibling: Option<PersonSibling<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub siblings: Option<PersonSiblings<'a>>,
+    pub siblings: Option<PersonSiblings<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub skills: Option<PersonSkills<'a>>,
+    pub skills: Option<PersonSkills<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sponsor: Option<PersonSponsor<'a>>,
+    pub sponsor: Option<PersonSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spouse: Option<PersonSpouse<'a>>,
+    pub spouse: Option<PersonSpouse<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<PersonSubjectOf<'a>>,
+    pub subject_of: Option<PersonSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tax_id: Option<PersonTaxId<'a>>,
+    pub tax_id: Option<PersonTaxId<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub telephone: Option<PersonTelephone<'a>>,
+    pub telephone: Option<PersonTelephone<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<PersonUrl<'a>>,
+    pub url: Option<PersonUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub vat_id: Option<PersonVatId<'a>>,
+    pub vat_id: Option<PersonVatId<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub weight: Option<PersonWeight<'a>>,
+    pub weight: Option<PersonWeight<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_location: Option<PersonWorkLocation<'a>>,
+    pub work_location: Option<PersonWorkLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub works_for: Option<PersonWorksFor<'a>>,
+    pub works_for: Option<PersonWorksFor<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonAdditionalName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonAdditionalName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonAddress<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonAddress<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonAffiliation<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonAffiliation<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonAgentInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonAgentInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonAlumniOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonAlumniOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonBirthDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonBirthDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonBirthPlace<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonBirthPlace<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonBrand<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonBrand<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Brand#embedded")]
-    BrandEmbedded(Box<brand::Embedded<'a>>),
+    BrandEmbedded(Box<brand::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonCallSign<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonCallSign<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonChildren<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonChildren<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonColleague<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonColleague<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonColleagues<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonColleagues<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonContactPoint<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonContactPoint<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonContactPoints<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonContactPoints<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonDeathDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonDeathDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonDeathPlace<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonDeathPlace<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonDuns<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonDuns<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonEmail<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonEmail<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonFamilyName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonFamilyName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonFaxNumber<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonFaxNumber<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonFollows<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonFollows<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonFunder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonGender<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonGender<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonGivenName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonGivenName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonGlobalLocationNumber<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonGlobalLocationNumber<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonHasCertification<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonHasCertification<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonHasCredential<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonHasCredential<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonHasOccupation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonHasOccupation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonHasOfferCatalog<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonHasOfferCatalog<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonHasPos<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonHasPos<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonHeight<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonHeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonHomeLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonHomeLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonHonorificPrefix<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonHonorificPrefix<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonHonorificSuffix<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonHonorificSuffix<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonIsicV4<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonIsicV4<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonJobTitle<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonJobTitle<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonKnows<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonKnows<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonKnowsAbout<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonKnowsAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonKnowsLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonKnowsLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonMakesOffer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonMakesOffer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonMemberOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonMemberOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonNaics<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonNaics<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonNationality<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonNationality<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonNetWorth<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonNetWorth<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonOwns<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonOwns<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonParent<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonParent<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonParents<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonParents<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonPerformerIn<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonPerformerIn<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonPronouns<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonPronouns<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonPublishingPrinciples<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonPublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonRelatedTo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonRelatedTo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonSeeks<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonSeeks<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonSibling<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonSibling<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonSiblings<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonSiblings<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonSkills<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonSkills<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonSponsor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonSpouse<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonSpouse<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    Embedded(Box<person::Embedded<'a>>),
+    Embedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonTaxId<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonTaxId<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonTelephone<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonTelephone<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonVatId<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonVatId<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonWeight<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonWeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonWorkLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonWorkLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PersonWorksFor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PersonWorksFor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PersonGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PersonGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Person<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Person<S>,
 }
 
-impl<'a> Person<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PersonRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Person<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PersonRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Embedded<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Embedded<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Person"
     }
@@ -1556,18 +2360,17 @@ pub struct PersonRecord;
 impl XrpcResp for PersonRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Person";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PersonGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PersonGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PersonGetRecordOutput<'_>> for Person<'_> {
-    fn from(output: PersonGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PersonGetRecordOutput<S>> for Person<S> {
+    fn from(output: PersonGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Person<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Person<S> {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Person";
     type Record = PersonRecord;
 }
@@ -1577,7 +2380,7 @@ impl Collection for PersonRecord {
     type Record = PersonRecord;
 }
 
-impl<'a> LexiconSchema for Person<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Person<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Person"
     }
@@ -3305,85 +4108,85 @@ pub mod person_state {
 pub struct PersonBuilder<'a, S: person_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<PersonAdditionalName<'a>>,
-        Option<PersonAdditionalType<'a>>,
-        Option<PersonAddress<'a>>,
-        Option<PersonAffiliation<'a>>,
-        Option<PersonAgentInteractionStatistic<'a>>,
-        Option<PersonAlternateName<'a>>,
-        Option<PersonAlumniOf<'a>>,
-        Option<PersonAward<'a>>,
-        Option<PersonAwards<'a>>,
-        Option<PersonBirthDate<'a>>,
-        Option<PersonBirthPlace<'a>>,
-        Option<PersonBrand<'a>>,
-        Option<PersonCallSign<'a>>,
-        Option<PersonChildren<'a>>,
-        Option<PersonColleague<'a>>,
-        Option<PersonColleagues<'a>>,
-        Option<PersonContactPoint<'a>>,
-        Option<PersonContactPoints<'a>>,
-        Option<PersonDeathDate<'a>>,
-        Option<PersonDeathPlace<'a>>,
-        Option<PersonDescription<'a>>,
-        Option<PersonDisambiguatingDescription<'a>>,
-        Option<PersonDuns<'a>>,
-        Option<PersonEmail<'a>>,
-        Option<PersonFamilyName<'a>>,
-        Option<PersonFaxNumber<'a>>,
-        Option<PersonFollows<'a>>,
-        Option<PersonFunder<'a>>,
-        Option<PersonFunding<'a>>,
-        Option<PersonGender<'a>>,
-        Option<PersonGivenName<'a>>,
-        Option<PersonGlobalLocationNumber<'a>>,
-        Option<PersonHasCertification<'a>>,
-        Option<PersonHasCredential<'a>>,
-        Option<PersonHasOccupation<'a>>,
-        Option<PersonHasOfferCatalog<'a>>,
-        Option<PersonHasPos<'a>>,
-        Option<PersonHeight<'a>>,
-        Option<PersonHomeLocation<'a>>,
-        Option<PersonHonorificPrefix<'a>>,
-        Option<PersonHonorificSuffix<'a>>,
-        Option<PersonIdentifier<'a>>,
-        Option<PersonImage<'a>>,
-        Option<PersonInteractionStatistic<'a>>,
-        Option<PersonIsicV4<'a>>,
-        Option<PersonJobTitle<'a>>,
-        Option<PersonKnows<'a>>,
-        Option<PersonKnowsAbout<'a>>,
-        Option<PersonKnowsLanguage<'a>>,
-        Option<PersonMainEntityOfPage<'a>>,
-        Option<PersonMakesOffer<'a>>,
-        Option<PersonMemberOf<'a>>,
-        Option<PersonNaics<'a>>,
-        Option<PersonName<'a>>,
-        Option<PersonNationality<'a>>,
-        Option<PersonNetWorth<'a>>,
-        Option<PersonOwns<'a>>,
-        Option<PersonParent<'a>>,
-        Option<PersonParents<'a>>,
-        Option<PersonPerformerIn<'a>>,
-        Option<PersonPotentialAction<'a>>,
-        Option<PersonPronouns<'a>>,
-        Option<PersonPublishingPrinciples<'a>>,
-        Option<PersonRelatedTo<'a>>,
-        Option<PersonSameAs<'a>>,
-        Option<PersonSeeks<'a>>,
-        Option<PersonSibling<'a>>,
-        Option<PersonSiblings<'a>>,
-        Option<PersonSkills<'a>>,
-        Option<PersonSponsor<'a>>,
-        Option<PersonSpouse<'a>>,
-        Option<PersonSubjectOf<'a>>,
-        Option<PersonTaxId<'a>>,
-        Option<PersonTelephone<'a>>,
-        Option<PersonUrl<'a>>,
-        Option<PersonVatId<'a>>,
-        Option<PersonWeight<'a>>,
-        Option<PersonWorkLocation<'a>>,
-        Option<PersonWorksFor<'a>>,
+        Option<PersonAdditionalName<S>>,
+        Option<PersonAdditionalType<S>>,
+        Option<PersonAddress<S>>,
+        Option<PersonAffiliation<S>>,
+        Option<PersonAgentInteractionStatistic<S>>,
+        Option<PersonAlternateName<S>>,
+        Option<PersonAlumniOf<S>>,
+        Option<PersonAward<S>>,
+        Option<PersonAwards<S>>,
+        Option<PersonBirthDate<S>>,
+        Option<PersonBirthPlace<S>>,
+        Option<PersonBrand<S>>,
+        Option<PersonCallSign<S>>,
+        Option<PersonChildren<S>>,
+        Option<PersonColleague<S>>,
+        Option<PersonColleagues<S>>,
+        Option<PersonContactPoint<S>>,
+        Option<PersonContactPoints<S>>,
+        Option<PersonDeathDate<S>>,
+        Option<PersonDeathPlace<S>>,
+        Option<PersonDescription<S>>,
+        Option<PersonDisambiguatingDescription<S>>,
+        Option<PersonDuns<S>>,
+        Option<PersonEmail<S>>,
+        Option<PersonFamilyName<S>>,
+        Option<PersonFaxNumber<S>>,
+        Option<PersonFollows<S>>,
+        Option<PersonFunder<S>>,
+        Option<PersonFunding<S>>,
+        Option<PersonGender<S>>,
+        Option<PersonGivenName<S>>,
+        Option<PersonGlobalLocationNumber<S>>,
+        Option<PersonHasCertification<S>>,
+        Option<PersonHasCredential<S>>,
+        Option<PersonHasOccupation<S>>,
+        Option<PersonHasOfferCatalog<S>>,
+        Option<PersonHasPos<S>>,
+        Option<PersonHeight<S>>,
+        Option<PersonHomeLocation<S>>,
+        Option<PersonHonorificPrefix<S>>,
+        Option<PersonHonorificSuffix<S>>,
+        Option<PersonIdentifier<S>>,
+        Option<PersonImage<S>>,
+        Option<PersonInteractionStatistic<S>>,
+        Option<PersonIsicV4<S>>,
+        Option<PersonJobTitle<S>>,
+        Option<PersonKnows<S>>,
+        Option<PersonKnowsAbout<S>>,
+        Option<PersonKnowsLanguage<S>>,
+        Option<PersonMainEntityOfPage<S>>,
+        Option<PersonMakesOffer<S>>,
+        Option<PersonMemberOf<S>>,
+        Option<PersonNaics<S>>,
+        Option<PersonName<S>>,
+        Option<PersonNationality<S>>,
+        Option<PersonNetWorth<S>>,
+        Option<PersonOwns<S>>,
+        Option<PersonParent<S>>,
+        Option<PersonParents<S>>,
+        Option<PersonPerformerIn<S>>,
+        Option<PersonPotentialAction<S>>,
+        Option<PersonPronouns<S>>,
+        Option<PersonPublishingPrinciples<S>>,
+        Option<PersonRelatedTo<S>>,
+        Option<PersonSameAs<S>>,
+        Option<PersonSeeks<S>>,
+        Option<PersonSibling<S>>,
+        Option<PersonSiblings<S>>,
+        Option<PersonSkills<S>>,
+        Option<PersonSponsor<S>>,
+        Option<PersonSpouse<S>>,
+        Option<PersonSubjectOf<S>>,
+        Option<PersonTaxId<S>>,
+        Option<PersonTelephone<S>>,
+        Option<PersonUrl<S>>,
+        Option<PersonVatId<S>>,
+        Option<PersonWeight<S>>,
+        Option<PersonWorkLocation<S>>,
+        Option<PersonWorksFor<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -3490,7 +4293,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `additionalName` field (optional)
     pub fn additional_name(
         mut self,
-        value: impl Into<Option<PersonAdditionalName<'a>>>,
+        value: impl Into<Option<PersonAdditionalName<S>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
@@ -3498,7 +4301,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `additionalName` field to an Option value (optional)
     pub fn maybe_additional_name(
         mut self,
-        value: Option<PersonAdditionalName<'a>>,
+        value: Option<PersonAdditionalName<S>>,
     ) -> Self {
         self._fields.0 = value;
         self
@@ -3509,7 +4312,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `additionalType` field (optional)
     pub fn additional_type(
         mut self,
-        value: impl Into<Option<PersonAdditionalType<'a>>>,
+        value: impl Into<Option<PersonAdditionalType<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -3517,7 +4320,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `additionalType` field to an Option value (optional)
     pub fn maybe_additional_type(
         mut self,
-        value: Option<PersonAdditionalType<'a>>,
+        value: Option<PersonAdditionalType<S>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -3526,12 +4329,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `address` field (optional)
-    pub fn address(mut self, value: impl Into<Option<PersonAddress<'a>>>) -> Self {
+    pub fn address(mut self, value: impl Into<Option<PersonAddress<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `address` field to an Option value (optional)
-    pub fn maybe_address(mut self, value: Option<PersonAddress<'a>>) -> Self {
+    pub fn maybe_address(mut self, value: Option<PersonAddress<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -3541,13 +4344,13 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `affiliation` field (optional)
     pub fn affiliation(
         mut self,
-        value: impl Into<Option<PersonAffiliation<'a>>>,
+        value: impl Into<Option<PersonAffiliation<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `affiliation` field to an Option value (optional)
-    pub fn maybe_affiliation(mut self, value: Option<PersonAffiliation<'a>>) -> Self {
+    pub fn maybe_affiliation(mut self, value: Option<PersonAffiliation<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -3557,7 +4360,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `agentInteractionStatistic` field (optional)
     pub fn agent_interaction_statistic(
         mut self,
-        value: impl Into<Option<PersonAgentInteractionStatistic<'a>>>,
+        value: impl Into<Option<PersonAgentInteractionStatistic<S>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
@@ -3565,7 +4368,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `agentInteractionStatistic` field to an Option value (optional)
     pub fn maybe_agent_interaction_statistic(
         mut self,
-        value: Option<PersonAgentInteractionStatistic<'a>>,
+        value: Option<PersonAgentInteractionStatistic<S>>,
     ) -> Self {
         self._fields.4 = value;
         self
@@ -3576,7 +4379,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `alternateName` field (optional)
     pub fn alternate_name(
         mut self,
-        value: impl Into<Option<PersonAlternateName<'a>>>,
+        value: impl Into<Option<PersonAlternateName<S>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
@@ -3584,7 +4387,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `alternateName` field to an Option value (optional)
     pub fn maybe_alternate_name(
         mut self,
-        value: Option<PersonAlternateName<'a>>,
+        value: Option<PersonAlternateName<S>>,
     ) -> Self {
         self._fields.5 = value;
         self
@@ -3593,12 +4396,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `alumniOf` field (optional)
-    pub fn alumni_of(mut self, value: impl Into<Option<PersonAlumniOf<'a>>>) -> Self {
+    pub fn alumni_of(mut self, value: impl Into<Option<PersonAlumniOf<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `alumniOf` field to an Option value (optional)
-    pub fn maybe_alumni_of(mut self, value: Option<PersonAlumniOf<'a>>) -> Self {
+    pub fn maybe_alumni_of(mut self, value: Option<PersonAlumniOf<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -3606,12 +4409,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `award` field (optional)
-    pub fn award(mut self, value: impl Into<Option<PersonAward<'a>>>) -> Self {
+    pub fn award(mut self, value: impl Into<Option<PersonAward<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
-    pub fn maybe_award(mut self, value: Option<PersonAward<'a>>) -> Self {
+    pub fn maybe_award(mut self, value: Option<PersonAward<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -3619,12 +4422,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `awards` field (optional)
-    pub fn awards(mut self, value: impl Into<Option<PersonAwards<'a>>>) -> Self {
+    pub fn awards(mut self, value: impl Into<Option<PersonAwards<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
-    pub fn maybe_awards(mut self, value: Option<PersonAwards<'a>>) -> Self {
+    pub fn maybe_awards(mut self, value: Option<PersonAwards<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -3632,12 +4435,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `birthDate` field (optional)
-    pub fn birth_date(mut self, value: impl Into<Option<PersonBirthDate<'a>>>) -> Self {
+    pub fn birth_date(mut self, value: impl Into<Option<PersonBirthDate<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `birthDate` field to an Option value (optional)
-    pub fn maybe_birth_date(mut self, value: Option<PersonBirthDate<'a>>) -> Self {
+    pub fn maybe_birth_date(mut self, value: Option<PersonBirthDate<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -3645,15 +4448,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `birthPlace` field (optional)
-    pub fn birth_place(
-        mut self,
-        value: impl Into<Option<PersonBirthPlace<'a>>>,
-    ) -> Self {
+    pub fn birth_place(mut self, value: impl Into<Option<PersonBirthPlace<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `birthPlace` field to an Option value (optional)
-    pub fn maybe_birth_place(mut self, value: Option<PersonBirthPlace<'a>>) -> Self {
+    pub fn maybe_birth_place(mut self, value: Option<PersonBirthPlace<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -3661,12 +4461,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `brand` field (optional)
-    pub fn brand(mut self, value: impl Into<Option<PersonBrand<'a>>>) -> Self {
+    pub fn brand(mut self, value: impl Into<Option<PersonBrand<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `brand` field to an Option value (optional)
-    pub fn maybe_brand(mut self, value: Option<PersonBrand<'a>>) -> Self {
+    pub fn maybe_brand(mut self, value: Option<PersonBrand<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -3674,12 +4474,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `callSign` field (optional)
-    pub fn call_sign(mut self, value: impl Into<Option<PersonCallSign<'a>>>) -> Self {
+    pub fn call_sign(mut self, value: impl Into<Option<PersonCallSign<S>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `callSign` field to an Option value (optional)
-    pub fn maybe_call_sign(mut self, value: Option<PersonCallSign<'a>>) -> Self {
+    pub fn maybe_call_sign(mut self, value: Option<PersonCallSign<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -3687,12 +4487,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `children` field (optional)
-    pub fn children(mut self, value: impl Into<Option<PersonChildren<'a>>>) -> Self {
+    pub fn children(mut self, value: impl Into<Option<PersonChildren<S>>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `children` field to an Option value (optional)
-    pub fn maybe_children(mut self, value: Option<PersonChildren<'a>>) -> Self {
+    pub fn maybe_children(mut self, value: Option<PersonChildren<S>>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -3700,12 +4500,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `colleague` field (optional)
-    pub fn colleague(mut self, value: impl Into<Option<PersonColleague<'a>>>) -> Self {
+    pub fn colleague(mut self, value: impl Into<Option<PersonColleague<S>>>) -> Self {
         self._fields.14 = value.into();
         self
     }
     /// Set the `colleague` field to an Option value (optional)
-    pub fn maybe_colleague(mut self, value: Option<PersonColleague<'a>>) -> Self {
+    pub fn maybe_colleague(mut self, value: Option<PersonColleague<S>>) -> Self {
         self._fields.14 = value;
         self
     }
@@ -3713,12 +4513,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `colleagues` field (optional)
-    pub fn colleagues(mut self, value: impl Into<Option<PersonColleagues<'a>>>) -> Self {
+    pub fn colleagues(mut self, value: impl Into<Option<PersonColleagues<S>>>) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `colleagues` field to an Option value (optional)
-    pub fn maybe_colleagues(mut self, value: Option<PersonColleagues<'a>>) -> Self {
+    pub fn maybe_colleagues(mut self, value: Option<PersonColleagues<S>>) -> Self {
         self._fields.15 = value;
         self
     }
@@ -3728,13 +4528,13 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `contactPoint` field (optional)
     pub fn contact_point(
         mut self,
-        value: impl Into<Option<PersonContactPoint<'a>>>,
+        value: impl Into<Option<PersonContactPoint<S>>>,
     ) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `contactPoint` field to an Option value (optional)
-    pub fn maybe_contact_point(mut self, value: Option<PersonContactPoint<'a>>) -> Self {
+    pub fn maybe_contact_point(mut self, value: Option<PersonContactPoint<S>>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -3744,7 +4544,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `contactPoints` field (optional)
     pub fn contact_points(
         mut self,
-        value: impl Into<Option<PersonContactPoints<'a>>>,
+        value: impl Into<Option<PersonContactPoints<S>>>,
     ) -> Self {
         self._fields.17 = value.into();
         self
@@ -3752,7 +4552,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `contactPoints` field to an Option value (optional)
     pub fn maybe_contact_points(
         mut self,
-        value: Option<PersonContactPoints<'a>>,
+        value: Option<PersonContactPoints<S>>,
     ) -> Self {
         self._fields.17 = value;
         self
@@ -3761,12 +4561,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `deathDate` field (optional)
-    pub fn death_date(mut self, value: impl Into<Option<PersonDeathDate<'a>>>) -> Self {
+    pub fn death_date(mut self, value: impl Into<Option<PersonDeathDate<S>>>) -> Self {
         self._fields.18 = value.into();
         self
     }
     /// Set the `deathDate` field to an Option value (optional)
-    pub fn maybe_death_date(mut self, value: Option<PersonDeathDate<'a>>) -> Self {
+    pub fn maybe_death_date(mut self, value: Option<PersonDeathDate<S>>) -> Self {
         self._fields.18 = value;
         self
     }
@@ -3774,15 +4574,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `deathPlace` field (optional)
-    pub fn death_place(
-        mut self,
-        value: impl Into<Option<PersonDeathPlace<'a>>>,
-    ) -> Self {
+    pub fn death_place(mut self, value: impl Into<Option<PersonDeathPlace<S>>>) -> Self {
         self._fields.19 = value.into();
         self
     }
     /// Set the `deathPlace` field to an Option value (optional)
-    pub fn maybe_death_place(mut self, value: Option<PersonDeathPlace<'a>>) -> Self {
+    pub fn maybe_death_place(mut self, value: Option<PersonDeathPlace<S>>) -> Self {
         self._fields.19 = value;
         self
     }
@@ -3792,13 +4589,13 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
-        value: impl Into<Option<PersonDescription<'a>>>,
+        value: impl Into<Option<PersonDescription<S>>>,
     ) -> Self {
         self._fields.20 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<PersonDescription<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<PersonDescription<S>>) -> Self {
         self._fields.20 = value;
         self
     }
@@ -3808,7 +4605,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
-        value: impl Into<Option<PersonDisambiguatingDescription<'a>>>,
+        value: impl Into<Option<PersonDisambiguatingDescription<S>>>,
     ) -> Self {
         self._fields.21 = value.into();
         self
@@ -3816,7 +4613,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field to an Option value (optional)
     pub fn maybe_disambiguating_description(
         mut self,
-        value: Option<PersonDisambiguatingDescription<'a>>,
+        value: Option<PersonDisambiguatingDescription<S>>,
     ) -> Self {
         self._fields.21 = value;
         self
@@ -3825,12 +4622,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `duns` field (optional)
-    pub fn duns(mut self, value: impl Into<Option<PersonDuns<'a>>>) -> Self {
+    pub fn duns(mut self, value: impl Into<Option<PersonDuns<S>>>) -> Self {
         self._fields.22 = value.into();
         self
     }
     /// Set the `duns` field to an Option value (optional)
-    pub fn maybe_duns(mut self, value: Option<PersonDuns<'a>>) -> Self {
+    pub fn maybe_duns(mut self, value: Option<PersonDuns<S>>) -> Self {
         self._fields.22 = value;
         self
     }
@@ -3838,12 +4635,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `email` field (optional)
-    pub fn email(mut self, value: impl Into<Option<PersonEmail<'a>>>) -> Self {
+    pub fn email(mut self, value: impl Into<Option<PersonEmail<S>>>) -> Self {
         self._fields.23 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
-    pub fn maybe_email(mut self, value: Option<PersonEmail<'a>>) -> Self {
+    pub fn maybe_email(mut self, value: Option<PersonEmail<S>>) -> Self {
         self._fields.23 = value;
         self
     }
@@ -3851,15 +4648,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `familyName` field (optional)
-    pub fn family_name(
-        mut self,
-        value: impl Into<Option<PersonFamilyName<'a>>>,
-    ) -> Self {
+    pub fn family_name(mut self, value: impl Into<Option<PersonFamilyName<S>>>) -> Self {
         self._fields.24 = value.into();
         self
     }
     /// Set the `familyName` field to an Option value (optional)
-    pub fn maybe_family_name(mut self, value: Option<PersonFamilyName<'a>>) -> Self {
+    pub fn maybe_family_name(mut self, value: Option<PersonFamilyName<S>>) -> Self {
         self._fields.24 = value;
         self
     }
@@ -3867,12 +4661,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `faxNumber` field (optional)
-    pub fn fax_number(mut self, value: impl Into<Option<PersonFaxNumber<'a>>>) -> Self {
+    pub fn fax_number(mut self, value: impl Into<Option<PersonFaxNumber<S>>>) -> Self {
         self._fields.25 = value.into();
         self
     }
     /// Set the `faxNumber` field to an Option value (optional)
-    pub fn maybe_fax_number(mut self, value: Option<PersonFaxNumber<'a>>) -> Self {
+    pub fn maybe_fax_number(mut self, value: Option<PersonFaxNumber<S>>) -> Self {
         self._fields.25 = value;
         self
     }
@@ -3880,12 +4674,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `follows` field (optional)
-    pub fn follows(mut self, value: impl Into<Option<PersonFollows<'a>>>) -> Self {
+    pub fn follows(mut self, value: impl Into<Option<PersonFollows<S>>>) -> Self {
         self._fields.26 = value.into();
         self
     }
     /// Set the `follows` field to an Option value (optional)
-    pub fn maybe_follows(mut self, value: Option<PersonFollows<'a>>) -> Self {
+    pub fn maybe_follows(mut self, value: Option<PersonFollows<S>>) -> Self {
         self._fields.26 = value;
         self
     }
@@ -3893,12 +4687,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `funder` field (optional)
-    pub fn funder(mut self, value: impl Into<Option<PersonFunder<'a>>>) -> Self {
+    pub fn funder(mut self, value: impl Into<Option<PersonFunder<S>>>) -> Self {
         self._fields.27 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
-    pub fn maybe_funder(mut self, value: Option<PersonFunder<'a>>) -> Self {
+    pub fn maybe_funder(mut self, value: Option<PersonFunder<S>>) -> Self {
         self._fields.27 = value;
         self
     }
@@ -3906,12 +4700,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `funding` field (optional)
-    pub fn funding(mut self, value: impl Into<Option<PersonFunding<'a>>>) -> Self {
+    pub fn funding(mut self, value: impl Into<Option<PersonFunding<S>>>) -> Self {
         self._fields.28 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
-    pub fn maybe_funding(mut self, value: Option<PersonFunding<'a>>) -> Self {
+    pub fn maybe_funding(mut self, value: Option<PersonFunding<S>>) -> Self {
         self._fields.28 = value;
         self
     }
@@ -3919,12 +4713,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `gender` field (optional)
-    pub fn gender(mut self, value: impl Into<Option<PersonGender<'a>>>) -> Self {
+    pub fn gender(mut self, value: impl Into<Option<PersonGender<S>>>) -> Self {
         self._fields.29 = value.into();
         self
     }
     /// Set the `gender` field to an Option value (optional)
-    pub fn maybe_gender(mut self, value: Option<PersonGender<'a>>) -> Self {
+    pub fn maybe_gender(mut self, value: Option<PersonGender<S>>) -> Self {
         self._fields.29 = value;
         self
     }
@@ -3932,12 +4726,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `givenName` field (optional)
-    pub fn given_name(mut self, value: impl Into<Option<PersonGivenName<'a>>>) -> Self {
+    pub fn given_name(mut self, value: impl Into<Option<PersonGivenName<S>>>) -> Self {
         self._fields.30 = value.into();
         self
     }
     /// Set the `givenName` field to an Option value (optional)
-    pub fn maybe_given_name(mut self, value: Option<PersonGivenName<'a>>) -> Self {
+    pub fn maybe_given_name(mut self, value: Option<PersonGivenName<S>>) -> Self {
         self._fields.30 = value;
         self
     }
@@ -3947,7 +4741,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `globalLocationNumber` field (optional)
     pub fn global_location_number(
         mut self,
-        value: impl Into<Option<PersonGlobalLocationNumber<'a>>>,
+        value: impl Into<Option<PersonGlobalLocationNumber<S>>>,
     ) -> Self {
         self._fields.31 = value.into();
         self
@@ -3955,7 +4749,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `globalLocationNumber` field to an Option value (optional)
     pub fn maybe_global_location_number(
         mut self,
-        value: Option<PersonGlobalLocationNumber<'a>>,
+        value: Option<PersonGlobalLocationNumber<S>>,
     ) -> Self {
         self._fields.31 = value;
         self
@@ -3966,7 +4760,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `hasCertification` field (optional)
     pub fn has_certification(
         mut self,
-        value: impl Into<Option<PersonHasCertification<'a>>>,
+        value: impl Into<Option<PersonHasCertification<S>>>,
     ) -> Self {
         self._fields.32 = value.into();
         self
@@ -3974,7 +4768,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `hasCertification` field to an Option value (optional)
     pub fn maybe_has_certification(
         mut self,
-        value: Option<PersonHasCertification<'a>>,
+        value: Option<PersonHasCertification<S>>,
     ) -> Self {
         self._fields.32 = value;
         self
@@ -3985,7 +4779,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `hasCredential` field (optional)
     pub fn has_credential(
         mut self,
-        value: impl Into<Option<PersonHasCredential<'a>>>,
+        value: impl Into<Option<PersonHasCredential<S>>>,
     ) -> Self {
         self._fields.33 = value.into();
         self
@@ -3993,7 +4787,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `hasCredential` field to an Option value (optional)
     pub fn maybe_has_credential(
         mut self,
-        value: Option<PersonHasCredential<'a>>,
+        value: Option<PersonHasCredential<S>>,
     ) -> Self {
         self._fields.33 = value;
         self
@@ -4004,7 +4798,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `hasOccupation` field (optional)
     pub fn has_occupation(
         mut self,
-        value: impl Into<Option<PersonHasOccupation<'a>>>,
+        value: impl Into<Option<PersonHasOccupation<S>>>,
     ) -> Self {
         self._fields.34 = value.into();
         self
@@ -4012,7 +4806,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `hasOccupation` field to an Option value (optional)
     pub fn maybe_has_occupation(
         mut self,
-        value: Option<PersonHasOccupation<'a>>,
+        value: Option<PersonHasOccupation<S>>,
     ) -> Self {
         self._fields.34 = value;
         self
@@ -4023,7 +4817,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `hasOfferCatalog` field (optional)
     pub fn has_offer_catalog(
         mut self,
-        value: impl Into<Option<PersonHasOfferCatalog<'a>>>,
+        value: impl Into<Option<PersonHasOfferCatalog<S>>>,
     ) -> Self {
         self._fields.35 = value.into();
         self
@@ -4031,7 +4825,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `hasOfferCatalog` field to an Option value (optional)
     pub fn maybe_has_offer_catalog(
         mut self,
-        value: Option<PersonHasOfferCatalog<'a>>,
+        value: Option<PersonHasOfferCatalog<S>>,
     ) -> Self {
         self._fields.35 = value;
         self
@@ -4040,12 +4834,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `hasPOS` field (optional)
-    pub fn has_pos(mut self, value: impl Into<Option<PersonHasPos<'a>>>) -> Self {
+    pub fn has_pos(mut self, value: impl Into<Option<PersonHasPos<S>>>) -> Self {
         self._fields.36 = value.into();
         self
     }
     /// Set the `hasPOS` field to an Option value (optional)
-    pub fn maybe_has_pos(mut self, value: Option<PersonHasPos<'a>>) -> Self {
+    pub fn maybe_has_pos(mut self, value: Option<PersonHasPos<S>>) -> Self {
         self._fields.36 = value;
         self
     }
@@ -4053,12 +4847,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `height` field (optional)
-    pub fn height(mut self, value: impl Into<Option<PersonHeight<'a>>>) -> Self {
+    pub fn height(mut self, value: impl Into<Option<PersonHeight<S>>>) -> Self {
         self._fields.37 = value.into();
         self
     }
     /// Set the `height` field to an Option value (optional)
-    pub fn maybe_height(mut self, value: Option<PersonHeight<'a>>) -> Self {
+    pub fn maybe_height(mut self, value: Option<PersonHeight<S>>) -> Self {
         self._fields.37 = value;
         self
     }
@@ -4068,13 +4862,13 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `homeLocation` field (optional)
     pub fn home_location(
         mut self,
-        value: impl Into<Option<PersonHomeLocation<'a>>>,
+        value: impl Into<Option<PersonHomeLocation<S>>>,
     ) -> Self {
         self._fields.38 = value.into();
         self
     }
     /// Set the `homeLocation` field to an Option value (optional)
-    pub fn maybe_home_location(mut self, value: Option<PersonHomeLocation<'a>>) -> Self {
+    pub fn maybe_home_location(mut self, value: Option<PersonHomeLocation<S>>) -> Self {
         self._fields.38 = value;
         self
     }
@@ -4084,7 +4878,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `honorificPrefix` field (optional)
     pub fn honorific_prefix(
         mut self,
-        value: impl Into<Option<PersonHonorificPrefix<'a>>>,
+        value: impl Into<Option<PersonHonorificPrefix<S>>>,
     ) -> Self {
         self._fields.39 = value.into();
         self
@@ -4092,7 +4886,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `honorificPrefix` field to an Option value (optional)
     pub fn maybe_honorific_prefix(
         mut self,
-        value: Option<PersonHonorificPrefix<'a>>,
+        value: Option<PersonHonorificPrefix<S>>,
     ) -> Self {
         self._fields.39 = value;
         self
@@ -4103,7 +4897,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `honorificSuffix` field (optional)
     pub fn honorific_suffix(
         mut self,
-        value: impl Into<Option<PersonHonorificSuffix<'a>>>,
+        value: impl Into<Option<PersonHonorificSuffix<S>>>,
     ) -> Self {
         self._fields.40 = value.into();
         self
@@ -4111,7 +4905,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `honorificSuffix` field to an Option value (optional)
     pub fn maybe_honorific_suffix(
         mut self,
-        value: Option<PersonHonorificSuffix<'a>>,
+        value: Option<PersonHonorificSuffix<S>>,
     ) -> Self {
         self._fields.40 = value;
         self
@@ -4120,12 +4914,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(mut self, value: impl Into<Option<PersonIdentifier<'a>>>) -> Self {
+    pub fn identifier(mut self, value: impl Into<Option<PersonIdentifier<S>>>) -> Self {
         self._fields.41 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
-    pub fn maybe_identifier(mut self, value: Option<PersonIdentifier<'a>>) -> Self {
+    pub fn maybe_identifier(mut self, value: Option<PersonIdentifier<S>>) -> Self {
         self._fields.41 = value;
         self
     }
@@ -4133,12 +4927,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<PersonImage<'a>>>) -> Self {
+    pub fn image(mut self, value: impl Into<Option<PersonImage<S>>>) -> Self {
         self._fields.42 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<PersonImage<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<PersonImage<S>>) -> Self {
         self._fields.42 = value;
         self
     }
@@ -4148,7 +4942,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `interactionStatistic` field (optional)
     pub fn interaction_statistic(
         mut self,
-        value: impl Into<Option<PersonInteractionStatistic<'a>>>,
+        value: impl Into<Option<PersonInteractionStatistic<S>>>,
     ) -> Self {
         self._fields.43 = value.into();
         self
@@ -4156,7 +4950,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `interactionStatistic` field to an Option value (optional)
     pub fn maybe_interaction_statistic(
         mut self,
-        value: Option<PersonInteractionStatistic<'a>>,
+        value: Option<PersonInteractionStatistic<S>>,
     ) -> Self {
         self._fields.43 = value;
         self
@@ -4165,12 +4959,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `isicV4` field (optional)
-    pub fn isic_v4(mut self, value: impl Into<Option<PersonIsicV4<'a>>>) -> Self {
+    pub fn isic_v4(mut self, value: impl Into<Option<PersonIsicV4<S>>>) -> Self {
         self._fields.44 = value.into();
         self
     }
     /// Set the `isicV4` field to an Option value (optional)
-    pub fn maybe_isic_v4(mut self, value: Option<PersonIsicV4<'a>>) -> Self {
+    pub fn maybe_isic_v4(mut self, value: Option<PersonIsicV4<S>>) -> Self {
         self._fields.44 = value;
         self
     }
@@ -4178,12 +4972,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `jobTitle` field (optional)
-    pub fn job_title(mut self, value: impl Into<Option<PersonJobTitle<'a>>>) -> Self {
+    pub fn job_title(mut self, value: impl Into<Option<PersonJobTitle<S>>>) -> Self {
         self._fields.45 = value.into();
         self
     }
     /// Set the `jobTitle` field to an Option value (optional)
-    pub fn maybe_job_title(mut self, value: Option<PersonJobTitle<'a>>) -> Self {
+    pub fn maybe_job_title(mut self, value: Option<PersonJobTitle<S>>) -> Self {
         self._fields.45 = value;
         self
     }
@@ -4191,12 +4985,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `knows` field (optional)
-    pub fn knows(mut self, value: impl Into<Option<PersonKnows<'a>>>) -> Self {
+    pub fn knows(mut self, value: impl Into<Option<PersonKnows<S>>>) -> Self {
         self._fields.46 = value.into();
         self
     }
     /// Set the `knows` field to an Option value (optional)
-    pub fn maybe_knows(mut self, value: Option<PersonKnows<'a>>) -> Self {
+    pub fn maybe_knows(mut self, value: Option<PersonKnows<S>>) -> Self {
         self._fields.46 = value;
         self
     }
@@ -4204,15 +4998,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `knowsAbout` field (optional)
-    pub fn knows_about(
-        mut self,
-        value: impl Into<Option<PersonKnowsAbout<'a>>>,
-    ) -> Self {
+    pub fn knows_about(mut self, value: impl Into<Option<PersonKnowsAbout<S>>>) -> Self {
         self._fields.47 = value.into();
         self
     }
     /// Set the `knowsAbout` field to an Option value (optional)
-    pub fn maybe_knows_about(mut self, value: Option<PersonKnowsAbout<'a>>) -> Self {
+    pub fn maybe_knows_about(mut self, value: Option<PersonKnowsAbout<S>>) -> Self {
         self._fields.47 = value;
         self
     }
@@ -4222,7 +5013,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `knowsLanguage` field (optional)
     pub fn knows_language(
         mut self,
-        value: impl Into<Option<PersonKnowsLanguage<'a>>>,
+        value: impl Into<Option<PersonKnowsLanguage<S>>>,
     ) -> Self {
         self._fields.48 = value.into();
         self
@@ -4230,7 +5021,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `knowsLanguage` field to an Option value (optional)
     pub fn maybe_knows_language(
         mut self,
-        value: Option<PersonKnowsLanguage<'a>>,
+        value: Option<PersonKnowsLanguage<S>>,
     ) -> Self {
         self._fields.48 = value;
         self
@@ -4241,7 +5032,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
-        value: impl Into<Option<PersonMainEntityOfPage<'a>>>,
+        value: impl Into<Option<PersonMainEntityOfPage<S>>>,
     ) -> Self {
         self._fields.49 = value.into();
         self
@@ -4249,7 +5040,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field to an Option value (optional)
     pub fn maybe_main_entity_of_page(
         mut self,
-        value: Option<PersonMainEntityOfPage<'a>>,
+        value: Option<PersonMainEntityOfPage<S>>,
     ) -> Self {
         self._fields.49 = value;
         self
@@ -4258,15 +5049,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `makesOffer` field (optional)
-    pub fn makes_offer(
-        mut self,
-        value: impl Into<Option<PersonMakesOffer<'a>>>,
-    ) -> Self {
+    pub fn makes_offer(mut self, value: impl Into<Option<PersonMakesOffer<S>>>) -> Self {
         self._fields.50 = value.into();
         self
     }
     /// Set the `makesOffer` field to an Option value (optional)
-    pub fn maybe_makes_offer(mut self, value: Option<PersonMakesOffer<'a>>) -> Self {
+    pub fn maybe_makes_offer(mut self, value: Option<PersonMakesOffer<S>>) -> Self {
         self._fields.50 = value;
         self
     }
@@ -4274,12 +5062,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `memberOf` field (optional)
-    pub fn member_of(mut self, value: impl Into<Option<PersonMemberOf<'a>>>) -> Self {
+    pub fn member_of(mut self, value: impl Into<Option<PersonMemberOf<S>>>) -> Self {
         self._fields.51 = value.into();
         self
     }
     /// Set the `memberOf` field to an Option value (optional)
-    pub fn maybe_member_of(mut self, value: Option<PersonMemberOf<'a>>) -> Self {
+    pub fn maybe_member_of(mut self, value: Option<PersonMemberOf<S>>) -> Self {
         self._fields.51 = value;
         self
     }
@@ -4287,12 +5075,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `naics` field (optional)
-    pub fn naics(mut self, value: impl Into<Option<PersonNaics<'a>>>) -> Self {
+    pub fn naics(mut self, value: impl Into<Option<PersonNaics<S>>>) -> Self {
         self._fields.52 = value.into();
         self
     }
     /// Set the `naics` field to an Option value (optional)
-    pub fn maybe_naics(mut self, value: Option<PersonNaics<'a>>) -> Self {
+    pub fn maybe_naics(mut self, value: Option<PersonNaics<S>>) -> Self {
         self._fields.52 = value;
         self
     }
@@ -4300,12 +5088,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<PersonName<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<PersonName<S>>>) -> Self {
         self._fields.53 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<PersonName<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<PersonName<S>>) -> Self {
         self._fields.53 = value;
         self
     }
@@ -4315,13 +5103,13 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `nationality` field (optional)
     pub fn nationality(
         mut self,
-        value: impl Into<Option<PersonNationality<'a>>>,
+        value: impl Into<Option<PersonNationality<S>>>,
     ) -> Self {
         self._fields.54 = value.into();
         self
     }
     /// Set the `nationality` field to an Option value (optional)
-    pub fn maybe_nationality(mut self, value: Option<PersonNationality<'a>>) -> Self {
+    pub fn maybe_nationality(mut self, value: Option<PersonNationality<S>>) -> Self {
         self._fields.54 = value;
         self
     }
@@ -4329,12 +5117,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `netWorth` field (optional)
-    pub fn net_worth(mut self, value: impl Into<Option<PersonNetWorth<'a>>>) -> Self {
+    pub fn net_worth(mut self, value: impl Into<Option<PersonNetWorth<S>>>) -> Self {
         self._fields.55 = value.into();
         self
     }
     /// Set the `netWorth` field to an Option value (optional)
-    pub fn maybe_net_worth(mut self, value: Option<PersonNetWorth<'a>>) -> Self {
+    pub fn maybe_net_worth(mut self, value: Option<PersonNetWorth<S>>) -> Self {
         self._fields.55 = value;
         self
     }
@@ -4342,12 +5130,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `owns` field (optional)
-    pub fn owns(mut self, value: impl Into<Option<PersonOwns<'a>>>) -> Self {
+    pub fn owns(mut self, value: impl Into<Option<PersonOwns<S>>>) -> Self {
         self._fields.56 = value.into();
         self
     }
     /// Set the `owns` field to an Option value (optional)
-    pub fn maybe_owns(mut self, value: Option<PersonOwns<'a>>) -> Self {
+    pub fn maybe_owns(mut self, value: Option<PersonOwns<S>>) -> Self {
         self._fields.56 = value;
         self
     }
@@ -4355,12 +5143,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `parent` field (optional)
-    pub fn parent(mut self, value: impl Into<Option<PersonParent<'a>>>) -> Self {
+    pub fn parent(mut self, value: impl Into<Option<PersonParent<S>>>) -> Self {
         self._fields.57 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
-    pub fn maybe_parent(mut self, value: Option<PersonParent<'a>>) -> Self {
+    pub fn maybe_parent(mut self, value: Option<PersonParent<S>>) -> Self {
         self._fields.57 = value;
         self
     }
@@ -4368,12 +5156,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `parents` field (optional)
-    pub fn parents(mut self, value: impl Into<Option<PersonParents<'a>>>) -> Self {
+    pub fn parents(mut self, value: impl Into<Option<PersonParents<S>>>) -> Self {
         self._fields.58 = value.into();
         self
     }
     /// Set the `parents` field to an Option value (optional)
-    pub fn maybe_parents(mut self, value: Option<PersonParents<'a>>) -> Self {
+    pub fn maybe_parents(mut self, value: Option<PersonParents<S>>) -> Self {
         self._fields.58 = value;
         self
     }
@@ -4383,13 +5171,13 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `performerIn` field (optional)
     pub fn performer_in(
         mut self,
-        value: impl Into<Option<PersonPerformerIn<'a>>>,
+        value: impl Into<Option<PersonPerformerIn<S>>>,
     ) -> Self {
         self._fields.59 = value.into();
         self
     }
     /// Set the `performerIn` field to an Option value (optional)
-    pub fn maybe_performer_in(mut self, value: Option<PersonPerformerIn<'a>>) -> Self {
+    pub fn maybe_performer_in(mut self, value: Option<PersonPerformerIn<S>>) -> Self {
         self._fields.59 = value;
         self
     }
@@ -4399,7 +5187,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `potentialAction` field (optional)
     pub fn potential_action(
         mut self,
-        value: impl Into<Option<PersonPotentialAction<'a>>>,
+        value: impl Into<Option<PersonPotentialAction<S>>>,
     ) -> Self {
         self._fields.60 = value.into();
         self
@@ -4407,7 +5195,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `potentialAction` field to an Option value (optional)
     pub fn maybe_potential_action(
         mut self,
-        value: Option<PersonPotentialAction<'a>>,
+        value: Option<PersonPotentialAction<S>>,
     ) -> Self {
         self._fields.60 = value;
         self
@@ -4416,12 +5204,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `pronouns` field (optional)
-    pub fn pronouns(mut self, value: impl Into<Option<PersonPronouns<'a>>>) -> Self {
+    pub fn pronouns(mut self, value: impl Into<Option<PersonPronouns<S>>>) -> Self {
         self._fields.61 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
-    pub fn maybe_pronouns(mut self, value: Option<PersonPronouns<'a>>) -> Self {
+    pub fn maybe_pronouns(mut self, value: Option<PersonPronouns<S>>) -> Self {
         self._fields.61 = value;
         self
     }
@@ -4431,7 +5219,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `publishingPrinciples` field (optional)
     pub fn publishing_principles(
         mut self,
-        value: impl Into<Option<PersonPublishingPrinciples<'a>>>,
+        value: impl Into<Option<PersonPublishingPrinciples<S>>>,
     ) -> Self {
         self._fields.62 = value.into();
         self
@@ -4439,7 +5227,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `publishingPrinciples` field to an Option value (optional)
     pub fn maybe_publishing_principles(
         mut self,
-        value: Option<PersonPublishingPrinciples<'a>>,
+        value: Option<PersonPublishingPrinciples<S>>,
     ) -> Self {
         self._fields.62 = value;
         self
@@ -4448,12 +5236,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `relatedTo` field (optional)
-    pub fn related_to(mut self, value: impl Into<Option<PersonRelatedTo<'a>>>) -> Self {
+    pub fn related_to(mut self, value: impl Into<Option<PersonRelatedTo<S>>>) -> Self {
         self._fields.63 = value.into();
         self
     }
     /// Set the `relatedTo` field to an Option value (optional)
-    pub fn maybe_related_to(mut self, value: Option<PersonRelatedTo<'a>>) -> Self {
+    pub fn maybe_related_to(mut self, value: Option<PersonRelatedTo<S>>) -> Self {
         self._fields.63 = value;
         self
     }
@@ -4461,12 +5249,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
-    pub fn same_as(mut self, value: impl Into<Option<PersonSameAs<'a>>>) -> Self {
+    pub fn same_as(mut self, value: impl Into<Option<PersonSameAs<S>>>) -> Self {
         self._fields.64 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
-    pub fn maybe_same_as(mut self, value: Option<PersonSameAs<'a>>) -> Self {
+    pub fn maybe_same_as(mut self, value: Option<PersonSameAs<S>>) -> Self {
         self._fields.64 = value;
         self
     }
@@ -4474,12 +5262,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `seeks` field (optional)
-    pub fn seeks(mut self, value: impl Into<Option<PersonSeeks<'a>>>) -> Self {
+    pub fn seeks(mut self, value: impl Into<Option<PersonSeeks<S>>>) -> Self {
         self._fields.65 = value.into();
         self
     }
     /// Set the `seeks` field to an Option value (optional)
-    pub fn maybe_seeks(mut self, value: Option<PersonSeeks<'a>>) -> Self {
+    pub fn maybe_seeks(mut self, value: Option<PersonSeeks<S>>) -> Self {
         self._fields.65 = value;
         self
     }
@@ -4487,12 +5275,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `sibling` field (optional)
-    pub fn sibling(mut self, value: impl Into<Option<PersonSibling<'a>>>) -> Self {
+    pub fn sibling(mut self, value: impl Into<Option<PersonSibling<S>>>) -> Self {
         self._fields.66 = value.into();
         self
     }
     /// Set the `sibling` field to an Option value (optional)
-    pub fn maybe_sibling(mut self, value: Option<PersonSibling<'a>>) -> Self {
+    pub fn maybe_sibling(mut self, value: Option<PersonSibling<S>>) -> Self {
         self._fields.66 = value;
         self
     }
@@ -4500,12 +5288,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `siblings` field (optional)
-    pub fn siblings(mut self, value: impl Into<Option<PersonSiblings<'a>>>) -> Self {
+    pub fn siblings(mut self, value: impl Into<Option<PersonSiblings<S>>>) -> Self {
         self._fields.67 = value.into();
         self
     }
     /// Set the `siblings` field to an Option value (optional)
-    pub fn maybe_siblings(mut self, value: Option<PersonSiblings<'a>>) -> Self {
+    pub fn maybe_siblings(mut self, value: Option<PersonSiblings<S>>) -> Self {
         self._fields.67 = value;
         self
     }
@@ -4513,12 +5301,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `skills` field (optional)
-    pub fn skills(mut self, value: impl Into<Option<PersonSkills<'a>>>) -> Self {
+    pub fn skills(mut self, value: impl Into<Option<PersonSkills<S>>>) -> Self {
         self._fields.68 = value.into();
         self
     }
     /// Set the `skills` field to an Option value (optional)
-    pub fn maybe_skills(mut self, value: Option<PersonSkills<'a>>) -> Self {
+    pub fn maybe_skills(mut self, value: Option<PersonSkills<S>>) -> Self {
         self._fields.68 = value;
         self
     }
@@ -4526,12 +5314,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
-    pub fn sponsor(mut self, value: impl Into<Option<PersonSponsor<'a>>>) -> Self {
+    pub fn sponsor(mut self, value: impl Into<Option<PersonSponsor<S>>>) -> Self {
         self._fields.69 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
-    pub fn maybe_sponsor(mut self, value: Option<PersonSponsor<'a>>) -> Self {
+    pub fn maybe_sponsor(mut self, value: Option<PersonSponsor<S>>) -> Self {
         self._fields.69 = value;
         self
     }
@@ -4539,12 +5327,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `spouse` field (optional)
-    pub fn spouse(mut self, value: impl Into<Option<PersonSpouse<'a>>>) -> Self {
+    pub fn spouse(mut self, value: impl Into<Option<PersonSpouse<S>>>) -> Self {
         self._fields.70 = value.into();
         self
     }
     /// Set the `spouse` field to an Option value (optional)
-    pub fn maybe_spouse(mut self, value: Option<PersonSpouse<'a>>) -> Self {
+    pub fn maybe_spouse(mut self, value: Option<PersonSpouse<S>>) -> Self {
         self._fields.70 = value;
         self
     }
@@ -4552,12 +5340,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(mut self, value: impl Into<Option<PersonSubjectOf<'a>>>) -> Self {
+    pub fn subject_of(mut self, value: impl Into<Option<PersonSubjectOf<S>>>) -> Self {
         self._fields.71 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
-    pub fn maybe_subject_of(mut self, value: Option<PersonSubjectOf<'a>>) -> Self {
+    pub fn maybe_subject_of(mut self, value: Option<PersonSubjectOf<S>>) -> Self {
         self._fields.71 = value;
         self
     }
@@ -4565,12 +5353,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `taxID` field (optional)
-    pub fn tax_id(mut self, value: impl Into<Option<PersonTaxId<'a>>>) -> Self {
+    pub fn tax_id(mut self, value: impl Into<Option<PersonTaxId<S>>>) -> Self {
         self._fields.72 = value.into();
         self
     }
     /// Set the `taxID` field to an Option value (optional)
-    pub fn maybe_tax_id(mut self, value: Option<PersonTaxId<'a>>) -> Self {
+    pub fn maybe_tax_id(mut self, value: Option<PersonTaxId<S>>) -> Self {
         self._fields.72 = value;
         self
     }
@@ -4578,12 +5366,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `telephone` field (optional)
-    pub fn telephone(mut self, value: impl Into<Option<PersonTelephone<'a>>>) -> Self {
+    pub fn telephone(mut self, value: impl Into<Option<PersonTelephone<S>>>) -> Self {
         self._fields.73 = value.into();
         self
     }
     /// Set the `telephone` field to an Option value (optional)
-    pub fn maybe_telephone(mut self, value: Option<PersonTelephone<'a>>) -> Self {
+    pub fn maybe_telephone(mut self, value: Option<PersonTelephone<S>>) -> Self {
         self._fields.73 = value;
         self
     }
@@ -4591,12 +5379,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<PersonUrl<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<PersonUrl<S>>>) -> Self {
         self._fields.74 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<PersonUrl<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<PersonUrl<S>>) -> Self {
         self._fields.74 = value;
         self
     }
@@ -4604,12 +5392,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `vatID` field (optional)
-    pub fn vat_id(mut self, value: impl Into<Option<PersonVatId<'a>>>) -> Self {
+    pub fn vat_id(mut self, value: impl Into<Option<PersonVatId<S>>>) -> Self {
         self._fields.75 = value.into();
         self
     }
     /// Set the `vatID` field to an Option value (optional)
-    pub fn maybe_vat_id(mut self, value: Option<PersonVatId<'a>>) -> Self {
+    pub fn maybe_vat_id(mut self, value: Option<PersonVatId<S>>) -> Self {
         self._fields.75 = value;
         self
     }
@@ -4617,12 +5405,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `weight` field (optional)
-    pub fn weight(mut self, value: impl Into<Option<PersonWeight<'a>>>) -> Self {
+    pub fn weight(mut self, value: impl Into<Option<PersonWeight<S>>>) -> Self {
         self._fields.76 = value.into();
         self
     }
     /// Set the `weight` field to an Option value (optional)
-    pub fn maybe_weight(mut self, value: Option<PersonWeight<'a>>) -> Self {
+    pub fn maybe_weight(mut self, value: Option<PersonWeight<S>>) -> Self {
         self._fields.76 = value;
         self
     }
@@ -4632,13 +5420,13 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `workLocation` field (optional)
     pub fn work_location(
         mut self,
-        value: impl Into<Option<PersonWorkLocation<'a>>>,
+        value: impl Into<Option<PersonWorkLocation<S>>>,
     ) -> Self {
         self._fields.77 = value.into();
         self
     }
     /// Set the `workLocation` field to an Option value (optional)
-    pub fn maybe_work_location(mut self, value: Option<PersonWorkLocation<'a>>) -> Self {
+    pub fn maybe_work_location(mut self, value: Option<PersonWorkLocation<S>>) -> Self {
         self._fields.77 = value;
         self
     }
@@ -4646,12 +5434,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `worksFor` field (optional)
-    pub fn works_for(mut self, value: impl Into<Option<PersonWorksFor<'a>>>) -> Self {
+    pub fn works_for(mut self, value: impl Into<Option<PersonWorksFor<S>>>) -> Self {
         self._fields.78 = value.into();
         self
     }
     /// Set the `worksFor` field to an Option value (optional)
-    pub fn maybe_works_for(mut self, value: Option<PersonWorksFor<'a>>) -> Self {
+    pub fn maybe_works_for(mut self, value: Option<PersonWorksFor<S>>) -> Self {
         self._fields.78 = value;
         self
     }
@@ -4747,10 +5535,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Person<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Person<'a> {
         Person {
             additional_name: self._fields.0,
             additional_type: self._fields.1,

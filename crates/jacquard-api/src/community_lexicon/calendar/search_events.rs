@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Cid, UriValue};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,10 +27,15 @@ use serde::{Serialize, Deserialize};
 use crate::community_lexicon::calendar::search_events;
 /// An event record with RSVP counts and URL.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EventView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EventView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Number of users who have RSVP'd as going.
     pub count_going: i64,
     ///Number of users who have RSVP'd as interested.
@@ -36,41 +43,55 @@ pub struct EventView<'a> {
     ///Number of users who have RSVP'd as not going.
     pub count_not_going: i64,
     ///The canonical web URL for this event.
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchEvents<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchEvents<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub location: Option<Vec<Cid<'a>>>,
+    pub location: Option<Vec<Cid<S>>>,
     ///(max length: 150)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub query: Option<CowStr<'a>>,
+    pub query: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub repository: Option<Did<'a>>,
+    pub repository: Option<Did<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchEventsOutput<'a> {
-    #[serde(borrow)]
-    pub results: Vec<search_events::EventView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchEventsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub results: Vec<search_events::EventView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -79,22 +100,23 @@ pub struct SearchEventsOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SearchEventsError<'a> {
+pub enum SearchEventsError {
     #[serde(rename = "InvalidRepository")]
-    InvalidRepository(Option<CowStr<'a>>),
+    InvalidRepository(Option<SmolStr>),
     #[serde(rename = "SearchUnavailable")]
-    SearchUnavailable(Option<CowStr<'a>>),
+    SearchUnavailable(Option<SmolStr>),
     #[serde(rename = "SearchError")]
-    SearchError(Option<CowStr<'a>>),
+    SearchError(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for SearchEventsError<'_> {
+impl core::fmt::Display for SearchEventsError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidRepository(msg) => {
@@ -118,12 +140,18 @@ impl core::fmt::Display for SearchEventsError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
-impl<'a> LexiconSchema for EventView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for EventView<S> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.searchEvents"
     }
@@ -143,11 +171,12 @@ pub struct SearchEventsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchEventsResponse {
     const NSID: &'static str = "community.lexicon.calendar.searchEvents";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchEventsOutput<'de>;
-    type Err<'de> = SearchEventsError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SearchEventsOutput<S>;
+    type Err = SearchEventsError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchEvents<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SearchEvents<S> {
     const NSID: &'static str = "community.lexicon.calendar.searchEvents";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchEventsResponse;
@@ -158,7 +187,7 @@ pub struct SearchEventsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchEventsRequest {
     const PATH: &'static str = "/xrpc/community.lexicon.calendar.searchEvents";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchEvents<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SearchEvents<S>;
     type Response = SearchEventsResponse;
 }
 
@@ -173,73 +202,73 @@ pub mod event_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CountNotGoing;
-        type CountGoing;
-        type Url;
         type CountInterested;
+        type Url;
+        type CountGoing;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CountNotGoing = Unset;
-        type CountGoing = Unset;
-        type Url = Unset;
         type CountInterested = Unset;
+        type Url = Unset;
+        type CountGoing = Unset;
     }
     ///State transition - sets the `count_not_going` field to Set
     pub struct SetCountNotGoing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountNotGoing<S> {}
     impl<S: State> State for SetCountNotGoing<S> {
         type CountNotGoing = Set<members::count_not_going>;
-        type CountGoing = S::CountGoing;
+        type CountInterested = S::CountInterested;
         type Url = S::Url;
-        type CountInterested = S::CountInterested;
-    }
-    ///State transition - sets the `count_going` field to Set
-    pub struct SetCountGoing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountGoing<S> {}
-    impl<S: State> State for SetCountGoing<S> {
-        type CountNotGoing = S::CountNotGoing;
-        type CountGoing = Set<members::count_going>;
-        type Url = S::Url;
-        type CountInterested = S::CountInterested;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type CountNotGoing = S::CountNotGoing;
         type CountGoing = S::CountGoing;
-        type Url = Set<members::url>;
-        type CountInterested = S::CountInterested;
     }
     ///State transition - sets the `count_interested` field to Set
     pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountInterested<S> {}
     impl<S: State> State for SetCountInterested<S> {
         type CountNotGoing = S::CountNotGoing;
-        type CountGoing = S::CountGoing;
-        type Url = S::Url;
         type CountInterested = Set<members::count_interested>;
+        type Url = S::Url;
+        type CountGoing = S::CountGoing;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type CountNotGoing = S::CountNotGoing;
+        type CountInterested = S::CountInterested;
+        type Url = Set<members::url>;
+        type CountGoing = S::CountGoing;
+    }
+    ///State transition - sets the `count_going` field to Set
+    pub struct SetCountGoing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountGoing<S> {}
+    impl<S: State> State for SetCountGoing<S> {
+        type CountNotGoing = S::CountNotGoing;
+        type CountInterested = S::CountInterested;
+        type Url = S::Url;
+        type CountGoing = Set<members::count_going>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `count_not_going` field
         pub struct count_not_going(());
-        ///Marker type for the `count_going` field
-        pub struct count_going(());
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `count_interested` field
         pub struct count_interested(());
+        ///Marker type for the `url` field
+        pub struct url(());
+        ///Marker type for the `count_going` field
+        pub struct count_going(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EventViewBuilder<'a, S: event_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<i64>, Option<i64>, Option<UriValue<'a>>),
+    _fields: (Option<i64>, Option<i64>, Option<i64>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -326,7 +355,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> EventViewBuilder<'a, event_view_state::SetUrl<S>> {
         self._fields.3 = Option::Some(value.into());
         EventViewBuilder {
@@ -341,9 +370,9 @@ impl<'a, S> EventViewBuilder<'a, S>
 where
     S: event_view_state::State,
     S::CountNotGoing: event_view_state::IsSet,
-    S::CountGoing: event_view_state::IsSet,
-    S::Url: event_view_state::IsSet,
     S::CountInterested: event_view_state::IsSet,
+    S::Url: event_view_state::IsSet,
+    S::CountGoing: event_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EventView<'a> {
@@ -358,10 +387,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> EventView<'a> {
         EventView {
             count_going: self._fields.0.unwrap(),
@@ -518,7 +544,7 @@ pub mod search_events_state {
 /// Builder for constructing an instance of this type
 pub struct SearchEventsBuilder<'a, S: search_events_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<Vec<Cid<'a>>>, Option<CowStr<'a>>, Option<Did<'a>>),
+    _fields: (Option<i64>, Option<Vec<Cid<S>>>, Option<S>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -555,12 +581,12 @@ impl<'a, S: search_events_state::State> SearchEventsBuilder<'a, S> {
 
 impl<'a, S: search_events_state::State> SearchEventsBuilder<'a, S> {
     /// Set the `location` field (optional)
-    pub fn location(mut self, value: impl Into<Option<Vec<Cid<'a>>>>) -> Self {
+    pub fn location(mut self, value: impl Into<Option<Vec<Cid<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
-    pub fn maybe_location(mut self, value: Option<Vec<Cid<'a>>>) -> Self {
+    pub fn maybe_location(mut self, value: Option<Vec<Cid<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -568,12 +594,12 @@ impl<'a, S: search_events_state::State> SearchEventsBuilder<'a, S> {
 
 impl<'a, S: search_events_state::State> SearchEventsBuilder<'a, S> {
     /// Set the `query` field (optional)
-    pub fn query(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn query(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `query` field to an Option value (optional)
-    pub fn maybe_query(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_query(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -581,12 +607,12 @@ impl<'a, S: search_events_state::State> SearchEventsBuilder<'a, S> {
 
 impl<'a, S: search_events_state::State> SearchEventsBuilder<'a, S> {
     /// Set the `repository` field (optional)
-    pub fn repository(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn repository(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `repository` field to an Option value (optional)
-    pub fn maybe_repository(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_repository(mut self, value: Option<Did<S>>) -> Self {
         self._fields.3 = value;
         self
     }

@@ -10,8 +10,10 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::social_showcase::CollectionView;
 use crate::social_showcase::ItemView;
@@ -19,46 +21,65 @@ use crate::social_showcase::ProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchPosts<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchPosts<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///(max length: 512)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(borrow)]
-    pub q: CowStr<'a>,
+    pub q: S,
     ///(max length: 20)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#type: Option<CowStr<'a>>,
+    pub r#type: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchPostsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchPostsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub results: Vec<SearchPostsOutputResultsItem<'a>>,
+    pub cursor: Option<S>,
+    pub results: Vec<SearchPostsOutputResultsItem<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SearchPostsOutputResultsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SearchPostsOutputResultsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.showcase.defs#itemView")]
-    ItemView(Box<ItemView<'a>>),
+    ItemView(Box<ItemView<S>>),
     #[serde(rename = "social.showcase.defs#collectionView")]
-    CollectionView(Box<CollectionView<'a>>),
+    CollectionView(Box<CollectionView<S>>),
     #[serde(rename = "social.showcase.defs#profileView")]
-    ProfileView(Box<ProfileView<'a>>),
+    ProfileView(Box<ProfileView<S>>),
 }
 
 /// Response type for social.showcase.feed.searchPosts
@@ -66,11 +87,12 @@ pub struct SearchPostsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchPostsResponse {
     const NSID: &'static str = "social.showcase.feed.searchPosts";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchPostsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SearchPostsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchPosts<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SearchPosts<S> {
     const NSID: &'static str = "social.showcase.feed.searchPosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchPostsResponse;
@@ -81,7 +103,7 @@ pub struct SearchPostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchPostsRequest {
     const PATH: &'static str = "/xrpc/social.showcase.feed.searchPosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchPosts<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SearchPosts<S>;
     type Response = SearchPostsResponse;
 }
 
@@ -124,7 +146,7 @@ pub mod search_posts_state {
 /// Builder for constructing an instance of this type
 pub struct SearchPostsBuilder<'a, S: search_posts_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -148,12 +170,12 @@ impl<'a> SearchPostsBuilder<'a, search_posts_state::Empty> {
 
 impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -180,7 +202,7 @@ where
     /// Set the `q` field (required)
     pub fn q(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SearchPostsBuilder<'a, search_posts_state::SetQ<S>> {
         self._fields.2 = Option::Some(value.into());
         SearchPostsBuilder {
@@ -193,12 +215,12 @@ where
 
 impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
-    pub fn maybe_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_type(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }

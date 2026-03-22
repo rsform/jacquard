@@ -10,33 +10,42 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::team::Member;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct AddMember<'a> {
-    #[serde(borrow)]
-    pub did: Did<'a>,
-    #[serde(borrow)]
-    pub role: AddMemberRole<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AddMember<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub did: Did<S>,
+    pub role: AddMemberRole<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AddMemberRole<'a> {
+pub enum AddMemberRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     RoleAdmin,
     RoleModerator,
     RoleVerifier,
     RoleTriage,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> AddMemberRole<'a> {
+impl<S: Bos<str> + AsRef<str>> AddMemberRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::RoleAdmin => "tools.ozone.team.defs#roleAdmin",
@@ -46,74 +55,58 @@ impl<'a> AddMemberRole<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for AddMemberRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
             "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
             "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
             "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for AddMemberRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "tools.ozone.team.defs#roleAdmin" => Self::RoleAdmin,
-            "tools.ozone.team.defs#roleModerator" => Self::RoleModerator,
-            "tools.ozone.team.defs#roleVerifier" => Self::RoleVerifier,
-            "tools.ozone.team.defs#roleTriage" => Self::RoleTriage,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for AddMemberRole<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for AddMemberRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for AddMemberRole<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for AddMemberRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for AddMemberRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for AddMemberRole<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for AddMemberRole<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for AddMemberRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for AddMemberRole<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for AddMemberRole<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for AddMemberRole<'_> {
-    type Output = AddMemberRole<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for AddMemberRole<S> {
+    type Output = AddMemberRole<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             AddMemberRole::RoleAdmin => AddMemberRole::RoleAdmin,
@@ -126,17 +119,25 @@ impl jacquard_common::IntoStatic for AddMemberRole<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct AddMemberOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AddMemberOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Member<'a>,
+    pub value: Member<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -145,19 +146,20 @@ pub struct AddMemberOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum AddMemberError<'a> {
+pub enum AddMemberError {
     /// Member already exists in the team.
     #[serde(rename = "MemberAlreadyExists")]
-    MemberAlreadyExists(Option<CowStr<'a>>),
+    MemberAlreadyExists(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for AddMemberError<'_> {
+impl core::fmt::Display for AddMemberError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::MemberAlreadyExists(msg) => {
@@ -167,7 +169,13 @@ impl core::fmt::Display for AddMemberError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -177,11 +185,12 @@ pub struct AddMemberResponse;
 impl jacquard_common::xrpc::XrpcResp for AddMemberResponse {
     const NSID: &'static str = "tools.ozone.team.addMember";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AddMemberOutput<'de>;
-    type Err<'de> = AddMemberError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AddMemberOutput<S>;
+    type Err = AddMemberError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for AddMember<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for AddMember<S> {
     const NSID: &'static str = "tools.ozone.team.addMember";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -196,7 +205,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for AddMemberRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = AddMember<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = AddMember<S>;
     type Response = AddMemberResponse;
 }
 
@@ -247,7 +256,7 @@ pub mod add_member_state {
 /// Builder for constructing an instance of this type
 pub struct AddMemberBuilder<'a, S: add_member_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<AddMemberRole<'a>>),
+    _fields: (Option<Did<S>>, Option<AddMemberRole<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -277,7 +286,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> AddMemberBuilder<'a, add_member_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         AddMemberBuilder {
@@ -296,7 +305,7 @@ where
     /// Set the `role` field (required)
     pub fn role(
         mut self,
-        value: impl Into<AddMemberRole<'a>>,
+        value: impl Into<AddMemberRole<S>>,
     ) -> AddMemberBuilder<'a, add_member_state::SetRole<S>> {
         self._fields.1 = Option::Some(value.into());
         AddMemberBuilder {
@@ -324,10 +333,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> AddMember<'a> {
         AddMember {
             did: self._fields.0.unwrap(),

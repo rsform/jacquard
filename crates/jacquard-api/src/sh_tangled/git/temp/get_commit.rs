@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
@@ -15,25 +15,44 @@ use crate::sh_tangled::git::temp::Commit;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetCommit<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetCommit<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub r#ref: CowStr<'a>,
+    pub r#ref: S,
     #[serde(borrow)]
-    pub repo: AtUri<'a>,
+    pub repo: AtUri<S>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetCommitOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetCommitOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Commit<'a>,
+    pub value: Commit<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -42,25 +61,29 @@ pub struct GetCommitOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetCommitError<'a> {
+pub enum GetCommitError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Commit not found
     #[serde(rename = "CommitNotFound")]
-    CommitNotFound(Option<CowStr<'a>>),
+    CommitNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for GetCommitError<'_> {
+impl core::fmt::Display for GetCommitError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -84,7 +107,13 @@ impl core::fmt::Display for GetCommitError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -94,11 +123,12 @@ pub struct GetCommitResponse;
 impl jacquard_common::xrpc::XrpcResp for GetCommitResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getCommit";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetCommitOutput<'de>;
-    type Err<'de> = GetCommitError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetCommitOutput<S>;
+    type Err = GetCommitError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetCommit<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetCommit<S> {
     const NSID: &'static str = "sh.tangled.git.temp.getCommit";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetCommitResponse;
@@ -109,7 +139,7 @@ pub struct GetCommitRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetCommitRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getCommit";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetCommit<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetCommit<S>;
     type Response = GetCommitResponse;
 }
 
@@ -123,44 +153,44 @@ pub mod get_commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
         type Repo;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type Repo = S::Repo;
+        type Ref = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Ref = S::Ref;
         type Repo = Set<members::repo>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Repo = S::Repo;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetCommitBuilder<'a, S: get_commit_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -190,7 +220,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetCommitBuilder<'a, get_commit_state::SetRef<S>> {
         self._fields.0 = Option::Some(value.into());
         GetCommitBuilder {
@@ -209,7 +239,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetCommitBuilder<'a, get_commit_state::SetRepo<S>> {
         self._fields.1 = Option::Some(value.into());
         GetCommitBuilder {
@@ -223,8 +253,8 @@ where
 impl<'a, S> GetCommitBuilder<'a, S>
 where
     S: get_commit_state::State,
-    S::Ref: get_commit_state::IsSet,
     S::Repo: get_commit_state::IsSet,
+    S::Ref: get_commit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetCommit<'a> {

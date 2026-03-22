@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,38 +28,46 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.colibri.approval", tag = "$type")]
-pub struct Approval<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.colibri.approval",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Approval<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///AT-URI of the social.colibri.community record
-    #[serde(borrow)]
-    pub community: AtUri<'a>,
+    pub community: AtUri<S>,
     pub created_at: Datetime,
     ///AT-URI of the user's social.colibri.membership record
-    #[serde(borrow)]
-    pub membership: AtUri<'a>,
+    pub membership: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ApprovalGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ApprovalGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Approval<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Approval<S>,
 }
 
-impl<'a> Approval<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ApprovalRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Approval<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ApprovalRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -68,18 +78,17 @@ pub struct ApprovalRecord;
 impl XrpcResp for ApprovalRecord {
     const NSID: &'static str = "social.colibri.approval";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ApprovalGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ApprovalGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ApprovalGetRecordOutput<'_>> for Approval<'_> {
-    fn from(output: ApprovalGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ApprovalGetRecordOutput<S>> for Approval<S> {
+    fn from(output: ApprovalGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Approval<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Approval<S> {
     const NSID: &'static str = "social.colibri.approval";
     type Record = ApprovalRecord;
 }
@@ -89,7 +98,7 @@ impl Collection for ApprovalRecord {
     type Record = ApprovalRecord;
 }
 
-impl<'a> LexiconSchema for Approval<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Approval<S> {
     fn nsid() -> &'static str {
         "social.colibri.approval"
     }
@@ -165,7 +174,7 @@ pub mod approval_state {
 /// Builder for constructing an instance of this type
 pub struct ApprovalBuilder<'a, S: approval_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<Datetime>, Option<AtUri<'a>>),
+    _fields: (Option<AtUri<S>>, Option<Datetime>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -195,7 +204,7 @@ where
     /// Set the `community` field (required)
     pub fn community(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ApprovalBuilder<'a, approval_state::SetCommunity<S>> {
         self._fields.0 = Option::Some(value.into());
         ApprovalBuilder {
@@ -233,7 +242,7 @@ where
     /// Set the `membership` field (required)
     pub fn membership(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ApprovalBuilder<'a, approval_state::SetMembership<S>> {
         self._fields.2 = Option::Some(value.into());
         ApprovalBuilder {
@@ -263,10 +272,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Approval<'a> {
         Approval {
             community: self._fields.0.unwrap(),

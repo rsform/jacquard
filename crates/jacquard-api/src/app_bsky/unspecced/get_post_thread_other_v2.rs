@@ -10,11 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,32 +29,51 @@ use crate::app_bsky::unspecced::get_post_thread_other_v2;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPostThreadOtherV2<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPostThreadOtherV2<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub anchor: AtUri<'a>,
+    pub anchor: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPostThreadOtherV2Output<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPostThreadOtherV2Output<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///A flat list of other thread items. The depth of each item is indicated by the depth property inside the item.
-    #[serde(borrow)]
-    pub thread: Vec<get_post_thread_other_v2::ThreadItem<'a>>,
+    pub thread: Vec<get_post_thread_other_v2::ThreadItem<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ThreadItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
     pub depth: i64,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: ThreadItemPost<'a>,
+    pub uri: AtUri<S>,
+    pub value: ThreadItemPost<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.unspecced.getPostThreadOtherV2
@@ -59,11 +81,12 @@ pub struct GetPostThreadOtherV2Response;
 impl jacquard_common::xrpc::XrpcResp for GetPostThreadOtherV2Response {
     const NSID: &'static str = "app.bsky.unspecced.getPostThreadOtherV2";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPostThreadOtherV2Output<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetPostThreadOtherV2Output<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPostThreadOtherV2<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetPostThreadOtherV2<S> {
     const NSID: &'static str = "app.bsky.unspecced.getPostThreadOtherV2";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPostThreadOtherV2Response;
@@ -74,11 +97,11 @@ pub struct GetPostThreadOtherV2Request;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadOtherV2Request {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getPostThreadOtherV2";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPostThreadOtherV2<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetPostThreadOtherV2<S>;
     type Response = GetPostThreadOtherV2Response;
 }
 
-impl<'a> LexiconSchema for ThreadItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ThreadItem<S> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.getPostThreadOtherV2"
     }
@@ -128,7 +151,7 @@ pub mod get_post_thread_other_v2_state {
 /// Builder for constructing an instance of this type
 pub struct GetPostThreadOtherV2Builder<'a, S: get_post_thread_other_v2_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -161,7 +184,7 @@ where
     /// Set the `anchor` field (required)
     pub fn anchor(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetPostThreadOtherV2Builder<'a, get_post_thread_other_v2_state::SetAnchor<S>> {
         self._fields.0 = Option::Some(value.into());
         GetPostThreadOtherV2Builder {
@@ -246,7 +269,7 @@ pub mod thread_item_state {
 /// Builder for constructing an instance of this type
 pub struct ThreadItemBuilder<'a, S: thread_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<AtUri<'a>>, Option<ThreadItemPost<'a>>),
+    _fields: (Option<i64>, Option<AtUri<S>>, Option<ThreadItemPost<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -295,7 +318,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ThreadItemBuilder<'a, thread_item_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         ThreadItemBuilder {
@@ -314,7 +337,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<ThreadItemPost<'a>>,
+        value: impl Into<ThreadItemPost<S>>,
     ) -> ThreadItemBuilder<'a, thread_item_state::SetValue<S>> {
         self._fields.2 = Option::Some(value.into());
         ThreadItemBuilder {
@@ -344,10 +367,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ThreadItem<'a> {
         ThreadItem {
             depth: self._fields.0.unwrap(),

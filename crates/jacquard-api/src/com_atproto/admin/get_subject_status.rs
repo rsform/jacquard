@@ -10,8 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Cid};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::admin::RepoBlobRef;
 use crate::com_atproto::admin::RepoRef;
@@ -20,44 +23,62 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSubjectStatus<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSubjectStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub blob: Option<Cid<'a>>,
+    pub blob: Option<Cid<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did: Option<Did<'a>>,
+    pub did: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSubjectStatusOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSubjectStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub deactivated: Option<StatusAttr<'a>>,
-    #[serde(borrow)]
-    pub subject: GetSubjectStatusOutputSubject<'a>,
+    pub deactivated: Option<StatusAttr<S>>,
+    pub subject: GetSubjectStatusOutputSubject<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub takedown: Option<StatusAttr<'a>>,
+    pub takedown: Option<StatusAttr<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum GetSubjectStatusOutputSubject<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum GetSubjectStatusOutputSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
-    RepoRef(Box<RepoRef<'a>>),
+    RepoRef(Box<RepoRef<S>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<StrongRef<'a>>),
+    StrongRef(Box<StrongRef<S>>),
     #[serde(rename = "com.atproto.admin.defs#repoBlobRef")]
-    RepoBlobRef(Box<RepoBlobRef<'a>>),
+    RepoBlobRef(Box<RepoBlobRef<S>>),
 }
 
 /// Response type for com.atproto.admin.getSubjectStatus
@@ -65,11 +86,12 @@ pub struct GetSubjectStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSubjectStatusResponse {
     const NSID: &'static str = "com.atproto.admin.getSubjectStatus";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSubjectStatusOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetSubjectStatusOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSubjectStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetSubjectStatus<S> {
     const NSID: &'static str = "com.atproto.admin.getSubjectStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSubjectStatusResponse;
@@ -80,7 +102,7 @@ pub struct GetSubjectStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSubjectStatusRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.getSubjectStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSubjectStatus<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetSubjectStatus<S>;
     type Response = GetSubjectStatusResponse;
 }
 
@@ -106,7 +128,7 @@ pub mod get_subject_status_state {
 /// Builder for constructing an instance of this type
 pub struct GetSubjectStatusBuilder<'a, S: get_subject_status_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Cid<'a>>, Option<Did<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<Cid<S>>, Option<Did<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -130,12 +152,12 @@ impl<'a> GetSubjectStatusBuilder<'a, get_subject_status_state::Empty> {
 
 impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
     /// Set the `blob` field (optional)
-    pub fn blob(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
+    pub fn blob(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `blob` field to an Option value (optional)
-    pub fn maybe_blob(mut self, value: Option<Cid<'a>>) -> Self {
+    pub fn maybe_blob(mut self, value: Option<Cid<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -143,12 +165,12 @@ impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
 
 impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
     /// Set the `did` field (optional)
-    pub fn did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_did(mut self, value: Option<Did<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -156,12 +178,12 @@ impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
 
 impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
     /// Set the `uri` field (optional)
-    pub fn uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
-    pub fn maybe_uri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_uri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.2 = value;
         self
     }

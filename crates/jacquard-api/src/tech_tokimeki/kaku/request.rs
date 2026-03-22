@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,10 +30,17 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A request for someone to draw something
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "tech.tokimeki.kaku.request", tag = "$type")]
-pub struct Request<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "tech.tokimeki.kaku.request",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Request<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///Whether still accepting responses  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,40 +48,39 @@ pub struct Request<'a> {
     pub is_open: Option<bool>,
     ///Reference images for the request
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reference_images: Option<Vec<BlobRef<'a>>>,
+    pub reference_images: Option<Vec<BlobRef<S>>>,
     ///Tags for categorization
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///Optional: specific artist to request
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub target_actor: Option<Did<'a>>,
+    pub target_actor: Option<Did<S>>,
     ///Description of what to draw
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RequestGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RequestGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Request<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Request<S>,
 }
 
-impl<'a> Request<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, RequestRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Request<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, RequestRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -83,18 +91,17 @@ pub struct RequestRecord;
 impl XrpcResp for RequestRecord {
     const NSID: &'static str = "tech.tokimeki.kaku.request";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RequestGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RequestGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<RequestGetRecordOutput<'_>> for Request<'_> {
-    fn from(output: RequestGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<RequestGetRecordOutput<S>> for Request<S> {
+    fn from(output: RequestGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Request<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Request<S> {
     const NSID: &'static str = "tech.tokimeki.kaku.request";
     type Record = RequestRecord;
 }
@@ -104,7 +111,7 @@ impl Collection for RequestRecord {
     type Record = RequestRecord;
 }
 
-impl<'a> LexiconSchema for Request<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Request<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.request"
     }
@@ -177,37 +184,37 @@ pub mod request_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Text;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Text = S::Text;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type CreatedAt = S::CreatedAt;
         type Text = Set<members::text>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Text = S::Text;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -217,10 +224,10 @@ pub struct RequestBuilder<'a, S: request_state::State> {
     _fields: (
         Option<Datetime>,
         Option<bool>,
-        Option<Vec<BlobRef<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
+        Option<Vec<BlobRef<S>>>,
+        Option<Vec<S>>,
+        Option<Did<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -279,13 +286,13 @@ impl<'a, S: request_state::State> RequestBuilder<'a, S> {
     /// Set the `referenceImages` field (optional)
     pub fn reference_images(
         mut self,
-        value: impl Into<Option<Vec<BlobRef<'a>>>>,
+        value: impl Into<Option<Vec<BlobRef<S>>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `referenceImages` field to an Option value (optional)
-    pub fn maybe_reference_images(mut self, value: Option<Vec<BlobRef<'a>>>) -> Self {
+    pub fn maybe_reference_images(mut self, value: Option<Vec<BlobRef<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -293,12 +300,12 @@ impl<'a, S: request_state::State> RequestBuilder<'a, S> {
 
 impl<'a, S: request_state::State> RequestBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -306,12 +313,12 @@ impl<'a, S: request_state::State> RequestBuilder<'a, S> {
 
 impl<'a, S: request_state::State> RequestBuilder<'a, S> {
     /// Set the `targetActor` field (optional)
-    pub fn target_actor(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn target_actor(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `targetActor` field to an Option value (optional)
-    pub fn maybe_target_actor(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_target_actor(mut self, value: Option<Did<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -325,7 +332,7 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RequestBuilder<'a, request_state::SetText<S>> {
         self._fields.5 = Option::Some(value.into());
         RequestBuilder {
@@ -339,8 +346,8 @@ where
 impl<'a, S> RequestBuilder<'a, S>
 where
     S: request_state::State,
-    S::CreatedAt: request_state::IsSet,
     S::Text: request_state::IsSet,
+    S::CreatedAt: request_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Request<'a> {
@@ -357,10 +364,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Request<'a> {
         Request {
             created_at: self._fields.0.unwrap(),

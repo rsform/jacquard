@@ -5,11 +5,15 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::CowStr;
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -98,35 +102,38 @@ impl core::fmt::Display for Cc010 {
 
 /// Content rights and attribution information.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ContentRights<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ContentRights<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Copyright notice for the work.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_notice: Option<CowStr<'a>>,
+    pub copyright_notice: Option<S>,
     ///Year of creation or publication.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub copyright_year: Option<i64>,
     ///Name of the creator of the work.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creator: Option<CowStr<'a>>,
+    pub creator: Option<S>,
     ///Credit line for the work.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub credit_line: Option<CowStr<'a>>,
+    pub credit_line: Option<S>,
     ///License URL or identifier.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub license: Option<ContentRightsLicense<'a>>,
+    pub license: Option<ContentRightsLicense<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// License URL or identifier.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ContentRightsLicense<'a> {
+pub enum ContentRightsLicense<S: Bos<str> + AsRef<str> = DefaultStr> {
     AllRightsReserved,
     Cc010,
     CcBy40,
@@ -135,10 +142,10 @@ pub enum ContentRightsLicense<'a> {
     CcByNcSa40,
     CcByNd40,
     CcByNcNd40,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ContentRightsLicense<'a> {
+impl<S: Bos<str> + AsRef<str>> ContentRightsLicense<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::AllRightsReserved => {
@@ -154,11 +161,9 @@ impl<'a> ContentRightsLicense<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ContentRightsLicense<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "place.stream.metadata.contentRights#all-rights-reserved" => {
                 Self::AllRightsReserved
             }
@@ -169,71 +174,51 @@ impl<'a> From<&'a str> for ContentRightsLicense<'a> {
             "place.stream.metadata.contentRights#cc-by-nc-sa_4__0" => Self::CcByNcSa40,
             "place.stream.metadata.contentRights#cc-by-nd_4__0" => Self::CcByNd40,
             "place.stream.metadata.contentRights#cc-by-nc-nd_4__0" => Self::CcByNcNd40,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ContentRightsLicense<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "place.stream.metadata.contentRights#all-rights-reserved" => {
-                Self::AllRightsReserved
-            }
-            "place.stream.metadata.contentRights#cc0_1__0" => Self::Cc010,
-            "place.stream.metadata.contentRights#cc-by_4__0" => Self::CcBy40,
-            "place.stream.metadata.contentRights#cc-by-sa_4__0" => Self::CcBySa40,
-            "place.stream.metadata.contentRights#cc-by-nc_4__0" => Self::CcByNc40,
-            "place.stream.metadata.contentRights#cc-by-nc-sa_4__0" => Self::CcByNcSa40,
-            "place.stream.metadata.contentRights#cc-by-nd_4__0" => Self::CcByNd40,
-            "place.stream.metadata.contentRights#cc-by-nc-nd_4__0" => Self::CcByNcNd40,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ContentRightsLicense<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ContentRightsLicense<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ContentRightsLicense<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ContentRightsLicense<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ContentRightsLicense<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ContentRightsLicense<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ContentRightsLicense<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ContentRightsLicense<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ContentRightsLicense<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ContentRightsLicense<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ContentRightsLicense<'_> {
-    type Output = ContentRightsLicense<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ContentRightsLicense<S> {
+    type Output = ContentRightsLicense<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ContentRightsLicense::AllRightsReserved => {
@@ -253,7 +238,7 @@ impl jacquard_common::IntoStatic for ContentRightsLicense<'_> {
     }
 }
 
-impl<'a> LexiconSchema for ContentRights<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ContentRights<S> {
     fn nsid() -> &'static str {
         "place.stream.metadata.contentRights"
     }

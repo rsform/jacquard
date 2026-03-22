@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,24 +29,32 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A declaration of a Bluesky chat account.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "chat.bsky.actor.declaration", tag = "$type")]
-pub struct Declaration<'a> {
-    #[serde(borrow)]
-    pub allow_incoming: DeclarationAllowIncoming<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "chat.bsky.actor.declaration",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Declaration<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub allow_incoming: DeclarationAllowIncoming<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DeclarationAllowIncoming<'a> {
+pub enum DeclarationAllowIncoming<S: Bos<str> + AsRef<str> = DefaultStr> {
     All,
     None,
     Following,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> DeclarationAllowIncoming<'a> {
+impl<S: Bos<str> + AsRef<str>> DeclarationAllowIncoming<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::All => "all",
@@ -53,72 +63,57 @@ impl<'a> DeclarationAllowIncoming<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for DeclarationAllowIncoming<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "all" => Self::All,
             "none" => Self::None,
             "following" => Self::Following,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for DeclarationAllowIncoming<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "all" => Self::All,
-            "none" => Self::None,
-            "following" => Self::Following,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for DeclarationAllowIncoming<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for DeclarationAllowIncoming<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for DeclarationAllowIncoming<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for DeclarationAllowIncoming<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for DeclarationAllowIncoming<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for DeclarationAllowIncoming<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for DeclarationAllowIncoming<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for DeclarationAllowIncoming<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for DeclarationAllowIncoming<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for DeclarationAllowIncoming<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for DeclarationAllowIncoming<'_> {
-    type Output = DeclarationAllowIncoming<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for DeclarationAllowIncoming<S> {
+    type Output = DeclarationAllowIncoming<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             DeclarationAllowIncoming::All => DeclarationAllowIncoming::All,
@@ -134,22 +129,23 @@ impl jacquard_common::IntoStatic for DeclarationAllowIncoming<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DeclarationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeclarationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Declaration<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Declaration<S>,
 }
 
-impl<'a> Declaration<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DeclarationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Declaration<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DeclarationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -160,18 +156,17 @@ pub struct DeclarationRecord;
 impl XrpcResp for DeclarationRecord {
     const NSID: &'static str = "chat.bsky.actor.declaration";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeclarationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DeclarationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
-    fn from(output: DeclarationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DeclarationGetRecordOutput<S>> for Declaration<S> {
+    fn from(output: DeclarationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Declaration<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Declaration<S> {
     const NSID: &'static str = "chat.bsky.actor.declaration";
     type Record = DeclarationRecord;
 }
@@ -181,7 +176,7 @@ impl Collection for DeclarationRecord {
     type Record = DeclarationRecord;
 }
 
-impl<'a> LexiconSchema for Declaration<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Declaration<S> {
     fn nsid() -> &'static str {
         "chat.bsky.actor.declaration"
     }
@@ -231,7 +226,7 @@ pub mod declaration_state {
 /// Builder for constructing an instance of this type
 pub struct DeclarationBuilder<'a, S: declaration_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<DeclarationAllowIncoming<'a>>,),
+    _fields: (Option<DeclarationAllowIncoming<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -261,7 +256,7 @@ where
     /// Set the `allowIncoming` field (required)
     pub fn allow_incoming(
         mut self,
-        value: impl Into<DeclarationAllowIncoming<'a>>,
+        value: impl Into<DeclarationAllowIncoming<S>>,
     ) -> DeclarationBuilder<'a, declaration_state::SetAllowIncoming<S>> {
         self._fields.0 = Option::Some(value.into());
         DeclarationBuilder {
@@ -287,10 +282,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Declaration<'a> {
         Declaration {
             allow_incoming: self._fields.0.unwrap(),

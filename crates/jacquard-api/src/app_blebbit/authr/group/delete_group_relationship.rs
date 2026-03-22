@@ -10,21 +10,29 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteGroupRelationship<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteGroupRelationship<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub relation: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub resource: CowStr<'a>,
-    #[serde(borrow)]
-    pub subject: CowStr<'a>,
+    pub relation: Option<S>,
+    pub resource: S,
+    pub subject: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.blebbit.authr.group.deleteGroupRelationship
@@ -32,11 +40,12 @@ pub struct DeleteGroupRelationshipResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteGroupRelationshipResponse {
     const NSID: &'static str = "app.blebbit.authr.group.deleteGroupRelationship";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteGroupRelationship<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DeleteGroupRelationship<S> {
     const NSID: &'static str = "app.blebbit.authr.group.deleteGroupRelationship";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -51,6 +60,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteGroupRelationshipRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DeleteGroupRelationship<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DeleteGroupRelationship<S>;
     type Response = DeleteGroupRelationshipResponse;
 }

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,48 +29,51 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// User subscription to an evaluator service. Published by the user (not the evaluator) to declare they want evaluations.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.gainforest.evaluator.subscription",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Subscription<'a> {
+pub struct Subscription<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Which of the user's record collections should be evaluated (NSIDs). Must be a subset of the evaluator's subjectCollections. If omitted, all supported collections are evaluated.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub collections: Option<Vec<CowStr<'a>>>,
+    pub collections: Option<Vec<S>>,
     ///Timestamp of when this subscription was created.
     pub created_at: Datetime,
     ///Which evaluation types the user wants. If omitted, all types the evaluator supports are applied.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub evaluation_types: Option<Vec<CowStr<'a>>>,
+    pub evaluation_types: Option<Vec<S>>,
     ///DID of the evaluator service to subscribe to.
-    #[serde(borrow)]
-    pub evaluator: Did<'a>,
+    pub evaluator: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscriptionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SubscriptionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Subscription<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Subscription<S>,
 }
 
-impl<'a> Subscription<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SubscriptionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Subscription<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SubscriptionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -79,18 +84,17 @@ pub struct SubscriptionRecord;
 impl XrpcResp for SubscriptionRecord {
     const NSID: &'static str = "app.gainforest.evaluator.subscription";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SubscriptionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SubscriptionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SubscriptionGetRecordOutput<'_>> for Subscription<'_> {
-    fn from(output: SubscriptionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SubscriptionGetRecordOutput<S>> for Subscription<S> {
+    fn from(output: SubscriptionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Subscription<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Subscription<S> {
     const NSID: &'static str = "app.gainforest.evaluator.subscription";
     type Record = SubscriptionRecord;
 }
@@ -100,7 +104,7 @@ impl Collection for SubscriptionRecord {
     type Record = SubscriptionRecord;
 }
 
-impl<'a> LexiconSchema for Subscription<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Subscription<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.subscription"
     }
@@ -145,49 +149,44 @@ pub mod subscription_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Evaluator;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Evaluator = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Evaluator = S::Evaluator;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `evaluator` field to Set
     pub struct SetEvaluator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEvaluator<S> {}
     impl<S: State> State for SetEvaluator<S> {
-        type CreatedAt = S::CreatedAt;
         type Evaluator = Set<members::evaluator>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Evaluator = S::Evaluator;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `evaluator` field
         pub struct evaluator(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SubscriptionBuilder<'a, S: subscription_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Vec<CowStr<'a>>>,
-        Option<Datetime>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Did<'a>>,
-    ),
+    _fields: (Option<Vec<S>>, Option<Datetime>, Option<Vec<S>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -211,12 +210,12 @@ impl<'a> SubscriptionBuilder<'a, subscription_state::Empty> {
 
 impl<'a, S: subscription_state::State> SubscriptionBuilder<'a, S> {
     /// Set the `collections` field (optional)
-    pub fn collections(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn collections(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `collections` field to an Option value (optional)
-    pub fn maybe_collections(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_collections(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -243,15 +242,12 @@ where
 
 impl<'a, S: subscription_state::State> SubscriptionBuilder<'a, S> {
     /// Set the `evaluationTypes` field (optional)
-    pub fn evaluation_types(
-        mut self,
-        value: impl Into<Option<Vec<CowStr<'a>>>>,
-    ) -> Self {
+    pub fn evaluation_types(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `evaluationTypes` field to an Option value (optional)
-    pub fn maybe_evaluation_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_evaluation_types(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -265,7 +261,7 @@ where
     /// Set the `evaluator` field (required)
     pub fn evaluator(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> SubscriptionBuilder<'a, subscription_state::SetEvaluator<S>> {
         self._fields.3 = Option::Some(value.into());
         SubscriptionBuilder {
@@ -279,8 +275,8 @@ where
 impl<'a, S> SubscriptionBuilder<'a, S>
 where
     S: subscription_state::State,
-    S::CreatedAt: subscription_state::IsSet,
     S::Evaluator: subscription_state::IsSet,
+    S::CreatedAt: subscription_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Subscription<'a> {
@@ -295,10 +291,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Subscription<'a> {
         Subscription {
             collections: self._fields.0,

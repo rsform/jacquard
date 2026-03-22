@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,41 +30,46 @@ use serde::{Serialize, Deserialize};
 use crate::blue__2048::verification::VerificationRef;
 /// A record that holds a verification of a stats record saying the owner of the repo has verified that it is a valid and most likely not tampered with.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "blue.2048.verification.stats",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Stats<'a> {
+pub struct Stats<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///This is the record that holds the publicly verifiable signature of a stats record
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub verified_ref: Option<VerificationRef<'a>>,
+    pub verified_ref: Option<VerificationRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StatsGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StatsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Stats<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Stats<S>,
 }
 
-impl<'a> Stats<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, StatsRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Stats<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, StatsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -73,18 +80,17 @@ pub struct StatsRecord;
 impl XrpcResp for StatsRecord {
     const NSID: &'static str = "blue.2048.verification.stats";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StatsGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StatsGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<StatsGetRecordOutput<'_>> for Stats<'_> {
-    fn from(output: StatsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<StatsGetRecordOutput<S>> for Stats<S> {
+    fn from(output: StatsGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Stats<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Stats<S> {
     const NSID: &'static str = "blue.2048.verification.stats";
     type Record = StatsRecord;
 }
@@ -94,7 +100,7 @@ impl Collection for StatsRecord {
     type Record = StatsRecord;
 }
 
-impl<'a> LexiconSchema for Stats<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Stats<S> {
     fn nsid() -> &'static str {
         "blue.2048.verification.stats"
     }
@@ -131,7 +137,7 @@ pub mod stats_state {
 /// Builder for constructing an instance of this type
 pub struct StatsBuilder<'a, S: stats_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<VerificationRef<'a>>),
+    _fields: (Option<Datetime>, Option<VerificationRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -168,15 +174,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `verifiedRef` field (optional)
-    pub fn verified_ref(
-        mut self,
-        value: impl Into<Option<VerificationRef<'a>>>,
-    ) -> Self {
+    pub fn verified_ref(mut self, value: impl Into<Option<VerificationRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `verifiedRef` field to an Option value (optional)
-    pub fn maybe_verified_ref(mut self, value: Option<VerificationRef<'a>>) -> Self {
+    pub fn maybe_verified_ref(mut self, value: Option<VerificationRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -195,13 +198,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Stats<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Stats<'a> {
         Stats {
             created_at: self._fields.0,
             verified_ref: self._fields.1,

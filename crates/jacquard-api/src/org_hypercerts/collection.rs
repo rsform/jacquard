@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::RecordError;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -32,105 +34,124 @@ use crate::org_hypercerts::Uri;
 use crate::pub_leaflet::pages::linear_document::LinearDocument;
 use crate::org_hypercerts::collection;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Item<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Item<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Strong reference to an item in this collection. Items can be activities (org.hypercerts.claim.activity) and/or other collections (org.hypercerts.collection).
-    #[serde(borrow)]
-    pub item_identifier: StrongRef<'a>,
+    pub item_identifier: StrongRef<S>,
     ///Optional weight for this item (positive numeric value stored as string). Weights do not need to sum to a specific total; normalization can be performed by the consuming application as needed.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub item_weight: Option<CowStr<'a>>,
+    pub item_weight: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A collection/group of items (activities and/or other collections). Collections support recursive nesting.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "org.hypercerts.collection", tag = "$type")]
-pub struct Collection<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "org.hypercerts.collection",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Collection<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The collection's avatar/profile image as a URI or image blob.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<CollectionAvatar<'a>>,
+    pub avatar: Option<CollectionAvatar<S>>,
     ///Larger horizontal image to display behind the collection view.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub banner: Option<CollectionBanner<'a>>,
+    pub banner: Option<CollectionBanner<S>>,
     ///Client-declared timestamp when this record was originally created
     pub created_at: Datetime,
     ///Rich-text description, represented as a Leaflet linear document.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<LinearDocument<'a>>,
+    pub description: Option<LinearDocument<S>>,
     ///Array of items in this collection with optional weights.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub items: Option<Vec<collection::Item<'a>>>,
+    pub items: Option<Vec<collection::Item<S>>>,
     ///A strong reference to the location where this collection's activities were performed. The record referenced must conform with the lexicon app.certified.location.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location: Option<StrongRef<'a>>,
+    pub location: Option<StrongRef<S>>,
     ///Short summary of this collection, suitable for previews and list views
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub short_description: Option<CowStr<'a>>,
+    pub short_description: Option<S>,
     ///Display name for this collection (e.g. 'Q1 2025 Impact Projects')
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
     ///The type of this collection. Possible fields can be 'favorites', 'project', or any other type of collection.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<CowStr<'a>>,
+    pub r#type: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum CollectionAvatar<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum CollectionAvatar<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallImage")]
-    SmallImage(Box<SmallImage<'a>>),
+    SmallImage(Box<SmallImage<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum CollectionBanner<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum CollectionBanner<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#largeImage")]
-    LargeImage(Box<LargeImage<'a>>),
+    LargeImage(Box<LargeImage<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollectionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Collection<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Collection<S>,
 }
 
-impl<'a> Collection<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CollectionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Collection<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CollectionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Item<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Item<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.collection"
     }
@@ -162,18 +183,18 @@ pub struct CollectionRecord;
 impl XrpcResp for CollectionRecord {
     const NSID: &'static str = "org.hypercerts.collection";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollectionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CollectionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CollectionGetRecordOutput<'_>> for Collection<'_> {
-    fn from(output: CollectionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CollectionGetRecordOutput<S>> for Collection<S> {
+    fn from(output: CollectionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl jacquard_common::types::collection::Collection for Collection<'_> {
+impl<S: Bos<str> + AsRef<str>> jacquard_common::types::collection::Collection
+for Collection<S> {
     const NSID: &'static str = "org.hypercerts.collection";
     type Record = CollectionRecord;
 }
@@ -183,7 +204,7 @@ impl jacquard_common::types::collection::Collection for CollectionRecord {
     type Record = CollectionRecord;
 }
 
-impl<'a> LexiconSchema for Collection<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Collection<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.collection"
     }
@@ -299,7 +320,7 @@ pub mod item_state {
 /// Builder for constructing an instance of this type
 pub struct ItemBuilder<'a, S: item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<StrongRef<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -329,7 +350,7 @@ where
     /// Set the `itemIdentifier` field (required)
     pub fn item_identifier(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> ItemBuilder<'a, item_state::SetItemIdentifier<S>> {
         self._fields.0 = Option::Some(value.into());
         ItemBuilder {
@@ -342,12 +363,12 @@ where
 
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `itemWeight` field (optional)
-    pub fn item_weight(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn item_weight(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `itemWeight` field to an Option value (optional)
-    pub fn maybe_item_weight(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_item_weight(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -367,13 +388,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Item<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Item<'a> {
         Item {
             item_identifier: self._fields.0.unwrap(),
             item_weight: self._fields.1,
@@ -577,37 +592,37 @@ pub mod collection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -615,15 +630,15 @@ pub mod collection_state {
 pub struct CollectionBuilder<'a, S: collection_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CollectionAvatar<'a>>,
-        Option<CollectionBanner<'a>>,
+        Option<CollectionAvatar<S>>,
+        Option<CollectionBanner<S>>,
         Option<Datetime>,
-        Option<LinearDocument<'a>>,
-        Option<Vec<collection::Item<'a>>>,
-        Option<StrongRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<LinearDocument<S>>,
+        Option<Vec<collection::Item<S>>>,
+        Option<StrongRef<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -648,12 +663,12 @@ impl<'a> CollectionBuilder<'a, collection_state::Empty> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<CollectionAvatar<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<CollectionAvatar<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<CollectionAvatar<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<CollectionAvatar<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -661,12 +676,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `banner` field (optional)
-    pub fn banner(mut self, value: impl Into<Option<CollectionBanner<'a>>>) -> Self {
+    pub fn banner(mut self, value: impl Into<Option<CollectionBanner<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `banner` field to an Option value (optional)
-    pub fn maybe_banner(mut self, value: Option<CollectionBanner<'a>>) -> Self {
+    pub fn maybe_banner(mut self, value: Option<CollectionBanner<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -693,12 +708,12 @@ where
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<LinearDocument<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<LinearDocument<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<LinearDocument<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<LinearDocument<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -706,12 +721,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `items` field (optional)
-    pub fn items(mut self, value: impl Into<Option<Vec<collection::Item<'a>>>>) -> Self {
+    pub fn items(mut self, value: impl Into<Option<Vec<collection::Item<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `items` field to an Option value (optional)
-    pub fn maybe_items(mut self, value: Option<Vec<collection::Item<'a>>>) -> Self {
+    pub fn maybe_items(mut self, value: Option<Vec<collection::Item<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -719,12 +734,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `location` field (optional)
-    pub fn location(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn location(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
-    pub fn maybe_location(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_location(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -732,12 +747,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `shortDescription` field (optional)
-    pub fn short_description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn short_description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `shortDescription` field to an Option value (optional)
-    pub fn maybe_short_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_short_description(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -751,7 +766,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CollectionBuilder<'a, collection_state::SetTitle<S>> {
         self._fields.7 = Option::Some(value.into());
         CollectionBuilder {
@@ -764,12 +779,12 @@ where
 
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
-    pub fn maybe_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_type(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -778,8 +793,8 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 impl<'a, S> CollectionBuilder<'a, S>
 where
     S: collection_state::State,
-    S::CreatedAt: collection_state::IsSet,
     S::Title: collection_state::IsSet,
+    S::CreatedAt: collection_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Collection<'a> {
@@ -799,10 +814,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Collection<'a> {
         Collection {
             avatar: self._fields.0,

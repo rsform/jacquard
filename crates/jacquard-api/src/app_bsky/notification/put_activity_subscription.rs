@@ -10,31 +10,48 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::notification::ActivitySubscription;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct PutActivitySubscription<'a> {
-    #[serde(borrow)]
-    pub activity_subscription: ActivitySubscription<'a>,
-    #[serde(borrow)]
-    pub subject: Did<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PutActivitySubscription<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub activity_subscription: ActivitySubscription<S>,
+    pub subject: Did<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct PutActivitySubscriptionOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PutActivitySubscriptionOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub activity_subscription: Option<ActivitySubscription<'a>>,
-    #[serde(borrow)]
-    pub subject: Did<'a>,
+    pub activity_subscription: Option<ActivitySubscription<S>>,
+    pub subject: Did<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.notification.putActivitySubscription
@@ -42,11 +59,12 @@ pub struct PutActivitySubscriptionResponse;
 impl jacquard_common::xrpc::XrpcResp for PutActivitySubscriptionResponse {
     const NSID: &'static str = "app.bsky.notification.putActivitySubscription";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PutActivitySubscriptionOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PutActivitySubscriptionOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for PutActivitySubscription<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for PutActivitySubscription<S> {
     const NSID: &'static str = "app.bsky.notification.putActivitySubscription";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -61,7 +79,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for PutActivitySubscriptionRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = PutActivitySubscription<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = PutActivitySubscription<S>;
     type Response = PutActivitySubscriptionResponse;
 }
 
@@ -75,37 +93,37 @@ pub mod put_activity_subscription_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type ActivitySubscription;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type ActivitySubscription = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type ActivitySubscription = S::ActivitySubscription;
+        type Subject = Unset;
     }
     ///State transition - sets the `activity_subscription` field to Set
     pub struct SetActivitySubscription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActivitySubscription<S> {}
     impl<S: State> State for SetActivitySubscription<S> {
-        type Subject = S::Subject;
         type ActivitySubscription = Set<members::activity_subscription>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type ActivitySubscription = S::ActivitySubscription;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `activity_subscription` field
         pub struct activity_subscription(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -115,7 +133,7 @@ pub struct PutActivitySubscriptionBuilder<
     S: put_activity_subscription_state::State,
 > {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<ActivitySubscription<'a>>, Option<Did<'a>>),
+    _fields: (Option<ActivitySubscription<S>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -148,7 +166,7 @@ where
     /// Set the `activitySubscription` field (required)
     pub fn activity_subscription(
         mut self,
-        value: impl Into<ActivitySubscription<'a>>,
+        value: impl Into<ActivitySubscription<S>>,
     ) -> PutActivitySubscriptionBuilder<
         'a,
         put_activity_subscription_state::SetActivitySubscription<S>,
@@ -170,7 +188,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> PutActivitySubscriptionBuilder<
         'a,
         put_activity_subscription_state::SetSubject<S>,
@@ -187,8 +205,8 @@ where
 impl<'a, S> PutActivitySubscriptionBuilder<'a, S>
 where
     S: put_activity_subscription_state::State,
-    S::Subject: put_activity_subscription_state::IsSet,
     S::ActivitySubscription: put_activity_subscription_state::IsSet,
+    S::Subject: put_activity_subscription_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PutActivitySubscription<'a> {
@@ -201,10 +219,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PutActivitySubscription<'a> {
         PutActivitySubscription {
             activity_subscription: self._fields.0.unwrap(),

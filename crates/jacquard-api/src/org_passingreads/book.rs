@@ -23,12 +23,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Datetime, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -41,37 +43,40 @@ use crate::org_passingreads::AspectRatio;
 use crate::org_passingreads::book;
 /// A confirmed book event for display purposes. Omits cryptographic fields (bookPub, bookSig) and book reference since it's shown in context of a book.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ConfirmedEvent<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ConfirmedEvent<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The person who performed this event
-    #[serde(borrow)]
-    pub actor: Actor<'a>,
+    pub actor: Actor<S>,
     ///What event occurred
-    #[serde(borrow)]
-    pub event: ConfirmedEventEvent<'a>,
+    pub event: ConfirmedEventEvent<S>,
     ///Where this event occurred
-    #[serde(borrow)]
-    pub location: Hthree<'a>,
+    pub location: Hthree<S>,
     ///When this event occurred
     pub occurred_at: Datetime,
     ///The AT URI of this event record
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// What event occurred
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ConfirmedEventEvent<'a> {
+pub enum ConfirmedEventEvent<S: Bos<str> + AsRef<str> = DefaultStr> {
     OrgPassingreadsBookCheckin,
     OrgPassingreadsBookDrop,
     OrgPassingreadsBookFind,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ConfirmedEventEvent<'a> {
+impl<S: Bos<str> + AsRef<str>> ConfirmedEventEvent<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::OrgPassingreadsBookCheckin => "org.passingreads.book.checkin",
@@ -80,72 +85,57 @@ impl<'a> ConfirmedEventEvent<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ConfirmedEventEvent<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "org.passingreads.book.checkin" => Self::OrgPassingreadsBookCheckin,
             "org.passingreads.book.drop" => Self::OrgPassingreadsBookDrop,
             "org.passingreads.book.find" => Self::OrgPassingreadsBookFind,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ConfirmedEventEvent<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "org.passingreads.book.checkin" => Self::OrgPassingreadsBookCheckin,
-            "org.passingreads.book.drop" => Self::OrgPassingreadsBookDrop,
-            "org.passingreads.book.find" => Self::OrgPassingreadsBookFind,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ConfirmedEventEvent<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ConfirmedEventEvent<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ConfirmedEventEvent<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ConfirmedEventEvent<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ConfirmedEventEvent<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ConfirmedEventEvent<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ConfirmedEventEvent<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ConfirmedEventEvent<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ConfirmedEventEvent<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ConfirmedEventEvent<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ConfirmedEventEvent<'_> {
-    type Output = ConfirmedEventEvent<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ConfirmedEventEvent<S> {
+    type Output = ConfirmedEventEvent<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ConfirmedEventEvent::OrgPassingreadsBookCheckin => {
@@ -164,81 +154,81 @@ impl jacquard_common::IntoStatic for ConfirmedEventEvent<'_> {
 
 /// A view of a book registration for API responses. Omits cryptographic fields (bookPub, bookSig) and the cover blob.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RegistrationView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RegistrationView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Authors of this book, in order of credit
-    #[serde(borrow)]
-    pub authors: Vec<CowStr<'a>>,
+    pub authors: Vec<S>,
     ///The book's ID (as defined on its QR Code)
-    #[serde(borrow)]
-    pub book_id: CowStr<'a>,
+    pub book_id: S,
     ///When the book was registered
     pub occurred_at: Datetime,
     ///The book's Open Library Edition ID
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publication_id: Option<CowStr<'a>>,
+    pub publication_id: Option<S>,
     ///The person who registered the book
-    #[serde(borrow)]
-    pub registered_by: Actor<'a>,
+    pub registered_by: Actor<S>,
     ///The title of the book
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A book with its current state, combining registration data with computed state information.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StatefulBook<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StatefulBook<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Aspect ratio of the cover image
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<AspectRatio<'a>>,
+    pub aspect_ratio: Option<AspectRatio<S>>,
     ///The CID of the book registration record
-    #[serde(borrow)]
-    pub cid: CowStr<'a>,
+    pub cid: S,
     ///Resolved URL to the cover image (from the registration blob)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cover_url: Option<UriValue<'a>>,
+    pub cover_url: Option<UriValue<S>>,
     ///The DID of the current holder of the book
-    #[serde(borrow)]
-    pub current_holder: Did<'a>,
+    pub current_holder: Did<S>,
     ///The current location of the book (only present if state is 'org.passingreads.book.drop')
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub current_location: Option<Hthree<'a>>,
+    pub current_location: Option<Hthree<S>>,
     ///List of confirmed events for this book, in chronological order
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub events: Option<Vec<book::ConfirmedEvent<'a>>>,
+    pub events: Option<Vec<book::ConfirmedEvent<S>>>,
     ///The book registration data (without cryptographic fields)
-    #[serde(borrow)]
-    pub registration: book::RegistrationView<'a>,
+    pub registration: book::RegistrationView<S>,
     ///The current state of the book, derived from the latest event
-    #[serde(borrow)]
-    pub state: StatefulBookState<'a>,
+    pub state: StatefulBookState<S>,
     ///The AT URI of the book registration record
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The current state of the book, derived from the latest event
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StatefulBookState<'a> {
+pub enum StatefulBookState<S: Bos<str> + AsRef<str> = DefaultStr> {
     OrgPassingreadsBookCheckin,
     OrgPassingreadsBookDrop,
     OrgPassingreadsBookFind,
     OrgPassingreadsBookRegistration,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> StatefulBookState<'a> {
+impl<S: Bos<str> + AsRef<str>> StatefulBookState<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::OrgPassingreadsBookCheckin => "org.passingreads.book.checkin",
@@ -248,74 +238,58 @@ impl<'a> StatefulBookState<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for StatefulBookState<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "org.passingreads.book.checkin" => Self::OrgPassingreadsBookCheckin,
             "org.passingreads.book.drop" => Self::OrgPassingreadsBookDrop,
             "org.passingreads.book.find" => Self::OrgPassingreadsBookFind,
             "org.passingreads.book.registration" => Self::OrgPassingreadsBookRegistration,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for StatefulBookState<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "org.passingreads.book.checkin" => Self::OrgPassingreadsBookCheckin,
-            "org.passingreads.book.drop" => Self::OrgPassingreadsBookDrop,
-            "org.passingreads.book.find" => Self::OrgPassingreadsBookFind,
-            "org.passingreads.book.registration" => Self::OrgPassingreadsBookRegistration,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for StatefulBookState<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for StatefulBookState<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for StatefulBookState<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for StatefulBookState<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for StatefulBookState<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for StatefulBookState<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for StatefulBookState<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for StatefulBookState<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for StatefulBookState<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for StatefulBookState<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for StatefulBookState<'_> {
-    type Output = StatefulBookState<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for StatefulBookState<S> {
+    type Output = StatefulBookState<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             StatefulBookState::OrgPassingreadsBookCheckin => {
@@ -335,7 +309,7 @@ impl jacquard_common::IntoStatic for StatefulBookState<'_> {
     }
 }
 
-impl<'a> LexiconSchema for ConfirmedEvent<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfirmedEvent<S> {
     fn nsid() -> &'static str {
         "org.passingreads.book.defs"
     }
@@ -350,7 +324,7 @@ impl<'a> LexiconSchema for ConfirmedEvent<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RegistrationView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RegistrationView<S> {
     fn nsid() -> &'static str {
         "org.passingreads.book.defs"
     }
@@ -365,7 +339,7 @@ impl<'a> LexiconSchema for RegistrationView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for StatefulBook<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for StatefulBook<S> {
     fn nsid() -> &'static str {
         "org.passingreads.book.defs"
     }
@@ -393,8 +367,8 @@ pub mod confirmed_event_state {
         type Event;
         type OccurredAt;
         type Uri;
-        type Location;
         type Actor;
+        type Location;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -403,8 +377,8 @@ pub mod confirmed_event_state {
         type Event = Unset;
         type OccurredAt = Unset;
         type Uri = Unset;
-        type Location = Unset;
         type Actor = Unset;
+        type Location = Unset;
     }
     ///State transition - sets the `event` field to Set
     pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
@@ -413,8 +387,8 @@ pub mod confirmed_event_state {
         type Event = Set<members::event>;
         type OccurredAt = S::OccurredAt;
         type Uri = S::Uri;
-        type Location = S::Location;
         type Actor = S::Actor;
+        type Location = S::Location;
     }
     ///State transition - sets the `occurred_at` field to Set
     pub struct SetOccurredAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -423,8 +397,8 @@ pub mod confirmed_event_state {
         type Event = S::Event;
         type OccurredAt = Set<members::occurred_at>;
         type Uri = S::Uri;
-        type Location = S::Location;
         type Actor = S::Actor;
+        type Location = S::Location;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
@@ -433,18 +407,8 @@ pub mod confirmed_event_state {
         type Event = S::Event;
         type OccurredAt = S::OccurredAt;
         type Uri = Set<members::uri>;
+        type Actor = S::Actor;
         type Location = S::Location;
-        type Actor = S::Actor;
-    }
-    ///State transition - sets the `location` field to Set
-    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocation<S> {}
-    impl<S: State> State for SetLocation<S> {
-        type Event = S::Event;
-        type OccurredAt = S::OccurredAt;
-        type Uri = S::Uri;
-        type Location = Set<members::location>;
-        type Actor = S::Actor;
     }
     ///State transition - sets the `actor` field to Set
     pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
@@ -453,8 +417,18 @@ pub mod confirmed_event_state {
         type Event = S::Event;
         type OccurredAt = S::OccurredAt;
         type Uri = S::Uri;
-        type Location = S::Location;
         type Actor = Set<members::actor>;
+        type Location = S::Location;
+    }
+    ///State transition - sets the `location` field to Set
+    pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocation<S> {}
+    impl<S: State> State for SetLocation<S> {
+        type Event = S::Event;
+        type OccurredAt = S::OccurredAt;
+        type Uri = S::Uri;
+        type Actor = S::Actor;
+        type Location = Set<members::location>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -465,10 +439,10 @@ pub mod confirmed_event_state {
         pub struct occurred_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `location` field
-        pub struct location(());
         ///Marker type for the `actor` field
         pub struct actor(());
+        ///Marker type for the `location` field
+        pub struct location(());
     }
 }
 
@@ -476,11 +450,11 @@ pub mod confirmed_event_state {
 pub struct ConfirmedEventBuilder<'a, S: confirmed_event_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Actor<'a>>,
-        Option<ConfirmedEventEvent<'a>>,
-        Option<Hthree<'a>>,
+        Option<Actor<S>>,
+        Option<ConfirmedEventEvent<S>>,
+        Option<Hthree<S>>,
         Option<Datetime>,
-        Option<AtUri<'a>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -511,7 +485,7 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<Actor<'a>>,
+        value: impl Into<Actor<S>>,
     ) -> ConfirmedEventBuilder<'a, confirmed_event_state::SetActor<S>> {
         self._fields.0 = Option::Some(value.into());
         ConfirmedEventBuilder {
@@ -530,7 +504,7 @@ where
     /// Set the `event` field (required)
     pub fn event(
         mut self,
-        value: impl Into<ConfirmedEventEvent<'a>>,
+        value: impl Into<ConfirmedEventEvent<S>>,
     ) -> ConfirmedEventBuilder<'a, confirmed_event_state::SetEvent<S>> {
         self._fields.1 = Option::Some(value.into());
         ConfirmedEventBuilder {
@@ -549,7 +523,7 @@ where
     /// Set the `location` field (required)
     pub fn location(
         mut self,
-        value: impl Into<Hthree<'a>>,
+        value: impl Into<Hthree<S>>,
     ) -> ConfirmedEventBuilder<'a, confirmed_event_state::SetLocation<S>> {
         self._fields.2 = Option::Some(value.into());
         ConfirmedEventBuilder {
@@ -587,7 +561,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ConfirmedEventBuilder<'a, confirmed_event_state::SetUri<S>> {
         self._fields.4 = Option::Some(value.into());
         ConfirmedEventBuilder {
@@ -604,8 +578,8 @@ where
     S::Event: confirmed_event_state::IsSet,
     S::OccurredAt: confirmed_event_state::IsSet,
     S::Uri: confirmed_event_state::IsSet,
-    S::Location: confirmed_event_state::IsSet,
     S::Actor: confirmed_event_state::IsSet,
+    S::Location: confirmed_event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConfirmedEvent<'a> {
@@ -621,10 +595,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ConfirmedEvent<'a> {
         ConfirmedEvent {
             actor: self._fields.0.unwrap(),
@@ -939,84 +910,84 @@ pub mod registration_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type RegisteredBy;
-        type Title;
+        type OccurredAt;
         type BookId;
         type Authors;
-        type OccurredAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type RegisteredBy = Unset;
-        type Title = Unset;
+        type OccurredAt = Unset;
         type BookId = Unset;
         type Authors = Unset;
-        type OccurredAt = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `registered_by` field to Set
     pub struct SetRegisteredBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRegisteredBy<S> {}
     impl<S: State> State for SetRegisteredBy<S> {
         type RegisteredBy = Set<members::registered_by>;
-        type Title = S::Title;
+        type OccurredAt = S::OccurredAt;
         type BookId = S::BookId;
         type Authors = S::Authors;
-        type OccurredAt = S::OccurredAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type RegisteredBy = S::RegisteredBy;
-        type Title = Set<members::title>;
-        type BookId = S::BookId;
-        type Authors = S::Authors;
-        type OccurredAt = S::OccurredAt;
-    }
-    ///State transition - sets the `book_id` field to Set
-    pub struct SetBookId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBookId<S> {}
-    impl<S: State> State for SetBookId<S> {
-        type RegisteredBy = S::RegisteredBy;
         type Title = S::Title;
-        type BookId = Set<members::book_id>;
-        type Authors = S::Authors;
-        type OccurredAt = S::OccurredAt;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type RegisteredBy = S::RegisteredBy;
-        type Title = S::Title;
-        type BookId = S::BookId;
-        type Authors = Set<members::authors>;
-        type OccurredAt = S::OccurredAt;
     }
     ///State transition - sets the `occurred_at` field to Set
     pub struct SetOccurredAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOccurredAt<S> {}
     impl<S: State> State for SetOccurredAt<S> {
         type RegisteredBy = S::RegisteredBy;
-        type Title = S::Title;
+        type OccurredAt = Set<members::occurred_at>;
         type BookId = S::BookId;
         type Authors = S::Authors;
-        type OccurredAt = Set<members::occurred_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `book_id` field to Set
+    pub struct SetBookId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBookId<S> {}
+    impl<S: State> State for SetBookId<S> {
+        type RegisteredBy = S::RegisteredBy;
+        type OccurredAt = S::OccurredAt;
+        type BookId = Set<members::book_id>;
+        type Authors = S::Authors;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type RegisteredBy = S::RegisteredBy;
+        type OccurredAt = S::OccurredAt;
+        type BookId = S::BookId;
+        type Authors = Set<members::authors>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type RegisteredBy = S::RegisteredBy;
+        type OccurredAt = S::OccurredAt;
+        type BookId = S::BookId;
+        type Authors = S::Authors;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `registered_by` field
         pub struct registered_by(());
-        ///Marker type for the `title` field
-        pub struct title(());
+        ///Marker type for the `occurred_at` field
+        pub struct occurred_at(());
         ///Marker type for the `book_id` field
         pub struct book_id(());
         ///Marker type for the `authors` field
         pub struct authors(());
-        ///Marker type for the `occurred_at` field
-        pub struct occurred_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -1024,12 +995,12 @@ pub mod registration_view_state {
 pub struct RegistrationViewBuilder<'a, S: registration_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Actor<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<Actor<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1060,7 +1031,7 @@ where
     /// Set the `authors` field (required)
     pub fn authors(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> RegistrationViewBuilder<'a, registration_view_state::SetAuthors<S>> {
         self._fields.0 = Option::Some(value.into());
         RegistrationViewBuilder {
@@ -1079,7 +1050,7 @@ where
     /// Set the `bookId` field (required)
     pub fn book_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RegistrationViewBuilder<'a, registration_view_state::SetBookId<S>> {
         self._fields.1 = Option::Some(value.into());
         RegistrationViewBuilder {
@@ -1111,12 +1082,12 @@ where
 
 impl<'a, S: registration_view_state::State> RegistrationViewBuilder<'a, S> {
     /// Set the `publicationId` field (optional)
-    pub fn publication_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn publication_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `publicationId` field to an Option value (optional)
-    pub fn maybe_publication_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_publication_id(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1130,7 +1101,7 @@ where
     /// Set the `registeredBy` field (required)
     pub fn registered_by(
         mut self,
-        value: impl Into<Actor<'a>>,
+        value: impl Into<Actor<S>>,
     ) -> RegistrationViewBuilder<'a, registration_view_state::SetRegisteredBy<S>> {
         self._fields.4 = Option::Some(value.into());
         RegistrationViewBuilder {
@@ -1149,7 +1120,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RegistrationViewBuilder<'a, registration_view_state::SetTitle<S>> {
         self._fields.5 = Option::Some(value.into());
         RegistrationViewBuilder {
@@ -1164,10 +1135,10 @@ impl<'a, S> RegistrationViewBuilder<'a, S>
 where
     S: registration_view_state::State,
     S::RegisteredBy: registration_view_state::IsSet,
-    S::Title: registration_view_state::IsSet,
+    S::OccurredAt: registration_view_state::IsSet,
     S::BookId: registration_view_state::IsSet,
     S::Authors: registration_view_state::IsSet,
-    S::OccurredAt: registration_view_state::IsSet,
+    S::Title: registration_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RegistrationView<'a> {
@@ -1184,10 +1155,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RegistrationView<'a> {
         RegistrationView {
             authors: self._fields.0.unwrap(),
@@ -1211,85 +1179,85 @@ pub mod stateful_book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
+        type Registration;
+        type Cid;
         type State;
         type CurrentHolder;
-        type Cid;
-        type Registration;
-        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
+        type Registration = Unset;
+        type Cid = Unset;
         type State = Unset;
         type CurrentHolder = Unset;
-        type Cid = Unset;
-        type Registration = Unset;
-        type Uri = Unset;
-    }
-    ///State transition - sets the `state` field to Set
-    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetState<S> {}
-    impl<S: State> State for SetState<S> {
-        type State = Set<members::state>;
-        type CurrentHolder = S::CurrentHolder;
-        type Cid = S::Cid;
-        type Registration = S::Registration;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `current_holder` field to Set
-    pub struct SetCurrentHolder<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrentHolder<S> {}
-    impl<S: State> State for SetCurrentHolder<S> {
-        type State = S::State;
-        type CurrentHolder = Set<members::current_holder>;
-        type Cid = S::Cid;
-        type Registration = S::Registration;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type State = S::State;
-        type CurrentHolder = S::CurrentHolder;
-        type Cid = Set<members::cid>;
-        type Registration = S::Registration;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `registration` field to Set
-    pub struct SetRegistration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRegistration<S> {}
-    impl<S: State> State for SetRegistration<S> {
-        type State = S::State;
-        type CurrentHolder = S::CurrentHolder;
-        type Cid = S::Cid;
-        type Registration = Set<members::registration>;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Registration = S::Registration;
+        type Cid = S::Cid;
         type State = S::State;
         type CurrentHolder = S::CurrentHolder;
+    }
+    ///State transition - sets the `registration` field to Set
+    pub struct SetRegistration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRegistration<S> {}
+    impl<S: State> State for SetRegistration<S> {
+        type Uri = S::Uri;
+        type Registration = Set<members::registration>;
         type Cid = S::Cid;
+        type State = S::State;
+        type CurrentHolder = S::CurrentHolder;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
         type Registration = S::Registration;
-        type Uri = Set<members::uri>;
+        type Cid = Set<members::cid>;
+        type State = S::State;
+        type CurrentHolder = S::CurrentHolder;
+    }
+    ///State transition - sets the `state` field to Set
+    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetState<S> {}
+    impl<S: State> State for SetState<S> {
+        type Uri = S::Uri;
+        type Registration = S::Registration;
+        type Cid = S::Cid;
+        type State = Set<members::state>;
+        type CurrentHolder = S::CurrentHolder;
+    }
+    ///State transition - sets the `current_holder` field to Set
+    pub struct SetCurrentHolder<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrentHolder<S> {}
+    impl<S: State> State for SetCurrentHolder<S> {
+        type Uri = S::Uri;
+        type Registration = S::Registration;
+        type Cid = S::Cid;
+        type State = S::State;
+        type CurrentHolder = Set<members::current_holder>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `registration` field
+        pub struct registration(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `state` field
         pub struct state(());
         ///Marker type for the `current_holder` field
         pub struct current_holder(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `registration` field
-        pub struct registration(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
     }
 }
 
@@ -1297,15 +1265,15 @@ pub mod stateful_book_state {
 pub struct StatefulBookBuilder<'a, S: stateful_book_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AspectRatio<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<Did<'a>>,
-        Option<Hthree<'a>>,
-        Option<Vec<book::ConfirmedEvent<'a>>>,
-        Option<book::RegistrationView<'a>>,
-        Option<StatefulBookState<'a>>,
-        Option<AtUri<'a>>,
+        Option<AspectRatio<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<Did<S>>,
+        Option<Hthree<S>>,
+        Option<Vec<book::ConfirmedEvent<S>>>,
+        Option<book::RegistrationView<S>>,
+        Option<StatefulBookState<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1330,12 +1298,12 @@ impl<'a> StatefulBookBuilder<'a, stateful_book_state::Empty> {
 
 impl<'a, S: stateful_book_state::State> StatefulBookBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1349,7 +1317,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> StatefulBookBuilder<'a, stateful_book_state::SetCid<S>> {
         self._fields.1 = Option::Some(value.into());
         StatefulBookBuilder {
@@ -1362,12 +1330,12 @@ where
 
 impl<'a, S: stateful_book_state::State> StatefulBookBuilder<'a, S> {
     /// Set the `coverUrl` field (optional)
-    pub fn cover_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn cover_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `coverUrl` field to an Option value (optional)
-    pub fn maybe_cover_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_cover_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1381,7 +1349,7 @@ where
     /// Set the `currentHolder` field (required)
     pub fn current_holder(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> StatefulBookBuilder<'a, stateful_book_state::SetCurrentHolder<S>> {
         self._fields.3 = Option::Some(value.into());
         StatefulBookBuilder {
@@ -1394,12 +1362,12 @@ where
 
 impl<'a, S: stateful_book_state::State> StatefulBookBuilder<'a, S> {
     /// Set the `currentLocation` field (optional)
-    pub fn current_location(mut self, value: impl Into<Option<Hthree<'a>>>) -> Self {
+    pub fn current_location(mut self, value: impl Into<Option<Hthree<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `currentLocation` field to an Option value (optional)
-    pub fn maybe_current_location(mut self, value: Option<Hthree<'a>>) -> Self {
+    pub fn maybe_current_location(mut self, value: Option<Hthree<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1409,13 +1377,13 @@ impl<'a, S: stateful_book_state::State> StatefulBookBuilder<'a, S> {
     /// Set the `events` field (optional)
     pub fn events(
         mut self,
-        value: impl Into<Option<Vec<book::ConfirmedEvent<'a>>>>,
+        value: impl Into<Option<Vec<book::ConfirmedEvent<S>>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `events` field to an Option value (optional)
-    pub fn maybe_events(mut self, value: Option<Vec<book::ConfirmedEvent<'a>>>) -> Self {
+    pub fn maybe_events(mut self, value: Option<Vec<book::ConfirmedEvent<S>>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -1429,7 +1397,7 @@ where
     /// Set the `registration` field (required)
     pub fn registration(
         mut self,
-        value: impl Into<book::RegistrationView<'a>>,
+        value: impl Into<book::RegistrationView<S>>,
     ) -> StatefulBookBuilder<'a, stateful_book_state::SetRegistration<S>> {
         self._fields.6 = Option::Some(value.into());
         StatefulBookBuilder {
@@ -1448,7 +1416,7 @@ where
     /// Set the `state` field (required)
     pub fn state(
         mut self,
-        value: impl Into<StatefulBookState<'a>>,
+        value: impl Into<StatefulBookState<S>>,
     ) -> StatefulBookBuilder<'a, stateful_book_state::SetState<S>> {
         self._fields.7 = Option::Some(value.into());
         StatefulBookBuilder {
@@ -1467,7 +1435,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> StatefulBookBuilder<'a, stateful_book_state::SetUri<S>> {
         self._fields.8 = Option::Some(value.into());
         StatefulBookBuilder {
@@ -1481,11 +1449,11 @@ where
 impl<'a, S> StatefulBookBuilder<'a, S>
 where
     S: stateful_book_state::State,
+    S::Uri: stateful_book_state::IsSet,
+    S::Registration: stateful_book_state::IsSet,
+    S::Cid: stateful_book_state::IsSet,
     S::State: stateful_book_state::IsSet,
     S::CurrentHolder: stateful_book_state::IsSet,
-    S::Cid: stateful_book_state::IsSet,
-    S::Registration: stateful_book_state::IsSet,
-    S::Uri: stateful_book_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> StatefulBook<'a> {
@@ -1505,10 +1473,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> StatefulBook<'a> {
         StatefulBook {
             aspect_ratio: self._fields.0,

@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,24 +25,36 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::fyi_frontpage::richtext::block;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Block<'a> {
-    #[serde(borrow)]
-    pub content: block::PlaintextParagraph<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Block<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub content: block::PlaintextParagraph<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct PlaintextParagraph<'a> {
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PlaintextParagraph<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Block<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Block<S> {
     fn nsid() -> &'static str {
         "fyi.frontpage.richtext.block"
     }
@@ -55,7 +69,7 @@ impl<'a> LexiconSchema for Block<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PlaintextParagraph<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlaintextParagraph<S> {
     fn nsid() -> &'static str {
         "fyi.frontpage.richtext.block"
     }
@@ -129,7 +143,7 @@ pub mod block_state {
 /// Builder for constructing an instance of this type
 pub struct BlockBuilder<'a, S: block_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<block::PlaintextParagraph<'a>>,),
+    _fields: (Option<block::PlaintextParagraph<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -159,7 +173,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<block::PlaintextParagraph<'a>>,
+        value: impl Into<block::PlaintextParagraph<S>>,
     ) -> BlockBuilder<'a, block_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         BlockBuilder {
@@ -183,13 +197,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Block<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Block<'a> {
         Block {
             content: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

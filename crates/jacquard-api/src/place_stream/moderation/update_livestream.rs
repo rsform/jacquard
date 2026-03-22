@@ -10,42 +10,56 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Cid};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateLivestream<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateLivestream<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The AT-URI of the livestream record to update.
-    #[serde(borrow)]
-    pub livestream_uri: AtUri<'a>,
+    pub livestream_uri: AtUri<S>,
     ///The DID of the streamer.
-    #[serde(borrow)]
-    pub streamer: Did<'a>,
+    pub streamer: Did<S>,
     ///New title for the livestream.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateLivestreamOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateLivestreamOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The CID of the updated livestream record.
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///The AT-URI of the updated livestream record.
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -54,28 +68,29 @@ pub struct UpdateLivestreamOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UpdateLivestreamError<'a> {
+pub enum UpdateLivestreamError {
     /// The request lacks valid authentication credentials.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(Option<CowStr<'a>>),
+    Unauthorized(Option<SmolStr>),
     /// The caller does not have permission to update livestream metadata for this streamer.
     #[serde(rename = "Forbidden")]
-    Forbidden(Option<CowStr<'a>>),
+    Forbidden(Option<SmolStr>),
     /// The streamer's OAuth session could not be found or is invalid.
     #[serde(rename = "SessionNotFound")]
-    SessionNotFound(Option<CowStr<'a>>),
+    SessionNotFound(Option<SmolStr>),
     /// The specified livestream record does not exist.
     #[serde(rename = "RecordNotFound")]
-    RecordNotFound(Option<CowStr<'a>>),
+    RecordNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for UpdateLivestreamError<'_> {
+impl core::fmt::Display for UpdateLivestreamError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Unauthorized(msg) => {
@@ -106,7 +121,13 @@ impl core::fmt::Display for UpdateLivestreamError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -116,11 +137,12 @@ pub struct UpdateLivestreamResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateLivestreamResponse {
     const NSID: &'static str = "place.stream.moderation.updateLivestream";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateLivestreamOutput<'de>;
-    type Err<'de> = UpdateLivestreamError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = UpdateLivestreamOutput<S>;
+    type Err = UpdateLivestreamError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateLivestream<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for UpdateLivestream<S> {
     const NSID: &'static str = "place.stream.moderation.updateLivestream";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -135,7 +157,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateLivestreamRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = UpdateLivestream<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = UpdateLivestream<S>;
     type Response = UpdateLivestreamResponse;
 }
 
@@ -149,44 +171,44 @@ pub mod update_livestream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type LivestreamUri;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type LivestreamUri = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type LivestreamUri = S::LivestreamUri;
+        type Streamer = Unset;
     }
     ///State transition - sets the `livestream_uri` field to Set
     pub struct SetLivestreamUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLivestreamUri<S> {}
     impl<S: State> State for SetLivestreamUri<S> {
-        type Streamer = S::Streamer;
         type LivestreamUri = Set<members::livestream_uri>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type LivestreamUri = S::LivestreamUri;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `livestream_uri` field
         pub struct livestream_uri(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct UpdateLivestreamBuilder<'a, S: update_livestream_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<Did<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<AtUri<S>>, Option<Did<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -216,7 +238,7 @@ where
     /// Set the `livestreamUri` field (required)
     pub fn livestream_uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> UpdateLivestreamBuilder<'a, update_livestream_state::SetLivestreamUri<S>> {
         self._fields.0 = Option::Some(value.into());
         UpdateLivestreamBuilder {
@@ -235,7 +257,7 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> UpdateLivestreamBuilder<'a, update_livestream_state::SetStreamer<S>> {
         self._fields.1 = Option::Some(value.into());
         UpdateLivestreamBuilder {
@@ -248,12 +270,12 @@ where
 
 impl<'a, S: update_livestream_state::State> UpdateLivestreamBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -262,8 +284,8 @@ impl<'a, S: update_livestream_state::State> UpdateLivestreamBuilder<'a, S> {
 impl<'a, S> UpdateLivestreamBuilder<'a, S>
 where
     S: update_livestream_state::State,
-    S::Streamer: update_livestream_state::IsSet,
     S::LivestreamUri: update_livestream_state::IsSet,
+    S::Streamer: update_livestream_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateLivestream<'a> {
@@ -277,10 +299,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> UpdateLivestream<'a> {
         UpdateLivestream {
             livestream_uri: self._fields.0.unwrap(),

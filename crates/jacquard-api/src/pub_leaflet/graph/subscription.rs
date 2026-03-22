@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,37 +29,42 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Record declaring a subscription to a publication
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "pub.leaflet.graph.subscription",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Subscription<'a> {
-    #[serde(borrow)]
-    pub publication: AtUri<'a>,
+pub struct Subscription<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub publication: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscriptionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SubscriptionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Subscription<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Subscription<S>,
 }
 
-impl<'a> Subscription<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SubscriptionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Subscription<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SubscriptionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -68,18 +75,17 @@ pub struct SubscriptionRecord;
 impl XrpcResp for SubscriptionRecord {
     const NSID: &'static str = "pub.leaflet.graph.subscription";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SubscriptionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SubscriptionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SubscriptionGetRecordOutput<'_>> for Subscription<'_> {
-    fn from(output: SubscriptionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SubscriptionGetRecordOutput<S>> for Subscription<S> {
+    fn from(output: SubscriptionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Subscription<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Subscription<S> {
     const NSID: &'static str = "pub.leaflet.graph.subscription";
     type Record = SubscriptionRecord;
 }
@@ -89,7 +95,7 @@ impl Collection for SubscriptionRecord {
     type Record = SubscriptionRecord;
 }
 
-impl<'a> LexiconSchema for Subscription<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Subscription<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.graph.subscription"
     }
@@ -139,7 +145,7 @@ pub mod subscription_state {
 /// Builder for constructing an instance of this type
 pub struct SubscriptionBuilder<'a, S: subscription_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -169,7 +175,7 @@ where
     /// Set the `publication` field (required)
     pub fn publication(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> SubscriptionBuilder<'a, subscription_state::SetPublication<S>> {
         self._fields.0 = Option::Some(value.into());
         SubscriptionBuilder {
@@ -195,10 +201,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Subscription<'a> {
         Subscription {
             publication: self._fields.0.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,73 +29,65 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A sampling or collecting event. Multiple dwc.occurrence records can reference the same event via eventRef, sharing location and protocol metadata.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.gainforest.dwc.event", tag = "$type")]
-pub struct Event<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.gainforest.dwc.event",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Event<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Uncertainty radius in meters around the coordinates.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub coordinate_uncertainty_in_meters: Option<i64>,
     ///The name of the country.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country: Option<CowStr<'a>>,
+    pub country: Option<S>,
     ///ISO 3166-1 alpha-2 country code.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_code: Option<CowStr<'a>>,
+    pub country_code: Option<S>,
     ///Second-level administrative division.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub county: Option<CowStr<'a>>,
+    pub county: Option<S>,
     ///Timestamp of record creation in the ATProto PDS.
     pub created_at: Datetime,
     ///Geographic latitude in decimal degrees (WGS84). Range: -90 to 90.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub decimal_latitude: Option<CowStr<'a>>,
+    pub decimal_latitude: Option<S>,
     ///Geographic longitude in decimal degrees (WGS84). Range: -180 to 180.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub decimal_longitude: Option<CowStr<'a>>,
+    pub decimal_longitude: Option<S>,
     ///The date or date range during which the event occurred. ISO 8601 format (e.g., '2024-03-15', '2024-03-15/2024-03-17').
-    #[serde(borrow)]
-    pub event_date: CowStr<'a>,
+    pub event_date: S,
     ///An identifier for the event. Should be globally unique or unique within the dataset.
-    #[serde(borrow)]
-    pub event_id: CowStr<'a>,
+    pub event_id: S,
     ///Comments or notes about the event.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub event_remarks: Option<CowStr<'a>>,
+    pub event_remarks: Option<S>,
     ///The time or time range during which the event occurred. ISO 8601 format (e.g., '06:30:00', '06:30:00/09:00:00').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub event_time: Option<CowStr<'a>>,
+    pub event_time: Option<S>,
     ///Notes or a reference to notes taken in the field about the event.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub field_notes: Option<CowStr<'a>>,
+    pub field_notes: Option<S>,
     ///The spatial reference system. Recommended: 'EPSG:4326'.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geodetic_datum: Option<CowStr<'a>>,
+    pub geodetic_datum: Option<S>,
     ///A category or description of the habitat in which the event occurred (e.g., 'primary tropical rainforest', 'degraded pasture', 'riparian zone').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub habitat: Option<CowStr<'a>>,
+    pub habitat: Option<S>,
     ///Specific locality description.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub locality: Option<CowStr<'a>>,
+    pub locality: Option<S>,
     ///Identifier for the location where the event occurred.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location_id: Option<CowStr<'a>>,
+    pub location_id: Option<S>,
     ///Comments about the location.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location_remarks: Option<CowStr<'a>>,
+    pub location_remarks: Option<S>,
     ///Upper limit of elevation range in meters above sea level.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum_elevation_in_meters: Option<i64>,
@@ -102,57 +96,52 @@ pub struct Event<'a> {
     pub minimum_elevation_in_meters: Option<i64>,
     ///Third-level administrative division.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub municipality: Option<CowStr<'a>>,
+    pub municipality: Option<S>,
     ///An identifier for the broader event that this event is part of (e.g., a survey campaign that contains multiple transects).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent_event_id: Option<CowStr<'a>>,
+    pub parent_event_id: Option<S>,
     ///AT-URI reference to the parent app.gainforest.dwc.event record.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent_event_ref: Option<AtUri<'a>>,
+    pub parent_event_ref: Option<AtUri<S>>,
     ///The unit of measurement for the sampleSizeValue (e.g., 'square meters', 'hectares', 'trap-nights').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sample_size_unit: Option<CowStr<'a>>,
+    pub sample_size_unit: Option<S>,
     ///A numeric value for a measurement of the size of a sample in the event (e.g., '20', '0.25').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sample_size_value: Option<CowStr<'a>>,
+    pub sample_size_value: Option<S>,
     ///The amount of effort expended during the event (e.g., '3 person-hours', '14 trap-nights', '2 km transect walked').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sampling_effort: Option<CowStr<'a>>,
+    pub sampling_effort: Option<S>,
     ///The names of, references to, or descriptions of the methods used during the event (e.g., 'camera trap array', 'line transect distance sampling', 'audio point count 10-min').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sampling_protocol: Option<CowStr<'a>>,
+    pub sampling_protocol: Option<S>,
     ///First-level administrative division.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub state_province: Option<CowStr<'a>>,
+    pub state_province: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EventGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EventGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Event<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Event<S>,
 }
 
-impl<'a> Event<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, EventRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Event<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, EventRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -163,18 +152,17 @@ pub struct EventRecord;
 impl XrpcResp for EventRecord {
     const NSID: &'static str = "app.gainforest.dwc.event";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = EventGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = EventGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<EventGetRecordOutput<'_>> for Event<'_> {
-    fn from(output: EventGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<EventGetRecordOutput<S>> for Event<S> {
+    fn from(output: EventGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Event<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Event<S> {
     const NSID: &'static str = "app.gainforest.dwc.event";
     type Record = EventRecord;
 }
@@ -184,7 +172,7 @@ impl Collection for EventRecord {
     type Record = EventRecord;
 }
 
-impl<'a> LexiconSchema for Event<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Event<S> {
     fn nsid() -> &'static str {
         "app.gainforest.dwc.event"
     }
@@ -545,32 +533,32 @@ pub struct EventBuilder<'a, S: event_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<i64>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -639,12 +627,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `country` field (optional)
-    pub fn country(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn country(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `country` field to an Option value (optional)
-    pub fn maybe_country(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_country(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -652,12 +640,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `countryCode` field (optional)
-    pub fn country_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn country_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `countryCode` field to an Option value (optional)
-    pub fn maybe_country_code(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_country_code(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -665,12 +653,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `county` field (optional)
-    pub fn county(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn county(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `county` field to an Option value (optional)
-    pub fn maybe_county(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_county(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -697,12 +685,12 @@ where
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `decimalLatitude` field (optional)
-    pub fn decimal_latitude(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn decimal_latitude(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `decimalLatitude` field to an Option value (optional)
-    pub fn maybe_decimal_latitude(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_decimal_latitude(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -710,12 +698,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `decimalLongitude` field (optional)
-    pub fn decimal_longitude(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn decimal_longitude(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `decimalLongitude` field to an Option value (optional)
-    pub fn maybe_decimal_longitude(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_decimal_longitude(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -729,7 +717,7 @@ where
     /// Set the `eventDate` field (required)
     pub fn event_date(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EventBuilder<'a, event_state::SetEventDate<S>> {
         self._fields.7 = Option::Some(value.into());
         EventBuilder {
@@ -748,7 +736,7 @@ where
     /// Set the `eventID` field (required)
     pub fn event_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EventBuilder<'a, event_state::SetEventId<S>> {
         self._fields.8 = Option::Some(value.into());
         EventBuilder {
@@ -761,12 +749,12 @@ where
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `eventRemarks` field (optional)
-    pub fn event_remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn event_remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `eventRemarks` field to an Option value (optional)
-    pub fn maybe_event_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_event_remarks(mut self, value: Option<S>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -774,12 +762,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `eventTime` field (optional)
-    pub fn event_time(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn event_time(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `eventTime` field to an Option value (optional)
-    pub fn maybe_event_time(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_event_time(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -787,12 +775,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `fieldNotes` field (optional)
-    pub fn field_notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn field_notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `fieldNotes` field to an Option value (optional)
-    pub fn maybe_field_notes(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_field_notes(mut self, value: Option<S>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -800,12 +788,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `geodeticDatum` field (optional)
-    pub fn geodetic_datum(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn geodetic_datum(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `geodeticDatum` field to an Option value (optional)
-    pub fn maybe_geodetic_datum(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_geodetic_datum(mut self, value: Option<S>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -813,12 +801,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `habitat` field (optional)
-    pub fn habitat(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn habitat(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `habitat` field to an Option value (optional)
-    pub fn maybe_habitat(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_habitat(mut self, value: Option<S>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -826,12 +814,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `locality` field (optional)
-    pub fn locality(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn locality(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.14 = value.into();
         self
     }
     /// Set the `locality` field to an Option value (optional)
-    pub fn maybe_locality(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_locality(mut self, value: Option<S>) -> Self {
         self._fields.14 = value;
         self
     }
@@ -839,12 +827,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `locationID` field (optional)
-    pub fn location_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn location_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `locationID` field to an Option value (optional)
-    pub fn maybe_location_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_location_id(mut self, value: Option<S>) -> Self {
         self._fields.15 = value;
         self
     }
@@ -852,12 +840,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `locationRemarks` field (optional)
-    pub fn location_remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn location_remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `locationRemarks` field to an Option value (optional)
-    pub fn maybe_location_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_location_remarks(mut self, value: Option<S>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -891,12 +879,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `municipality` field (optional)
-    pub fn municipality(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn municipality(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.19 = value.into();
         self
     }
     /// Set the `municipality` field to an Option value (optional)
-    pub fn maybe_municipality(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_municipality(mut self, value: Option<S>) -> Self {
         self._fields.19 = value;
         self
     }
@@ -904,12 +892,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `parentEventID` field (optional)
-    pub fn parent_event_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn parent_event_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.20 = value.into();
         self
     }
     /// Set the `parentEventID` field to an Option value (optional)
-    pub fn maybe_parent_event_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_parent_event_id(mut self, value: Option<S>) -> Self {
         self._fields.20 = value;
         self
     }
@@ -917,12 +905,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `parentEventRef` field (optional)
-    pub fn parent_event_ref(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn parent_event_ref(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.21 = value.into();
         self
     }
     /// Set the `parentEventRef` field to an Option value (optional)
-    pub fn maybe_parent_event_ref(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_parent_event_ref(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.21 = value;
         self
     }
@@ -930,12 +918,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `sampleSizeUnit` field (optional)
-    pub fn sample_size_unit(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sample_size_unit(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.22 = value.into();
         self
     }
     /// Set the `sampleSizeUnit` field to an Option value (optional)
-    pub fn maybe_sample_size_unit(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sample_size_unit(mut self, value: Option<S>) -> Self {
         self._fields.22 = value;
         self
     }
@@ -943,12 +931,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `sampleSizeValue` field (optional)
-    pub fn sample_size_value(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sample_size_value(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.23 = value.into();
         self
     }
     /// Set the `sampleSizeValue` field to an Option value (optional)
-    pub fn maybe_sample_size_value(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sample_size_value(mut self, value: Option<S>) -> Self {
         self._fields.23 = value;
         self
     }
@@ -956,12 +944,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `samplingEffort` field (optional)
-    pub fn sampling_effort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sampling_effort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.24 = value.into();
         self
     }
     /// Set the `samplingEffort` field to an Option value (optional)
-    pub fn maybe_sampling_effort(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sampling_effort(mut self, value: Option<S>) -> Self {
         self._fields.24 = value;
         self
     }
@@ -969,12 +957,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `samplingProtocol` field (optional)
-    pub fn sampling_protocol(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sampling_protocol(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.25 = value.into();
         self
     }
     /// Set the `samplingProtocol` field to an Option value (optional)
-    pub fn maybe_sampling_protocol(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sampling_protocol(mut self, value: Option<S>) -> Self {
         self._fields.25 = value;
         self
     }
@@ -982,12 +970,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `stateProvince` field (optional)
-    pub fn state_province(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn state_province(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.26 = value.into();
         self
     }
     /// Set the `stateProvince` field to an Option value (optional)
-    pub fn maybe_state_province(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_state_province(mut self, value: Option<S>) -> Self {
         self._fields.26 = value;
         self
     }
@@ -1034,13 +1022,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Event<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Event<'a> {
         Event {
             coordinate_uncertainty_in_meters: self._fields.0,
             country: self._fields.1,

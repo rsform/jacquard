@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,51 +29,52 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A songwriter, composer, or music publisher who owns the publishing rights to a song or musical work
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "ch.indiemusi.alpha.actor.publishingOwner",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct PublishingOwner<'a> {
+pub struct PublishingOwner<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub collecting_society: Option<CowStr<'a>>,
+    pub collecting_society: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub company_name: Option<CowStr<'a>>,
+    pub company_name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub first_name: Option<CowStr<'a>>,
+    pub first_name: Option<S>,
     ///Interested Party Information (IPI) number assigned to the publishing owner by a collecting society
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ipi: Option<CowStr<'a>>,
+    pub ipi: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub last_name: Option<CowStr<'a>>,
+    pub last_name: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PublishingOwnerGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PublishingOwnerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: PublishingOwner<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: PublishingOwner<S>,
 }
 
-impl<'a> PublishingOwner<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PublishingOwnerRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> PublishingOwner<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PublishingOwnerRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -82,18 +85,18 @@ pub struct PublishingOwnerRecord;
 impl XrpcResp for PublishingOwnerRecord {
     const NSID: &'static str = "ch.indiemusi.alpha.actor.publishingOwner";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PublishingOwnerGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PublishingOwnerGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PublishingOwnerGetRecordOutput<'_>> for PublishingOwner<'_> {
-    fn from(output: PublishingOwnerGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PublishingOwnerGetRecordOutput<S>>
+for PublishingOwner<S> {
+    fn from(output: PublishingOwnerGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for PublishingOwner<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for PublishingOwner<S> {
     const NSID: &'static str = "ch.indiemusi.alpha.actor.publishingOwner";
     type Record = PublishingOwnerRecord;
 }
@@ -103,7 +106,7 @@ impl Collection for PublishingOwnerRecord {
     type Record = PublishingOwnerRecord;
 }
 
-impl<'a> LexiconSchema for PublishingOwner<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PublishingOwner<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.actor.publishingOwner"
     }
@@ -190,13 +193,7 @@ pub mod publishing_owner_state {
 /// Builder for constructing an instance of this type
 pub struct PublishingOwnerBuilder<'a, S: publishing_owner_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -220,12 +217,12 @@ impl<'a> PublishingOwnerBuilder<'a, publishing_owner_state::Empty> {
 
 impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     /// Set the `collectingSociety` field (optional)
-    pub fn collecting_society(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn collecting_society(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `collectingSociety` field to an Option value (optional)
-    pub fn maybe_collecting_society(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_collecting_society(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -233,12 +230,12 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
 
 impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     /// Set the `companyName` field (optional)
-    pub fn company_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn company_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `companyName` field to an Option value (optional)
-    pub fn maybe_company_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_company_name(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -246,12 +243,12 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
 
 impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     /// Set the `firstName` field (optional)
-    pub fn first_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn first_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `firstName` field to an Option value (optional)
-    pub fn maybe_first_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_first_name(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -259,12 +256,12 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
 
 impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     /// Set the `ipi` field (optional)
-    pub fn ipi(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn ipi(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `ipi` field to an Option value (optional)
-    pub fn maybe_ipi(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_ipi(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -272,12 +269,12 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
 
 impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     /// Set the `lastName` field (optional)
-    pub fn last_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn last_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `lastName` field to an Option value (optional)
-    pub fn maybe_last_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_last_name(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -301,10 +298,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PublishingOwner<'a> {
         PublishingOwner {
             collecting_society: self._fields.0,

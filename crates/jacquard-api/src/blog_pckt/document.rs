@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,35 +29,43 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blog.pckt.document", tag = "$type")]
-pub struct Document<'a> {
-    #[serde(borrow)]
-    pub document: StrongRef<'a>,
-    #[serde(borrow)]
-    pub site: UriValue<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "blog.pckt.document",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Document<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub document: StrongRef<S>,
+    pub site: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DocumentGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DocumentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Document<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Document<S>,
 }
 
-impl<'a> Document<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DocumentRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Document<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DocumentRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -66,18 +76,17 @@ pub struct DocumentRecord;
 impl XrpcResp for DocumentRecord {
     const NSID: &'static str = "blog.pckt.document";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DocumentGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DocumentGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DocumentGetRecordOutput<'_>> for Document<'_> {
-    fn from(output: DocumentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DocumentGetRecordOutput<S>> for Document<S> {
+    fn from(output: DocumentGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Document<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Document<S> {
     const NSID: &'static str = "blog.pckt.document";
     type Record = DocumentRecord;
 }
@@ -87,7 +96,7 @@ impl Collection for DocumentRecord {
     type Record = DocumentRecord;
 }
 
-impl<'a> LexiconSchema for Document<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Document<S> {
     fn nsid() -> &'static str {
         "blog.pckt.document"
     }
@@ -149,7 +158,7 @@ pub mod document_state {
 /// Builder for constructing an instance of this type
 pub struct DocumentBuilder<'a, S: document_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>, Option<UriValue<'a>>),
+    _fields: (Option<StrongRef<S>>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -179,7 +188,7 @@ where
     /// Set the `document` field (required)
     pub fn document(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> DocumentBuilder<'a, document_state::SetDocument<S>> {
         self._fields.0 = Option::Some(value.into());
         DocumentBuilder {
@@ -198,7 +207,7 @@ where
     /// Set the `site` field (required)
     pub fn site(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> DocumentBuilder<'a, document_state::SetSite<S>> {
         self._fields.1 = Option::Some(value.into());
         DocumentBuilder {
@@ -226,10 +235,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Document<'a> {
         Document {
             document: self._fields.0.unwrap(),

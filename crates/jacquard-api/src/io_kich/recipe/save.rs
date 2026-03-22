@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,38 +29,46 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "io.kich.recipe.save", tag = "$type")]
-pub struct Save<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "io.kich.recipe.save",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Save<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///Reference to the saved recipe (io.kich.recipe.recipe).
-    #[serde(borrow)]
-    pub subject: StrongRef<'a>,
+    pub subject: StrongRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub via: Option<StrongRef<'a>>,
+    pub via: Option<StrongRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SaveGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SaveGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Save<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Save<S>,
 }
 
-impl<'a> Save<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SaveRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Save<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SaveRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -69,18 +79,17 @@ pub struct SaveRecord;
 impl XrpcResp for SaveRecord {
     const NSID: &'static str = "io.kich.recipe.save";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SaveGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SaveGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SaveGetRecordOutput<'_>> for Save<'_> {
-    fn from(output: SaveGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SaveGetRecordOutput<S>> for Save<S> {
+    fn from(output: SaveGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Save<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Save<S> {
     const NSID: &'static str = "io.kich.recipe.save";
     type Record = SaveRecord;
 }
@@ -90,7 +99,7 @@ impl Collection for SaveRecord {
     type Record = SaveRecord;
 }
 
-impl<'a> LexiconSchema for Save<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Save<S> {
     fn nsid() -> &'static str {
         "io.kich.recipe.save"
     }
@@ -152,7 +161,7 @@ pub mod save_state {
 /// Builder for constructing an instance of this type
 pub struct SaveBuilder<'a, S: save_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<StrongRef<'a>>, Option<StrongRef<'a>>),
+    _fields: (Option<Datetime>, Option<StrongRef<S>>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -201,7 +210,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> SaveBuilder<'a, save_state::SetSubject<S>> {
         self._fields.1 = Option::Some(value.into());
         SaveBuilder {
@@ -214,12 +223,12 @@ where
 
 impl<'a, S: save_state::State> SaveBuilder<'a, S> {
     /// Set the `via` field (optional)
-    pub fn via(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn via(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `via` field to an Option value (optional)
-    pub fn maybe_via(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_via(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -241,13 +250,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Save<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Save<'a> {
         Save {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

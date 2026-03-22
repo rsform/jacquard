@@ -10,29 +10,45 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::ProfileSummaryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchProfilesTypeahead<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchProfilesTypeahead<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 25.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(borrow)]
-    pub q: CowStr<'a>,
+    pub q: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchProfilesTypeaheadOutput<'a> {
-    #[serde(borrow)]
-    pub profiles: Vec<ProfileSummaryView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchProfilesTypeaheadOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub profiles: Vec<ProfileSummaryView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for games.gamesgamesgamesgames.searchProfilesTypeahead
@@ -40,11 +56,12 @@ pub struct SearchProfilesTypeaheadResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchProfilesTypeaheadResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.searchProfilesTypeahead";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchProfilesTypeaheadOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SearchProfilesTypeaheadOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchProfilesTypeahead<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SearchProfilesTypeahead<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.searchProfilesTypeahead";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchProfilesTypeaheadResponse;
@@ -55,7 +72,7 @@ pub struct SearchProfilesTypeaheadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchProfilesTypeaheadRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.searchProfilesTypeahead";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchProfilesTypeahead<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SearchProfilesTypeahead<S>;
     type Response = SearchProfilesTypeaheadResponse;
 }
 
@@ -101,7 +118,7 @@ pub struct SearchProfilesTypeaheadBuilder<
     S: search_profiles_typeahead_state::State,
 > {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -150,7 +167,7 @@ where
     /// Set the `q` field (required)
     pub fn q(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SearchProfilesTypeaheadBuilder<'a, search_profiles_typeahead_state::SetQ<S>> {
         self._fields.1 = Option::Some(value.into());
         SearchProfilesTypeaheadBuilder {

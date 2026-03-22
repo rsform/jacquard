@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,58 +28,77 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::embed::AspectRatio;
 use crate::app_bsky::embed::images;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Image<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text description of the image, for accessibility.
-    #[serde(borrow)]
-    pub alt: CowStr<'a>,
+    pub alt: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<AspectRatio<'a>>,
-    #[serde(borrow)]
-    pub image: BlobRef<'a>,
+    pub aspect_ratio: Option<AspectRatio<S>>,
+    pub image: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Images<'a> {
-    #[serde(borrow)]
-    pub images: Vec<images::Image<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Images<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub images: Vec<images::Image<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct View<'a> {
-    #[serde(borrow)]
-    pub images: Vec<images::ViewImage<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct View<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub images: Vec<images::ViewImage<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewImage<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ViewImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text description of the image, for accessibility.
-    #[serde(borrow)]
-    pub alt: CowStr<'a>,
+    pub alt: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<AspectRatio<'a>>,
+    pub aspect_ratio: Option<AspectRatio<S>>,
     ///Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.
-    #[serde(borrow)]
-    pub fullsize: UriValue<'a>,
+    pub fullsize: UriValue<S>,
     ///Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.
-    #[serde(borrow)]
-    pub thumb: UriValue<'a>,
+    pub thumb: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Image<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Image<S> {
     fn nsid() -> &'static str {
         "app.bsky.embed.images"
     }
@@ -132,7 +153,7 @@ impl<'a> LexiconSchema for Image<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Images<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Images<S> {
     fn nsid() -> &'static str {
         "app.bsky.embed.images"
     }
@@ -158,7 +179,7 @@ impl<'a> LexiconSchema for Images<'a> {
     }
 }
 
-impl<'a> LexiconSchema for View<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for View<S> {
     fn nsid() -> &'static str {
         "app.bsky.embed.images"
     }
@@ -184,7 +205,7 @@ impl<'a> LexiconSchema for View<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ViewImage<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViewImage<S> {
     fn nsid() -> &'static str {
         "app.bsky.embed.images"
     }
@@ -246,7 +267,7 @@ pub mod image_state {
 /// Builder for constructing an instance of this type
 pub struct ImageBuilder<'a, S: image_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<AspectRatio<'a>>, Option<BlobRef<'a>>),
+    _fields: (Option<S>, Option<AspectRatio<S>>, Option<BlobRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -276,7 +297,7 @@ where
     /// Set the `alt` field (required)
     pub fn alt(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ImageBuilder<'a, image_state::SetAlt<S>> {
         self._fields.0 = Option::Some(value.into());
         ImageBuilder {
@@ -289,12 +310,12 @@ where
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -308,7 +329,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> ImageBuilder<'a, image_state::SetImage<S>> {
         self._fields.2 = Option::Some(value.into());
         ImageBuilder {
@@ -335,13 +356,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Image<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Image<'a> {
         Image {
             alt: self._fields.0.unwrap(),
             aspect_ratio: self._fields.1,
@@ -547,7 +562,7 @@ pub mod images_state {
 /// Builder for constructing an instance of this type
 pub struct ImagesBuilder<'a, S: images_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<images::Image<'a>>>,),
+    _fields: (Option<Vec<images::Image<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -577,7 +592,7 @@ where
     /// Set the `images` field (required)
     pub fn images(
         mut self,
-        value: impl Into<Vec<images::Image<'a>>>,
+        value: impl Into<Vec<images::Image<S>>>,
     ) -> ImagesBuilder<'a, images_state::SetImages<S>> {
         self._fields.0 = Option::Some(value.into());
         ImagesBuilder {
@@ -601,13 +616,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Images<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Images<'a> {
         Images {
             images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -650,7 +659,7 @@ pub mod view_state {
 /// Builder for constructing an instance of this type
 pub struct ViewBuilder<'a, S: view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<images::ViewImage<'a>>>,),
+    _fields: (Option<Vec<images::ViewImage<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -680,7 +689,7 @@ where
     /// Set the `images` field (required)
     pub fn images(
         mut self,
-        value: impl Into<Vec<images::ViewImage<'a>>>,
+        value: impl Into<Vec<images::ViewImage<S>>>,
     ) -> ViewBuilder<'a, view_state::SetImages<S>> {
         self._fields.0 = Option::Some(value.into());
         ViewBuilder {
@@ -704,13 +713,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> View<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> View<'a> {
         View {
             images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -780,10 +783,10 @@ pub mod view_image_state {
 pub struct ViewImageBuilder<'a, S: view_image_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<AspectRatio<'a>>,
-        Option<UriValue<'a>>,
-        Option<UriValue<'a>>,
+        Option<S>,
+        Option<AspectRatio<S>>,
+        Option<UriValue<S>>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -814,7 +817,7 @@ where
     /// Set the `alt` field (required)
     pub fn alt(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ViewImageBuilder<'a, view_image_state::SetAlt<S>> {
         self._fields.0 = Option::Some(value.into());
         ViewImageBuilder {
@@ -827,12 +830,12 @@ where
 
 impl<'a, S: view_image_state::State> ViewImageBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -846,7 +849,7 @@ where
     /// Set the `fullsize` field (required)
     pub fn fullsize(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ViewImageBuilder<'a, view_image_state::SetFullsize<S>> {
         self._fields.2 = Option::Some(value.into());
         ViewImageBuilder {
@@ -865,7 +868,7 @@ where
     /// Set the `thumb` field (required)
     pub fn thumb(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ViewImageBuilder<'a, view_image_state::SetThumb<S>> {
         self._fields.3 = Option::Some(value.into());
         ViewImageBuilder {
@@ -896,10 +899,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ViewImage<'a> {
         ViewImage {
             alt: self._fields.0.unwrap(),

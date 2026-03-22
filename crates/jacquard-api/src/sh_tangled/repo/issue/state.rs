@@ -14,13 +14,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,27 +32,34 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.tangled.repo.issue.state", tag = "$type")]
-pub struct State<'a> {
-    #[serde(borrow)]
-    pub issue: AtUri<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.tangled.repo.issue.state",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct State<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub issue: AtUri<S>,
     ///state of the issue
-    #[serde(borrow)]
-    pub state: StateState<'a>,
+    pub state: StateState<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// state of the issue
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StateState<'a> {
+pub enum StateState<S: Bos<str> + AsRef<str> = DefaultStr> {
     ShTangledRepoIssueStateOpen,
     ShTangledRepoIssueStateClosed,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> StateState<'a> {
+impl<S: Bos<str> + AsRef<str>> StateState<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ShTangledRepoIssueStateOpen => "sh.tangled.repo.issue.state.open",
@@ -58,70 +67,56 @@ impl<'a> StateState<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for StateState<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "sh.tangled.repo.issue.state.open" => Self::ShTangledRepoIssueStateOpen,
             "sh.tangled.repo.issue.state.closed" => Self::ShTangledRepoIssueStateClosed,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for StateState<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "sh.tangled.repo.issue.state.open" => Self::ShTangledRepoIssueStateOpen,
-            "sh.tangled.repo.issue.state.closed" => Self::ShTangledRepoIssueStateClosed,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for StateState<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for StateState<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for StateState<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for StateState<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for StateState<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for StateState<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for StateState<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for StateState<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for StateState<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for StateState<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for StateState<'_> {
-    type Output = StateState<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for StateState<S> {
+    type Output = StateState<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             StateState::ShTangledRepoIssueStateOpen => {
@@ -138,22 +133,23 @@ impl jacquard_common::IntoStatic for StateState<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StateGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: State<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: State<S>,
 }
 
-impl<'a> State<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, StateRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> State<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, StateRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -164,18 +160,17 @@ pub struct StateRecord;
 impl XrpcResp for StateRecord {
     const NSID: &'static str = "sh.tangled.repo.issue.state";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StateGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StateGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<StateGetRecordOutput<'_>> for State<'_> {
-    fn from(output: StateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<StateGetRecordOutput<S>> for State<S> {
+    fn from(output: StateGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for State<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for State<S> {
     const NSID: &'static str = "sh.tangled.repo.issue.state";
     type Record = StateRecord;
 }
@@ -185,7 +180,7 @@ impl Collection for StateRecord {
     type Record = StateRecord;
 }
 
-impl<'a> LexiconSchema for State<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for State<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.issue.state"
     }
@@ -247,7 +242,7 @@ pub mod state_state {
 /// Builder for constructing an instance of this type
 pub struct StateBuilder<'a, S: state_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<StateState<'a>>),
+    _fields: (Option<AtUri<S>>, Option<StateState<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -277,7 +272,7 @@ where
     /// Set the `issue` field (required)
     pub fn issue(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> StateBuilder<'a, state_state::SetIssue<S>> {
         self._fields.0 = Option::Some(value.into());
         StateBuilder {
@@ -296,7 +291,7 @@ where
     /// Set the `state` field (required)
     pub fn state(
         mut self,
-        value: impl Into<StateState<'a>>,
+        value: impl Into<StateState<S>>,
     ) -> StateBuilder<'a, state_state::SetState<S>> {
         self._fields.1 = Option::Some(value.into());
         StateBuilder {
@@ -322,13 +317,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> State<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> State<'a> {
         State {
             issue: self._fields.0.unwrap(),
             state: self._fields.1.unwrap(),

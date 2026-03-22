@@ -10,29 +10,47 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteDraft<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteDraft<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///TID of the draft to delete.
-    #[serde(borrow)]
-    pub tid: CowStr<'a>,
+    pub tid: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteDraftOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteDraftOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub success: bool,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -41,18 +59,19 @@ pub struct DeleteDraftOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteDraftError<'a> {
+pub enum DeleteDraftError {
     #[serde(rename = "DraftNotFound")]
-    DraftNotFound(Option<CowStr<'a>>),
+    DraftNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for DeleteDraftError<'_> {
+impl core::fmt::Display for DeleteDraftError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::DraftNotFound(msg) => {
@@ -62,7 +81,13 @@ impl core::fmt::Display for DeleteDraftError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -72,11 +97,12 @@ pub struct DeleteDraftResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteDraftResponse {
     const NSID: &'static str = "at.unthread.document.deleteDraft";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeleteDraftOutput<'de>;
-    type Err<'de> = DeleteDraftError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DeleteDraftOutput<S>;
+    type Err = DeleteDraftError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteDraft<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DeleteDraft<S> {
     const NSID: &'static str = "at.unthread.document.deleteDraft";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -91,6 +117,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteDraftRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DeleteDraft<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DeleteDraft<S>;
     type Response = DeleteDraftResponse;
 }

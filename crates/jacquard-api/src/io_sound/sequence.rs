@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -31,18 +33,23 @@ use crate::io_sound::credit::Credit;
 use crate::io_sound::sequence;
 /// A sequence of timed events. Full documentation at https://github.com/soundio/sequence/.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "io.sound.sequence", tag = "$type")]
-pub struct Sequence<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "io.sound.sequence",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Sequence<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Strong reference to a Bluesky post. Useful to keep track of comments off-platform.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub bsky_post_ref: Option<StrongRef<'a>>,
+    pub bsky_post_ref: Option<StrongRef<S>>,
     ///Attribution for composers, arrangers, etc
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub credits: Option<Vec<Credit<'a>>>,
+    pub credits: Option<Vec<Credit<S>>>,
     ///Serialised and binary encoded array of events of the form `[beat, type, data...]`, where `data` parameters depend on `type` and the byte layout of the serialised data conforms to the Sequence spec at https://github.com/soundio/sequence.
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub events: Bytes,
@@ -51,50 +58,49 @@ pub struct Sequence<'a> {
     pub id: Option<i64>,
     ///Name of the sequence
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///Timestamp of the time of publication.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published_at: Option<Datetime>,
     ///A collection of sequences that may be played back by "sequence" events.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sequences: Option<Vec<sequence::Sequence<'a>>>,
+    pub sequences: Option<Vec<sequence::Sequence<S>>>,
     ///Array of strings used to tag the sequence.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///Timestamp of the time of last edit.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     ///Canonical location of this sequence. May be an `at://` URI or an `https://` URL to a JSON endpoint.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<UriValue<'a>>,
+    pub url: Option<UriValue<S>>,
     ///Version number for the byte array encoding of the events field.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub version: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SequenceGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SequenceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Sequence<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Sequence<S>,
 }
 
-impl<'a> Sequence<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SequenceRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Sequence<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SequenceRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -105,18 +111,17 @@ pub struct SequenceRecord;
 impl XrpcResp for SequenceRecord {
     const NSID: &'static str = "io.sound.sequence";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SequenceGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SequenceGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SequenceGetRecordOutput<'_>> for Sequence<'_> {
-    fn from(output: SequenceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SequenceGetRecordOutput<S>> for Sequence<S> {
+    fn from(output: SequenceGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Sequence<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Sequence<S> {
     const NSID: &'static str = "io.sound.sequence";
     type Record = SequenceRecord;
 }
@@ -126,7 +131,7 @@ impl Collection for SequenceRecord {
     type Record = SequenceRecord;
 }
 
-impl<'a> LexiconSchema for Sequence<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Sequence<S> {
     fn nsid() -> &'static str {
         "io.sound.sequence"
     }
@@ -218,16 +223,16 @@ pub mod sequence_state {
 pub struct SequenceBuilder<'a, S: sequence_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<StrongRef<'a>>,
-        Option<Vec<Credit<'a>>>,
+        Option<StrongRef<S>>,
+        Option<Vec<Credit<S>>>,
         Option<Bytes>,
         Option<i64>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<Vec<sequence::Sequence<'a>>>,
-        Option<Vec<CowStr<'a>>>,
+        Option<Vec<sequence::Sequence<S>>>,
+        Option<Vec<S>>,
         Option<Datetime>,
-        Option<UriValue<'a>>,
+        Option<UriValue<S>>,
         Option<i64>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -253,12 +258,12 @@ impl<'a> SequenceBuilder<'a, sequence_state::Empty> {
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `bskyPostRef` field (optional)
-    pub fn bsky_post_ref(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn bsky_post_ref(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `bskyPostRef` field to an Option value (optional)
-    pub fn maybe_bsky_post_ref(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_bsky_post_ref(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -266,12 +271,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `credits` field (optional)
-    pub fn credits(mut self, value: impl Into<Option<Vec<Credit<'a>>>>) -> Self {
+    pub fn credits(mut self, value: impl Into<Option<Vec<Credit<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `credits` field to an Option value (optional)
-    pub fn maybe_credits(mut self, value: Option<Vec<Credit<'a>>>) -> Self {
+    pub fn maybe_credits(mut self, value: Option<Vec<Credit<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -311,12 +316,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -339,16 +344,13 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `sequences` field (optional)
     pub fn sequences(
         mut self,
-        value: impl Into<Option<Vec<sequence::Sequence<'a>>>>,
+        value: impl Into<Option<Vec<sequence::Sequence<S>>>>,
     ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `sequences` field to an Option value (optional)
-    pub fn maybe_sequences(
-        mut self,
-        value: Option<Vec<sequence::Sequence<'a>>>,
-    ) -> Self {
+    pub fn maybe_sequences(mut self, value: Option<Vec<sequence::Sequence<S>>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -356,12 +358,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -382,12 +384,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -431,10 +433,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Sequence<'a> {
         Sequence {
             bsky_post_ref: self._fields.0,

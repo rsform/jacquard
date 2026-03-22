@@ -10,12 +10,17 @@ pub mod follow;
 pub mod like;
 pub mod podcast;
 
-use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,19 +29,25 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A podcast category from the Apple Podcasts taxonomy.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct AppleCategory<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AppleCategory<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The category value. Subcategories use the format 'Category > Subcategory'.
-    #[serde(borrow)]
-    pub value: AppleCategoryValue<'a>,
+    pub value: AppleCategoryValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The category value. Subcategories use the format 'Category > Subcategory'.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AppleCategoryValue<'a> {
+pub enum AppleCategoryValue<S: Bos<str> + AsRef<str> = DefaultStr> {
     Arts,
     ArtsBooks,
     ArtsDesign,
@@ -147,10 +158,10 @@ pub enum AppleCategoryValue<'a> {
     TvFilmFilmInterviews,
     TvFilmFilmReviews,
     TvFilmTvReviews,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> AppleCategoryValue<'a> {
+impl<S: Bos<str> + AsRef<str>> AppleCategoryValue<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Arts => "Arts",
@@ -274,11 +285,9 @@ impl<'a> AppleCategoryValue<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for AppleCategoryValue<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "Arts" => Self::Arts,
             "Arts > Books" => Self::ArtsBooks,
             "Arts > Design" => Self::ArtsDesign,
@@ -397,179 +406,51 @@ impl<'a> From<&'a str> for AppleCategoryValue<'a> {
             "TV & Film > Film Interviews" => Self::TvFilmFilmInterviews,
             "TV & Film > Film Reviews" => Self::TvFilmFilmReviews,
             "TV & Film > TV Reviews" => Self::TvFilmTvReviews,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for AppleCategoryValue<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "Arts" => Self::Arts,
-            "Arts > Books" => Self::ArtsBooks,
-            "Arts > Design" => Self::ArtsDesign,
-            "Arts > Fashion & Beauty" => Self::ArtsFashionBeauty,
-            "Arts > Food" => Self::ArtsFood,
-            "Arts > Performing Arts" => Self::ArtsPerformingArts,
-            "Arts > Visual Arts" => Self::ArtsVisualArts,
-            "Business" => Self::Business,
-            "Business > Careers" => Self::BusinessCareers,
-            "Business > Entrepreneurship" => Self::BusinessEntrepreneurship,
-            "Business > Investing" => Self::BusinessInvesting,
-            "Business > Management" => Self::BusinessManagement,
-            "Business > Marketing" => Self::BusinessMarketing,
-            "Business > Non-Profit" => Self::BusinessNonProfit,
-            "Comedy" => Self::Comedy,
-            "Comedy > Comedy Interviews" => Self::ComedyComedyInterviews,
-            "Comedy > Improv" => Self::ComedyImprov,
-            "Comedy > Stand-Up" => Self::ComedyStandUp,
-            "Education" => Self::Education,
-            "Education > Courses" => Self::EducationCourses,
-            "Education > How To" => Self::EducationHowTo,
-            "Education > Language Learning" => Self::EducationLanguageLearning,
-            "Education > Self-Improvement" => Self::EducationSelfImprovement,
-            "Fiction" => Self::Fiction,
-            "Fiction > Comedy Fiction" => Self::FictionComedyFiction,
-            "Fiction > Drama" => Self::FictionDrama,
-            "Fiction > Science Fiction" => Self::FictionScienceFiction,
-            "Government" => Self::Government,
-            "Health & Fitness" => Self::HealthFitness,
-            "Health & Fitness > Alternative Health" => {
-                Self::HealthFitnessAlternativeHealth
-            }
-            "Health & Fitness > Fitness" => Self::HealthFitnessFitness,
-            "Health & Fitness > Medicine" => Self::HealthFitnessMedicine,
-            "Health & Fitness > Mental Health" => Self::HealthFitnessMentalHealth,
-            "Health & Fitness > Nutrition" => Self::HealthFitnessNutrition,
-            "Health & Fitness > Sexuality" => Self::HealthFitnessSexuality,
-            "History" => Self::History,
-            "Kids & Family" => Self::KidsFamily,
-            "Kids & Family > Education for Kids" => Self::KidsFamilyEducationForKids,
-            "Kids & Family > Parenting" => Self::KidsFamilyParenting,
-            "Kids & Family > Pets & Animals" => Self::KidsFamilyPetsAnimals,
-            "Kids & Family > Stories for Kids" => Self::KidsFamilyStoriesForKids,
-            "Leisure" => Self::Leisure,
-            "Leisure > Animation & Manga" => Self::LeisureAnimationManga,
-            "Leisure > Automotive" => Self::LeisureAutomotive,
-            "Leisure > Aviation" => Self::LeisureAviation,
-            "Leisure > Crafts" => Self::LeisureCrafts,
-            "Leisure > Games" => Self::LeisureGames,
-            "Leisure > Hobbies" => Self::LeisureHobbies,
-            "Leisure > Home & Garden" => Self::LeisureHomeGarden,
-            "Leisure > Video Games" => Self::LeisureVideoGames,
-            "Music" => Self::Music,
-            "Music > Music Commentary" => Self::MusicMusicCommentary,
-            "Music > Music History" => Self::MusicMusicHistory,
-            "Music > Music Interviews" => Self::MusicMusicInterviews,
-            "News" => Self::News,
-            "News > Business News" => Self::NewsBusinessNews,
-            "News > Daily News" => Self::NewsDailyNews,
-            "News > Entertainment News" => Self::NewsEntertainmentNews,
-            "News > News Commentary" => Self::NewsNewsCommentary,
-            "News > Politics" => Self::NewsPolitics,
-            "News > Sports News" => Self::NewsSportsNews,
-            "News > Tech News" => Self::NewsTechNews,
-            "Religion & Spirituality" => Self::ReligionSpirituality,
-            "Religion & Spirituality > Buddhism" => Self::ReligionSpiritualityBuddhism,
-            "Religion & Spirituality > Christianity" => {
-                Self::ReligionSpiritualityChristianity
-            }
-            "Religion & Spirituality > Hinduism" => Self::ReligionSpiritualityHinduism,
-            "Religion & Spirituality > Islam" => Self::ReligionSpiritualityIslam,
-            "Religion & Spirituality > Judaism" => Self::ReligionSpiritualityJudaism,
-            "Religion & Spirituality > Religion" => Self::ReligionSpiritualityReligion,
-            "Religion & Spirituality > Spirituality" => {
-                Self::ReligionSpiritualitySpirituality
-            }
-            "Science" => Self::Science,
-            "Science > Astronomy" => Self::ScienceAstronomy,
-            "Science > Chemistry" => Self::ScienceChemistry,
-            "Science > Earth Sciences" => Self::ScienceEarthSciences,
-            "Science > Life Sciences" => Self::ScienceLifeSciences,
-            "Science > Mathematics" => Self::ScienceMathematics,
-            "Science > Natural Sciences" => Self::ScienceNaturalSciences,
-            "Science > Nature" => Self::ScienceNature,
-            "Science > Physics" => Self::SciencePhysics,
-            "Science > Social Sciences" => Self::ScienceSocialSciences,
-            "Society & Culture" => Self::SocietyCulture,
-            "Society & Culture > Documentary" => Self::SocietyCultureDocumentary,
-            "Society & Culture > Personal Journals" => {
-                Self::SocietyCulturePersonalJournals
-            }
-            "Society & Culture > Philosophy" => Self::SocietyCulturePhilosophy,
-            "Society & Culture > Places & Travel" => Self::SocietyCulturePlacesTravel,
-            "Society & Culture > Relationships" => Self::SocietyCultureRelationships,
-            "Sports" => Self::Sports,
-            "Sports > Baseball" => Self::SportsBaseball,
-            "Sports > Basketball" => Self::SportsBasketball,
-            "Sports > Cricket" => Self::SportsCricket,
-            "Sports > Fantasy Sports" => Self::SportsFantasySports,
-            "Sports > Football" => Self::SportsFootball,
-            "Sports > Golf" => Self::SportsGolf,
-            "Sports > Hockey" => Self::SportsHockey,
-            "Sports > Rugby" => Self::SportsRugby,
-            "Sports > Running" => Self::SportsRunning,
-            "Sports > Soccer" => Self::SportsSoccer,
-            "Sports > Swimming" => Self::SportsSwimming,
-            "Sports > Tennis" => Self::SportsTennis,
-            "Sports > Volleyball" => Self::SportsVolleyball,
-            "Sports > Wilderness" => Self::SportsWilderness,
-            "Sports > Wrestling" => Self::SportsWrestling,
-            "Technology" => Self::Technology,
-            "True Crime" => Self::TrueCrime,
-            "TV & Film" => Self::TvFilm,
-            "TV & Film > After Shows" => Self::TvFilmAfterShows,
-            "TV & Film > Film History" => Self::TvFilmFilmHistory,
-            "TV & Film > Film Interviews" => Self::TvFilmFilmInterviews,
-            "TV & Film > Film Reviews" => Self::TvFilmFilmReviews,
-            "TV & Film > TV Reviews" => Self::TvFilmTvReviews,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for AppleCategoryValue<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for AppleCategoryValue<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for AppleCategoryValue<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for AppleCategoryValue<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for AppleCategoryValue<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for AppleCategoryValue<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for AppleCategoryValue<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for AppleCategoryValue<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for AppleCategoryValue<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for AppleCategoryValue<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for AppleCategoryValue<'_> {
-    type Output = AppleCategoryValue<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for AppleCategoryValue<S> {
+    type Output = AppleCategoryValue<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             AppleCategoryValue::Arts => AppleCategoryValue::Arts,
@@ -795,38 +676,47 @@ impl jacquard_common::IntoStatic for AppleCategoryValue<'_> {
 
 /// Identifies a podcast episode by its podcast GUID and feed item identifier, independent of which repository currently holds the record.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct EpisodeRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EpisodeRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item.
-    #[serde(borrow)]
-    pub feed_item_guid: CowStr<'a>,
+    pub feed_item_guid: S,
     ///URL of the podcast's RSS feed.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub feed_url: Option<UriValue<'a>>,
+    pub feed_url: Option<UriValue<S>>,
     ///Podcasting 2.0 UUIDv5 GUID of the parent podcast. If the feed does not include a <podcast:guid> tag, derive it as specified in https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/tags/guid.md.
-    #[serde(borrow)]
-    pub podcast_guid: CowStr<'a>,
+    pub podcast_guid: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Identifies a podcast by its Podcasting 2.0 GUID, independent of which repository currently holds the record.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct PodcastRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PodcastRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///URL of the podcast's RSS feed.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub feed_url: Option<UriValue<'a>>,
+    pub feed_url: Option<UriValue<S>>,
     ///Podcasting 2.0 UUIDv5 GUID of the podcast. If the feed does not include a <podcast:guid> tag, derive it as specified in https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/tags/guid.md.
-    #[serde(borrow)]
-    pub podcast_guid: CowStr<'a>,
+    pub podcast_guid: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for AppleCategory<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AppleCategory<S> {
     fn nsid() -> &'static str {
         "org.atpodcasting.defs"
     }
@@ -841,7 +731,7 @@ impl<'a> LexiconSchema for AppleCategory<'a> {
     }
 }
 
-impl<'a> LexiconSchema for EpisodeRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for EpisodeRef<S> {
     fn nsid() -> &'static str {
         "org.atpodcasting.defs"
     }
@@ -878,7 +768,7 @@ impl<'a> LexiconSchema for EpisodeRef<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PodcastRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PodcastRef<S> {
     fn nsid() -> &'static str {
         "org.atpodcasting.defs"
     }

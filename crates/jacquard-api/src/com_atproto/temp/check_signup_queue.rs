@@ -10,18 +10,30 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CheckSignupQueueOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CheckSignupQueueOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub activated: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub estimated_time_ms: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub place_in_queue: Option<i64>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// XRPC request marker type.
@@ -33,8 +45,8 @@ pub struct CheckSignupQueueResponse;
 impl jacquard_common::xrpc::XrpcResp for CheckSignupQueueResponse {
     const NSID: &'static str = "com.atproto.temp.checkSignupQueue";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CheckSignupQueueOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CheckSignupQueueOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for CheckSignupQueue {
@@ -48,6 +60,6 @@ pub struct CheckSignupQueueRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CheckSignupQueueRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.checkSignupQueue";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = CheckSignupQueue;
+    type Request<S: Bos<str> + AsRef<str>> = CheckSignupQueue;
     type Response = CheckSignupQueueResponse;
 }

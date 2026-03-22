@@ -10,28 +10,46 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateInviteCode<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateInviteCode<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub for_account: Option<Did<'a>>,
+    pub for_account: Option<Did<S>>,
     pub use_count: i64,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateInviteCodeOutput<'a> {
-    #[serde(borrow)]
-    pub code: CowStr<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateInviteCodeOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub code: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.atproto.server.createInviteCode
@@ -39,11 +57,12 @@ pub struct CreateInviteCodeResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateInviteCodeResponse {
     const NSID: &'static str = "com.atproto.server.createInviteCode";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateInviteCodeOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CreateInviteCodeOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateInviteCode<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CreateInviteCode<S> {
     const NSID: &'static str = "com.atproto.server.createInviteCode";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -58,7 +77,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateInviteCodeRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CreateInviteCode<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CreateInviteCode<S>;
     type Response = CreateInviteCodeResponse;
 }
 
@@ -97,7 +116,7 @@ pub mod create_invite_code_state {
 /// Builder for constructing an instance of this type
 pub struct CreateInviteCodeBuilder<'a, S: create_invite_code_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<i64>),
+    _fields: (Option<Did<S>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -121,12 +140,12 @@ impl<'a> CreateInviteCodeBuilder<'a, create_invite_code_state::Empty> {
 
 impl<'a, S: create_invite_code_state::State> CreateInviteCodeBuilder<'a, S> {
     /// Set the `forAccount` field (optional)
-    pub fn for_account(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn for_account(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `forAccount` field to an Option value (optional)
-    pub fn maybe_for_account(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_for_account(mut self, value: Option<Did<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -167,10 +186,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CreateInviteCode<'a> {
         CreateInviteCode {
             for_account: self._fields.0,

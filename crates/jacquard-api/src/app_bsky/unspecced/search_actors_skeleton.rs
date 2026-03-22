@@ -10,48 +10,62 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::unspecced::SkeletonSearchActor;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchActorsSkeleton<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchActorsSkeleton<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(borrow)]
-    pub q: CowStr<'a>,
+    pub q: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub typeahead: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub viewer: Option<Did<'a>>,
+    pub viewer: Option<Did<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchActorsSkeletonOutput<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<SkeletonSearchActor<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchActorsSkeletonOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub actors: Vec<SkeletonSearchActor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hits_total: Option<i64>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -60,18 +74,19 @@ pub struct SearchActorsSkeletonOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SearchActorsSkeletonError<'a> {
+pub enum SearchActorsSkeletonError {
     #[serde(rename = "BadQueryString")]
-    BadQueryString(Option<CowStr<'a>>),
+    BadQueryString(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for SearchActorsSkeletonError<'_> {
+impl core::fmt::Display for SearchActorsSkeletonError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::BadQueryString(msg) => {
@@ -81,7 +96,13 @@ impl core::fmt::Display for SearchActorsSkeletonError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -91,11 +112,12 @@ pub struct SearchActorsSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchActorsSkeletonResponse {
     const NSID: &'static str = "app.bsky.unspecced.searchActorsSkeleton";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchActorsSkeletonOutput<'de>;
-    type Err<'de> = SearchActorsSkeletonError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SearchActorsSkeletonOutput<S>;
+    type Err = SearchActorsSkeletonError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchActorsSkeleton<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SearchActorsSkeleton<S> {
     const NSID: &'static str = "app.bsky.unspecced.searchActorsSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchActorsSkeletonResponse;
@@ -106,7 +128,7 @@ pub struct SearchActorsSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsSkeletonRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.searchActorsSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchActorsSkeleton<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SearchActorsSkeleton<S>;
     type Response = SearchActorsSkeletonResponse;
 }
 
@@ -149,13 +171,7 @@ pub mod search_actors_skeleton_state {
 /// Builder for constructing an instance of this type
 pub struct SearchActorsSkeletonBuilder<'a, S: search_actors_skeleton_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-        Option<bool>,
-        Option<Did<'a>>,
-    ),
+    _fields: (Option<S>, Option<i64>, Option<S>, Option<bool>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -182,12 +198,12 @@ impl<'a> SearchActorsSkeletonBuilder<'a, search_actors_skeleton_state::Empty> {
 
 impl<'a, S: search_actors_skeleton_state::State> SearchActorsSkeletonBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -214,7 +230,7 @@ where
     /// Set the `q` field (required)
     pub fn q(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SearchActorsSkeletonBuilder<'a, search_actors_skeleton_state::SetQ<S>> {
         self._fields.2 = Option::Some(value.into());
         SearchActorsSkeletonBuilder {
@@ -240,12 +256,12 @@ impl<'a, S: search_actors_skeleton_state::State> SearchActorsSkeletonBuilder<'a,
 
 impl<'a, S: search_actors_skeleton_state::State> SearchActorsSkeletonBuilder<'a, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn viewer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_viewer(mut self, value: Option<Did<S>>) -> Self {
         self._fields.4 = value;
         self
     }

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,33 +30,42 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Record declaring a list of account references.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "net.mmatt.my.accounts", tag = "$type")]
-pub struct Accounts<'a> {
-    #[serde(borrow)]
-    pub accounts: Vec<StrongRef<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "net.mmatt.my.accounts",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Accounts<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub accounts: Vec<StrongRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AccountsGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AccountsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Accounts<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Accounts<S>,
 }
 
-impl<'a> Accounts<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AccountsRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Accounts<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AccountsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -65,18 +76,17 @@ pub struct AccountsRecord;
 impl XrpcResp for AccountsRecord {
     const NSID: &'static str = "net.mmatt.my.accounts";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AccountsGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AccountsGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AccountsGetRecordOutput<'_>> for Accounts<'_> {
-    fn from(output: AccountsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AccountsGetRecordOutput<S>> for Accounts<S> {
+    fn from(output: AccountsGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Accounts<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Accounts<S> {
     const NSID: &'static str = "net.mmatt.my.accounts";
     type Record = AccountsRecord;
 }
@@ -86,7 +96,7 @@ impl Collection for AccountsRecord {
     type Record = AccountsRecord;
 }
 
-impl<'a> LexiconSchema for Accounts<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Accounts<S> {
     fn nsid() -> &'static str {
         "net.mmatt.my.accounts"
     }
@@ -136,7 +146,7 @@ pub mod accounts_state {
 /// Builder for constructing an instance of this type
 pub struct AccountsBuilder<'a, S: accounts_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<StrongRef<'a>>>,),
+    _fields: (Option<Vec<StrongRef<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -166,7 +176,7 @@ where
     /// Set the `accounts` field (required)
     pub fn accounts(
         mut self,
-        value: impl Into<Vec<StrongRef<'a>>>,
+        value: impl Into<Vec<StrongRef<S>>>,
     ) -> AccountsBuilder<'a, accounts_state::SetAccounts<S>> {
         self._fields.0 = Option::Some(value.into());
         AccountsBuilder {
@@ -192,10 +202,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Accounts<'a> {
         Accounts {
             accounts: self._fields.0.unwrap(),

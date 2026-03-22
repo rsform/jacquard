@@ -26,18 +26,22 @@ pub struct ExportRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for ExportRepoResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.exportRepo";
     const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<'de> = ExportRepoOutput;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ExportRepoOutput;
+    type Err = jacquard_common::xrpc::GenericError;
+    fn encode_output<S: jacquard_common::Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: jacquard_common::Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(ExportRepoOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -56,6 +60,6 @@ pub struct ExportRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ExportRepoRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.exportRepo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ExportRepo;
+    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = ExportRepo;
     type Response = ExportRepoResponse;
 }

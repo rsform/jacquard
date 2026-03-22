@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::types::string::Did;
 use jacquard_derive::{IntoStatic, open_union};
@@ -15,12 +15,18 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetBlob<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetBlob<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub broadcaster: Option<Did<'a>>,
+    pub broadcaster: Option<Did<S>>,
     #[serde(borrow)]
-    pub key: CowStr<'a>,
+    pub key: S,
 }
 
 /// Raw blob data with appropriate content-type
@@ -32,7 +38,6 @@ pub struct GetBlobOutput {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -41,19 +46,23 @@ pub struct GetBlobOutput {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetBlobError<'a> {
+pub enum GetBlobError {
     /// The requested branding asset does not exist
     #[serde(rename = "BrandingNotFound")]
-    BrandingNotFound(Option<CowStr<'a>>),
+    BrandingNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for GetBlobError<'_> {
+impl core::fmt::Display for GetBlobError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::BrandingNotFound(msg) => {
@@ -63,7 +72,13 @@ impl core::fmt::Display for GetBlobError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -73,18 +88,22 @@ pub struct GetBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBlobResponse {
     const NSID: &'static str = "place.stream.branding.getBlob";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = GetBlobOutput;
-    type Err<'de> = GetBlobError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = GetBlobOutput;
+    type Err = GetBlobError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(GetBlobOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -92,7 +111,8 @@ impl jacquard_common::xrpc::XrpcResp for GetBlobResponse {
     }
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetBlob<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetBlob<S> {
     const NSID: &'static str = "place.stream.branding.getBlob";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBlobResponse;
@@ -103,7 +123,7 @@ pub struct GetBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBlobRequest {
     const PATH: &'static str = "/xrpc/place.stream.branding.getBlob";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBlob<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetBlob<S>;
     type Response = GetBlobResponse;
 }
 
@@ -142,7 +162,7 @@ pub mod get_blob_state {
 /// Builder for constructing an instance of this type
 pub struct GetBlobBuilder<'a, S: get_blob_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Did<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -166,12 +186,12 @@ impl<'a> GetBlobBuilder<'a, get_blob_state::Empty> {
 
 impl<'a, S: get_blob_state::State> GetBlobBuilder<'a, S> {
     /// Set the `broadcaster` field (optional)
-    pub fn broadcaster(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn broadcaster(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `broadcaster` field to an Option value (optional)
-    pub fn maybe_broadcaster(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_broadcaster(mut self, value: Option<Did<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -185,7 +205,7 @@ where
     /// Set the `key` field (required)
     pub fn key(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetBlobBuilder<'a, get_blob_state::SetKey<S>> {
         self._fields.1 = Option::Some(value.into());
         GetBlobBuilder {

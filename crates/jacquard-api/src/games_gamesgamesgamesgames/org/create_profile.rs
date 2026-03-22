@@ -10,65 +10,67 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::{AtUri, Datetime};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::games_gamesgamesgamesgames::MediaItem;
 use crate::games_gamesgamesgamesgames::Website;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateProfile<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateProfile<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
+    pub avatar: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country: Option<CowStr<'a>>,
+    pub country: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description_facets: Option<Vec<Facet<'a>>>,
+    pub description_facets: Option<Vec<Facet<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub founded_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub media: Option<Vec<MediaItem<'a>>>,
+    pub media: Option<Vec<MediaItem<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent: Option<AtUri<'a>>,
+    pub parent: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<CreateProfileStatus<'a>>,
+    pub status: Option<CreateProfileStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub websites: Option<Vec<Website<'a>>>,
+    pub websites: Option<Vec<Website<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CreateProfileStatus<'a> {
+pub enum CreateProfileStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Active,
     Inactive,
     Merged,
     Acquired,
     Defunct,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> CreateProfileStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> CreateProfileStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Active => "active",
@@ -79,76 +81,59 @@ impl<'a> CreateProfileStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for CreateProfileStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "active" => Self::Active,
             "inactive" => Self::Inactive,
             "merged" => Self::Merged,
             "acquired" => Self::Acquired,
             "defunct" => Self::Defunct,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for CreateProfileStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "active" => Self::Active,
-            "inactive" => Self::Inactive,
-            "merged" => Self::Merged,
-            "acquired" => Self::Acquired,
-            "defunct" => Self::Defunct,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CreateProfileStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CreateProfileStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for CreateProfileStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for CreateProfileStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for CreateProfileStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for CreateProfileStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for CreateProfileStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for CreateProfileStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for CreateProfileStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for CreateProfileStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for CreateProfileStatus<'_> {
-    type Output = CreateProfileStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for CreateProfileStatus<S> {
+    type Output = CreateProfileStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             CreateProfileStatus::Active => CreateProfileStatus::Active,
@@ -162,14 +147,21 @@ impl jacquard_common::IntoStatic for CreateProfileStatus<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateProfileOutput<'a> {
-    #[serde(borrow)]
-    pub cid: CowStr<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateProfileOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub cid: S,
+    pub uri: AtUri<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for games.gamesgamesgamesgames.org.createProfile
@@ -177,11 +169,12 @@ pub struct CreateProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateProfileResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.org.createProfile";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateProfileOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CreateProfileOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateProfile<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CreateProfile<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.org.createProfile";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -196,6 +189,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateProfileRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CreateProfile<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CreateProfile<S>;
     type Response = CreateProfileResponse;
 }

@@ -10,25 +10,34 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetUploadLimitsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetUploadLimitsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub can_upload: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub error: Option<CowStr<'a>>,
+    pub error: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub remaining_daily_bytes: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub remaining_daily_videos: Option<i64>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// XRPC request marker type.
@@ -40,8 +49,8 @@ pub struct GetUploadLimitsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUploadLimitsResponse {
     const NSID: &'static str = "app.bsky.video.getUploadLimits";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetUploadLimitsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetUploadLimitsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetUploadLimits {
@@ -55,6 +64,6 @@ pub struct GetUploadLimitsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUploadLimitsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.video.getUploadLimits";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetUploadLimits;
+    type Request<S: Bos<str> + AsRef<str>> = GetUploadLimits;
     type Response = GetUploadLimitsResponse;
 }

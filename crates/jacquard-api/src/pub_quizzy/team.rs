@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,44 +30,50 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A quiz team
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "pub.quizzy.team", tag = "$type")]
-pub struct Team<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "pub.quizzy.team",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Team<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Small image to be displayed near the team name
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
+    pub avatar: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar_alt: Option<CowStr<'a>>,
+    pub avatar_alt: Option<S>,
     ///DIDs of team members
-    #[serde(borrow)]
-    pub members: Vec<Did<'a>>,
+    pub members: Vec<Did<S>>,
     ///Team name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TeamGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TeamGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Team<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Team<S>,
 }
 
-impl<'a> Team<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TeamRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Team<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TeamRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -76,18 +84,17 @@ pub struct TeamRecord;
 impl XrpcResp for TeamRecord {
     const NSID: &'static str = "pub.quizzy.team";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TeamGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TeamGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TeamGetRecordOutput<'_>> for Team<'_> {
-    fn from(output: TeamGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TeamGetRecordOutput<S>> for Team<S> {
+    fn from(output: TeamGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Team<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Team<S> {
     const NSID: &'static str = "pub.quizzy.team";
     type Record = TeamRecord;
 }
@@ -97,7 +104,7 @@ impl Collection for TeamRecord {
     type Record = TeamRecord;
 }
 
-impl<'a> LexiconSchema for Team<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Team<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.team"
     }
@@ -230,49 +237,44 @@ pub mod team_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Members;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Members = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Members = S::Members;
+        type Name = Unset;
     }
     ///State transition - sets the `members` field to Set
     pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMembers<S> {}
     impl<S: State> State for SetMembers<S> {
-        type Name = S::Name;
         type Members = Set<members::members>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Members = S::Members;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `members` field
         pub struct members(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TeamBuilder<'a, S: team_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<Did<'a>>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<BlobRef<S>>, Option<S>, Option<Vec<Did<S>>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -296,12 +298,12 @@ impl<'a> TeamBuilder<'a, team_state::Empty> {
 
 impl<'a, S: team_state::State> TeamBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -309,12 +311,12 @@ impl<'a, S: team_state::State> TeamBuilder<'a, S> {
 
 impl<'a, S: team_state::State> TeamBuilder<'a, S> {
     /// Set the `avatarAlt` field (optional)
-    pub fn avatar_alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn avatar_alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `avatarAlt` field to an Option value (optional)
-    pub fn maybe_avatar_alt(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_avatar_alt(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -328,7 +330,7 @@ where
     /// Set the `members` field (required)
     pub fn members(
         mut self,
-        value: impl Into<Vec<Did<'a>>>,
+        value: impl Into<Vec<Did<S>>>,
     ) -> TeamBuilder<'a, team_state::SetMembers<S>> {
         self._fields.2 = Option::Some(value.into());
         TeamBuilder {
@@ -347,7 +349,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TeamBuilder<'a, team_state::SetName<S>> {
         self._fields.3 = Option::Some(value.into());
         TeamBuilder {
@@ -361,8 +363,8 @@ where
 impl<'a, S> TeamBuilder<'a, S>
 where
     S: team_state::State,
-    S::Name: team_state::IsSet,
     S::Members: team_state::IsSet,
+    S::Name: team_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Team<'a> {
@@ -375,13 +377,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Team<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Team<'a> {
         Team {
             avatar: self._fields.0,
             avatar_alt: self._fields.1,

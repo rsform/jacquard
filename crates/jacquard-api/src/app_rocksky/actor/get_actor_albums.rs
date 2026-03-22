@@ -10,17 +10,26 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::album::AlbumViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetActorAlbums<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetActorAlbums<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: AtIdentifier<'a>,
+    pub did: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end_date: Option<Datetime>,
     ///(min: 1)
@@ -34,13 +43,21 @@ pub struct GetActorAlbums<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetActorAlbumsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetActorAlbumsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub albums: Option<Vec<AlbumViewBasic<'a>>>,
+    pub albums: Option<Vec<AlbumViewBasic<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.actor.getActorAlbums
@@ -48,11 +65,12 @@ pub struct GetActorAlbumsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorAlbumsResponse {
     const NSID: &'static str = "app.rocksky.actor.getActorAlbums";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorAlbumsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetActorAlbumsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorAlbums<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetActorAlbums<S> {
     const NSID: &'static str = "app.rocksky.actor.getActorAlbums";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetActorAlbumsResponse;
@@ -63,7 +81,7 @@ pub struct GetActorAlbumsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorAlbumsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.actor.getActorAlbums";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetActorAlbums<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetActorAlbums<S>;
     type Response = GetActorAlbumsResponse;
 }
 
@@ -103,7 +121,7 @@ pub mod get_actor_albums_state {
 pub struct GetActorAlbumsBuilder<'a, S: get_actor_albums_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtIdentifier<'a>>,
+        Option<AtIdentifier<S>>,
         Option<Datetime>,
         Option<i64>,
         Option<i64>,
@@ -138,7 +156,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetActorAlbumsBuilder<'a, get_actor_albums_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetActorAlbumsBuilder {

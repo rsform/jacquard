@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,41 +29,46 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Agent journal entry record.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "top.launchpadx.agent.journal",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Journal<'a> {
+pub struct Journal<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when the journal entry was created.
     pub created_at: Datetime,
     ///Journal entry content written by the agent.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub journal: Option<CowStr<'a>>,
+    pub journal: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct JournalGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct JournalGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Journal<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Journal<S>,
 }
 
-impl<'a> Journal<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, JournalRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Journal<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, JournalRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -72,18 +79,17 @@ pub struct JournalRecord;
 impl XrpcResp for JournalRecord {
     const NSID: &'static str = "top.launchpadx.agent.journal";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = JournalGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = JournalGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<JournalGetRecordOutput<'_>> for Journal<'_> {
-    fn from(output: JournalGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<JournalGetRecordOutput<S>> for Journal<S> {
+    fn from(output: JournalGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Journal<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Journal<S> {
     const NSID: &'static str = "top.launchpadx.agent.journal";
     type Record = JournalRecord;
 }
@@ -93,7 +99,7 @@ impl Collection for JournalRecord {
     type Record = JournalRecord;
 }
 
-impl<'a> LexiconSchema for Journal<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Journal<S> {
     fn nsid() -> &'static str {
         "top.launchpadx.agent.journal"
     }
@@ -143,7 +149,7 @@ pub mod journal_state {
 /// Builder for constructing an instance of this type
 pub struct JournalBuilder<'a, S: journal_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<CowStr<'a>>),
+    _fields: (Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -186,12 +192,12 @@ where
 
 impl<'a, S: journal_state::State> JournalBuilder<'a, S> {
     /// Set the `journal` field (optional)
-    pub fn journal(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn journal(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `journal` field to an Option value (optional)
-    pub fn maybe_journal(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_journal(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -213,10 +219,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Journal<'a> {
         Journal {
             created_at: self._fields.0.unwrap(),

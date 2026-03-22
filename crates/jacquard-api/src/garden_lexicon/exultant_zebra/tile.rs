@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Nsid, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -32,83 +34,83 @@ use crate::garden_lexicon::exultant_zebra::masl::Resource;
 use crate::garden_lexicon::exultant_zebra::tile;
 /// Declares the AT Protocol interactions a tile performs. Methods listed here gate which XRPC calls the tile is allowed to attempt (the user must still grant per-method consent). Collections and services are informational metadata for display and auditing.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Interactions<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Interactions<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Repository collection NSIDs this tile reads from or writes to.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub collections: Option<Vec<Nsid<'a>>>,
+    pub collections: Option<Vec<Nsid<S>>>,
     ///XRPC method NSIDs this tile may call. When present, the tile runtime restricts XRPC calls to only these methods. When absent, all server-allowed methods may be called (with user consent).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub methods: Option<Vec<CowStr<'a>>>,
+    pub methods: Option<Vec<S>>,
     ///AT Protocol service proxy targets this tile interacts with, identified by DID and service endpoint fragment.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub services: Option<Vec<CowStr<'a>>>,
+    pub services: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A tile with a name and associated resource or bundle.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "garden.lexicon.exultant-zebra.tile",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Tile<'a> {
+pub struct Tile<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Declared aspect ratio for tile rendering.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<TileAspectRatio<'a>>,
+    pub aspect_ratio: Option<TileAspectRatio<S>>,
     ///The tile content, either a single resource or a bundle.
-    #[serde(borrow)]
-    pub content: TileContent<'a>,
+    pub content: TileContent<S>,
     ///Optional rich text description of the tile.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Rich text facets for the description (links, mentions, hashtags).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Facet<'a>>>,
+    pub facets: Option<Vec<Facet<S>>>,
     ///Optional icon image for the tile.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub icon: Option<BlobRef<'a>>,
+    pub icon: Option<BlobRef<S>>,
     ///Declaration of the XRPC methods, collections, and services this tile interacts with.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interactions: Option<tile::Interactions<'a>>,
+    pub interactions: Option<tile::Interactions<S>>,
     ///Optional loading screen image for the tile.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub loading_image: Option<BlobRef<'a>>,
+    pub loading_image: Option<BlobRef<S>>,
     ///The name of the tile.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Input parameters this tile accepts. When present, the tile runtime shows a configuration form for required parameters without defaults before loading the tile.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub params: Option<Vec<tile::Param<'a>>>,
+    pub params: Option<Vec<tile::Param<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Declared aspect ratio for tile rendering.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TileAspectRatio<'a> {
+pub enum TileAspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
     _11,
     _21,
     _31,
     _12,
     _13,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> TileAspectRatio<'a> {
+impl<S: Bos<str> + AsRef<str>> TileAspectRatio<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::_11 => "1:1",
@@ -119,76 +121,59 @@ impl<'a> TileAspectRatio<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for TileAspectRatio<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "1:1" => Self::_11,
             "2:1" => Self::_21,
             "3:1" => Self::_31,
             "1:2" => Self::_12,
             "1:3" => Self::_13,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for TileAspectRatio<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "1:1" => Self::_11,
-            "2:1" => Self::_21,
-            "3:1" => Self::_31,
-            "1:2" => Self::_12,
-            "1:3" => Self::_13,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TileAspectRatio<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for TileAspectRatio<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for TileAspectRatio<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for TileAspectRatio<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for TileAspectRatio<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for TileAspectRatio<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for TileAspectRatio<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for TileAspectRatio<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for TileAspectRatio<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for TileAspectRatio<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for TileAspectRatio<'_> {
-    type Output = TileAspectRatio<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for TileAspectRatio<S> {
+    type Output = TileAspectRatio<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             TileAspectRatio::_11 => TileAspectRatio::_11,
@@ -204,64 +189,76 @@ impl jacquard_common::IntoStatic for TileAspectRatio<'_> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TileContent<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TileContent<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "garden.lexicon.exultant-zebra.masl#resource")]
-    MaslResource(Box<Resource<'a>>),
+    MaslResource(Box<Resource<S>>),
     #[serde(rename = "garden.lexicon.exultant-zebra.masl#main")]
-    Masl(Box<Masl<'a>>),
+    Masl(Box<Masl<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TileGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Tile<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Tile<S>,
 }
 
 /// Declares an input parameter for a tile, similar to XRPC query parameters.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Param<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Param<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Default value for this parameter, encoded as a string.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub default: Option<CowStr<'a>>,
+    pub default: Option<S>,
     ///Human-readable description of this parameter.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Parameter name, used as a URL search param key. Must not start with an underscore.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Whether this parameter must be provided before loading the tile.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     ///Parameter value type.
-    #[serde(borrow)]
-    pub r#type: ParamType<'a>,
+    pub r#type: ParamType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Parameter value type.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ParamType<'a> {
+pub enum ParamType<S: Bos<str> + AsRef<str> = DefaultStr> {
     String,
     Integer,
     Boolean,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ParamType<'a> {
+impl<S: Bos<str> + AsRef<str>> ParamType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::String => "string",
@@ -270,72 +267,57 @@ impl<'a> ParamType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ParamType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "string" => Self::String,
             "integer" => Self::Integer,
             "boolean" => Self::Boolean,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ParamType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "string" => Self::String,
-            "integer" => Self::Integer,
-            "boolean" => Self::Boolean,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ParamType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ParamType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ParamType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ParamType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ParamType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ParamType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ParamType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ParamType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ParamType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ParamType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ParamType<'_> {
-    type Output = ParamType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ParamType<S> {
+    type Output = ParamType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ParamType::String => ParamType::String,
@@ -346,15 +328,13 @@ impl jacquard_common::IntoStatic for ParamType<'_> {
     }
 }
 
-impl<'a> Tile<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TileRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Tile<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TileRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Interactions<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Interactions<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.tile"
     }
@@ -376,18 +356,17 @@ pub struct TileRecord;
 impl XrpcResp for TileRecord {
     const NSID: &'static str = "garden.lexicon.exultant-zebra.tile";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TileGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TileGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TileGetRecordOutput<'_>> for Tile<'_> {
-    fn from(output: TileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TileGetRecordOutput<S>> for Tile<S> {
+    fn from(output: TileGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Tile<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Tile<S> {
     const NSID: &'static str = "garden.lexicon.exultant-zebra.tile";
     type Record = TileRecord;
 }
@@ -397,7 +376,7 @@ impl Collection for TileRecord {
     type Record = TileRecord;
 }
 
-impl<'a> LexiconSchema for Tile<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tile<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.tile"
     }
@@ -502,7 +481,7 @@ impl<'a> LexiconSchema for Tile<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Param<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Param<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.tile"
     }
@@ -809,37 +788,37 @@ pub mod tile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Name;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Name = S::Name;
+        type Content = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Content = S::Content;
         type Name = Set<members::name>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Name = S::Name;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -847,15 +826,15 @@ pub mod tile_state {
 pub struct TileBuilder<'a, S: tile_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<TileAspectRatio<'a>>,
-        Option<TileContent<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<BlobRef<'a>>,
-        Option<tile::Interactions<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<tile::Param<'a>>>,
+        Option<TileAspectRatio<S>>,
+        Option<TileContent<S>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<BlobRef<S>>,
+        Option<tile::Interactions<S>>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<Vec<tile::Param<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -880,15 +859,12 @@ impl<'a> TileBuilder<'a, tile_state::Empty> {
 
 impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(
-        mut self,
-        value: impl Into<Option<TileAspectRatio<'a>>>,
-    ) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<TileAspectRatio<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(mut self, value: Option<TileAspectRatio<'a>>) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<TileAspectRatio<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -902,7 +878,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<TileContent<'a>>,
+        value: impl Into<TileContent<S>>,
     ) -> TileBuilder<'a, tile_state::SetContent<S>> {
         self._fields.1 = Option::Some(value.into());
         TileBuilder {
@@ -915,12 +891,12 @@ where
 
 impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -928,12 +904,12 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
 
 impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `facets` field (optional)
-    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
+    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
-    pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -941,12 +917,12 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
 
 impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `icon` field (optional)
-    pub fn icon(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `icon` field to an Option value (optional)
-    pub fn maybe_icon(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_icon(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -956,13 +932,13 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `interactions` field (optional)
     pub fn interactions(
         mut self,
-        value: impl Into<Option<tile::Interactions<'a>>>,
+        value: impl Into<Option<tile::Interactions<S>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `interactions` field to an Option value (optional)
-    pub fn maybe_interactions(mut self, value: Option<tile::Interactions<'a>>) -> Self {
+    pub fn maybe_interactions(mut self, value: Option<tile::Interactions<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -970,12 +946,12 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
 
 impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `loadingImage` field (optional)
-    pub fn loading_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn loading_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `loadingImage` field to an Option value (optional)
-    pub fn maybe_loading_image(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_loading_image(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -989,7 +965,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TileBuilder<'a, tile_state::SetName<S>> {
         self._fields.7 = Option::Some(value.into());
         TileBuilder {
@@ -1002,12 +978,12 @@ where
 
 impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `params` field (optional)
-    pub fn params(mut self, value: impl Into<Option<Vec<tile::Param<'a>>>>) -> Self {
+    pub fn params(mut self, value: impl Into<Option<Vec<tile::Param<S>>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `params` field to an Option value (optional)
-    pub fn maybe_params(mut self, value: Option<Vec<tile::Param<'a>>>) -> Self {
+    pub fn maybe_params(mut self, value: Option<Vec<tile::Param<S>>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -1016,8 +992,8 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
 impl<'a, S> TileBuilder<'a, S>
 where
     S: tile_state::State,
-    S::Content: tile_state::IsSet,
     S::Name: tile_state::IsSet,
+    S::Content: tile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tile<'a> {
@@ -1035,13 +1011,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Tile<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Tile<'a> {
         Tile {
             aspect_ratio: self._fields.0,
             content: self._fields.1.unwrap(),

@@ -10,32 +10,41 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Post<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Post<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub foo: Option<PostFoo<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub foo: Option<PostFoo<S>>,
+    pub uri: AtUri<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PostFoo<'a> {
+pub enum PostFoo<S: Bos<str> + AsRef<str> = DefaultStr> {
     Bar,
     Baz,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> PostFoo<'a> {
+impl<S: Bos<str> + AsRef<str>> PostFoo<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Bar => "bar",
@@ -43,70 +52,55 @@ impl<'a> PostFoo<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for PostFoo<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "bar" => Self::Bar,
             "baz" => Self::Baz,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for PostFoo<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "bar" => Self::Bar,
-            "baz" => Self::Baz,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for PostFoo<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for PostFoo<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for PostFoo<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for PostFoo<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for PostFoo<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for PostFoo<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for PostFoo<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for PostFoo<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for PostFoo<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for PostFoo<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for PostFoo<'_> {
-    type Output = PostFoo<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for PostFoo<S> {
+    type Output = PostFoo<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             PostFoo::Bar => PostFoo::Bar,
@@ -117,13 +111,22 @@ impl jacquard_common::IntoStatic for PostFoo<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct PostOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PostOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Response<'a>,
+    pub value: Response<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for mov.danabra.Post
@@ -131,11 +134,12 @@ pub struct PostResponse;
 impl jacquard_common::xrpc::XrpcResp for PostResponse {
     const NSID: &'static str = "mov.danabra.Post";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PostOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PostOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Post<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Post<S> {
     const NSID: &'static str = "mov.danabra.Post";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -150,7 +154,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for PostRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Post<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Post<S>;
     type Response = PostResponse;
 }
 
@@ -189,7 +193,7 @@ pub mod post_state {
 /// Builder for constructing an instance of this type
 pub struct PostBuilder<'a, S: post_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<PostFoo<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<PostFoo<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -213,12 +217,12 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `foo` field (optional)
-    pub fn foo(mut self, value: impl Into<Option<PostFoo<'a>>>) -> Self {
+    pub fn foo(mut self, value: impl Into<Option<PostFoo<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `foo` field to an Option value (optional)
-    pub fn maybe_foo(mut self, value: Option<PostFoo<'a>>) -> Self {
+    pub fn maybe_foo(mut self, value: Option<PostFoo<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -232,7 +236,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> PostBuilder<'a, post_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         PostBuilder {
@@ -257,13 +261,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Post<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Post<'a> {
         Post {
             foo: self._fields.0,
             uri: self._fields.1.unwrap(),

@@ -10,20 +10,28 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::buzz_bookhive::hive_book::HiveBook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchBooks<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchBooks<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub genre: Option<CowStr<'a>>,
+    pub genre: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -32,19 +40,27 @@ pub struct SearchBooks<'a> {
     pub offset: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub q: Option<CowStr<'a>>,
+    pub q: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchBooksOutput<'a> {
-    #[serde(borrow)]
-    pub books: Vec<HiveBook<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchBooksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub books: Vec<HiveBook<S>>,
     ///The next offset to use for pagination (result of limit + offset)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i64>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for buzz.bookhive.searchBooks
@@ -52,11 +68,12 @@ pub struct SearchBooksResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchBooksResponse {
     const NSID: &'static str = "buzz.bookhive.searchBooks";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchBooksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SearchBooksOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchBooks<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SearchBooks<S> {
     const NSID: &'static str = "buzz.bookhive.searchBooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchBooksResponse;
@@ -67,7 +84,7 @@ pub struct SearchBooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchBooksRequest {
     const PATH: &'static str = "/xrpc/buzz.bookhive.searchBooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchBooks<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SearchBooks<S>;
     type Response = SearchBooksResponse;
 }
 
@@ -97,13 +114,7 @@ pub mod search_books_state {
 /// Builder for constructing an instance of this type
 pub struct SearchBooksBuilder<'a, S: search_books_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<i64>, Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -127,12 +138,12 @@ impl<'a> SearchBooksBuilder<'a, search_books_state::Empty> {
 
 impl<'a, S: search_books_state::State> SearchBooksBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_genre(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -140,12 +151,12 @@ impl<'a, S: search_books_state::State> SearchBooksBuilder<'a, S> {
 
 impl<'a, S: search_books_state::State> SearchBooksBuilder<'a, S> {
     /// Set the `id` field (optional)
-    pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
-    pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_id(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -179,12 +190,12 @@ impl<'a, S: search_books_state::State> SearchBooksBuilder<'a, S> {
 
 impl<'a, S: search_books_state::State> SearchBooksBuilder<'a, S> {
     /// Set the `q` field (optional)
-    pub fn q(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn q(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `q` field to an Option value (optional)
-    pub fn maybe_q(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_q(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }

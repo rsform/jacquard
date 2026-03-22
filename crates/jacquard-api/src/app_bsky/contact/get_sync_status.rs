@@ -10,8 +10,10 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::contact::SyncStatus;
 
@@ -19,18 +21,25 @@ use crate::app_bsky::contact::SyncStatus;
 #[serde(rename_all = "camelCase")]
 pub struct GetSyncStatus;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSyncStatusOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSyncStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///If present, indicates the user has imported their contacts. If not present, indicates the user never used the feature or called `app.bsky.contact.removeData` and didn't import again since.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sync_status: Option<SyncStatus<'a>>,
+    pub sync_status: Option<SyncStatus<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -39,20 +48,21 @@ pub struct GetSyncStatusOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetSyncStatusError<'a> {
+pub enum GetSyncStatusError {
     #[serde(rename = "InvalidDid")]
-    InvalidDid(Option<CowStr<'a>>),
+    InvalidDid(Option<SmolStr>),
     #[serde(rename = "InternalError")]
-    InternalError(Option<CowStr<'a>>),
+    InternalError(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetSyncStatusError<'_> {
+impl core::fmt::Display for GetSyncStatusError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidDid(msg) => {
@@ -69,7 +79,13 @@ impl core::fmt::Display for GetSyncStatusError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -79,8 +95,8 @@ pub struct GetSyncStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSyncStatusResponse {
     const NSID: &'static str = "app.bsky.contact.getSyncStatus";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSyncStatusOutput<'de>;
-    type Err<'de> = GetSyncStatusError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetSyncStatusOutput<S>;
+    type Err = GetSyncStatusError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetSyncStatus {
@@ -94,6 +110,6 @@ pub struct GetSyncStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSyncStatusRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.getSyncStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSyncStatus;
+    type Request<S: Bos<str> + AsRef<str>> = GetSyncStatus;
     type Response = GetSyncStatusResponse;
 }

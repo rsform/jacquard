@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,35 +30,44 @@ use serde::{Serialize, Deserialize};
 use crate::blue__2048::key::Key;
 /// A record that holds a did:key for verifying a players game. This is intended to be written at a verification authorities repo
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blue.2048.key.game", tag = "$type")]
-pub struct Game<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "blue.2048.key.game",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Game<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///A did:key that is used to verify an at://2048 authority has verified this game to a certain degree
-    #[serde(borrow)]
-    pub key: Key<'a>,
+    pub key: Key<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GameGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GameGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Game<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Game<S>,
 }
 
-impl<'a> Game<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, GameRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Game<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, GameRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -67,18 +78,17 @@ pub struct GameRecord;
 impl XrpcResp for GameRecord {
     const NSID: &'static str = "blue.2048.key.game";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GameGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GameGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<GameGetRecordOutput<'_>> for Game<'_> {
-    fn from(output: GameGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<GameGetRecordOutput<S>> for Game<S> {
+    fn from(output: GameGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Game<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Game<S> {
     const NSID: &'static str = "blue.2048.key.game";
     type Record = GameRecord;
 }
@@ -88,7 +98,7 @@ impl Collection for GameRecord {
     type Record = GameRecord;
 }
 
-impl<'a> LexiconSchema for Game<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Game<S> {
     fn nsid() -> &'static str {
         "blue.2048.key.game"
     }
@@ -150,7 +160,7 @@ pub mod game_state {
 /// Builder for constructing an instance of this type
 pub struct GameBuilder<'a, S: game_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Key<'a>>),
+    _fields: (Option<Datetime>, Option<Key<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -199,7 +209,7 @@ where
     /// Set the `key` field (required)
     pub fn key(
         mut self,
-        value: impl Into<Key<'a>>,
+        value: impl Into<Key<S>>,
     ) -> GameBuilder<'a, game_state::SetKey<S>> {
         self._fields.1 = Option::Some(value.into());
         GameBuilder {
@@ -225,13 +235,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Game<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Game<'a> {
         Game {
             created_at: self._fields.0.unwrap(),
             key: self._fields.1.unwrap(),

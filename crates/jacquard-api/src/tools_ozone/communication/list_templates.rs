@@ -10,16 +10,27 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::communication::TemplateView;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListTemplatesOutput<'a> {
-    #[serde(borrow)]
-    pub communication_templates: Vec<TemplateView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListTemplatesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub communication_templates: Vec<TemplateView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// XRPC request marker type.
@@ -31,8 +42,8 @@ pub struct ListTemplatesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListTemplatesResponse {
     const NSID: &'static str = "tools.ozone.communication.listTemplates";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListTemplatesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListTemplatesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for ListTemplates {
@@ -46,6 +57,6 @@ pub struct ListTemplatesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListTemplatesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.communication.listTemplates";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListTemplates;
+    type Request<S: Bos<str> + AsRef<str>> = ListTemplates;
     type Response = ListTemplatesResponse;
 }

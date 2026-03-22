@@ -10,49 +10,69 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::graph::NotFoundActor;
 use crate::app_bsky::graph::Relationship;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRelationships<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRelationships<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub actor: AtIdentifier<'a>,
+    pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub others: Option<Vec<AtIdentifier<'a>>>,
+    pub others: Option<Vec<AtIdentifier<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRelationshipsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRelationshipsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub actor: Option<Did<'a>>,
-    #[serde(borrow)]
-    pub relationships: Vec<GetRelationshipsOutputRelationshipsItem<'a>>,
+    pub actor: Option<Did<S>>,
+    pub relationships: Vec<GetRelationshipsOutputRelationshipsItem<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum GetRelationshipsOutputRelationshipsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum GetRelationshipsOutputRelationshipsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.graph.defs#relationship")]
-    Relationship(Box<Relationship<'a>>),
+    Relationship(Box<Relationship<S>>),
     #[serde(rename = "app.bsky.graph.defs#notFoundActor")]
-    NotFoundActor(Box<NotFoundActor<'a>>),
+    NotFoundActor(Box<NotFoundActor<S>>),
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -61,19 +81,20 @@ pub enum GetRelationshipsOutputRelationshipsItem<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetRelationshipsError<'a> {
+pub enum GetRelationshipsError {
     /// the primary actor at-identifier could not be resolved
     #[serde(rename = "ActorNotFound")]
-    ActorNotFound(Option<CowStr<'a>>),
+    ActorNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetRelationshipsError<'_> {
+impl core::fmt::Display for GetRelationshipsError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::ActorNotFound(msg) => {
@@ -83,7 +104,13 @@ impl core::fmt::Display for GetRelationshipsError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -93,11 +120,12 @@ pub struct GetRelationshipsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRelationshipsResponse {
     const NSID: &'static str = "app.bsky.graph.getRelationships";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRelationshipsOutput<'de>;
-    type Err<'de> = GetRelationshipsError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetRelationshipsOutput<S>;
+    type Err = GetRelationshipsError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRelationships<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetRelationships<S> {
     const NSID: &'static str = "app.bsky.graph.getRelationships";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRelationshipsResponse;
@@ -108,7 +136,7 @@ pub struct GetRelationshipsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRelationshipsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.getRelationships";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRelationships<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetRelationships<S>;
     type Response = GetRelationshipsResponse;
 }
 
@@ -147,7 +175,7 @@ pub mod get_relationships_state {
 /// Builder for constructing an instance of this type
 pub struct GetRelationshipsBuilder<'a, S: get_relationships_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>, Option<Vec<AtIdentifier<'a>>>),
+    _fields: (Option<AtIdentifier<S>>, Option<Vec<AtIdentifier<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -177,7 +205,7 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetRelationshipsBuilder<'a, get_relationships_state::SetActor<S>> {
         self._fields.0 = Option::Some(value.into());
         GetRelationshipsBuilder {
@@ -190,12 +218,12 @@ where
 
 impl<'a, S: get_relationships_state::State> GetRelationshipsBuilder<'a, S> {
     /// Set the `others` field (optional)
-    pub fn others(mut self, value: impl Into<Option<Vec<AtIdentifier<'a>>>>) -> Self {
+    pub fn others(mut self, value: impl Into<Option<Vec<AtIdentifier<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `others` field to an Option value (optional)
-    pub fn maybe_others(mut self, value: Option<Vec<AtIdentifier<'a>>>) -> Self {
+    pub fn maybe_others(mut self, value: Option<Vec<AtIdentifier<S>>>) -> Self {
         self._fields.1 = value;
         self
     }

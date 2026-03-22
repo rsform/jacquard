@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -32,88 +34,100 @@ use crate::org_hypercerts::Uri;
 use crate::org_hypercerts::context::evaluation;
 /// An evaluation of a hypercert record (e.g. an activity and its impact).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.hypercerts.context.evaluation",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Evaluation<'a> {
+pub struct Evaluation<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Evaluation data (URIs or blobs) containing detailed reports or methodology
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content: Option<Vec<EvaluationContentItem<'a>>>,
+    pub content: Option<Vec<EvaluationContentItem<S>>>,
     ///Client-declared timestamp when this record was originally created
     pub created_at: Datetime,
     ///DIDs of the evaluators
-    #[serde(borrow)]
-    pub evaluators: Vec<Did<'a>>,
+    pub evaluators: Vec<Did<S>>,
     ///An optional reference for georeferenced evaluations. The record referenced must conform with the lexicon app.certified.location.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location: Option<StrongRef<'a>>,
+    pub location: Option<StrongRef<S>>,
     ///Optional references to the measurements that contributed to this evaluation. The record(s) referenced must conform with the lexicon org.hypercerts.context.measurement
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub measurements: Option<Vec<StrongRef<'a>>>,
+    pub measurements: Option<Vec<StrongRef<S>>>,
     ///Optional overall score for this evaluation on a numeric scale.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub score: Option<evaluation::Score<'a>>,
+    pub score: Option<evaluation::Score<S>>,
     ///A strong reference to what is being evaluated (e.g. activity, measurement, contribution, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject: Option<StrongRef<'a>>,
+    pub subject: Option<StrongRef<S>>,
     ///Brief evaluation summary
-    #[serde(borrow)]
-    pub summary: CowStr<'a>,
+    pub summary: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EvaluationContentItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EvaluationContentItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallBlob")]
-    SmallBlob(Box<SmallBlob<'a>>),
+    SmallBlob(Box<SmallBlob<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EvaluationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EvaluationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Evaluation<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Evaluation<S>,
 }
 
 /// Overall score for an evaluation on a numeric scale.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Score<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Score<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Maximum value of the scale, e.g. 5 or 10.
     pub max: i64,
     ///Minimum value of the scale, e.g. 0 or 1.
     pub min: i64,
     ///Score within the inclusive range [min, max].
     pub value: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Evaluation<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, EvaluationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Evaluation<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, EvaluationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -124,18 +138,17 @@ pub struct EvaluationRecord;
 impl XrpcResp for EvaluationRecord {
     const NSID: &'static str = "org.hypercerts.context.evaluation";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = EvaluationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = EvaluationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<EvaluationGetRecordOutput<'_>> for Evaluation<'_> {
-    fn from(output: EvaluationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<EvaluationGetRecordOutput<S>> for Evaluation<S> {
+    fn from(output: EvaluationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Evaluation<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Evaluation<S> {
     const NSID: &'static str = "org.hypercerts.context.evaluation";
     type Record = EvaluationRecord;
 }
@@ -145,7 +158,7 @@ impl Collection for EvaluationRecord {
     type Record = EvaluationRecord;
 }
 
-impl<'a> LexiconSchema for Evaluation<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Evaluation<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.context.evaluation"
     }
@@ -215,7 +228,7 @@ impl<'a> LexiconSchema for Evaluation<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Score<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Score<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.context.evaluation"
     }
@@ -240,51 +253,51 @@ pub mod evaluation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Evaluators;
         type Summary;
         type CreatedAt;
+        type Evaluators;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Evaluators = Unset;
         type Summary = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `evaluators` field to Set
-    pub struct SetEvaluators<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvaluators<S> {}
-    impl<S: State> State for SetEvaluators<S> {
-        type Evaluators = Set<members::evaluators>;
-        type Summary = S::Summary;
-        type CreatedAt = S::CreatedAt;
+        type Evaluators = Unset;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSummary<S> {}
     impl<S: State> State for SetSummary<S> {
-        type Evaluators = S::Evaluators;
         type Summary = Set<members::summary>;
         type CreatedAt = S::CreatedAt;
+        type Evaluators = S::Evaluators;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Evaluators = S::Evaluators;
         type Summary = S::Summary;
         type CreatedAt = Set<members::created_at>;
+        type Evaluators = S::Evaluators;
+    }
+    ///State transition - sets the `evaluators` field to Set
+    pub struct SetEvaluators<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvaluators<S> {}
+    impl<S: State> State for SetEvaluators<S> {
+        type Summary = S::Summary;
+        type CreatedAt = S::CreatedAt;
+        type Evaluators = Set<members::evaluators>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `evaluators` field
-        pub struct evaluators(());
         ///Marker type for the `summary` field
         pub struct summary(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `evaluators` field
+        pub struct evaluators(());
     }
 }
 
@@ -292,14 +305,14 @@ pub mod evaluation_state {
 pub struct EvaluationBuilder<'a, S: evaluation_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<EvaluationContentItem<'a>>>,
+        Option<Vec<EvaluationContentItem<S>>>,
         Option<Datetime>,
-        Option<Vec<Did<'a>>>,
-        Option<StrongRef<'a>>,
-        Option<Vec<StrongRef<'a>>>,
-        Option<evaluation::Score<'a>>,
-        Option<StrongRef<'a>>,
-        Option<CowStr<'a>>,
+        Option<Vec<Did<S>>>,
+        Option<StrongRef<S>>,
+        Option<Vec<StrongRef<S>>>,
+        Option<evaluation::Score<S>>,
+        Option<StrongRef<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -326,7 +339,7 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `content` field (optional)
     pub fn content(
         mut self,
-        value: impl Into<Option<Vec<EvaluationContentItem<'a>>>>,
+        value: impl Into<Option<Vec<EvaluationContentItem<S>>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
@@ -334,7 +347,7 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `content` field to an Option value (optional)
     pub fn maybe_content(
         mut self,
-        value: Option<Vec<EvaluationContentItem<'a>>>,
+        value: Option<Vec<EvaluationContentItem<S>>>,
     ) -> Self {
         self._fields.0 = value;
         self
@@ -368,7 +381,7 @@ where
     /// Set the `evaluators` field (required)
     pub fn evaluators(
         mut self,
-        value: impl Into<Vec<Did<'a>>>,
+        value: impl Into<Vec<Did<S>>>,
     ) -> EvaluationBuilder<'a, evaluation_state::SetEvaluators<S>> {
         self._fields.2 = Option::Some(value.into());
         EvaluationBuilder {
@@ -381,12 +394,12 @@ where
 
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `location` field (optional)
-    pub fn location(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn location(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
-    pub fn maybe_location(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_location(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -394,12 +407,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `measurements` field (optional)
-    pub fn measurements(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
+    pub fn measurements(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `measurements` field to an Option value (optional)
-    pub fn maybe_measurements(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
+    pub fn maybe_measurements(mut self, value: Option<Vec<StrongRef<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -407,12 +420,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `score` field (optional)
-    pub fn score(mut self, value: impl Into<Option<evaluation::Score<'a>>>) -> Self {
+    pub fn score(mut self, value: impl Into<Option<evaluation::Score<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `score` field to an Option value (optional)
-    pub fn maybe_score(mut self, value: Option<evaluation::Score<'a>>) -> Self {
+    pub fn maybe_score(mut self, value: Option<evaluation::Score<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -420,12 +433,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `subject` field (optional)
-    pub fn subject(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn subject(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
-    pub fn maybe_subject(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_subject(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -439,7 +452,7 @@ where
     /// Set the `summary` field (required)
     pub fn summary(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EvaluationBuilder<'a, evaluation_state::SetSummary<S>> {
         self._fields.7 = Option::Some(value.into());
         EvaluationBuilder {
@@ -453,9 +466,9 @@ where
 impl<'a, S> EvaluationBuilder<'a, S>
 where
     S: evaluation_state::State,
-    S::Evaluators: evaluation_state::IsSet,
     S::Summary: evaluation_state::IsSet,
     S::CreatedAt: evaluation_state::IsSet,
+    S::Evaluators: evaluation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Evaluation<'a> {
@@ -474,10 +487,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Evaluation<'a> {
         Evaluation {
             content: self._fields.0,
@@ -679,51 +689,51 @@ pub mod score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Min;
-        type Value;
         type Max;
+        type Value;
+        type Min;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Min = Unset;
-        type Value = Unset;
         type Max = Unset;
-    }
-    ///State transition - sets the `min` field to Set
-    pub struct SetMin<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMin<S> {}
-    impl<S: State> State for SetMin<S> {
-        type Min = Set<members::min>;
-        type Value = S::Value;
-        type Max = S::Max;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Min = S::Min;
-        type Value = Set<members::value>;
-        type Max = S::Max;
+        type Value = Unset;
+        type Min = Unset;
     }
     ///State transition - sets the `max` field to Set
     pub struct SetMax<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMax<S> {}
     impl<S: State> State for SetMax<S> {
-        type Min = S::Min;
-        type Value = S::Value;
         type Max = Set<members::max>;
+        type Value = S::Value;
+        type Min = S::Min;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Max = S::Max;
+        type Value = Set<members::value>;
+        type Min = S::Min;
+    }
+    ///State transition - sets the `min` field to Set
+    pub struct SetMin<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMin<S> {}
+    impl<S: State> State for SetMin<S> {
+        type Max = S::Max;
+        type Value = S::Value;
+        type Min = Set<members::min>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `min` field
-        pub struct min(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `max` field
         pub struct max(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `min` field
+        pub struct min(());
     }
 }
 
@@ -812,9 +822,9 @@ where
 impl<'a, S> ScoreBuilder<'a, S>
 where
     S: score_state::State,
-    S::Min: score_state::IsSet,
-    S::Value: score_state::IsSet,
     S::Max: score_state::IsSet,
+    S::Value: score_state::IsSet,
+    S::Min: score_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Score<'a> {
@@ -826,13 +836,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Score<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Score<'a> {
         Score {
             max: self._fields.0.unwrap(),
             min: self._fields.1.unwrap(),

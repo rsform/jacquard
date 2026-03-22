@@ -14,11 +14,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -28,34 +30,38 @@ use serde::{Serialize, Deserialize};
 use crate::org_impactindexer::review;
 /// Reference to the subject being reviewed.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SubjectRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SubjectRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional CID for record subjects to pin to a specific version.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<CowStr<'a>>,
+    pub cid: Option<S>,
     ///The type of subject.
-    #[serde(borrow)]
-    pub r#type: review::SubjectType<'a>,
+    pub r#type: review::SubjectType<S>,
     ///The subject identifier. For records: AT-URI (at://did/collection/rkey). For users: DID (did:plc:xxx). For PDSes: hostname (example.com). For lexicons: NSID (app.bsky.feed.post).
-    #[serde(borrow)]
-    pub uri: CowStr<'a>,
+    pub uri: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The type of subject being reviewed.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SubjectType<'a> {
+pub enum SubjectType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Record,
     User,
     Pds,
     Lexicon,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SubjectType<'a> {
+impl<S: Bos<str> + AsRef<str>> SubjectType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Record => "record",
@@ -65,68 +71,52 @@ impl<'a> SubjectType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SubjectType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "record" => Self::Record,
             "user" => Self::User,
             "pds" => Self::Pds,
             "lexicon" => Self::Lexicon,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SubjectType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "record" => Self::Record,
-            "user" => Self::User,
-            "pds" => Self::Pds,
-            "lexicon" => Self::Lexicon,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for SubjectType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SubjectType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for SubjectType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SubjectType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for SubjectType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SubjectType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SubjectType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for SubjectType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for SubjectType<'_> {
-    type Output = SubjectType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SubjectType<S> {
+    type Output = SubjectType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SubjectType::Record => SubjectType::Record,
@@ -138,7 +128,7 @@ impl jacquard_common::IntoStatic for SubjectType<'_> {
     }
 }
 
-impl<'a> LexiconSchema for SubjectRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SubjectRef<S> {
     fn nsid() -> &'static str {
         "org.impactindexer.review.defs"
     }
@@ -221,7 +211,7 @@ pub mod subject_ref_state {
 /// Builder for constructing an instance of this type
 pub struct SubjectRefBuilder<'a, S: subject_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<review::SubjectType<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<review::SubjectType<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -245,12 +235,12 @@ impl<'a> SubjectRefBuilder<'a, subject_ref_state::Empty> {
 
 impl<'a, S: subject_ref_state::State> SubjectRefBuilder<'a, S> {
     /// Set the `cid` field (optional)
-    pub fn cid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
-    pub fn maybe_cid(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cid(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -264,7 +254,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<review::SubjectType<'a>>,
+        value: impl Into<review::SubjectType<S>>,
     ) -> SubjectRefBuilder<'a, subject_ref_state::SetType<S>> {
         self._fields.1 = Option::Some(value.into());
         SubjectRefBuilder {
@@ -283,7 +273,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SubjectRefBuilder<'a, subject_ref_state::SetUri<S>> {
         self._fields.2 = Option::Some(value.into());
         SubjectRefBuilder {
@@ -312,10 +302,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SubjectRef<'a> {
         SubjectRef {
             cid: self._fields.0,

@@ -18,8 +18,8 @@ pub struct RequestEmailConfirmationResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestEmailConfirmationResponse {
     const NSID: &'static str = "com.atproto.server.requestEmailConfirmation";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for RequestEmailConfirmation {
@@ -37,6 +37,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for RequestEmailConfirmationRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = RequestEmailConfirmation;
+    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = RequestEmailConfirmation;
     type Response = RequestEmailConfirmationResponse;
 }

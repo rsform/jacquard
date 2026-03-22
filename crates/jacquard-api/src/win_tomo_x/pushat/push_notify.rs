@@ -10,30 +10,49 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::win_tomo_x::pushat::NotifyBody;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct PushNotify<'a> {
-    #[serde(borrow)]
-    pub body: NotifyBody<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PushNotify<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub body: NotifyBody<S>,
     ///The DID of the target user to whom the notification will be sent.
-    #[serde(borrow)]
-    pub target: Did<'a>,
+    pub target: Did<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct PushNotifyOutput<'a> {}
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PushNotifyOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
 
-#[open_union]
+
 #[derive(
     Serialize,
     Deserialize,
@@ -42,20 +61,21 @@ pub struct PushNotifyOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PushNotifyError<'a> {
+pub enum PushNotifyError {
     #[serde(rename = "ServiceNotAllowedError")]
-    ServiceNotAllowedError(Option<CowStr<'a>>),
+    ServiceNotAllowedError(Option<SmolStr>),
     #[serde(rename = "DeviceNotFoundError")]
-    DeviceNotFoundError(Option<CowStr<'a>>),
+    DeviceNotFoundError(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for PushNotifyError<'_> {
+impl core::fmt::Display for PushNotifyError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::ServiceNotAllowedError(msg) => {
@@ -72,7 +92,13 @@ impl core::fmt::Display for PushNotifyError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -82,11 +108,12 @@ pub struct PushNotifyResponse;
 impl jacquard_common::xrpc::XrpcResp for PushNotifyResponse {
     const NSID: &'static str = "win.tomo-x.pushat.pushNotify";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PushNotifyOutput<'de>;
-    type Err<'de> = PushNotifyError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PushNotifyOutput<S>;
+    type Err = PushNotifyError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for PushNotify<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for PushNotify<S> {
     const NSID: &'static str = "win.tomo-x.pushat.pushNotify";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -101,7 +128,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for PushNotifyRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = PushNotify<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = PushNotify<S>;
     type Response = PushNotifyResponse;
 }
 
@@ -152,7 +179,7 @@ pub mod push_notify_state {
 /// Builder for constructing an instance of this type
 pub struct PushNotifyBuilder<'a, S: push_notify_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<NotifyBody<'a>>, Option<Did<'a>>),
+    _fields: (Option<NotifyBody<S>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -182,7 +209,7 @@ where
     /// Set the `body` field (required)
     pub fn body(
         mut self,
-        value: impl Into<NotifyBody<'a>>,
+        value: impl Into<NotifyBody<S>>,
     ) -> PushNotifyBuilder<'a, push_notify_state::SetBody<S>> {
         self._fields.0 = Option::Some(value.into());
         PushNotifyBuilder {
@@ -201,7 +228,7 @@ where
     /// Set the `target` field (required)
     pub fn target(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> PushNotifyBuilder<'a, push_notify_state::SetTarget<S>> {
         self._fields.1 = Option::Some(value.into());
         PushNotifyBuilder {
@@ -229,10 +256,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PushNotify<'a> {
         PushNotify {
             body: self._fields.0.unwrap(),

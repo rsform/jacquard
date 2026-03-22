@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,44 +28,53 @@ use crate::sh_tangled::repo::branch;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Branch<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Branch<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     #[serde(borrow)]
-    pub repo: CowStr<'a>,
+    pub repo: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct BranchOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BranchOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<branch::Signature<'a>>,
+    pub author: Option<branch::Signature<S>>,
     ///Latest commit hash on this branch
-    #[serde(borrow)]
-    pub hash: CowStr<'a>,
+    pub hash: S,
     ///Whether this is the default branch
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_default: Option<bool>,
     ///Latest commit message
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     ///Branch name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Short commit hash
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub short_hash: Option<CowStr<'a>>,
+    pub short_hash: Option<S>,
     ///Timestamp of latest commit
     pub when: Datetime,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -72,25 +83,26 @@ pub struct BranchOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum BranchError<'a> {
+pub enum BranchError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<SmolStr>),
     /// Branch not found
     #[serde(rename = "BranchNotFound")]
-    BranchNotFound(Option<CowStr<'a>>),
+    BranchNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for BranchError<'_> {
+impl core::fmt::Display for BranchError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -114,24 +126,35 @@ impl core::fmt::Display for BranchError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Signature<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Signature<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Author email
-    #[serde(borrow)]
-    pub email: CowStr<'a>,
+    pub email: S,
     ///Author name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Author timestamp
     pub when: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.tangled.repo.branch
@@ -139,11 +162,12 @@ pub struct BranchResponse;
 impl jacquard_common::xrpc::XrpcResp for BranchResponse {
     const NSID: &'static str = "sh.tangled.repo.branch";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BranchOutput<'de>;
-    type Err<'de> = BranchError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BranchOutput<S>;
+    type Err = BranchError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Branch<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Branch<S> {
     const NSID: &'static str = "sh.tangled.repo.branch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = BranchResponse;
@@ -154,11 +178,11 @@ pub struct BranchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BranchRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.branch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Branch<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Branch<S>;
     type Response = BranchResponse;
 }
 
-impl<'a> LexiconSchema for Signature<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Signature<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.branch"
     }
@@ -183,44 +207,44 @@ pub mod branch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Repo;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Repo = S::Repo;
+        type Name = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Name = S::Name;
         type Repo = Set<members::repo>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Repo = S::Repo;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BranchBuilder<'a, S: branch_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -250,7 +274,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BranchBuilder<'a, branch_state::SetName<S>> {
         self._fields.0 = Option::Some(value.into());
         BranchBuilder {
@@ -269,7 +293,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BranchBuilder<'a, branch_state::SetRepo<S>> {
         self._fields.1 = Option::Some(value.into());
         BranchBuilder {
@@ -283,8 +307,8 @@ where
 impl<'a, S> BranchBuilder<'a, S>
 where
     S: branch_state::State,
-    S::Name: branch_state::IsSet,
     S::Repo: branch_state::IsSet,
+    S::Name: branch_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Branch<'a> {
@@ -305,58 +329,58 @@ pub mod signature_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type When;
-        type Name;
         type Email;
+        type Name;
+        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type When = Unset;
-        type Name = Unset;
         type Email = Unset;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type When = Set<members::when>;
-        type Name = S::Name;
-        type Email = S::Email;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type When = S::When;
-        type Name = Set<members::name>;
-        type Email = S::Email;
+        type Name = Unset;
+        type When = Unset;
     }
     ///State transition - sets the `email` field to Set
     pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEmail<S> {}
     impl<S: State> State for SetEmail<S> {
-        type When = S::When;
-        type Name = S::Name;
         type Email = Set<members::email>;
+        type Name = S::Name;
+        type When = S::When;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Email = S::Email;
+        type Name = Set<members::name>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Email = S::Email;
+        type Name = S::Name;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `when` field
-        pub struct when(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `email` field
         pub struct email(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `when` field
+        pub struct when(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SignatureBuilder<'a, S: signature_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _fields: (Option<S>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -386,7 +410,7 @@ where
     /// Set the `email` field (required)
     pub fn email(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SignatureBuilder<'a, signature_state::SetEmail<S>> {
         self._fields.0 = Option::Some(value.into());
         SignatureBuilder {
@@ -405,7 +429,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SignatureBuilder<'a, signature_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         SignatureBuilder {
@@ -438,9 +462,9 @@ where
 impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
-    S::When: signature_state::IsSet,
-    S::Name: signature_state::IsSet,
     S::Email: signature_state::IsSet,
+    S::Name: signature_state::IsSet,
+    S::When: signature_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Signature<'a> {
@@ -454,10 +478,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Signature<'a> {
         Signature {
             email: self._fields.0.unwrap(),

@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,83 +30,98 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::blue_recipes::feed::recipe;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Ingredient<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Ingredient<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The amount of the ingredient needed.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub amount: Option<CowStr<'a>>,
+    pub amount: Option<S>,
     ///The name of the ingredient.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Record containing a recipe.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blue.recipes.feed.recipe", tag = "$type")]
-pub struct Recipe<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "blue.recipes.feed.recipe",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Recipe<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub created_at: Option<CowStr<'a>>,
+    pub created_at: Option<S>,
     ///Free-form recipe description text.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Image representing the recipe.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<BlobRef<'a>>,
-    #[serde(borrow)]
-    pub ingredients: Vec<recipe::Ingredient<'a>>,
+    pub image: Option<BlobRef<S>>,
+    pub ingredients: Vec<recipe::Ingredient<S>>,
     ///The number of servings the recipe prepares.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub serves: Option<i64>,
-    #[serde(borrow)]
-    pub steps: Vec<recipe::Step<'a>>,
+    pub steps: Vec<recipe::Step<S>>,
     ///The amount of time (in minutes) it takes to complete the recipe.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub time: Option<i64>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RecipeGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RecipeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Recipe<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Recipe<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Step<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Step<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The instruction to provide to the user.
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Recipe<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, RecipeRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Recipe<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, RecipeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Ingredient<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Ingredient<S> {
     fn nsid() -> &'static str {
         "blue.recipes.feed.recipe"
     }
@@ -150,18 +167,17 @@ pub struct RecipeRecord;
 impl XrpcResp for RecipeRecord {
     const NSID: &'static str = "blue.recipes.feed.recipe";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RecipeGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RecipeGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<RecipeGetRecordOutput<'_>> for Recipe<'_> {
-    fn from(output: RecipeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<RecipeGetRecordOutput<S>> for Recipe<S> {
+    fn from(output: RecipeGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Recipe<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Recipe<S> {
     const NSID: &'static str = "blue.recipes.feed.recipe";
     type Record = RecipeRecord;
 }
@@ -171,7 +187,7 @@ impl Collection for RecipeRecord {
     type Record = RecipeRecord;
 }
 
-impl<'a> LexiconSchema for Recipe<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Recipe<S> {
     fn nsid() -> &'static str {
         "blue.recipes.feed.recipe"
     }
@@ -272,7 +288,7 @@ impl<'a> LexiconSchema for Recipe<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Step<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Step<S> {
     fn nsid() -> &'static str {
         "blue.recipes.feed.recipe"
     }
@@ -477,49 +493,49 @@ pub mod recipe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Steps;
         type Ingredients;
+        type Steps;
         type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Steps = Unset;
         type Ingredients = Unset;
+        type Steps = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `steps` field to Set
-    pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSteps<S> {}
-    impl<S: State> State for SetSteps<S> {
-        type Steps = Set<members::steps>;
-        type Ingredients = S::Ingredients;
-        type Title = S::Title;
     }
     ///State transition - sets the `ingredients` field to Set
     pub struct SetIngredients<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIngredients<S> {}
     impl<S: State> State for SetIngredients<S> {
-        type Steps = S::Steps;
         type Ingredients = Set<members::ingredients>;
+        type Steps = S::Steps;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `steps` field to Set
+    pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSteps<S> {}
+    impl<S: State> State for SetSteps<S> {
+        type Ingredients = S::Ingredients;
+        type Steps = Set<members::steps>;
         type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Steps = S::Steps;
         type Ingredients = S::Ingredients;
+        type Steps = S::Steps;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `steps` field
-        pub struct steps(());
         ///Marker type for the `ingredients` field
         pub struct ingredients(());
+        ///Marker type for the `steps` field
+        pub struct steps(());
         ///Marker type for the `title` field
         pub struct title(());
     }
@@ -529,14 +545,14 @@ pub mod recipe_state {
 pub struct RecipeBuilder<'a, S: recipe_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<Vec<recipe::Ingredient<'a>>>,
+        Option<S>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<Vec<recipe::Ingredient<S>>>,
         Option<i64>,
-        Option<Vec<recipe::Step<'a>>>,
+        Option<Vec<recipe::Step<S>>>,
         Option<i64>,
-        Option<CowStr<'a>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -561,12 +577,12 @@ impl<'a> RecipeBuilder<'a, recipe_state::Empty> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
-    pub fn created_at(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn created_at(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
-    pub fn maybe_created_at(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_created_at(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -574,12 +590,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -587,12 +603,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -606,7 +622,7 @@ where
     /// Set the `ingredients` field (required)
     pub fn ingredients(
         mut self,
-        value: impl Into<Vec<recipe::Ingredient<'a>>>,
+        value: impl Into<Vec<recipe::Ingredient<S>>>,
     ) -> RecipeBuilder<'a, recipe_state::SetIngredients<S>> {
         self._fields.3 = Option::Some(value.into());
         RecipeBuilder {
@@ -638,7 +654,7 @@ where
     /// Set the `steps` field (required)
     pub fn steps(
         mut self,
-        value: impl Into<Vec<recipe::Step<'a>>>,
+        value: impl Into<Vec<recipe::Step<S>>>,
     ) -> RecipeBuilder<'a, recipe_state::SetSteps<S>> {
         self._fields.5 = Option::Some(value.into());
         RecipeBuilder {
@@ -670,7 +686,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RecipeBuilder<'a, recipe_state::SetTitle<S>> {
         self._fields.7 = Option::Some(value.into());
         RecipeBuilder {
@@ -684,8 +700,8 @@ where
 impl<'a, S> RecipeBuilder<'a, S>
 where
     S: recipe_state::State,
-    S::Steps: recipe_state::IsSet,
     S::Ingredients: recipe_state::IsSet,
+    S::Steps: recipe_state::IsSet,
     S::Title: recipe_state::IsSet,
 {
     /// Build the final struct
@@ -703,13 +719,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Recipe<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Recipe<'a> {
         Recipe {
             created_at: self._fields.0,
             description: self._fields.1,

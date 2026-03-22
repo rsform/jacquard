@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,38 +30,46 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Acceptance of a collaboration invite. Completes the two-way agreement.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.weaver.collab.accept", tag = "$type")]
-pub struct Accept<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.weaver.collab.accept",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Accept<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///Reference to the invite record being accepted.
-    #[serde(borrow)]
-    pub invite: StrongRef<'a>,
+    pub invite: StrongRef<S>,
     ///URI of the resource (denormalized for easier querying).
-    #[serde(borrow)]
-    pub resource: AtUri<'a>,
+    pub resource: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AcceptGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AcceptGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Accept<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Accept<S>,
 }
 
-impl<'a> Accept<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AcceptRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Accept<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AcceptRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -70,18 +80,17 @@ pub struct AcceptRecord;
 impl XrpcResp for AcceptRecord {
     const NSID: &'static str = "sh.weaver.collab.accept";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AcceptGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AcceptGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AcceptGetRecordOutput<'_>> for Accept<'_> {
-    fn from(output: AcceptGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AcceptGetRecordOutput<S>> for Accept<S> {
+    fn from(output: AcceptGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Accept<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Accept<S> {
     const NSID: &'static str = "sh.weaver.collab.accept";
     type Record = AcceptRecord;
 }
@@ -91,7 +100,7 @@ impl Collection for AcceptRecord {
     type Record = AcceptRecord;
 }
 
-impl<'a> LexiconSchema for Accept<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Accept<S> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.accept"
     }
@@ -167,7 +176,7 @@ pub mod accept_state {
 /// Builder for constructing an instance of this type
 pub struct AcceptBuilder<'a, S: accept_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<StrongRef<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<Datetime>, Option<StrongRef<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -216,7 +225,7 @@ where
     /// Set the `invite` field (required)
     pub fn invite(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> AcceptBuilder<'a, accept_state::SetInvite<S>> {
         self._fields.1 = Option::Some(value.into());
         AcceptBuilder {
@@ -235,7 +244,7 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> AcceptBuilder<'a, accept_state::SetResource<S>> {
         self._fields.2 = Option::Some(value.into());
         AcceptBuilder {
@@ -263,13 +272,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Accept<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Accept<'a> {
         Accept {
             created_at: self._fields.0.unwrap(),
             invite: self._fields.1.unwrap(),

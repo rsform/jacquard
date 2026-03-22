@@ -13,14 +13,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -32,113 +34,115 @@ use serde::{Serialize, Deserialize};
 use crate::social_grain::AspectRatio;
 use crate::social_grain::photo;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.grain.photo", tag = "$type")]
-pub struct Photo<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.grain.photo",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Photo<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text description of the image, for accessibility.
-    #[serde(borrow)]
-    pub alt: CowStr<'a>,
+    pub alt: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<AspectRatio<'a>>,
+    pub aspect_ratio: Option<AspectRatio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    #[serde(borrow)]
-    pub photo: BlobRef<'a>,
+    pub photo: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PhotoGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PhotoGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Photo<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Photo<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ExifView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExifView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
+    pub cid: Option<Cid<S>>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_time_original: Option<CowStr<'a>>,
+    pub date_time_original: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub exposure_time: Option<CowStr<'a>>,
+    pub exposure_time: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub f_number: Option<CowStr<'a>>,
+    pub f_number: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub flash: Option<CowStr<'a>>,
+    pub flash: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub focal_length_in35mm_format: Option<CowStr<'a>>,
+    pub focal_length_in35mm_format: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub i_so: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lens_make: Option<CowStr<'a>>,
+    pub lens_make: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lens_model: Option<CowStr<'a>>,
+    pub lens_model: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub make: Option<CowStr<'a>>,
+    pub make: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub model: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub photo: AtUri<'a>,
+    pub model: Option<S>,
+    pub photo: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PhotoView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PhotoView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text description of the image, for accessibility.
-    #[serde(borrow)]
-    pub alt: CowStr<'a>,
+    pub alt: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<AspectRatio<'a>>,
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub aspect_ratio: Option<AspectRatio<S>>,
+    pub cid: Cid<S>,
     ///EXIF metadata for the photo, if available.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub exif: Option<photo::ExifView<'a>>,
+    pub exif: Option<photo::ExifView<S>>,
     ///Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.
-    #[serde(borrow)]
-    pub fullsize: UriValue<'a>,
+    pub fullsize: UriValue<S>,
     ///Fully-qualified URL where a thumbnail of the image can be fetched. For example, CDN location provided by the App View.
-    #[serde(borrow)]
-    pub thumb: UriValue<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub thumb: UriValue<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Photo<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PhotoRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Photo<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PhotoRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -149,18 +153,17 @@ pub struct PhotoRecord;
 impl XrpcResp for PhotoRecord {
     const NSID: &'static str = "social.grain.photo";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PhotoGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PhotoGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PhotoGetRecordOutput<'_>> for Photo<'_> {
-    fn from(output: PhotoGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PhotoGetRecordOutput<S>> for Photo<S> {
+    fn from(output: PhotoGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Photo<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Photo<S> {
     const NSID: &'static str = "social.grain.photo";
     type Record = PhotoRecord;
 }
@@ -170,7 +173,7 @@ impl Collection for PhotoRecord {
     type Record = PhotoRecord;
 }
 
-impl<'a> LexiconSchema for Photo<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Photo<S> {
     fn nsid() -> &'static str {
         "social.grain.photo"
     }
@@ -225,7 +228,7 @@ impl<'a> LexiconSchema for Photo<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ExifView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExifView<S> {
     fn nsid() -> &'static str {
         "social.grain.photo.defs"
     }
@@ -240,7 +243,7 @@ impl<'a> LexiconSchema for ExifView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PhotoView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PhotoView<S> {
     fn nsid() -> &'static str {
         "social.grain.photo.defs"
     }
@@ -302,12 +305,7 @@ pub mod photo_state {
 /// Builder for constructing an instance of this type
 pub struct PhotoBuilder<'a, S: photo_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<AspectRatio<'a>>,
-        Option<Datetime>,
-        Option<BlobRef<'a>>,
-    ),
+    _fields: (Option<S>, Option<AspectRatio<S>>, Option<Datetime>, Option<BlobRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -337,7 +335,7 @@ where
     /// Set the `alt` field (required)
     pub fn alt(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PhotoBuilder<'a, photo_state::SetAlt<S>> {
         self._fields.0 = Option::Some(value.into());
         PhotoBuilder {
@@ -350,12 +348,12 @@ where
 
 impl<'a, S: photo_state::State> PhotoBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -382,7 +380,7 @@ where
     /// Set the `photo` field (required)
     pub fn photo(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> PhotoBuilder<'a, photo_state::SetPhoto<S>> {
         self._fields.3 = Option::Some(value.into());
         PhotoBuilder {
@@ -410,13 +408,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Photo<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Photo<'a> {
         Photo {
             alt: self._fields.0.unwrap(),
             aspect_ratio: self._fields.1,
@@ -540,20 +532,20 @@ pub mod exif_view_state {
 pub struct ExifViewBuilder<'a, S: exif_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Cid<'a>>,
+        Option<Cid<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<AtUri<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -593,12 +585,12 @@ impl<'a> ExifViewBuilder<'a, exif_view_state::Empty> {
 
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `cid` field (optional)
-    pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
+    pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
-    pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
+    pub fn maybe_cid(mut self, value: Option<Cid<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -625,12 +617,12 @@ where
 
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `dateTimeOriginal` field (optional)
-    pub fn date_time_original(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn date_time_original(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `dateTimeOriginal` field to an Option value (optional)
-    pub fn maybe_date_time_original(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_date_time_original(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -638,12 +630,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `exposureTime` field (optional)
-    pub fn exposure_time(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn exposure_time(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `exposureTime` field to an Option value (optional)
-    pub fn maybe_exposure_time(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_exposure_time(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -651,12 +643,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `fNumber` field (optional)
-    pub fn f_number(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn f_number(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `fNumber` field to an Option value (optional)
-    pub fn maybe_f_number(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_f_number(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -664,12 +656,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `flash` field (optional)
-    pub fn flash(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn flash(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `flash` field to an Option value (optional)
-    pub fn maybe_flash(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_flash(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -677,18 +669,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `focalLengthIn35mmFormat` field (optional)
-    pub fn focal_length_in35mm_format(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn focal_length_in35mm_format(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `focalLengthIn35mmFormat` field to an Option value (optional)
-    pub fn maybe_focal_length_in35mm_format(
-        mut self,
-        value: Option<CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_focal_length_in35mm_format(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -709,12 +695,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `lensMake` field (optional)
-    pub fn lens_make(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn lens_make(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `lensMake` field to an Option value (optional)
-    pub fn maybe_lens_make(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_lens_make(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -722,12 +708,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `lensModel` field (optional)
-    pub fn lens_model(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn lens_model(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `lensModel` field to an Option value (optional)
-    pub fn maybe_lens_model(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_lens_model(mut self, value: Option<S>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -735,12 +721,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `make` field (optional)
-    pub fn make(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn make(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `make` field to an Option value (optional)
-    pub fn maybe_make(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_make(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -748,12 +734,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `model` field (optional)
-    pub fn model(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn model(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `model` field to an Option value (optional)
-    pub fn maybe_model(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_model(mut self, value: Option<S>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -767,7 +753,7 @@ where
     /// Set the `photo` field (required)
     pub fn photo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ExifViewBuilder<'a, exif_view_state::SetPhoto<S>> {
         self._fields.12 = Option::Some(value.into());
         ExifViewBuilder {
@@ -780,12 +766,12 @@ where
 
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `uri` field (optional)
-    pub fn uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
-    pub fn maybe_uri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_uri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -820,10 +806,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ExifView<'a> {
         ExifView {
             cid: self._fields.0,
@@ -1041,85 +1024,85 @@ pub mod photo_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Thumb;
         type Fullsize;
-        type Cid;
-        type Uri;
         type Alt;
+        type Uri;
+        type Thumb;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Thumb = Unset;
         type Fullsize = Unset;
-        type Cid = Unset;
-        type Uri = Unset;
         type Alt = Unset;
-    }
-    ///State transition - sets the `thumb` field to Set
-    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumb<S> {}
-    impl<S: State> State for SetThumb<S> {
-        type Thumb = Set<members::thumb>;
-        type Fullsize = S::Fullsize;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Alt = S::Alt;
+        type Uri = Unset;
+        type Thumb = Unset;
+        type Cid = Unset;
     }
     ///State transition - sets the `fullsize` field to Set
     pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFullsize<S> {}
     impl<S: State> State for SetFullsize<S> {
-        type Thumb = S::Thumb;
         type Fullsize = Set<members::fullsize>;
-        type Cid = S::Cid;
+        type Alt = S::Alt;
         type Uri = S::Uri;
-        type Alt = S::Alt;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
         type Thumb = S::Thumb;
-        type Fullsize = S::Fullsize;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Alt = S::Alt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Thumb = S::Thumb;
-        type Fullsize = S::Fullsize;
         type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Alt = S::Alt;
     }
     ///State transition - sets the `alt` field to Set
     pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlt<S> {}
     impl<S: State> State for SetAlt<S> {
-        type Thumb = S::Thumb;
         type Fullsize = S::Fullsize;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
         type Alt = Set<members::alt>;
+        type Uri = S::Uri;
+        type Thumb = S::Thumb;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Fullsize = S::Fullsize;
+        type Alt = S::Alt;
+        type Uri = Set<members::uri>;
+        type Thumb = S::Thumb;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumb<S> {}
+    impl<S: State> State for SetThumb<S> {
+        type Fullsize = S::Fullsize;
+        type Alt = S::Alt;
+        type Uri = S::Uri;
+        type Thumb = Set<members::thumb>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Fullsize = S::Fullsize;
+        type Alt = S::Alt;
+        type Uri = S::Uri;
+        type Thumb = S::Thumb;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `thumb` field
-        pub struct thumb(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `alt` field
         pub struct alt(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -1127,13 +1110,13 @@ pub mod photo_view_state {
 pub struct PhotoViewBuilder<'a, S: photo_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<AspectRatio<'a>>,
-        Option<Cid<'a>>,
-        Option<photo::ExifView<'a>>,
-        Option<UriValue<'a>>,
-        Option<UriValue<'a>>,
-        Option<AtUri<'a>>,
+        Option<S>,
+        Option<AspectRatio<S>>,
+        Option<Cid<S>>,
+        Option<photo::ExifView<S>>,
+        Option<UriValue<S>>,
+        Option<UriValue<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1164,7 +1147,7 @@ where
     /// Set the `alt` field (required)
     pub fn alt(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PhotoViewBuilder<'a, photo_view_state::SetAlt<S>> {
         self._fields.0 = Option::Some(value.into());
         PhotoViewBuilder {
@@ -1177,12 +1160,12 @@ where
 
 impl<'a, S: photo_view_state::State> PhotoViewBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
+    pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1196,7 +1179,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> PhotoViewBuilder<'a, photo_view_state::SetCid<S>> {
         self._fields.2 = Option::Some(value.into());
         PhotoViewBuilder {
@@ -1209,12 +1192,12 @@ where
 
 impl<'a, S: photo_view_state::State> PhotoViewBuilder<'a, S> {
     /// Set the `exif` field (optional)
-    pub fn exif(mut self, value: impl Into<Option<photo::ExifView<'a>>>) -> Self {
+    pub fn exif(mut self, value: impl Into<Option<photo::ExifView<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `exif` field to an Option value (optional)
-    pub fn maybe_exif(mut self, value: Option<photo::ExifView<'a>>) -> Self {
+    pub fn maybe_exif(mut self, value: Option<photo::ExifView<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1228,7 +1211,7 @@ where
     /// Set the `fullsize` field (required)
     pub fn fullsize(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> PhotoViewBuilder<'a, photo_view_state::SetFullsize<S>> {
         self._fields.4 = Option::Some(value.into());
         PhotoViewBuilder {
@@ -1247,7 +1230,7 @@ where
     /// Set the `thumb` field (required)
     pub fn thumb(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> PhotoViewBuilder<'a, photo_view_state::SetThumb<S>> {
         self._fields.5 = Option::Some(value.into());
         PhotoViewBuilder {
@@ -1266,7 +1249,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> PhotoViewBuilder<'a, photo_view_state::SetUri<S>> {
         self._fields.6 = Option::Some(value.into());
         PhotoViewBuilder {
@@ -1280,11 +1263,11 @@ where
 impl<'a, S> PhotoViewBuilder<'a, S>
 where
     S: photo_view_state::State,
-    S::Thumb: photo_view_state::IsSet,
     S::Fullsize: photo_view_state::IsSet,
-    S::Cid: photo_view_state::IsSet,
-    S::Uri: photo_view_state::IsSet,
     S::Alt: photo_view_state::IsSet,
+    S::Uri: photo_view_state::IsSet,
+    S::Thumb: photo_view_state::IsSet,
+    S::Cid: photo_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PhotoView<'a> {
@@ -1302,10 +1285,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PhotoView<'a> {
         PhotoView {
             alt: self._fields.0.unwrap(),

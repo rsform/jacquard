@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,41 +31,48 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::fyi_frontpage::richtext::block::Block;
 /// Record containing a Frontpage comment.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "fyi.frontpage.feed.comment", tag = "$type")]
-pub struct Comment<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "fyi.frontpage.feed.comment",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Comment<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The content of the comment. Note, there are additional constraints placed on the total size of the content within the Frontpage AppView that are not possible to express in lexicon. Generally a comment can have a maximum length of 10,000 graphemes, the Frontpage AppView will enforce this limit.
-    #[serde(borrow)]
-    pub blocks: Vec<Block<'a>>,
+    pub blocks: Vec<Block<S>>,
     ///Client-declared timestamp when this comment was originally created.
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent: Option<StrongRef<'a>>,
-    #[serde(borrow)]
-    pub post: StrongRef<'a>,
+    pub parent: Option<StrongRef<S>>,
+    pub post: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CommentGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CommentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Comment<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Comment<S>,
 }
 
-impl<'a> Comment<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CommentRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Comment<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CommentRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -74,18 +83,17 @@ pub struct CommentRecord;
 impl XrpcResp for CommentRecord {
     const NSID: &'static str = "fyi.frontpage.feed.comment";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CommentGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CommentGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CommentGetRecordOutput<'_>> for Comment<'_> {
-    fn from(output: CommentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CommentGetRecordOutput<S>> for Comment<S> {
+    fn from(output: CommentGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Comment<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Comment<S> {
     const NSID: &'static str = "fyi.frontpage.feed.comment";
     type Record = CommentRecord;
 }
@@ -95,7 +103,7 @@ impl Collection for CommentRecord {
     type Record = CommentRecord;
 }
 
-impl<'a> LexiconSchema for Comment<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Comment<S> {
     fn nsid() -> &'static str {
         "fyi.frontpage.feed.comment"
     }
@@ -131,49 +139,49 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blocks;
         type CreatedAt;
+        type Blocks;
         type Post;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blocks = Unset;
         type CreatedAt = Unset;
+        type Blocks = Unset;
         type Post = Unset;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocks<S> {}
-    impl<S: State> State for SetBlocks<S> {
-        type Blocks = Set<members::blocks>;
-        type CreatedAt = S::CreatedAt;
-        type Post = S::Post;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Blocks = S::Blocks;
         type CreatedAt = Set<members::created_at>;
+        type Blocks = S::Blocks;
+        type Post = S::Post;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type CreatedAt = S::CreatedAt;
+        type Blocks = Set<members::blocks>;
         type Post = S::Post;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPost<S> {}
     impl<S: State> State for SetPost<S> {
-        type Blocks = S::Blocks;
         type CreatedAt = S::CreatedAt;
+        type Blocks = S::Blocks;
         type Post = Set<members::post>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
         ///Marker type for the `post` field
         pub struct post(());
     }
@@ -183,10 +191,10 @@ pub mod comment_state {
 pub struct CommentBuilder<'a, S: comment_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<Block<'a>>>,
+        Option<Vec<Block<S>>>,
         Option<Datetime>,
-        Option<StrongRef<'a>>,
-        Option<StrongRef<'a>>,
+        Option<StrongRef<S>>,
+        Option<StrongRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -217,7 +225,7 @@ where
     /// Set the `blocks` field (required)
     pub fn blocks(
         mut self,
-        value: impl Into<Vec<Block<'a>>>,
+        value: impl Into<Vec<Block<S>>>,
     ) -> CommentBuilder<'a, comment_state::SetBlocks<S>> {
         self._fields.0 = Option::Some(value.into());
         CommentBuilder {
@@ -249,12 +257,12 @@ where
 
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `parent` field (optional)
-    pub fn parent(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn parent(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
-    pub fn maybe_parent(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_parent(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -268,7 +276,7 @@ where
     /// Set the `post` field (required)
     pub fn post(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> CommentBuilder<'a, comment_state::SetPost<S>> {
         self._fields.3 = Option::Some(value.into());
         CommentBuilder {
@@ -282,8 +290,8 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Blocks: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
+    S::Blocks: comment_state::IsSet,
     S::Post: comment_state::IsSet,
 {
     /// Build the final struct
@@ -299,10 +307,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Comment<'a> {
         Comment {
             blocks: self._fields.0.unwrap(),

@@ -7,18 +7,24 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Tag<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub repo: CowStr<'a>,
+    pub repo: S,
     #[serde(borrow)]
-    pub tag: CowStr<'a>,
+    pub tag: S,
 }
 
 
@@ -29,7 +35,6 @@ pub struct TagOutput {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -38,25 +43,29 @@ pub struct TagOutput {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum TagError<'a> {
+pub enum TagError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Tag not found
     #[serde(rename = "TagNotFound")]
-    TagNotFound(Option<CowStr<'a>>),
+    TagNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for TagError<'_> {
+impl core::fmt::Display for TagError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -80,7 +89,13 @@ impl core::fmt::Display for TagError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -90,18 +105,22 @@ pub struct TagResponse;
 impl jacquard_common::xrpc::XrpcResp for TagResponse {
     const NSID: &'static str = "sh.tangled.repo.tag";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = TagOutput;
-    type Err<'de> = TagError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = TagOutput;
+    type Err = TagError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(TagOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -109,7 +128,8 @@ impl jacquard_common::xrpc::XrpcResp for TagResponse {
     }
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Tag<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Tag<S> {
     const NSID: &'static str = "sh.tangled.repo.tag";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = TagResponse;
@@ -120,7 +140,7 @@ pub struct TagRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for TagRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.tag";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Tag<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Tag<S>;
     type Response = TagResponse;
 }
 
@@ -171,7 +191,7 @@ pub mod tag_state {
 /// Builder for constructing an instance of this type
 pub struct TagBuilder<'a, S: tag_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -199,10 +219,7 @@ where
     S::Repo: tag_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<CowStr<'a>>,
-    ) -> TagBuilder<'a, tag_state::SetRepo<S>> {
+    pub fn repo(mut self, value: impl Into<S>) -> TagBuilder<'a, tag_state::SetRepo<S>> {
         self._fields.0 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
@@ -218,10 +235,7 @@ where
     S::Tag: tag_state::IsUnset,
 {
     /// Set the `tag` field (required)
-    pub fn tag(
-        mut self,
-        value: impl Into<CowStr<'a>>,
-    ) -> TagBuilder<'a, tag_state::SetTag<S>> {
+    pub fn tag(mut self, value: impl Into<S>) -> TagBuilder<'a, tag_state::SetTag<S>> {
         self._fields.1 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,

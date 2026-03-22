@@ -10,10 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,29 +27,41 @@ use crate::blog_pckt::block::bullet_list::BulletList;
 use crate::blog_pckt::block::ordered_list::OrderedList;
 use crate::blog_pckt::block::text::Text;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ListItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of block content (text or nested lists)
-    #[serde(borrow)]
-    pub content: Vec<ListItemContentItem<'a>>,
+    pub content: Vec<ListItemContentItem<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ListItemContentItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ListItemContentItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "blog.pckt.block.text")]
-    Text(Box<Text<'a>>),
+    Text(Box<Text<S>>),
     #[serde(rename = "blog.pckt.block.bulletList")]
-    BulletList(Box<BulletList<'a>>),
+    BulletList(Box<BulletList<S>>),
     #[serde(rename = "blog.pckt.block.orderedList")]
-    OrderedList(Box<OrderedList<'a>>),
+    OrderedList(Box<OrderedList<S>>),
 }
 
-impl<'a> LexiconSchema for ListItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListItem<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.listItem"
     }
@@ -96,7 +111,7 @@ pub mod list_item_state {
 /// Builder for constructing an instance of this type
 pub struct ListItemBuilder<'a, S: list_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<ListItemContentItem<'a>>>,),
+    _fields: (Option<Vec<ListItemContentItem<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -126,7 +141,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<Vec<ListItemContentItem<'a>>>,
+        value: impl Into<Vec<ListItemContentItem<S>>>,
     ) -> ListItemBuilder<'a, list_item_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         ListItemBuilder {
@@ -152,10 +167,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ListItem<'a> {
         ListItem {
             content: self._fields.0.unwrap(),

@@ -10,35 +10,49 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetNotebookByTitle<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetNotebookByTitle<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub actor: AtIdentifier<'a>,
+    pub actor: AtIdentifier<S>,
     #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetNotebookByTitleOutput<'a> {
-    #[serde(borrow)]
-    pub entries: Vec<StrongRef<'a>>,
-    #[serde(borrow)]
-    pub notebook: NotebookView<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetNotebookByTitleOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub entries: Vec<StrongRef<S>>,
+    pub notebook: NotebookView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -47,18 +61,19 @@ pub struct GetNotebookByTitleOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetNotebookByTitleError<'a> {
+pub enum GetNotebookByTitleError {
     #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(Option<CowStr<'a>>),
+    NotebookNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetNotebookByTitleError<'_> {
+impl core::fmt::Display for GetNotebookByTitleError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::NotebookNotFound(msg) => {
@@ -68,7 +83,13 @@ impl core::fmt::Display for GetNotebookByTitleError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -78,11 +99,12 @@ pub struct GetNotebookByTitleResponse;
 impl jacquard_common::xrpc::XrpcResp for GetNotebookByTitleResponse {
     const NSID: &'static str = "sh.weaver.notebook.getNotebookByTitle";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetNotebookByTitleOutput<'de>;
-    type Err<'de> = GetNotebookByTitleError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetNotebookByTitleOutput<S>;
+    type Err = GetNotebookByTitleError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetNotebookByTitle<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetNotebookByTitle<S> {
     const NSID: &'static str = "sh.weaver.notebook.getNotebookByTitle";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetNotebookByTitleResponse;
@@ -93,7 +115,7 @@ pub struct GetNotebookByTitleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookByTitleRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getNotebookByTitle";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetNotebookByTitle<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetNotebookByTitle<S>;
     type Response = GetNotebookByTitleResponse;
 }
 
@@ -144,7 +166,7 @@ pub mod get_notebook_by_title_state {
 /// Builder for constructing an instance of this type
 pub struct GetNotebookByTitleBuilder<'a, S: get_notebook_by_title_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<AtIdentifier<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -174,7 +196,7 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetNotebookByTitleBuilder<'a, get_notebook_by_title_state::SetActor<S>> {
         self._fields.0 = Option::Some(value.into());
         GetNotebookByTitleBuilder {
@@ -193,7 +215,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetNotebookByTitleBuilder<'a, get_notebook_by_title_state::SetTitle<S>> {
         self._fields.1 = Option::Some(value.into());
         GetNotebookByTitleBuilder {

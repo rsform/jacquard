@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,41 +26,59 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::place_stream::live::get_recommendations;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LivestreamRecommendation<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LivestreamRecommendation<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The DID of the recommended streamer
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///Source of the recommendation
-    #[serde(borrow)]
-    pub source: CowStr<'a>,
+    pub source: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRecommendations<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRecommendations<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub user_did: Did<'a>,
+    pub user_did: Did<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRecommendationsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRecommendationsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Ordered list of recommendations
-    #[serde(borrow)]
-    pub recommendations: Vec<get_recommendations::LivestreamRecommendation<'a>>,
+    pub recommendations: Vec<get_recommendations::LivestreamRecommendation<S>>,
     ///The user DID this recommendation is for
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub user_did: Option<Did<'a>>,
+    pub user_did: Option<Did<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for LivestreamRecommendation<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LivestreamRecommendation<S> {
     fn nsid() -> &'static str {
         "place.stream.live.getRecommendations"
     }
@@ -78,11 +98,12 @@ pub struct GetRecommendationsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecommendationsResponse {
     const NSID: &'static str = "place.stream.live.getRecommendations";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRecommendationsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetRecommendationsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecommendations<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetRecommendations<S> {
     const NSID: &'static str = "place.stream.live.getRecommendations";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecommendationsResponse;
@@ -93,7 +114,7 @@ pub struct GetRecommendationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecommendationsRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.getRecommendations";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRecommendations<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetRecommendations<S>;
     type Response = GetRecommendationsResponse;
 }
 
@@ -147,7 +168,7 @@ pub struct LivestreamRecommendationBuilder<
     S: livestream_recommendation_state::State,
 > {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Did<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -180,7 +201,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> LivestreamRecommendationBuilder<
         'a,
         livestream_recommendation_state::SetDid<S>,
@@ -202,7 +223,7 @@ where
     /// Set the `source` field (required)
     pub fn source(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LivestreamRecommendationBuilder<
         'a,
         livestream_recommendation_state::SetSource<S>,
@@ -233,10 +254,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LivestreamRecommendation<'a> {
         LivestreamRecommendation {
             did: self._fields.0.unwrap(),
@@ -359,7 +377,7 @@ pub mod get_recommendations_state {
 /// Builder for constructing an instance of this type
 pub struct GetRecommendationsBuilder<'a, S: get_recommendations_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -389,7 +407,7 @@ where
     /// Set the `userDID` field (required)
     pub fn user_did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetRecommendationsBuilder<'a, get_recommendations_state::SetUserDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetRecommendationsBuilder {

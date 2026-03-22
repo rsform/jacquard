@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,41 +29,41 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A claim for ownership of game or organization records.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "games.gamesgamesgamesgames.claim",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Claim<'a> {
+pub struct Claim<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Contact information for the claimant (filtered from responses unless caller is admin)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contact: Option<CowStr<'a>>,
+    pub contact: Option<S>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub games: Option<Vec<AtUri<'a>>>,
+    pub games: Option<Vec<AtUri<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub org: Option<AtUri<'a>>,
-    #[serde(borrow)]
-    pub r#type: ClaimType<'a>,
+    pub org: Option<AtUri<S>>,
+    pub r#type: ClaimType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ClaimType<'a> {
+pub enum ClaimType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Game,
     Org,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ClaimType<'a> {
+impl<S: Bos<str> + AsRef<str>> ClaimType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Game => "game",
@@ -69,70 +71,56 @@ impl<'a> ClaimType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ClaimType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "game" => Self::Game,
             "org" => Self::Org,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ClaimType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "game" => Self::Game,
-            "org" => Self::Org,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ClaimType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ClaimType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ClaimType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ClaimType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ClaimType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ClaimType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ClaimType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ClaimType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ClaimType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ClaimType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ClaimType<'_> {
-    type Output = ClaimType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ClaimType<S> {
+    type Output = ClaimType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ClaimType::Game => ClaimType::Game,
@@ -145,22 +133,23 @@ impl jacquard_common::IntoStatic for ClaimType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ClaimGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ClaimGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Claim<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Claim<S>,
 }
 
-impl<'a> Claim<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ClaimRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Claim<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ClaimRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -171,18 +160,17 @@ pub struct ClaimRecord;
 impl XrpcResp for ClaimRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.claim";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ClaimGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ClaimGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ClaimGetRecordOutput<'_>> for Claim<'_> {
-    fn from(output: ClaimGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ClaimGetRecordOutput<S>> for Claim<S> {
+    fn from(output: ClaimGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Claim<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Claim<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.claim";
     type Record = ClaimRecord;
 }
@@ -192,7 +180,7 @@ impl Collection for ClaimRecord {
     type Record = ClaimRecord;
 }
 
-impl<'a> LexiconSchema for Claim<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Claim<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.claim"
     }
@@ -279,12 +267,12 @@ pub mod claim_state {
 pub struct ClaimBuilder<'a, S: claim_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<Vec<AtUri<'a>>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<ClaimType<'a>>,
+        Option<Vec<AtUri<S>>>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<ClaimType<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -309,12 +297,12 @@ impl<'a> ClaimBuilder<'a, claim_state::Empty> {
 
 impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     /// Set the `contact` field (optional)
-    pub fn contact(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn contact(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `contact` field to an Option value (optional)
-    pub fn maybe_contact(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_contact(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -341,12 +329,12 @@ where
 
 impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     /// Set the `games` field (optional)
-    pub fn games(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn games(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `games` field to an Option value (optional)
-    pub fn maybe_games(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_games(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -354,12 +342,12 @@ impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
 
 impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
-    pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_message(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -367,12 +355,12 @@ impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
 
 impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     /// Set the `org` field (optional)
-    pub fn org(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn org(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `org` field to an Option value (optional)
-    pub fn maybe_org(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_org(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -386,7 +374,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<ClaimType<'a>>,
+        value: impl Into<ClaimType<S>>,
     ) -> ClaimBuilder<'a, claim_state::SetType<S>> {
         self._fields.5 = Option::Some(value.into());
         ClaimBuilder {
@@ -416,13 +404,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Claim<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Claim<'a> {
         Claim {
             contact: self._fields.0,
             created_at: self._fields.1.unwrap(),

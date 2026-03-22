@@ -17,13 +17,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::{AtUri, Datetime, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -31,53 +33,75 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BlobMetadata<'a> {
-    #[serde(borrow)]
-    pub blobref: BlobRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BlobMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub blobref: BlobRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct BlogEntry<'a> {
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BlogEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub content: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Comment<'a> {
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
-    #[serde(borrow)]
-    pub entry_uri: AtUri<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Comment<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub content: S,
+    pub entry_uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Ogp<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Ogp<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for BlobMetadata<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BlobMetadata<S> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.defs"
     }
@@ -119,7 +143,7 @@ impl<'a> LexiconSchema for BlobMetadata<'a> {
     }
 }
 
-impl<'a> LexiconSchema for BlogEntry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BlogEntry<S> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.defs"
     }
@@ -145,7 +169,7 @@ impl<'a> LexiconSchema for BlogEntry<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Comment<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Comment<S> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.defs"
     }
@@ -171,7 +195,7 @@ impl<'a> LexiconSchema for Comment<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Ogp<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Ogp<S> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.defs"
     }
@@ -221,7 +245,7 @@ pub mod blob_metadata_state {
 /// Builder for constructing an instance of this type
 pub struct BlobMetadataBuilder<'a, S: blob_metadata_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<BlobRef<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -251,7 +275,7 @@ where
     /// Set the `blobref` field (required)
     pub fn blobref(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> BlobMetadataBuilder<'a, blob_metadata_state::SetBlobref<S>> {
         self._fields.0 = Option::Some(value.into());
         BlobMetadataBuilder {
@@ -264,12 +288,12 @@ where
 
 impl<'a, S: blob_metadata_state::State> BlobMetadataBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -291,10 +315,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BlobMetadata<'a> {
         BlobMetadata {
             blobref: self._fields.0.unwrap(),
@@ -438,44 +459,44 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EntryUri;
         type Content;
+        type EntryUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EntryUri = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `entry_uri` field to Set
-    pub struct SetEntryUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntryUri<S> {}
-    impl<S: State> State for SetEntryUri<S> {
-        type EntryUri = Set<members::entry_uri>;
-        type Content = S::Content;
+        type EntryUri = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type EntryUri = S::EntryUri;
         type Content = Set<members::content>;
+        type EntryUri = S::EntryUri;
+    }
+    ///State transition - sets the `entry_uri` field to Set
+    pub struct SetEntryUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntryUri<S> {}
+    impl<S: State> State for SetEntryUri<S> {
+        type Content = S::Content;
+        type EntryUri = Set<members::entry_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entry_uri` field
-        pub struct entry_uri(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `entry_uri` field
+        pub struct entry_uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CommentBuilder<'a, S: comment_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -505,7 +526,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CommentBuilder<'a, comment_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         CommentBuilder {
@@ -524,7 +545,7 @@ where
     /// Set the `entryUri` field (required)
     pub fn entry_uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> CommentBuilder<'a, comment_state::SetEntryUri<S>> {
         self._fields.1 = Option::Some(value.into());
         CommentBuilder {
@@ -538,8 +559,8 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::EntryUri: comment_state::IsSet,
     S::Content: comment_state::IsSet,
+    S::EntryUri: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
@@ -552,10 +573,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Comment<'a> {
         Comment {
             content: self._fields.0.unwrap(),
@@ -600,7 +618,7 @@ pub mod ogp_state {
 /// Builder for constructing an instance of this type
 pub struct OgpBuilder<'a, S: ogp_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<UriValue<'a>>, Option<i64>),
+    _fields: (Option<i64>, Option<UriValue<S>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -643,7 +661,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> OgpBuilder<'a, ogp_state::SetUrl<S>> {
         self._fields.1 = Option::Some(value.into());
         OgpBuilder {
@@ -682,13 +700,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Ogp<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Ogp<'a> {
         Ogp {
             height: self._fields.0,
             url: self._fields.1.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,43 +30,50 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Maps a unique article ID to its Bluesky comments thread, preserving original creation time.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.juttu.articleLink", tag = "$type")]
-pub struct ArticleLink<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.juttu.articleLink",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ArticleLink<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The site-specific unique identifier for the article (e.g., slug).
-    #[serde(borrow)]
-    pub article_id: CowStr<'a>,
+    pub article_id: S,
     ///The URL of the article.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub article_url: Option<UriValue<'a>>,
+    pub article_url: Option<UriValue<S>>,
     ///A strong reference to the root post (e.g., app.bsky.feed.post) of the comments thread.
-    #[serde(borrow)]
-    pub comments_thread: StrongRef<'a>,
+    pub comments_thread: StrongRef<S>,
     ///The original publication timestamp of the article.
     pub created_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ArticleLinkGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ArticleLinkGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: ArticleLink<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: ArticleLink<S>,
 }
 
-impl<'a> ArticleLink<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ArticleLinkRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> ArticleLink<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ArticleLinkRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -75,18 +84,17 @@ pub struct ArticleLinkRecord;
 impl XrpcResp for ArticleLinkRecord {
     const NSID: &'static str = "app.juttu.articleLink";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ArticleLinkGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ArticleLinkGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ArticleLinkGetRecordOutput<'_>> for ArticleLink<'_> {
-    fn from(output: ArticleLinkGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ArticleLinkGetRecordOutput<S>> for ArticleLink<S> {
+    fn from(output: ArticleLinkGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for ArticleLink<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for ArticleLink<S> {
     const NSID: &'static str = "app.juttu.articleLink";
     type Record = ArticleLinkRecord;
 }
@@ -96,7 +104,7 @@ impl Collection for ArticleLinkRecord {
     type Record = ArticleLinkRecord;
 }
 
-impl<'a> LexiconSchema for ArticleLink<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ArticleLink<S> {
     fn nsid() -> &'static str {
         "app.juttu.articleLink"
     }
@@ -132,49 +140,49 @@ pub mod article_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ArticleId;
         type CommentsThread;
+        type ArticleId;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ArticleId = Unset;
         type CommentsThread = Unset;
+        type ArticleId = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `article_id` field to Set
-    pub struct SetArticleId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArticleId<S> {}
-    impl<S: State> State for SetArticleId<S> {
-        type ArticleId = Set<members::article_id>;
-        type CommentsThread = S::CommentsThread;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `comments_thread` field to Set
     pub struct SetCommentsThread<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommentsThread<S> {}
     impl<S: State> State for SetCommentsThread<S> {
-        type ArticleId = S::ArticleId;
         type CommentsThread = Set<members::comments_thread>;
+        type ArticleId = S::ArticleId;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `article_id` field to Set
+    pub struct SetArticleId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArticleId<S> {}
+    impl<S: State> State for SetArticleId<S> {
+        type CommentsThread = S::CommentsThread;
+        type ArticleId = Set<members::article_id>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ArticleId = S::ArticleId;
         type CommentsThread = S::CommentsThread;
+        type ArticleId = S::ArticleId;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `article_id` field
-        pub struct article_id(());
         ///Marker type for the `comments_thread` field
         pub struct comments_thread(());
+        ///Marker type for the `article_id` field
+        pub struct article_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -183,12 +191,7 @@ pub mod article_link_state {
 /// Builder for constructing an instance of this type
 pub struct ArticleLinkBuilder<'a, S: article_link_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<StrongRef<'a>>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<S>, Option<UriValue<S>>, Option<StrongRef<S>>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -218,7 +221,7 @@ where
     /// Set the `articleId` field (required)
     pub fn article_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ArticleLinkBuilder<'a, article_link_state::SetArticleId<S>> {
         self._fields.0 = Option::Some(value.into());
         ArticleLinkBuilder {
@@ -231,12 +234,12 @@ where
 
 impl<'a, S: article_link_state::State> ArticleLinkBuilder<'a, S> {
     /// Set the `articleUrl` field (optional)
-    pub fn article_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn article_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `articleUrl` field to an Option value (optional)
-    pub fn maybe_article_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_article_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -250,7 +253,7 @@ where
     /// Set the `commentsThread` field (required)
     pub fn comments_thread(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> ArticleLinkBuilder<'a, article_link_state::SetCommentsThread<S>> {
         self._fields.2 = Option::Some(value.into());
         ArticleLinkBuilder {
@@ -283,8 +286,8 @@ where
 impl<'a, S> ArticleLinkBuilder<'a, S>
 where
     S: article_link_state::State,
-    S::ArticleId: article_link_state::IsSet,
     S::CommentsThread: article_link_state::IsSet,
+    S::ArticleId: article_link_state::IsSet,
     S::CreatedAt: article_link_state::IsSet,
 {
     /// Build the final struct
@@ -300,10 +303,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ArticleLink<'a> {
         ArticleLink {
             article_id: self._fields.0.unwrap(),

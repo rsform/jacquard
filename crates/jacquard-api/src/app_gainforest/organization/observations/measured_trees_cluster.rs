@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -28,40 +29,45 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A declaration of a measured trees cluster for an organization
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.gainforest.organization.observations.measuredTreesCluster",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct MeasuredTreesCluster<'a> {
+pub struct MeasuredTreesCluster<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,
     ///A blob pointing to a shapefile of the measured trees cluster
-    #[serde(borrow)]
-    pub shapefile: Data<'a>,
+    pub shapefile: Data<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MeasuredTreesClusterGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MeasuredTreesClusterGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: MeasuredTreesCluster<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: MeasuredTreesCluster<S>,
 }
 
-impl<'a> MeasuredTreesCluster<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, MeasuredTreesClusterRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> MeasuredTreesCluster<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, MeasuredTreesClusterRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -72,18 +78,18 @@ pub struct MeasuredTreesClusterRecord;
 impl XrpcResp for MeasuredTreesClusterRecord {
     const NSID: &'static str = "app.gainforest.organization.observations.measuredTreesCluster";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MeasuredTreesClusterGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MeasuredTreesClusterGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<MeasuredTreesClusterGetRecordOutput<'_>> for MeasuredTreesCluster<'_> {
-    fn from(output: MeasuredTreesClusterGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<MeasuredTreesClusterGetRecordOutput<S>>
+for MeasuredTreesCluster<S> {
+    fn from(output: MeasuredTreesClusterGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for MeasuredTreesCluster<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for MeasuredTreesCluster<S> {
     const NSID: &'static str = "app.gainforest.organization.observations.measuredTreesCluster";
     type Record = MeasuredTreesClusterRecord;
 }
@@ -93,7 +99,7 @@ impl Collection for MeasuredTreesClusterRecord {
     type Record = MeasuredTreesClusterRecord;
 }
 
-impl<'a> LexiconSchema for MeasuredTreesCluster<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for MeasuredTreesCluster<S> {
     fn nsid() -> &'static str {
         "app.gainforest.organization.observations.measuredTreesCluster"
     }
@@ -155,7 +161,7 @@ pub mod measured_trees_cluster_state {
 /// Builder for constructing an instance of this type
 pub struct MeasuredTreesClusterBuilder<'a, S: measured_trees_cluster_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Data<'a>>),
+    _fields: (Option<Datetime>, Option<Data<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -207,7 +213,7 @@ where
     /// Set the `shapefile` field (required)
     pub fn shapefile(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> MeasuredTreesClusterBuilder<'a, measured_trees_cluster_state::SetShapefile<S>> {
         self._fields.1 = Option::Some(value.into());
         MeasuredTreesClusterBuilder {
@@ -235,7 +241,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> MeasuredTreesCluster<'a> {
         MeasuredTreesCluster {
             created_at: self._fields.0.unwrap(),

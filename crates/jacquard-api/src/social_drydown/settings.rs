@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,10 +29,17 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// User preferences for fragrance review scoring
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.drydown.settings", tag = "$type")]
-pub struct Settings<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.drydown.settings",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Settings<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Preference for fragrance complexity (1=simple, 5=intricate)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub complexity_preference: Option<i64>,
@@ -44,26 +53,27 @@ pub struct Settings<'a> {
     pub presence_style: Option<i64>,
     ///When viewing others' reviews: show their score or recalculate with your preferences
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub score_lens: Option<SettingsScoreLens<'a>>,
+    pub score_lens: Option<SettingsScoreLens<S>>,
     ///How user evaluates fragrances (1=instinct, 5=analytical)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scoring_approach: Option<i64>,
     ///Timestamp when settings were last updated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// When viewing others' reviews: show their score or recalculate with your preferences
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SettingsScoreLens<'a> {
+pub enum SettingsScoreLens<S: Bos<str> + AsRef<str> = DefaultStr> {
     Theirs,
     Mine,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SettingsScoreLens<'a> {
+impl<S: Bos<str> + AsRef<str>> SettingsScoreLens<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Theirs => "theirs",
@@ -71,70 +81,56 @@ impl<'a> SettingsScoreLens<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SettingsScoreLens<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "theirs" => Self::Theirs,
             "mine" => Self::Mine,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SettingsScoreLens<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "theirs" => Self::Theirs,
-            "mine" => Self::Mine,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SettingsScoreLens<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SettingsScoreLens<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for SettingsScoreLens<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SettingsScoreLens<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for SettingsScoreLens<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SettingsScoreLens<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SettingsScoreLens<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for SettingsScoreLens<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for SettingsScoreLens<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for SettingsScoreLens<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for SettingsScoreLens<'_> {
-    type Output = SettingsScoreLens<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SettingsScoreLens<S> {
+    type Output = SettingsScoreLens<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SettingsScoreLens::Theirs => SettingsScoreLens::Theirs,
@@ -147,22 +143,23 @@ impl jacquard_common::IntoStatic for SettingsScoreLens<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SettingsGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SettingsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Settings<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Settings<S>,
 }
 
-impl<'a> Settings<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SettingsRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Settings<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SettingsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -173,18 +170,17 @@ pub struct SettingsRecord;
 impl XrpcResp for SettingsRecord {
     const NSID: &'static str = "social.drydown.settings";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SettingsGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SettingsGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SettingsGetRecordOutput<'_>> for Settings<'_> {
-    fn from(output: SettingsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SettingsGetRecordOutput<S>> for Settings<S> {
+    fn from(output: SettingsGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Settings<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Settings<S> {
     const NSID: &'static str = "social.drydown.settings";
     type Record = SettingsRecord;
 }
@@ -194,7 +190,7 @@ impl Collection for SettingsRecord {
     type Record = SettingsRecord;
 }
 
-impl<'a> LexiconSchema for Settings<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Settings<S> {
     fn nsid() -> &'static str {
         "social.drydown.settings"
     }
@@ -331,7 +327,7 @@ pub struct SettingsBuilder<'a, S: settings_state::State> {
         Option<Datetime>,
         Option<i64>,
         Option<i64>,
-        Option<SettingsScoreLens<'a>>,
+        Option<SettingsScoreLens<S>>,
         Option<i64>,
         Option<Datetime>,
     ),
@@ -416,15 +412,12 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `scoreLens` field (optional)
-    pub fn score_lens(
-        mut self,
-        value: impl Into<Option<SettingsScoreLens<'a>>>,
-    ) -> Self {
+    pub fn score_lens(mut self, value: impl Into<Option<SettingsScoreLens<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `scoreLens` field to an Option value (optional)
-    pub fn maybe_score_lens(mut self, value: Option<SettingsScoreLens<'a>>) -> Self {
+    pub fn maybe_score_lens(mut self, value: Option<SettingsScoreLens<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -477,10 +470,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Settings<'a> {
         Settings {
             complexity_preference: self._fields.0,

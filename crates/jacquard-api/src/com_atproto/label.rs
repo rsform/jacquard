@@ -17,13 +17,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Cid, Datetime, Language, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -33,14 +35,18 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::label;
 /// Metadata tag on an atproto resource (eg, repo or record).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Label<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Label<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optionally, CID specifying the specific version of 'uri' resource this label applies to.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
+    pub cid: Option<Cid<S>>,
     ///Timestamp when this label was created.
     pub cts: Datetime,
     ///Timestamp at which this label expires (no longer applies).
@@ -54,22 +60,21 @@ pub struct Label<'a> {
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
     pub sig: Option<Bytes>,
     ///DID of the actor who created this label.
-    #[serde(borrow)]
-    pub src: Did<'a>,
+    pub src: Did<S>,
     ///AT URI of the record, repository (account), or other resource that this label applies to.
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+    pub uri: UriValue<S>,
     ///The short string name of the value or type of this label.
-    #[serde(borrow)]
-    pub val: CowStr<'a>,
+    pub val: S,
     ///The AT Protocol version of the label object.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ver: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LabelValue<'a> {
+pub enum LabelValue<S: Bos<str> + AsRef<str> = DefaultStr> {
     Hide,
     Warn,
     NoUnauthenticated,
@@ -78,10 +83,10 @@ pub enum LabelValue<'a> {
     Nudity,
     GraphicMedia,
     Bot,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> LabelValue<'a> {
+impl<S: Bos<str> + AsRef<str>> LabelValue<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Hide => "!hide",
@@ -95,11 +100,9 @@ impl<'a> LabelValue<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for LabelValue<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "!hide" => Self::Hide,
             "!warn" => Self::Warn,
             "!no-unauthenticated" => Self::NoUnauthenticated,
@@ -108,63 +111,45 @@ impl<'a> From<&'a str> for LabelValue<'a> {
             "nudity" => Self::Nudity,
             "graphic-media" => Self::GraphicMedia,
             "bot" => Self::Bot,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for LabelValue<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "!hide" => Self::Hide,
-            "!warn" => Self::Warn,
-            "!no-unauthenticated" => Self::NoUnauthenticated,
-            "porn" => Self::Porn,
-            "sexual" => Self::Sexual,
-            "nudity" => Self::Nudity,
-            "graphic-media" => Self::GraphicMedia,
-            "bot" => Self::Bot,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for LabelValue<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for LabelValue<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for LabelValue<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for LabelValue<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for LabelValue<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for LabelValue<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for LabelValue<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for LabelValue<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for LabelValue<'_> {
-    type Output = LabelValue<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for LabelValue<S> {
+    type Output = LabelValue<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             LabelValue::Hide => LabelValue::Hide,
@@ -182,41 +167,43 @@ impl jacquard_common::IntoStatic for LabelValue<'_> {
 
 /// Declares a label value and its expected interpretations and behaviors.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LabelValueDefinition<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LabelValueDefinition<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Does the user need to have adult content enabled in order to configure this label?
     #[serde(skip_serializing_if = "Option::is_none")]
     pub adult_only: Option<bool>,
     ///What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing.
-    #[serde(borrow)]
-    pub blurs: LabelValueDefinitionBlurs<'a>,
+    pub blurs: LabelValueDefinitionBlurs<S>,
     ///The default setting for this label.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub default_setting: Option<LabelValueDefinitionDefaultSetting<'a>>,
+    pub default_setting: Option<LabelValueDefinitionDefaultSetting<S>>,
     ///The value of the label being defined. Must only include lowercase ascii and the '-' character ([a-z-]+).
-    #[serde(borrow)]
-    pub identifier: CowStr<'a>,
-    #[serde(borrow)]
-    pub locales: Vec<label::LabelValueDefinitionStrings<'a>>,
+    pub identifier: S,
+    pub locales: Vec<label::LabelValueDefinitionStrings<S>>,
     ///How should a client visually convey this label? 'inform' means neutral and informational; 'alert' means negative and warning; 'none' means show nothing.
-    #[serde(borrow)]
-    pub severity: LabelValueDefinitionSeverity<'a>,
+    pub severity: LabelValueDefinitionSeverity<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LabelValueDefinitionBlurs<'a> {
+pub enum LabelValueDefinitionBlurs<S: Bos<str> + AsRef<str> = DefaultStr> {
     Content,
     Media,
     None,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> LabelValueDefinitionBlurs<'a> {
+impl<S: Bos<str> + AsRef<str>> LabelValueDefinitionBlurs<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Content => "content",
@@ -225,72 +212,57 @@ impl<'a> LabelValueDefinitionBlurs<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for LabelValueDefinitionBlurs<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "content" => Self::Content,
             "media" => Self::Media,
             "none" => Self::None,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for LabelValueDefinitionBlurs<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "content" => Self::Content,
-            "media" => Self::Media,
-            "none" => Self::None,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for LabelValueDefinitionBlurs<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for LabelValueDefinitionBlurs<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for LabelValueDefinitionBlurs<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for LabelValueDefinitionBlurs<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for LabelValueDefinitionBlurs<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for LabelValueDefinitionBlurs<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for LabelValueDefinitionBlurs<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for LabelValueDefinitionBlurs<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for LabelValueDefinitionBlurs<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for LabelValueDefinitionBlurs<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for LabelValueDefinitionBlurs<'_> {
-    type Output = LabelValueDefinitionBlurs<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for LabelValueDefinitionBlurs<S> {
+    type Output = LabelValueDefinitionBlurs<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             LabelValueDefinitionBlurs::Content => LabelValueDefinitionBlurs::Content,
@@ -306,14 +278,14 @@ impl jacquard_common::IntoStatic for LabelValueDefinitionBlurs<'_> {
 /// The default setting for this label.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LabelValueDefinitionDefaultSetting<'a> {
+pub enum LabelValueDefinitionDefaultSetting<S: Bos<str> + AsRef<str> = DefaultStr> {
     Ignore,
     Warn,
     Hide,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> LabelValueDefinitionDefaultSetting<'a> {
+impl<S: Bos<str> + AsRef<str>> LabelValueDefinitionDefaultSetting<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Ignore => "ignore",
@@ -322,72 +294,59 @@ impl<'a> LabelValueDefinitionDefaultSetting<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for LabelValueDefinitionDefaultSetting<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "ignore" => Self::Ignore,
             "warn" => Self::Warn,
             "hide" => Self::Hide,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for LabelValueDefinitionDefaultSetting<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "ignore" => Self::Ignore,
-            "warn" => Self::Warn,
-            "hide" => Self::Hide,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for LabelValueDefinitionDefaultSetting<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display
+for LabelValueDefinitionDefaultSetting<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for LabelValueDefinitionDefaultSetting<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for LabelValueDefinitionDefaultSetting<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for LabelValueDefinitionDefaultSetting<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for LabelValueDefinitionDefaultSetting<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for LabelValueDefinitionDefaultSetting<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for LabelValueDefinitionDefaultSetting<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for LabelValueDefinitionDefaultSetting<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default
+for LabelValueDefinitionDefaultSetting<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for LabelValueDefinitionDefaultSetting<'_> {
-    type Output = LabelValueDefinitionDefaultSetting<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for LabelValueDefinitionDefaultSetting<S> {
+    type Output = LabelValueDefinitionDefaultSetting<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             LabelValueDefinitionDefaultSetting::Ignore => {
@@ -409,14 +368,14 @@ impl jacquard_common::IntoStatic for LabelValueDefinitionDefaultSetting<'_> {
 /// How should a client visually convey this label? 'inform' means neutral and informational; 'alert' means negative and warning; 'none' means show nothing.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LabelValueDefinitionSeverity<'a> {
+pub enum LabelValueDefinitionSeverity<S: Bos<str> + AsRef<str> = DefaultStr> {
     Inform,
     Alert,
     None,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> LabelValueDefinitionSeverity<'a> {
+impl<S: Bos<str> + AsRef<str>> LabelValueDefinitionSeverity<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Inform => "inform",
@@ -425,72 +384,57 @@ impl<'a> LabelValueDefinitionSeverity<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for LabelValueDefinitionSeverity<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "inform" => Self::Inform,
             "alert" => Self::Alert,
             "none" => Self::None,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for LabelValueDefinitionSeverity<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "inform" => Self::Inform,
-            "alert" => Self::Alert,
-            "none" => Self::None,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for LabelValueDefinitionSeverity<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for LabelValueDefinitionSeverity<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for LabelValueDefinitionSeverity<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for LabelValueDefinitionSeverity<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for LabelValueDefinitionSeverity<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for LabelValueDefinitionSeverity<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for LabelValueDefinitionSeverity<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for LabelValueDefinitionSeverity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for LabelValueDefinitionSeverity<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for LabelValueDefinitionSeverity<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for LabelValueDefinitionSeverity<'_> {
-    type Output = LabelValueDefinitionSeverity<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for LabelValueDefinitionSeverity<S> {
+    type Output = LabelValueDefinitionSeverity<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             LabelValueDefinitionSeverity::Inform => LabelValueDefinitionSeverity::Inform,
@@ -505,42 +449,59 @@ impl jacquard_common::IntoStatic for LabelValueDefinitionSeverity<'_> {
 
 /// Strings which describe the label in the UI, localized into a specific language.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LabelValueDefinitionStrings<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LabelValueDefinitionStrings<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///A longer description of what the label means and why it might be applied.
-    #[serde(borrow)]
-    pub description: CowStr<'a>,
+    pub description: S,
     ///The code of the language these strings are written in.
     pub lang: Language,
     ///A short human-readable name for the label.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Metadata tag on an atproto record, published by the author within the record. Note that schemas should use #selfLabels, not #selfLabel.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SelfLabel<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SelfLabel<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The short string name of the value or type of this label.
-    #[serde(borrow)]
-    pub val: CowStr<'a>,
+    pub val: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Metadata tags on an atproto record, published by the author within the record.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SelfLabels<'a> {
-    #[serde(borrow)]
-    pub values: Vec<label::SelfLabel<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SelfLabels<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub values: Vec<label::SelfLabel<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Label<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Label<S> {
     fn nsid() -> &'static str {
         "com.atproto.label.defs"
     }
@@ -566,7 +527,7 @@ impl<'a> LexiconSchema for Label<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LabelValueDefinition<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LabelValueDefinition<S> {
     fn nsid() -> &'static str {
         "com.atproto.label.defs"
     }
@@ -605,7 +566,7 @@ impl<'a> LexiconSchema for LabelValueDefinition<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LabelValueDefinitionStrings<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LabelValueDefinitionStrings<S> {
     fn nsid() -> &'static str {
         "com.atproto.label.defs"
     }
@@ -668,7 +629,7 @@ impl<'a> LexiconSchema for LabelValueDefinitionStrings<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SelfLabel<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SelfLabel<S> {
     fn nsid() -> &'static str {
         "com.atproto.label.defs"
     }
@@ -694,7 +655,7 @@ impl<'a> LexiconSchema for SelfLabel<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SelfLabels<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SelfLabels<S> {
     fn nsid() -> &'static str {
         "com.atproto.label.defs"
     }
@@ -730,67 +691,67 @@ pub mod label_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Src;
         type Val;
+        type Src;
         type Cts;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Src = Unset;
         type Val = Unset;
+        type Src = Unset;
         type Cts = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Src = S::Src;
-        type Val = S::Val;
-        type Cts = S::Cts;
-    }
-    ///State transition - sets the `src` field to Set
-    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrc<S> {}
-    impl<S: State> State for SetSrc<S> {
-        type Uri = S::Uri;
-        type Src = Set<members::src>;
-        type Val = S::Val;
-        type Cts = S::Cts;
+        type Uri = Unset;
     }
     ///State transition - sets the `val` field to Set
     pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVal<S> {}
     impl<S: State> State for SetVal<S> {
-        type Uri = S::Uri;
-        type Src = S::Src;
         type Val = Set<members::val>;
+        type Src = S::Src;
         type Cts = S::Cts;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Val = S::Val;
+        type Src = Set<members::src>;
+        type Cts = S::Cts;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `cts` field to Set
     pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCts<S> {}
     impl<S: State> State for SetCts<S> {
-        type Uri = S::Uri;
-        type Src = S::Src;
         type Val = S::Val;
+        type Src = S::Src;
         type Cts = Set<members::cts>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Val = S::Val;
+        type Src = S::Src;
+        type Cts = S::Cts;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `src` field
-        pub struct src(());
         ///Marker type for the `val` field
         pub struct val(());
+        ///Marker type for the `src` field
+        pub struct src(());
         ///Marker type for the `cts` field
         pub struct cts(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -798,14 +759,14 @@ pub mod label_state {
 pub struct LabelBuilder<'a, S: label_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Cid<'a>>,
+        Option<Cid<S>>,
         Option<Datetime>,
         Option<Datetime>,
         Option<bool>,
         Option<Bytes>,
-        Option<Did<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
+        Option<Did<S>>,
+        Option<UriValue<S>>,
+        Option<S>,
         Option<i64>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -831,12 +792,12 @@ impl<'a> LabelBuilder<'a, label_state::Empty> {
 
 impl<'a, S: label_state::State> LabelBuilder<'a, S> {
     /// Set the `cid` field (optional)
-    pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
+    pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
-    pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
+    pub fn maybe_cid(mut self, value: Option<Cid<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -908,7 +869,7 @@ where
     /// Set the `src` field (required)
     pub fn src(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> LabelBuilder<'a, label_state::SetSrc<S>> {
         self._fields.5 = Option::Some(value.into());
         LabelBuilder {
@@ -927,7 +888,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> LabelBuilder<'a, label_state::SetUri<S>> {
         self._fields.6 = Option::Some(value.into());
         LabelBuilder {
@@ -946,7 +907,7 @@ where
     /// Set the `val` field (required)
     pub fn val(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LabelBuilder<'a, label_state::SetVal<S>> {
         self._fields.7 = Option::Some(value.into());
         LabelBuilder {
@@ -973,10 +934,10 @@ impl<'a, S: label_state::State> LabelBuilder<'a, S> {
 impl<'a, S> LabelBuilder<'a, S>
 where
     S: label_state::State,
-    S::Uri: label_state::IsSet,
-    S::Src: label_state::IsSet,
     S::Val: label_state::IsSet,
+    S::Src: label_state::IsSet,
     S::Cts: label_state::IsSet,
+    S::Uri: label_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Label<'a> {
@@ -994,13 +955,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Label<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Label<'a> {
         Label {
             cid: self._fields.0,
             cts: self._fields.1.unwrap(),
@@ -1354,67 +1309,67 @@ pub mod label_value_definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Severity;
-        type Identifier;
         type Blurs;
+        type Severity;
         type Locales;
+        type Identifier;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Severity = Unset;
-        type Identifier = Unset;
         type Blurs = Unset;
+        type Severity = Unset;
         type Locales = Unset;
-    }
-    ///State transition - sets the `severity` field to Set
-    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeverity<S> {}
-    impl<S: State> State for SetSeverity<S> {
-        type Severity = Set<members::severity>;
-        type Identifier = S::Identifier;
-        type Blurs = S::Blurs;
-        type Locales = S::Locales;
-    }
-    ///State transition - sets the `identifier` field to Set
-    pub struct SetIdentifier<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIdentifier<S> {}
-    impl<S: State> State for SetIdentifier<S> {
-        type Severity = S::Severity;
-        type Identifier = Set<members::identifier>;
-        type Blurs = S::Blurs;
-        type Locales = S::Locales;
+        type Identifier = Unset;
     }
     ///State transition - sets the `blurs` field to Set
     pub struct SetBlurs<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlurs<S> {}
     impl<S: State> State for SetBlurs<S> {
-        type Severity = S::Severity;
-        type Identifier = S::Identifier;
         type Blurs = Set<members::blurs>;
+        type Severity = S::Severity;
         type Locales = S::Locales;
+        type Identifier = S::Identifier;
+    }
+    ///State transition - sets the `severity` field to Set
+    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeverity<S> {}
+    impl<S: State> State for SetSeverity<S> {
+        type Blurs = S::Blurs;
+        type Severity = Set<members::severity>;
+        type Locales = S::Locales;
+        type Identifier = S::Identifier;
     }
     ///State transition - sets the `locales` field to Set
     pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocales<S> {}
     impl<S: State> State for SetLocales<S> {
-        type Severity = S::Severity;
-        type Identifier = S::Identifier;
         type Blurs = S::Blurs;
+        type Severity = S::Severity;
         type Locales = Set<members::locales>;
+        type Identifier = S::Identifier;
+    }
+    ///State transition - sets the `identifier` field to Set
+    pub struct SetIdentifier<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIdentifier<S> {}
+    impl<S: State> State for SetIdentifier<S> {
+        type Blurs = S::Blurs;
+        type Severity = S::Severity;
+        type Locales = S::Locales;
+        type Identifier = Set<members::identifier>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `severity` field
-        pub struct severity(());
-        ///Marker type for the `identifier` field
-        pub struct identifier(());
         ///Marker type for the `blurs` field
         pub struct blurs(());
+        ///Marker type for the `severity` field
+        pub struct severity(());
         ///Marker type for the `locales` field
         pub struct locales(());
+        ///Marker type for the `identifier` field
+        pub struct identifier(());
     }
 }
 
@@ -1423,11 +1378,11 @@ pub struct LabelValueDefinitionBuilder<'a, S: label_value_definition_state::Stat
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<bool>,
-        Option<LabelValueDefinitionBlurs<'a>>,
-        Option<LabelValueDefinitionDefaultSetting<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<label::LabelValueDefinitionStrings<'a>>>,
-        Option<LabelValueDefinitionSeverity<'a>>,
+        Option<LabelValueDefinitionBlurs<S>>,
+        Option<LabelValueDefinitionDefaultSetting<S>>,
+        Option<S>,
+        Option<Vec<label::LabelValueDefinitionStrings<S>>>,
+        Option<LabelValueDefinitionSeverity<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1474,7 +1429,7 @@ where
     /// Set the `blurs` field (required)
     pub fn blurs(
         mut self,
-        value: impl Into<LabelValueDefinitionBlurs<'a>>,
+        value: impl Into<LabelValueDefinitionBlurs<S>>,
     ) -> LabelValueDefinitionBuilder<'a, label_value_definition_state::SetBlurs<S>> {
         self._fields.1 = Option::Some(value.into());
         LabelValueDefinitionBuilder {
@@ -1489,7 +1444,7 @@ impl<'a, S: label_value_definition_state::State> LabelValueDefinitionBuilder<'a,
     /// Set the `defaultSetting` field (optional)
     pub fn default_setting(
         mut self,
-        value: impl Into<Option<LabelValueDefinitionDefaultSetting<'a>>>,
+        value: impl Into<Option<LabelValueDefinitionDefaultSetting<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -1497,7 +1452,7 @@ impl<'a, S: label_value_definition_state::State> LabelValueDefinitionBuilder<'a,
     /// Set the `defaultSetting` field to an Option value (optional)
     pub fn maybe_default_setting(
         mut self,
-        value: Option<LabelValueDefinitionDefaultSetting<'a>>,
+        value: Option<LabelValueDefinitionDefaultSetting<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -1512,7 +1467,7 @@ where
     /// Set the `identifier` field (required)
     pub fn identifier(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LabelValueDefinitionBuilder<
         'a,
         label_value_definition_state::SetIdentifier<S>,
@@ -1534,7 +1489,7 @@ where
     /// Set the `locales` field (required)
     pub fn locales(
         mut self,
-        value: impl Into<Vec<label::LabelValueDefinitionStrings<'a>>>,
+        value: impl Into<Vec<label::LabelValueDefinitionStrings<S>>>,
     ) -> LabelValueDefinitionBuilder<'a, label_value_definition_state::SetLocales<S>> {
         self._fields.4 = Option::Some(value.into());
         LabelValueDefinitionBuilder {
@@ -1553,7 +1508,7 @@ where
     /// Set the `severity` field (required)
     pub fn severity(
         mut self,
-        value: impl Into<LabelValueDefinitionSeverity<'a>>,
+        value: impl Into<LabelValueDefinitionSeverity<S>>,
     ) -> LabelValueDefinitionBuilder<'a, label_value_definition_state::SetSeverity<S>> {
         self._fields.5 = Option::Some(value.into());
         LabelValueDefinitionBuilder {
@@ -1567,10 +1522,10 @@ where
 impl<'a, S> LabelValueDefinitionBuilder<'a, S>
 where
     S: label_value_definition_state::State,
-    S::Severity: label_value_definition_state::IsSet,
-    S::Identifier: label_value_definition_state::IsSet,
     S::Blurs: label_value_definition_state::IsSet,
+    S::Severity: label_value_definition_state::IsSet,
     S::Locales: label_value_definition_state::IsSet,
+    S::Identifier: label_value_definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LabelValueDefinition<'a> {
@@ -1587,10 +1542,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LabelValueDefinition<'a> {
         LabelValueDefinition {
             adult_only: self._fields.0,
@@ -1614,51 +1566,51 @@ pub mod label_value_definition_strings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Lang;
         type Name;
         type Description;
-        type Lang;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Lang = Unset;
         type Name = Unset;
         type Description = Unset;
-        type Lang = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Description = S::Description;
-        type Lang = S::Lang;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Name = S::Name;
-        type Description = Set<members::description>;
-        type Lang = S::Lang;
     }
     ///State transition - sets the `lang` field to Set
     pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLang<S> {}
     impl<S: State> State for SetLang<S> {
+        type Lang = Set<members::lang>;
         type Name = S::Name;
         type Description = S::Description;
-        type Lang = Set<members::lang>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Lang = S::Lang;
+        type Name = Set<members::name>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Lang = S::Lang;
+        type Name = S::Name;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `lang` field
+        pub struct lang(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `lang` field
-        pub struct lang(());
     }
 }
 
@@ -1668,7 +1620,7 @@ pub struct LabelValueDefinitionStringsBuilder<
     S: label_value_definition_strings_state::State,
 > {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Language>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<Language>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1703,7 +1655,7 @@ where
     /// Set the `description` field (required)
     pub fn description(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LabelValueDefinitionStringsBuilder<
         'a,
         label_value_definition_strings_state::SetDescription<S>,
@@ -1747,7 +1699,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LabelValueDefinitionStringsBuilder<
         'a,
         label_value_definition_strings_state::SetName<S>,
@@ -1764,9 +1716,9 @@ where
 impl<'a, S> LabelValueDefinitionStringsBuilder<'a, S>
 where
     S: label_value_definition_strings_state::State,
+    S::Lang: label_value_definition_strings_state::IsSet,
     S::Name: label_value_definition_strings_state::IsSet,
     S::Description: label_value_definition_strings_state::IsSet,
-    S::Lang: label_value_definition_strings_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LabelValueDefinitionStrings<'a> {
@@ -1780,10 +1732,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LabelValueDefinitionStrings<'a> {
         LabelValueDefinitionStrings {
             description: self._fields.0.unwrap(),
@@ -1829,7 +1778,7 @@ pub mod self_labels_state {
 /// Builder for constructing an instance of this type
 pub struct SelfLabelsBuilder<'a, S: self_labels_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<label::SelfLabel<'a>>>,),
+    _fields: (Option<Vec<label::SelfLabel<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1859,7 +1808,7 @@ where
     /// Set the `values` field (required)
     pub fn values(
         mut self,
-        value: impl Into<Vec<label::SelfLabel<'a>>>,
+        value: impl Into<Vec<label::SelfLabel<S>>>,
     ) -> SelfLabelsBuilder<'a, self_labels_state::SetValues<S>> {
         self._fields.0 = Option::Some(value.into());
         SelfLabelsBuilder {
@@ -1885,10 +1834,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SelfLabels<'a> {
         SelfLabels {
             values: self._fields.0.unwrap(),

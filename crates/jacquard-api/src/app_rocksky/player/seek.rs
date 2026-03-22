@@ -7,16 +7,22 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SeekParams<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SeekParams<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub player_id: Option<CowStr<'a>>,
+    pub player_id: Option<S>,
     pub position: i64,
 }
 
@@ -29,8 +35,8 @@ pub struct SeekResponse;
 impl jacquard_common::xrpc::XrpcResp for SeekResponse {
     const NSID: &'static str = "app.rocksky.player.seek";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for Seek {
@@ -48,7 +54,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SeekRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Seek;
+    type Request<S: Bos<str> + AsRef<str>> = Seek;
     type Response = SeekResponse;
 }
 
@@ -87,7 +93,7 @@ pub mod seek_params_state {
 /// Builder for constructing an instance of this type
 pub struct SeekParamsBuilder<'a, S: seek_params_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -111,12 +117,12 @@ impl<'a> SeekParamsBuilder<'a, seek_params_state::Empty> {
 
 impl<'a, S: seek_params_state::State> SeekParamsBuilder<'a, S> {
     /// Set the `playerId` field (optional)
-    pub fn player_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn player_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `playerId` field to an Option value (optional)
-    pub fn maybe_player_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_player_id(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }

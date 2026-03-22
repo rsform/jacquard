@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,46 +30,52 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A cryptographically-verified professional endorsement between two identities.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "place.atwork.endorsement", tag = "$type")]
-pub struct Endorsement<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "place.atwork.endorsement",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Endorsement<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when the endorsement was created.
     pub created_at: Datetime,
     ///The DID of the identity giving the endorsement.
-    #[serde(borrow)]
-    pub giver: Did<'a>,
+    pub giver: Did<S>,
     ///The DID of the identity receiving the endorsement.
-    #[serde(borrow)]
-    pub receiver: Did<'a>,
+    pub receiver: Did<S>,
     ///Verified signatures from endorsement proofs (strong references).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub signatures: Option<Vec<StrongRef<'a>>>,
+    pub signatures: Option<Vec<StrongRef<S>>>,
     ///The endorsement text content.
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EndorsementGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EndorsementGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Endorsement<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Endorsement<S>,
 }
 
-impl<'a> Endorsement<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, EndorsementRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Endorsement<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, EndorsementRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -78,18 +86,17 @@ pub struct EndorsementRecord;
 impl XrpcResp for EndorsementRecord {
     const NSID: &'static str = "place.atwork.endorsement";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = EndorsementGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = EndorsementGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<EndorsementGetRecordOutput<'_>> for Endorsement<'_> {
-    fn from(output: EndorsementGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<EndorsementGetRecordOutput<S>> for Endorsement<S> {
+    fn from(output: EndorsementGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Endorsement<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Endorsement<S> {
     const NSID: &'static str = "place.atwork.endorsement";
     type Record = EndorsementRecord;
 }
@@ -99,7 +106,7 @@ impl Collection for EndorsementRecord {
     type Record = EndorsementRecord;
 }
 
-impl<'a> LexiconSchema for Endorsement<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Endorsement<S> {
     fn nsid() -> &'static str {
         "place.atwork.endorsement"
     }
@@ -148,67 +155,67 @@ pub mod endorsement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
+        type Receiver;
         type Text;
         type Giver;
-        type Receiver;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
+        type Receiver = Unset;
         type Text = Unset;
         type Giver = Unset;
-        type Receiver = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Text = S::Text;
-        type Giver = S::Giver;
-        type Receiver = S::Receiver;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type CreatedAt = S::CreatedAt;
-        type Text = Set<members::text>;
-        type Giver = S::Giver;
-        type Receiver = S::Receiver;
-    }
-    ///State transition - sets the `giver` field to Set
-    pub struct SetGiver<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGiver<S> {}
-    impl<S: State> State for SetGiver<S> {
-        type CreatedAt = S::CreatedAt;
-        type Text = S::Text;
-        type Giver = Set<members::giver>;
-        type Receiver = S::Receiver;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `receiver` field to Set
     pub struct SetReceiver<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReceiver<S> {}
     impl<S: State> State for SetReceiver<S> {
-        type CreatedAt = S::CreatedAt;
+        type Receiver = Set<members::receiver>;
         type Text = S::Text;
         type Giver = S::Giver;
-        type Receiver = Set<members::receiver>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Receiver = S::Receiver;
+        type Text = Set<members::text>;
+        type Giver = S::Giver;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `giver` field to Set
+    pub struct SetGiver<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGiver<S> {}
+    impl<S: State> State for SetGiver<S> {
+        type Receiver = S::Receiver;
+        type Text = S::Text;
+        type Giver = Set<members::giver>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Receiver = S::Receiver;
+        type Text = S::Text;
+        type Giver = S::Giver;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `receiver` field
+        pub struct receiver(());
         ///Marker type for the `text` field
         pub struct text(());
         ///Marker type for the `giver` field
         pub struct giver(());
-        ///Marker type for the `receiver` field
-        pub struct receiver(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -217,10 +224,10 @@ pub struct EndorsementBuilder<'a, S: endorsement_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<Did<'a>>,
-        Option<Did<'a>>,
-        Option<Vec<StrongRef<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Did<S>>,
+        Option<Did<S>>,
+        Option<Vec<StrongRef<S>>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -270,7 +277,7 @@ where
     /// Set the `giver` field (required)
     pub fn giver(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> EndorsementBuilder<'a, endorsement_state::SetGiver<S>> {
         self._fields.1 = Option::Some(value.into());
         EndorsementBuilder {
@@ -289,7 +296,7 @@ where
     /// Set the `receiver` field (required)
     pub fn receiver(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> EndorsementBuilder<'a, endorsement_state::SetReceiver<S>> {
         self._fields.2 = Option::Some(value.into());
         EndorsementBuilder {
@@ -302,12 +309,12 @@ where
 
 impl<'a, S: endorsement_state::State> EndorsementBuilder<'a, S> {
     /// Set the `signatures` field (optional)
-    pub fn signatures(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
+    pub fn signatures(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `signatures` field to an Option value (optional)
-    pub fn maybe_signatures(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
+    pub fn maybe_signatures(mut self, value: Option<Vec<StrongRef<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -321,7 +328,7 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EndorsementBuilder<'a, endorsement_state::SetText<S>> {
         self._fields.4 = Option::Some(value.into());
         EndorsementBuilder {
@@ -335,10 +342,10 @@ where
 impl<'a, S> EndorsementBuilder<'a, S>
 where
     S: endorsement_state::State,
-    S::CreatedAt: endorsement_state::IsSet,
+    S::Receiver: endorsement_state::IsSet,
     S::Text: endorsement_state::IsSet,
     S::Giver: endorsement_state::IsSet,
-    S::Receiver: endorsement_state::IsSet,
+    S::CreatedAt: endorsement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Endorsement<'a> {
@@ -354,10 +361,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Endorsement<'a> {
         Endorsement {
             created_at: self._fields.0.unwrap(),

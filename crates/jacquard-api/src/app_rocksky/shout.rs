@@ -21,14 +21,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -41,94 +43,106 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::app_rocksky::shout;
 /// A declaration of a shout.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.rocksky.shout", tag = "$type")]
-pub struct Shout<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.rocksky.shout",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Shout<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The date when the shout was created.
     pub created_at: Datetime,
     ///The message of the shout.
-    #[serde(borrow)]
-    pub message: CowStr<'a>,
+    pub message: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent: Option<StrongRef<'a>>,
-    #[serde(borrow)]
-    pub subject: StrongRef<'a>,
+    pub parent: Option<StrongRef<S>>,
+    pub subject: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ShoutGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ShoutGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Shout<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Shout<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Author<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Author<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The URL of the author's avatar image.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<UriValue<'a>>,
+    pub avatar: Option<UriValue<S>>,
     ///The decentralized identifier (DID) of the author.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub did: Option<AtIdentifier<'a>>,
+    pub did: Option<AtIdentifier<S>>,
     ///The display name of the author.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     ///The handle of the author.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub handle: Option<AtIdentifier<'a>>,
+    pub handle: Option<AtIdentifier<S>>,
     ///The unique identifier of the author.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ShoutView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ShoutView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The author of the shout.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<shout::Author<'a>>,
+    pub author: Option<shout::Author<S>>,
     ///The date and time when the shout was created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///The unique identifier of the shout.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///The content of the shout.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     ///The ID of the parent shout if this is a reply, otherwise null.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent: Option<CowStr<'a>>,
+    pub parent: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Shout<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ShoutRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Shout<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ShoutRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -139,18 +153,17 @@ pub struct ShoutRecord;
 impl XrpcResp for ShoutRecord {
     const NSID: &'static str = "app.rocksky.shout";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ShoutGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ShoutGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ShoutGetRecordOutput<'_>> for Shout<'_> {
-    fn from(output: ShoutGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ShoutGetRecordOutput<S>> for Shout<S> {
+    fn from(output: ShoutGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Shout<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Shout<S> {
     const NSID: &'static str = "app.rocksky.shout";
     type Record = ShoutRecord;
 }
@@ -160,7 +173,7 @@ impl Collection for ShoutRecord {
     type Record = ShoutRecord;
 }
 
-impl<'a> LexiconSchema for Shout<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Shout<S> {
     fn nsid() -> &'static str {
         "app.rocksky.shout"
     }
@@ -197,7 +210,7 @@ impl<'a> LexiconSchema for Shout<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Author<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Author<S> {
     fn nsid() -> &'static str {
         "app.rocksky.shout.defs"
     }
@@ -212,7 +225,7 @@ impl<'a> LexiconSchema for Author<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ShoutView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ShoutView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.shout.defs"
     }
@@ -238,62 +251,57 @@ pub mod shout_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Message;
-        type Subject;
         type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Message = Unset;
-        type Subject = Unset;
         type CreatedAt = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
         type Message = Set<members::message>;
+        type CreatedAt = S::CreatedAt;
         type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Message = S::Message;
-        type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Message = S::Message;
-        type Subject = S::Subject;
         type CreatedAt = Set<members::created_at>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Message = S::Message;
+        type CreatedAt = S::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `message` field
         pub struct message(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ShoutBuilder<'a, S: shout_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<StrongRef<'a>>,
-        Option<StrongRef<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<StrongRef<S>>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -342,7 +350,7 @@ where
     /// Set the `message` field (required)
     pub fn message(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ShoutBuilder<'a, shout_state::SetMessage<S>> {
         self._fields.1 = Option::Some(value.into());
         ShoutBuilder {
@@ -355,12 +363,12 @@ where
 
 impl<'a, S: shout_state::State> ShoutBuilder<'a, S> {
     /// Set the `parent` field (optional)
-    pub fn parent(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn parent(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
-    pub fn maybe_parent(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_parent(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -374,7 +382,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> ShoutBuilder<'a, shout_state::SetSubject<S>> {
         self._fields.3 = Option::Some(value.into());
         ShoutBuilder {
@@ -389,8 +397,8 @@ impl<'a, S> ShoutBuilder<'a, S>
 where
     S: shout_state::State,
     S::Message: shout_state::IsSet,
-    S::Subject: shout_state::IsSet,
     S::CreatedAt: shout_state::IsSet,
+    S::Subject: shout_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Shout<'a> {
@@ -403,13 +411,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Shout<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Shout<'a> {
         Shout {
             created_at: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),

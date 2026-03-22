@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::cid::CidLink;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
@@ -31,45 +32,51 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::coop_hypha::pollen::embed::text::Text;
 /// A provenance claim linking a perceptual fingerprint (PFP) to a blob.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "coop.hypha.pollen.claim", tag = "$type")]
-pub struct Claim<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "coop.hypha.pollen.claim",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Claim<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///CID of the blob the PFP was generated from.
-    #[serde(borrow)]
-    pub cid: CidLink<'a>,
+    pub cid: CidLink<S>,
     ///Content of the claim, such as text.
-    #[serde(borrow)]
-    pub content: Text<'a>,
+    pub content: Text<S>,
     ///Timestamp when this claim was created.
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub pfp: Data<'a>,
+    pub pfp: Data<S>,
     ///Ref to the source record containing the blob.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject: Option<StrongRef<'a>>,
+    pub subject: Option<StrongRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ClaimGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ClaimGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Claim<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Claim<S>,
 }
 
-impl<'a> Claim<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ClaimRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Claim<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ClaimRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -80,18 +87,17 @@ pub struct ClaimRecord;
 impl XrpcResp for ClaimRecord {
     const NSID: &'static str = "coop.hypha.pollen.claim";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ClaimGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ClaimGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ClaimGetRecordOutput<'_>> for Claim<'_> {
-    fn from(output: ClaimGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ClaimGetRecordOutput<S>> for Claim<S> {
+    fn from(output: ClaimGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Claim<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Claim<S> {
     const NSID: &'static str = "coop.hypha.pollen.claim";
     type Record = ClaimRecord;
 }
@@ -101,7 +107,7 @@ impl Collection for ClaimRecord {
     type Record = ClaimRecord;
 }
 
-impl<'a> LexiconSchema for Claim<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Claim<S> {
     fn nsid() -> &'static str {
         "coop.hypha.pollen.claim"
     }
@@ -126,67 +132,67 @@ pub mod claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Pfp;
-        type Cid;
+        type Content;
         type CreatedAt;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Pfp = Unset;
-        type Cid = Unset;
+        type Content = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Pfp = S::Pfp;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
+        type Cid = Unset;
     }
     ///State transition - sets the `pfp` field to Set
     pub struct SetPfp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPfp<S> {}
     impl<S: State> State for SetPfp<S> {
-        type Content = S::Content;
         type Pfp = Set<members::pfp>;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
         type Content = S::Content;
-        type Pfp = S::Pfp;
-        type Cid = Set<members::cid>;
         type CreatedAt = S::CreatedAt;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Pfp = S::Pfp;
+        type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+        type Cid = S::Cid;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
         type Pfp = S::Pfp;
-        type Cid = S::Cid;
+        type Content = S::Content;
         type CreatedAt = Set<members::created_at>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Pfp = S::Pfp;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `pfp` field
         pub struct pfp(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -194,11 +200,11 @@ pub mod claim_state {
 pub struct ClaimBuilder<'a, S: claim_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CidLink<'a>>,
-        Option<Text<'a>>,
+        Option<CidLink<S>>,
+        Option<Text<S>>,
         Option<Datetime>,
-        Option<Data<'a>>,
-        Option<StrongRef<'a>>,
+        Option<Data<S>>,
+        Option<StrongRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -229,7 +235,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<CidLink<'a>>,
+        value: impl Into<CidLink<S>>,
     ) -> ClaimBuilder<'a, claim_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         ClaimBuilder {
@@ -248,7 +254,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<Text<'a>>,
+        value: impl Into<Text<S>>,
     ) -> ClaimBuilder<'a, claim_state::SetContent<S>> {
         self._fields.1 = Option::Some(value.into());
         ClaimBuilder {
@@ -286,7 +292,7 @@ where
     /// Set the `pfp` field (required)
     pub fn pfp(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> ClaimBuilder<'a, claim_state::SetPfp<S>> {
         self._fields.3 = Option::Some(value.into());
         ClaimBuilder {
@@ -299,12 +305,12 @@ where
 
 impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     /// Set the `subject` field (optional)
-    pub fn subject(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn subject(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
-    pub fn maybe_subject(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_subject(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -313,10 +319,10 @@ impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
 impl<'a, S> ClaimBuilder<'a, S>
 where
     S: claim_state::State,
-    S::Content: claim_state::IsSet,
     S::Pfp: claim_state::IsSet,
-    S::Cid: claim_state::IsSet,
+    S::Content: claim_state::IsSet,
     S::CreatedAt: claim_state::IsSet,
+    S::Cid: claim_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Claim<'a> {
@@ -330,10 +336,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Claim<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Claim<'a> {
         Claim {
             cid: self._fields.0.unwrap(),
             content: self._fields.1.unwrap(),

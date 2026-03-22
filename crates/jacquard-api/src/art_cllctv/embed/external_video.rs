@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,45 +26,50 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ExternalVideo<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExternalVideo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub service: Option<CowStr<'a>>,
+    pub service: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumb: Option<BlobRef<'a>>,
+    pub thumb: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumb_hash: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+    pub thumb_hash: Option<S>,
+    pub uri: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct View<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct View<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub service: Option<CowStr<'a>>,
+    pub service: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumb: Option<UriValue<'a>>,
-    #[serde(borrow)]
-    pub uri: UriValue<'a>,
+    pub thumb: Option<UriValue<S>>,
+    pub uri: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for ExternalVideo<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExternalVideo<S> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.externalVideo"
     }
@@ -137,7 +144,7 @@ impl<'a> LexiconSchema for ExternalVideo<'a> {
     }
 }
 
-impl<'a> LexiconSchema for View<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for View<S> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.externalVideo"
     }
@@ -187,13 +194,7 @@ pub mod external_video_state {
 /// Builder for constructing an instance of this type
 pub struct ExternalVideoBuilder<'a, S: external_video_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<BlobRef<S>>, Option<S>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -217,12 +218,12 @@ impl<'a> ExternalVideoBuilder<'a, external_video_state::Empty> {
 
 impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
     /// Set the `id` field (optional)
-    pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
-    pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_id(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -230,12 +231,12 @@ impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
 
 impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
     /// Set the `service` field (optional)
-    pub fn service(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn service(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `service` field to an Option value (optional)
-    pub fn maybe_service(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_service(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -243,12 +244,12 @@ impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
 
 impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
     /// Set the `thumb` field (optional)
-    pub fn thumb(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn thumb(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `thumb` field to an Option value (optional)
-    pub fn maybe_thumb(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_thumb(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -256,12 +257,12 @@ impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
 
 impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
     /// Set the `thumbHash` field (optional)
-    pub fn thumb_hash(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn thumb_hash(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `thumbHash` field to an Option value (optional)
-    pub fn maybe_thumb_hash(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_thumb_hash(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -275,7 +276,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ExternalVideoBuilder<'a, external_video_state::SetUri<S>> {
         self._fields.4 = Option::Some(value.into());
         ExternalVideoBuilder {
@@ -305,10 +306,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ExternalVideo<'a> {
         ExternalVideo {
             id: self._fields.0,
@@ -445,12 +443,7 @@ pub mod view_state {
 /// Builder for constructing an instance of this type
 pub struct ViewBuilder<'a, S: view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<UriValue<'a>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<UriValue<S>>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -474,12 +467,12 @@ impl<'a> ViewBuilder<'a, view_state::Empty> {
 
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `id` field (optional)
-    pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
-    pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_id(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -487,12 +480,12 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
 
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `service` field (optional)
-    pub fn service(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn service(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `service` field to an Option value (optional)
-    pub fn maybe_service(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_service(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -500,12 +493,12 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
 
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `thumb` field (optional)
-    pub fn thumb(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn thumb(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `thumb` field to an Option value (optional)
-    pub fn maybe_thumb(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_thumb(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -519,7 +512,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ViewBuilder<'a, view_state::SetUri<S>> {
         self._fields.3 = Option::Some(value.into());
         ViewBuilder {
@@ -546,13 +539,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> View<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> View<'a> {
         View {
             id: self._fields.0,
             service: self._fields.1,

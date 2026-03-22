@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, Language, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,124 +32,138 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::ai_syui::log::post;
 /// Record containing a blog post. Compatible with site.standard.document.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "ai.syui.log.post", tag = "$type")]
-pub struct Post<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "ai.syui.log.post",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Post<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Strong reference to a Bluesky post.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub bsky_post_ref: Option<StrongRef<'a>>,
+    pub bsky_post_ref: Option<StrongRef<S>>,
     ///Open union for content. Supports markdown and other formats via $type.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content: Option<post::Markdown<'a>>,
+    pub content: Option<post::Markdown<S>>,
     ///Cover image. Less than 1MB.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cover_image: Option<BlobRef<'a>>,
+    pub cover_image: Option<BlobRef<S>>,
     ///A brief description or excerpt from the post.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Indicates human language of post content.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub langs: Option<Vec<Language>>,
     ///AT-URI of the parent message being replied to.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent: Option<AtUri<'a>>,
+    pub parent: Option<AtUri<S>>,
     ///Combine with site URL to construct a canonical URL to the post.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub path: Option<CowStr<'a>>,
+    pub path: Option<S>,
     ///Timestamp of the post's publish time.
     pub published_at: Datetime,
     ///AT-URI of the root message in a thread.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub root: Option<AtUri<'a>>,
+    pub root: Option<AtUri<S>>,
     ///Points to a publication record (at://) or a publication URL (https://).
-    #[serde(borrow)]
-    pub site: UriValue<'a>,
+    pub site: UriValue<S>,
     ///Tags to categorize the post.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///Plaintext representation of the post content. Should not contain markdown or other formatting.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text_content: Option<CowStr<'a>>,
+    pub text_content: Option<S>,
     ///Title of the post.
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
     ///Translations of the post in other languages.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translations: Option<post::TranslationMap<'a>>,
+    pub translations: Option<post::TranslationMap<S>>,
     ///Timestamp of the post's last edit.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PostGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PostGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Post<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Post<S>,
 }
 
 /// Markdown content format.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Markdown<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Markdown<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Markdown text content.
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A translation of a post.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Translation<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Translation<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content: Option<CowStr<'a>>,
+    pub content: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Map of language codes to translations.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct TranslationMap<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TranslationMap<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub en: Option<post::Translation<'a>>,
+    pub en: Option<post::Translation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ja: Option<post::Translation<'a>>,
+    pub ja: Option<post::Translation<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Post<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PostRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Post<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PostRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -158,18 +174,17 @@ pub struct PostRecord;
 impl XrpcResp for PostRecord {
     const NSID: &'static str = "ai.syui.log.post";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PostGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PostGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PostGetRecordOutput<'_>> for Post<'_> {
-    fn from(output: PostGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PostGetRecordOutput<S>> for Post<S> {
+    fn from(output: PostGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Post<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Post<S> {
     const NSID: &'static str = "ai.syui.log.post";
     type Record = PostRecord;
 }
@@ -179,7 +194,7 @@ impl Collection for PostRecord {
     type Record = PostRecord;
 }
 
-impl<'a> LexiconSchema for Post<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Post<S> {
     fn nsid() -> &'static str {
         "ai.syui.log.post"
     }
@@ -288,7 +303,7 @@ impl<'a> LexiconSchema for Post<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Markdown<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Markdown<S> {
     fn nsid() -> &'static str {
         "ai.syui.log.post"
     }
@@ -327,7 +342,7 @@ impl<'a> LexiconSchema for Markdown<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Translation<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Translation<S> {
     fn nsid() -> &'static str {
         "ai.syui.log.post"
     }
@@ -386,7 +401,7 @@ impl<'a> LexiconSchema for Translation<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TranslationMap<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TranslationMap<S> {
     fn nsid() -> &'static str {
         "ai.syui.log.post"
     }
@@ -411,49 +426,49 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PublishedAt;
         type Site;
+        type PublishedAt;
         type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PublishedAt = Unset;
         type Site = Unset;
+        type PublishedAt = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
-    impl<S: State> State for SetPublishedAt<S> {
-        type PublishedAt = Set<members::published_at>;
-        type Site = S::Site;
-        type Title = S::Title;
     }
     ///State transition - sets the `site` field to Set
     pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSite<S> {}
     impl<S: State> State for SetSite<S> {
-        type PublishedAt = S::PublishedAt;
         type Site = Set<members::site>;
+        type PublishedAt = S::PublishedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `published_at` field to Set
+    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
+    impl<S: State> State for SetPublishedAt<S> {
+        type Site = S::Site;
+        type PublishedAt = Set<members::published_at>;
         type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type PublishedAt = S::PublishedAt;
         type Site = S::Site;
+        type PublishedAt = S::PublishedAt;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `published_at` field
-        pub struct published_at(());
         ///Marker type for the `site` field
         pub struct site(());
+        ///Marker type for the `published_at` field
+        pub struct published_at(());
         ///Marker type for the `title` field
         pub struct title(());
     }
@@ -463,20 +478,20 @@ pub mod post_state {
 pub struct PostBuilder<'a, S: post_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<StrongRef<'a>>,
-        Option<post::Markdown<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
+        Option<StrongRef<S>>,
+        Option<post::Markdown<S>>,
+        Option<BlobRef<S>>,
+        Option<S>,
         Option<Vec<Language>>,
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
+        Option<AtUri<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<AtUri<'a>>,
-        Option<UriValue<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<post::TranslationMap<'a>>,
+        Option<AtUri<S>>,
+        Option<UriValue<S>>,
+        Option<Vec<S>>,
+        Option<S>,
+        Option<S>,
+        Option<post::TranslationMap<S>>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -518,12 +533,12 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `bskyPostRef` field (optional)
-    pub fn bsky_post_ref(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn bsky_post_ref(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `bskyPostRef` field to an Option value (optional)
-    pub fn maybe_bsky_post_ref(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_bsky_post_ref(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -531,12 +546,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `content` field (optional)
-    pub fn content(mut self, value: impl Into<Option<post::Markdown<'a>>>) -> Self {
+    pub fn content(mut self, value: impl Into<Option<post::Markdown<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
-    pub fn maybe_content(mut self, value: Option<post::Markdown<'a>>) -> Self {
+    pub fn maybe_content(mut self, value: Option<post::Markdown<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -544,12 +559,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `coverImage` field (optional)
-    pub fn cover_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn cover_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `coverImage` field to an Option value (optional)
-    pub fn maybe_cover_image(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_cover_image(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -557,12 +572,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -583,12 +598,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `parent` field (optional)
-    pub fn parent(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn parent(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
-    pub fn maybe_parent(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_parent(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -596,12 +611,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `path` field (optional)
-    pub fn path(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn path(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `path` field to an Option value (optional)
-    pub fn maybe_path(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_path(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -628,12 +643,12 @@ where
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `root` field (optional)
-    pub fn root(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn root(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `root` field to an Option value (optional)
-    pub fn maybe_root(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_root(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -647,7 +662,7 @@ where
     /// Set the `site` field (required)
     pub fn site(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> PostBuilder<'a, post_state::SetSite<S>> {
         self._fields.9 = Option::Some(value.into());
         PostBuilder {
@@ -660,12 +675,12 @@ where
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -673,12 +688,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `textContent` field (optional)
-    pub fn text_content(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn text_content(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `textContent` field to an Option value (optional)
-    pub fn maybe_text_content(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_text_content(mut self, value: Option<S>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -692,7 +707,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PostBuilder<'a, post_state::SetTitle<S>> {
         self._fields.12 = Option::Some(value.into());
         PostBuilder {
@@ -707,16 +722,13 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `translations` field (optional)
     pub fn translations(
         mut self,
-        value: impl Into<Option<post::TranslationMap<'a>>>,
+        value: impl Into<Option<post::TranslationMap<S>>>,
     ) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `translations` field to an Option value (optional)
-    pub fn maybe_translations(
-        mut self,
-        value: Option<post::TranslationMap<'a>>,
-    ) -> Self {
+    pub fn maybe_translations(mut self, value: Option<post::TranslationMap<S>>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -738,8 +750,8 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::PublishedAt: post_state::IsSet,
     S::Site: post_state::IsSet,
+    S::PublishedAt: post_state::IsSet,
     S::Title: post_state::IsSet,
 {
     /// Build the final struct
@@ -764,13 +776,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Post<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Post<'a> {
         Post {
             bsky_post_ref: self._fields.0,
             content: self._fields.1,

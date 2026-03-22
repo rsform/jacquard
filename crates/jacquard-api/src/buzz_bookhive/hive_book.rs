@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,29 +30,31 @@ use serde::{Serialize, Deserialize};
 use crate::buzz_bookhive::BookIdentifiers;
 /// A book within the hive
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "buzz.bookhive.hiveBook", tag = "$type")]
-pub struct HiveBook<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "buzz.bookhive.hiveBook",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct HiveBook<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The authors of the book (tab separated)
-    #[serde(borrow)]
-    pub authors: CowStr<'a>,
+    pub authors: S,
     ///URL to full-size cover image
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cover: Option<CowStr<'a>>,
+    pub cover: Option<S>,
     pub created_at: Datetime,
     ///Book description/summary
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The book's hive id, used to correlate user's books with the hive
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
     ///External identifiers for the book
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifiers: Option<BookIdentifiers<'a>>,
+    pub identifiers: Option<BookIdentifiers<S>>,
     ///Average rating (0-1000)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rating: Option<i64>,
@@ -59,44 +63,42 @@ pub struct HiveBook<'a> {
     pub ratings_count: Option<i64>,
     ///The source service name (e.g. Goodreads)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source: Option<CowStr<'a>>,
+    pub source: Option<S>,
     ///ID of the book in the source service
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_id: Option<CowStr<'a>>,
+    pub source_id: Option<S>,
     ///URL to the book on the source service
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_url: Option<CowStr<'a>>,
+    pub source_url: Option<S>,
     ///URL to thumbnail image
-    #[serde(borrow)]
-    pub thumbnail: CowStr<'a>,
+    pub thumbnail: S,
     ///The title of the book
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
     pub updated_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct HiveBookGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct HiveBookGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: HiveBook<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: HiveBook<S>,
 }
 
-impl<'a> HiveBook<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, HiveBookRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> HiveBook<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, HiveBookRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -107,18 +109,17 @@ pub struct HiveBookRecord;
 impl XrpcResp for HiveBookRecord {
     const NSID: &'static str = "buzz.bookhive.hiveBook";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = HiveBookGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = HiveBookGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<HiveBookGetRecordOutput<'_>> for HiveBook<'_> {
-    fn from(output: HiveBookGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<HiveBookGetRecordOutput<S>> for HiveBook<S> {
+    fn from(output: HiveBookGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for HiveBook<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for HiveBook<S> {
     const NSID: &'static str = "buzz.bookhive.hiveBook";
     type Record = HiveBookRecord;
 }
@@ -128,7 +129,7 @@ impl Collection for HiveBookRecord {
     type Record = HiveBookRecord;
 }
 
-impl<'a> LexiconSchema for HiveBook<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for HiveBook<S> {
     fn nsid() -> &'static str {
         "buzz.bookhive.hiveBook"
     }
@@ -225,105 +226,105 @@ pub mod hive_book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type Title;
-        type Id;
         type Authors;
         type CreatedAt;
+        type UpdatedAt;
         type Thumbnail;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type Title = Unset;
-        type Id = Unset;
         type Authors = Unset;
         type CreatedAt = Unset;
+        type UpdatedAt = Unset;
         type Thumbnail = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Title = S::Title;
-        type Id = S::Id;
-        type Authors = S::Authors;
-        type CreatedAt = S::CreatedAt;
-        type Thumbnail = S::Thumbnail;
+        type Id = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Title = Set<members::title>;
-        type Id = S::Id;
         type Authors = S::Authors;
         type CreatedAt = S::CreatedAt;
-        type Thumbnail = S::Thumbnail;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
         type UpdatedAt = S::UpdatedAt;
-        type Title = S::Title;
-        type Id = Set<members::id>;
-        type Authors = S::Authors;
-        type CreatedAt = S::CreatedAt;
         type Thumbnail = S::Thumbnail;
+        type Id = S::Id;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthors<S> {}
     impl<S: State> State for SetAuthors<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Title = S::Title;
-        type Id = S::Id;
         type Authors = Set<members::authors>;
         type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
         type Thumbnail = S::Thumbnail;
+        type Id = S::Id;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Title = S::Title;
-        type Id = S::Id;
         type Authors = S::Authors;
         type CreatedAt = Set<members::created_at>;
+        type UpdatedAt = S::UpdatedAt;
         type Thumbnail = S::Thumbnail;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Title = S::Title;
+        type Authors = S::Authors;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = Set<members::updated_at>;
+        type Thumbnail = S::Thumbnail;
+        type Id = S::Id;
     }
     ///State transition - sets the `thumbnail` field to Set
     pub struct SetThumbnail<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThumbnail<S> {}
     impl<S: State> State for SetThumbnail<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Title = S::Title;
-        type Id = S::Id;
         type Authors = S::Authors;
         type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
         type Thumbnail = Set<members::thumbnail>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Title = S::Title;
+        type Authors = S::Authors;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+        type Thumbnail = S::Thumbnail;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `authors` field
         pub struct authors(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
         ///Marker type for the `thumbnail` field
         pub struct thumbnail(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -331,19 +332,19 @@ pub mod hive_book_state {
 pub struct HiveBookBuilder<'a, S: hive_book_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<BookIdentifiers<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<BookIdentifiers<S>>,
         Option<i64>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -390,7 +391,7 @@ where
     /// Set the `authors` field (required)
     pub fn authors(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> HiveBookBuilder<'a, hive_book_state::SetAuthors<S>> {
         self._fields.0 = Option::Some(value.into());
         HiveBookBuilder {
@@ -403,12 +404,12 @@ where
 
 impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     /// Set the `cover` field (optional)
-    pub fn cover(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cover(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `cover` field to an Option value (optional)
-    pub fn maybe_cover(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cover(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -435,12 +436,12 @@ where
 
 impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -454,7 +455,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> HiveBookBuilder<'a, hive_book_state::SetId<S>> {
         self._fields.4 = Option::Some(value.into());
         HiveBookBuilder {
@@ -467,12 +468,12 @@ where
 
 impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     /// Set the `identifiers` field (optional)
-    pub fn identifiers(mut self, value: impl Into<Option<BookIdentifiers<'a>>>) -> Self {
+    pub fn identifiers(mut self, value: impl Into<Option<BookIdentifiers<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `identifiers` field to an Option value (optional)
-    pub fn maybe_identifiers(mut self, value: Option<BookIdentifiers<'a>>) -> Self {
+    pub fn maybe_identifiers(mut self, value: Option<BookIdentifiers<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -506,12 +507,12 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
 
 impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
-    pub fn maybe_source(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_source(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -519,12 +520,12 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
 
 impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     /// Set the `sourceId` field (optional)
-    pub fn source_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn source_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `sourceId` field to an Option value (optional)
-    pub fn maybe_source_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_source_id(mut self, value: Option<S>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -532,12 +533,12 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
 
 impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     /// Set the `sourceUrl` field (optional)
-    pub fn source_url(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn source_url(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `sourceUrl` field to an Option value (optional)
-    pub fn maybe_source_url(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_source_url(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -551,7 +552,7 @@ where
     /// Set the `thumbnail` field (required)
     pub fn thumbnail(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> HiveBookBuilder<'a, hive_book_state::SetThumbnail<S>> {
         self._fields.11 = Option::Some(value.into());
         HiveBookBuilder {
@@ -570,7 +571,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> HiveBookBuilder<'a, hive_book_state::SetTitle<S>> {
         self._fields.12 = Option::Some(value.into());
         HiveBookBuilder {
@@ -603,12 +604,12 @@ where
 impl<'a, S> HiveBookBuilder<'a, S>
 where
     S: hive_book_state::State,
-    S::UpdatedAt: hive_book_state::IsSet,
     S::Title: hive_book_state::IsSet,
-    S::Id: hive_book_state::IsSet,
     S::Authors: hive_book_state::IsSet,
     S::CreatedAt: hive_book_state::IsSet,
+    S::UpdatedAt: hive_book_state::IsSet,
     S::Thumbnail: hive_book_state::IsSet,
+    S::Id: hive_book_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> HiveBook<'a> {
@@ -633,10 +634,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> HiveBook<'a> {
         HiveBook {
             authors: self._fields.0.unwrap(),

@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,46 +30,50 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Attestation proof for a supporter relationship. When inline, cid and signature are required. When remote, only cid is required.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "com.atprotofans.supporterProof",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct SupporterProof<'a> {
+pub struct SupporterProof<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///CID of the proof record. Required for both inline and remote proofs.
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///Signing key (for inline proofs).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub key: Option<CowStr<'a>>,
+    pub key: Option<S>,
     ///Signature data (for inline proofs).
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
     pub signature: Option<Bytes>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SupporterProofGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SupporterProofGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: SupporterProof<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: SupporterProof<S>,
 }
 
-impl<'a> SupporterProof<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SupporterProofRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> SupporterProof<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SupporterProofRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -78,18 +84,18 @@ pub struct SupporterProofRecord;
 impl XrpcResp for SupporterProofRecord {
     const NSID: &'static str = "com.atprotofans.supporterProof";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SupporterProofGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SupporterProofGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SupporterProofGetRecordOutput<'_>> for SupporterProof<'_> {
-    fn from(output: SupporterProofGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SupporterProofGetRecordOutput<S>>
+for SupporterProof<S> {
+    fn from(output: SupporterProofGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for SupporterProof<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for SupporterProof<S> {
     const NSID: &'static str = "com.atprotofans.supporterProof";
     type Record = SupporterProofRecord;
 }
@@ -99,7 +105,7 @@ impl Collection for SupporterProofRecord {
     type Record = SupporterProofRecord;
 }
 
-impl<'a> LexiconSchema for SupporterProof<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SupporterProof<S> {
     fn nsid() -> &'static str {
         "com.atprotofans.supporterProof"
     }
@@ -149,7 +155,7 @@ pub mod supporter_proof_state {
 /// Builder for constructing an instance of this type
 pub struct SupporterProofBuilder<'a, S: supporter_proof_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Cid<'a>>, Option<CowStr<'a>>, Option<Bytes>),
+    _fields: (Option<Cid<S>>, Option<S>, Option<Bytes>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -179,7 +185,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> SupporterProofBuilder<'a, supporter_proof_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         SupporterProofBuilder {
@@ -192,12 +198,12 @@ where
 
 impl<'a, S: supporter_proof_state::State> SupporterProofBuilder<'a, S> {
     /// Set the `key` field (optional)
-    pub fn key(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn key(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `key` field to an Option value (optional)
-    pub fn maybe_key(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_key(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -233,10 +239,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SupporterProof<'a> {
         SupporterProof {
             cid: self._fields.0.unwrap(),

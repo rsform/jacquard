@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,58 +32,67 @@ use crate::network_cosmik::Provenance;
 use crate::network_cosmik::card;
 /// A record representing a card with content.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "network.cosmik.card", tag = "$type")]
-pub struct Card<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "network.cosmik.card",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Card<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The specific content of the card, determined by the card type.
-    #[serde(borrow)]
-    pub content: CardContent<'a>,
+    pub content: CardContent<S>,
     ///Timestamp when this card was created (usually set by PDS).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///Optional strong reference to the original card (for NOTE cards).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub original_card: Option<StrongRef<'a>>,
+    pub original_card: Option<StrongRef<S>>,
     ///Optional strong reference to a parent card (for NOTE cards).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent_card: Option<StrongRef<'a>>,
+    pub parent_card: Option<StrongRef<S>>,
     ///Optional provenance information for this card.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub provenance: Option<Provenance<'a>>,
+    pub provenance: Option<Provenance<S>>,
     ///The type of card
-    #[serde(borrow)]
-    pub r#type: CardType<'a>,
+    pub r#type: CardType<S>,
     ///Optional URL associated with the card. Required for URL cards, optional for NOTE cards.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<UriValue<'a>>,
+    pub url: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum CardContent<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum CardContent<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "network.cosmik.card#urlContent")]
-    UrlContent(Box<card::UrlContent<'a>>),
+    UrlContent(Box<card::UrlContent<S>>),
     #[serde(rename = "network.cosmik.card#noteContent")]
-    NoteContent(Box<card::NoteContent<'a>>),
+    NoteContent(Box<card::NoteContent<S>>),
 }
 
 /// The type of card
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CardType<'a> {
+pub enum CardType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Url,
     Note,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> CardType<'a> {
+impl<S: Bos<str> + AsRef<str>> CardType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Url => "URL",
@@ -89,70 +100,55 @@ impl<'a> CardType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for CardType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "URL" => Self::Url,
             "NOTE" => Self::Note,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for CardType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "URL" => Self::Url,
-            "NOTE" => Self::Note,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CardType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CardType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for CardType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for CardType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for CardType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for CardType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for CardType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for CardType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for CardType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for CardType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for CardType<'_> {
-    type Output = CardType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for CardType<S> {
+    type Output = CardType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             CardType::Url => CardType::Url,
@@ -165,69 +161,83 @@ impl jacquard_common::IntoStatic for CardType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CardGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CardGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Card<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Card<S>,
 }
 
 /// Content structure for a note card.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct NoteContent<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct NoteContent<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The note text content
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Content structure for a URL card.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct UrlContent<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UrlContent<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional metadata about the URL
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub metadata: Option<card::UrlMetadata<'a>>,
+    pub metadata: Option<card::UrlMetadata<S>>,
     ///The URL being saved
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Metadata about a URL.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct UrlMetadata<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UrlMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Author of the content
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<CowStr<'a>>,
+    pub author: Option<S>,
     ///Description of the page
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Digital Object Identifier (DOI) for academic content
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub doi: Option<CowStr<'a>>,
+    pub doi: Option<S>,
     ///URL of a representative image
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image_url: Option<UriValue<'a>>,
+    pub image_url: Option<UriValue<S>>,
     ///International Standard Book Number (ISBN) for books
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub isbn: Option<CowStr<'a>>,
+    pub isbn: Option<S>,
     ///When the content was published
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published_date: Option<Datetime>,
@@ -236,23 +246,20 @@ pub struct UrlMetadata<'a> {
     pub retrieved_at: Option<Datetime>,
     ///Name of the site
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub site_name: Option<CowStr<'a>>,
+    pub site_name: Option<S>,
     ///Title of the page
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     ///Type of content (e.g., 'video', 'article')
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<CowStr<'a>>,
+    pub r#type: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Card<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CardRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Card<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CardRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -263,18 +270,17 @@ pub struct CardRecord;
 impl XrpcResp for CardRecord {
     const NSID: &'static str = "network.cosmik.card";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CardGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CardGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CardGetRecordOutput<'_>> for Card<'_> {
-    fn from(output: CardGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CardGetRecordOutput<S>> for Card<S> {
+    fn from(output: CardGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Card<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Card<S> {
     const NSID: &'static str = "network.cosmik.card";
     type Record = CardRecord;
 }
@@ -284,7 +290,7 @@ impl Collection for CardRecord {
     type Record = CardRecord;
 }
 
-impl<'a> LexiconSchema for Card<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Card<S> {
     fn nsid() -> &'static str {
         "network.cosmik.card"
     }
@@ -299,7 +305,7 @@ impl<'a> LexiconSchema for Card<'a> {
     }
 }
 
-impl<'a> LexiconSchema for NoteContent<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for NoteContent<S> {
     fn nsid() -> &'static str {
         "network.cosmik.card"
     }
@@ -325,7 +331,7 @@ impl<'a> LexiconSchema for NoteContent<'a> {
     }
 }
 
-impl<'a> LexiconSchema for UrlContent<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for UrlContent<S> {
     fn nsid() -> &'static str {
         "network.cosmik.card"
     }
@@ -340,7 +346,7 @@ impl<'a> LexiconSchema for UrlContent<'a> {
     }
 }
 
-impl<'a> LexiconSchema for UrlMetadata<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for UrlMetadata<S> {
     fn nsid() -> &'static str {
         "network.cosmik.card"
     }
@@ -365,37 +371,37 @@ pub mod card_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Type;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Type = S::Type;
+        type Content = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Content = S::Content;
         type Type = Set<members::r#type>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Type = S::Type;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -403,13 +409,13 @@ pub mod card_state {
 pub struct CardBuilder<'a, S: card_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CardContent<'a>>,
+        Option<CardContent<S>>,
         Option<Datetime>,
-        Option<StrongRef<'a>>,
-        Option<StrongRef<'a>>,
-        Option<Provenance<'a>>,
-        Option<CardType<'a>>,
-        Option<UriValue<'a>>,
+        Option<StrongRef<S>>,
+        Option<StrongRef<S>>,
+        Option<Provenance<S>>,
+        Option<CardType<S>>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -440,7 +446,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<CardContent<'a>>,
+        value: impl Into<CardContent<S>>,
     ) -> CardBuilder<'a, card_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         CardBuilder {
@@ -466,12 +472,12 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
 
 impl<'a, S: card_state::State> CardBuilder<'a, S> {
     /// Set the `originalCard` field (optional)
-    pub fn original_card(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn original_card(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `originalCard` field to an Option value (optional)
-    pub fn maybe_original_card(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_original_card(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -479,12 +485,12 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
 
 impl<'a, S: card_state::State> CardBuilder<'a, S> {
     /// Set the `parentCard` field (optional)
-    pub fn parent_card(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn parent_card(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `parentCard` field to an Option value (optional)
-    pub fn maybe_parent_card(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_parent_card(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -492,12 +498,12 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
 
 impl<'a, S: card_state::State> CardBuilder<'a, S> {
     /// Set the `provenance` field (optional)
-    pub fn provenance(mut self, value: impl Into<Option<Provenance<'a>>>) -> Self {
+    pub fn provenance(mut self, value: impl Into<Option<Provenance<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `provenance` field to an Option value (optional)
-    pub fn maybe_provenance(mut self, value: Option<Provenance<'a>>) -> Self {
+    pub fn maybe_provenance(mut self, value: Option<Provenance<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -511,7 +517,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<CardType<'a>>,
+        value: impl Into<CardType<S>>,
     ) -> CardBuilder<'a, card_state::SetType<S>> {
         self._fields.5 = Option::Some(value.into());
         CardBuilder {
@@ -524,12 +530,12 @@ where
 
 impl<'a, S: card_state::State> CardBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -538,8 +544,8 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
 impl<'a, S> CardBuilder<'a, S>
 where
     S: card_state::State,
-    S::Content: card_state::IsSet,
     S::Type: card_state::IsSet,
+    S::Content: card_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Card<'a> {
@@ -555,13 +561,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Card<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Card<'a> {
         Card {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1,
@@ -880,7 +880,7 @@ pub mod url_content_state {
 /// Builder for constructing an instance of this type
 pub struct UrlContentBuilder<'a, S: url_content_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<card::UrlMetadata<'a>>, Option<UriValue<'a>>),
+    _fields: (Option<card::UrlMetadata<S>>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -904,12 +904,12 @@ impl<'a> UrlContentBuilder<'a, url_content_state::Empty> {
 
 impl<'a, S: url_content_state::State> UrlContentBuilder<'a, S> {
     /// Set the `metadata` field (optional)
-    pub fn metadata(mut self, value: impl Into<Option<card::UrlMetadata<'a>>>) -> Self {
+    pub fn metadata(mut self, value: impl Into<Option<card::UrlMetadata<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
-    pub fn maybe_metadata(mut self, value: Option<card::UrlMetadata<'a>>) -> Self {
+    pub fn maybe_metadata(mut self, value: Option<card::UrlMetadata<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -923,7 +923,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> UrlContentBuilder<'a, url_content_state::SetUrl<S>> {
         self._fields.1 = Option::Some(value.into());
         UrlContentBuilder {
@@ -950,10 +950,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> UrlContent<'a> {
         UrlContent {
             metadata: self._fields.0,

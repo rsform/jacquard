@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -28,196 +29,155 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A biodiversity occurrence record following the Simple Darwin Core standard. Each record represents one occurrence of an organism at a location and time.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.gainforest.dwc.occurrence",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Occurrence<'a> {
+pub struct Occurrence<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Identifiers (URIs) of media associated with the occurrence. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_media: Option<CowStr<'a>>,
+    pub associated_media: Option<S>,
     ///Identifiers of other occurrences associated with this one (e.g., parasite-host). Pipe-delimited.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_occurrences: Option<CowStr<'a>>,
+    pub associated_occurrences: Option<S>,
     ///Identifiers (URIs) of literature associated with the occurrence. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_references: Option<CowStr<'a>>,
+    pub associated_references: Option<S>,
     ///Identifiers (URIs) of genetic sequence information associated with the occurrence. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_sequences: Option<CowStr<'a>>,
+    pub associated_sequences: Option<S>,
     ///Audio evidence (bioacoustics, soundscape, species call, field recording, etc.).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audio_evidence: Option<Data<'a>>,
+    pub audio_evidence: Option<Data<S>>,
     ///The specific nature of the data record. Must be one of the Darwin Core class names.
-    #[serde(borrow)]
-    pub basis_of_record: CowStr<'a>,
+    pub basis_of_record: S,
     ///The behavior shown by the subject at the time of occurrence (e.g., 'foraging', 'nesting', 'roosting').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub behavior: Option<CowStr<'a>>,
+    pub behavior: Option<S>,
     ///The full scientific name of the class.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub class: Option<CowStr<'a>>,
+    pub class: Option<S>,
     ///The name, acronym, or code identifying the collection or dataset from which the record was derived.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub collection_code: Option<CowStr<'a>>,
+    pub collection_code: Option<S>,
     ///Horizontal distance (meters) from the given coordinates describing the smallest circle containing the whole location.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub coordinate_uncertainty_in_meters: Option<i64>,
     ///The name of the country or major administrative unit.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country: Option<CowStr<'a>>,
+    pub country: Option<S>,
     ///The standard code for the country (ISO 3166-1 alpha-2).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_code: Option<CowStr<'a>>,
+    pub country_code: Option<S>,
     ///The full, unabbreviated name of the next smaller administrative region than stateProvince.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub county: Option<CowStr<'a>>,
+    pub county: Option<S>,
     ///Timestamp of record creation in the ATProto PDS.
     pub created_at: Datetime,
     ///A description of actions taken to make the data less specific or complete (e.g., 'coordinates rounded to nearest 0.1 degree').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub data_generalizations: Option<CowStr<'a>>,
+    pub data_generalizations: Option<S>,
     ///The name identifying the dataset from which the record was derived.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub dataset_name: Option<CowStr<'a>>,
+    pub dataset_name: Option<S>,
     ///The date on which the identification was made. ISO 8601 format.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_identified: Option<CowStr<'a>>,
+    pub date_identified: Option<S>,
     ///The Dublin Core type class that best describes the resource (dc:type).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub dc_type: Option<CowStr<'a>>,
+    pub dc_type: Option<S>,
     ///Geographic latitude in decimal degrees (WGS84). Positive values are north of the Equator. Range: -90 to 90.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub decimal_latitude: Option<CowStr<'a>>,
+    pub decimal_latitude: Option<S>,
     ///Geographic longitude in decimal degrees (WGS84). Positive values are east of the Greenwich Meridian. Range: -180 to 180.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub decimal_longitude: Option<CowStr<'a>>,
+    pub decimal_longitude: Option<S>,
     ///Additional structured data as a valid JSON string (per Simple DwC Section 7.1). Example: '{"iucnStatus":"vulnerable","canopyCover":"85%"}'. Should be flattened to a single line with no non-printing characters.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub dynamic_properties: Option<CowStr<'a>>,
+    pub dynamic_properties: Option<S>,
     ///The date or date-time (or interval) during which the occurrence was recorded. ISO 8601 format (e.g., '2024-03-15', '2024-03-15T10:30:00Z', '2024-03/2024-06').
-    #[serde(borrow)]
-    pub event_date: CowStr<'a>,
+    pub event_date: S,
     ///Identifier for the sampling event. Can be used to group occurrences from the same event.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub event_id: Option<CowStr<'a>>,
+    pub event_id: Option<S>,
     ///AT-URI reference to an app.gainforest.dwc.event record (for star-schema linkage).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub event_ref: Option<AtUri<'a>>,
+    pub event_ref: Option<AtUri<S>>,
     ///The time of the event. ISO 8601 format (e.g., '14:30:00', '14:30:00+02:00').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub event_time: Option<CowStr<'a>>,
+    pub event_time: Option<S>,
     ///The full scientific name of the family.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub family: Option<CowStr<'a>>,
+    pub family: Option<S>,
     ///Notes or reference to notes taken in the field about the event.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub field_notes: Option<CowStr<'a>>,
+    pub field_notes: Option<S>,
     ///GBIF backbone taxonomy key for the identified taxon. Retained for backward compatibility with existing GainForest workflows.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gbif_taxon_key: Option<CowStr<'a>>,
+    pub gbif_taxon_key: Option<S>,
     ///The full scientific name of the genus.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genus: Option<CowStr<'a>>,
+    pub genus: Option<S>,
     ///The spatial reference system for the coordinates. Recommended: 'EPSG:4326' (WGS84).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geodetic_datum: Option<CowStr<'a>>,
+    pub geodetic_datum: Option<S>,
     ///A description of the habitat in which the event occurred (e.g., 'tropical rainforest', 'mangrove swamp', 'montane cloud forest').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub habitat: Option<CowStr<'a>>,
+    pub habitat: Option<S>,
     ///A complete list of taxa names terminating at the rank immediately superior to the taxon. Pipe-delimited (e.g., 'Animalia|Chordata|Mammalia|Rodentia|Ctenomyidae|Ctenomys').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub higher_classification: Option<CowStr<'a>>,
+    pub higher_classification: Option<S>,
     ///A brief phrase or standard term qualifying the identification (e.g., 'cf. agrestis', 'aff. agrestis').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identification_qualifier: Option<CowStr<'a>>,
+    pub identification_qualifier: Option<S>,
     ///Comments or notes about the identification.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identification_remarks: Option<CowStr<'a>>,
+    pub identification_remarks: Option<S>,
     ///Person(s) who assigned the taxon to the occurrence. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identified_by: Option<CowStr<'a>>,
+    pub identified_by: Option<S>,
     ///Persistent identifier(s) (e.g., ORCID) of the person(s) who identified. Pipe-delimited.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identified_by_id: Option<CowStr<'a>>,
+    pub identified_by_id: Option<S>,
     ///Image evidence (photo, camera trap, drone still, scanned specimen, etc.).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image_evidence: Option<Data<'a>>,
+    pub image_evidence: Option<Data<S>>,
     ///The number of individuals present at the time of the occurrence.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub individual_count: Option<i64>,
     ///A description of what information is withheld from this record and why (e.g., 'coordinates generalized to protect endangered species').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub information_withheld: Option<CowStr<'a>>,
+    pub information_withheld: Option<S>,
     ///The name of the lowest or terminal infraspecific epithet.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub infraspecific_epithet: Option<CowStr<'a>>,
+    pub infraspecific_epithet: Option<S>,
     ///The name or acronym of the institution having custody of the object(s) or information in the record.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub institution_code: Option<CowStr<'a>>,
+    pub institution_code: Option<S>,
     ///The full scientific name of the kingdom (e.g., 'Animalia', 'Plantae', 'Fungi').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub kingdom: Option<CowStr<'a>>,
+    pub kingdom: Option<S>,
     ///A legal document giving official permission to do something with the record. Recommended: a Creative Commons URI (e.g., 'http://creativecommons.org/licenses/by/4.0/').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub license: Option<CowStr<'a>>,
+    pub license: Option<S>,
     ///The age class or life stage at the time of occurrence (e.g., 'adult', 'juvenile', 'larva', 'seedling', 'sapling').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub life_stage: Option<CowStr<'a>>,
+    pub life_stage: Option<S>,
     ///The specific description of the place (e.g., '500m upstream of bridge on Rio Pará').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub locality: Option<CowStr<'a>>,
+    pub locality: Option<S>,
     ///Identifier for the location (e.g., a reference to a named site).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location_id: Option<CowStr<'a>>,
+    pub location_id: Option<S>,
     ///Comments about the location.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location_remarks: Option<CowStr<'a>>,
+    pub location_remarks: Option<S>,
     ///The greater depth of a range of depth below the local surface (in meters).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum_depth_in_meters: Option<i64>,
@@ -232,136 +192,111 @@ pub struct Occurrence<'a> {
     pub minimum_elevation_in_meters: Option<i64>,
     ///The full, unabbreviated name of the next smaller administrative region than county.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub municipality: Option<CowStr<'a>>,
+    pub municipality: Option<S>,
     ///The nomenclatural code under which the scientificName is constructed.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub nomenclatural_code: Option<CowStr<'a>>,
+    pub nomenclatural_code: Option<S>,
     ///A globally unique identifier for the occurrence record. Recommended: a persistent URI (e.g., DOI, LSID, or UUID-based URI).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub occurrence_id: Option<CowStr<'a>>,
+    pub occurrence_id: Option<S>,
     ///Comments or notes about the occurrence.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub occurrence_remarks: Option<CowStr<'a>>,
+    pub occurrence_remarks: Option<S>,
     ///Statement about the presence or absence of a taxon at a location.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub occurrence_status: Option<CowStr<'a>>,
+    pub occurrence_status: Option<S>,
     ///The full scientific name of the order.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub order: Option<CowStr<'a>>,
+    pub order: Option<S>,
     ///A number or enumeration value for the quantity of organisms (e.g., '27', '12.5', 'many').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub organism_quantity: Option<CowStr<'a>>,
+    pub organism_quantity: Option<S>,
     ///The type of quantification system used for organismQuantity (e.g., 'individuals', '% biomass', 'stems/ha').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub organism_quantity_type: Option<CowStr<'a>>,
+    pub organism_quantity_type: Option<S>,
     ///The full scientific name of the phylum or division.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub phylum: Option<CowStr<'a>>,
+    pub phylum: Option<S>,
     ///Previous assignments of names to the occurrence. Pipe-delimited.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub previous_identifications: Option<CowStr<'a>>,
+    pub previous_identifications: Option<S>,
     ///Person(s) responsible for recording the occurrence in the field. Pipe-delimited for multiple (e.g., 'Jane Smith | John Doe').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recorded_by: Option<CowStr<'a>>,
+    pub recorded_by: Option<S>,
     ///Persistent identifier(s) (e.g., ORCID) of the person(s) who recorded. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recorded_by_id: Option<CowStr<'a>>,
+    pub recorded_by_id: Option<S>,
     ///A related resource that is referenced, cited, or otherwise pointed to by the record (URL).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub references: Option<UriValue<'a>>,
+    pub references: Option<UriValue<S>>,
     ///The reproductive condition at the time of occurrence (e.g., 'flowering', 'fruiting', 'budding', 'pregnant').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reproductive_condition: Option<CowStr<'a>>,
+    pub reproductive_condition: Option<S>,
     ///Person or organization owning or managing rights over the resource.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rights_holder: Option<CowStr<'a>>,
+    pub rights_holder: Option<S>,
     ///The amount of effort expended during the event (e.g., '2 trap-nights', '30 minutes', '10 km transect').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sampling_effort: Option<CowStr<'a>>,
+    pub sampling_effort: Option<S>,
     ///The method or protocol used during the event (e.g., 'camera trap', 'point count', 'mist net', '20m x 20m plot survey', 'acoustic monitoring').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sampling_protocol: Option<CowStr<'a>>,
+    pub sampling_protocol: Option<S>,
     ///The full scientific name, with authorship and date if known (e.g., 'Centropyge flavicauda Fraser-Brunner 1933').
-    #[serde(borrow)]
-    pub scientific_name: CowStr<'a>,
+    pub scientific_name: S,
     ///The authorship information for the scientific name (e.g., 'Fraser-Brunner 1933').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub scientific_name_authorship: Option<CowStr<'a>>,
+    pub scientific_name_authorship: Option<S>,
     ///The sex of the biological individual(s).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sex: Option<CowStr<'a>>,
+    pub sex: Option<S>,
     ///The name of the species epithet of the scientificName.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub specific_epithet: Option<CowStr<'a>>,
+    pub specific_epithet: Option<S>,
     ///Spectrogram image showing frequency analysis of audio recording.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spectrogram_evidence: Option<Data<'a>>,
+    pub spectrogram_evidence: Option<Data<S>>,
     ///The name of the next smaller administrative region than country.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub state_province: Option<CowStr<'a>>,
+    pub state_province: Option<S>,
     ///The taxonomic rank of the most specific name in scientificName.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub taxon_rank: Option<CowStr<'a>>,
+    pub taxon_rank: Option<S>,
     ///The status of the use of the scientificName (e.g., 'accepted', 'synonym', 'doubtful').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub taxonomic_status: Option<CowStr<'a>>,
+    pub taxonomic_status: Option<S>,
     ///The original textual description of the place as provided by the recorder.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub verbatim_locality: Option<CowStr<'a>>,
+    pub verbatim_locality: Option<S>,
     ///A common or vernacular name for the taxon.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub vernacular_name: Option<CowStr<'a>>,
+    pub vernacular_name: Option<S>,
     ///Video evidence (camera trap, drone footage, underwater video, behavioral observation, etc.).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub video_evidence: Option<Data<'a>>,
+    pub video_evidence: Option<Data<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct OccurrenceGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct OccurrenceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Occurrence<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Occurrence<S>,
 }
 
-impl<'a> Occurrence<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, OccurrenceRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Occurrence<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, OccurrenceRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -372,18 +307,17 @@ pub struct OccurrenceRecord;
 impl XrpcResp for OccurrenceRecord {
     const NSID: &'static str = "app.gainforest.dwc.occurrence";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = OccurrenceGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = OccurrenceGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<OccurrenceGetRecordOutput<'_>> for Occurrence<'_> {
-    fn from(output: OccurrenceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<OccurrenceGetRecordOutput<S>> for Occurrence<S> {
+    fn from(output: OccurrenceGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Occurrence<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Occurrence<S> {
     const NSID: &'static str = "app.gainforest.dwc.occurrence";
     type Record = OccurrenceRecord;
 }
@@ -393,7 +327,7 @@ impl Collection for OccurrenceRecord {
     type Record = OccurrenceRecord;
 }
 
-impl<'a> LexiconSchema for Occurrence<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Occurrence<S> {
     fn nsid() -> &'static str {
         "app.gainforest.dwc.occurrence"
     }
@@ -1257,67 +1191,67 @@ pub mod occurrence_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EventDate;
         type BasisOfRecord;
         type ScientificName;
         type CreatedAt;
+        type EventDate;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EventDate = Unset;
         type BasisOfRecord = Unset;
         type ScientificName = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `event_date` field to Set
-    pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventDate<S> {}
-    impl<S: State> State for SetEventDate<S> {
-        type EventDate = Set<members::event_date>;
-        type BasisOfRecord = S::BasisOfRecord;
-        type ScientificName = S::ScientificName;
-        type CreatedAt = S::CreatedAt;
+        type EventDate = Unset;
     }
     ///State transition - sets the `basis_of_record` field to Set
     pub struct SetBasisOfRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBasisOfRecord<S> {}
     impl<S: State> State for SetBasisOfRecord<S> {
-        type EventDate = S::EventDate;
         type BasisOfRecord = Set<members::basis_of_record>;
         type ScientificName = S::ScientificName;
         type CreatedAt = S::CreatedAt;
+        type EventDate = S::EventDate;
     }
     ///State transition - sets the `scientific_name` field to Set
     pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScientificName<S> {}
     impl<S: State> State for SetScientificName<S> {
-        type EventDate = S::EventDate;
         type BasisOfRecord = S::BasisOfRecord;
         type ScientificName = Set<members::scientific_name>;
         type CreatedAt = S::CreatedAt;
+        type EventDate = S::EventDate;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type EventDate = S::EventDate;
         type BasisOfRecord = S::BasisOfRecord;
         type ScientificName = S::ScientificName;
         type CreatedAt = Set<members::created_at>;
+        type EventDate = S::EventDate;
+    }
+    ///State transition - sets the `event_date` field to Set
+    pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventDate<S> {}
+    impl<S: State> State for SetEventDate<S> {
+        type BasisOfRecord = S::BasisOfRecord;
+        type ScientificName = S::ScientificName;
+        type CreatedAt = S::CreatedAt;
+        type EventDate = Set<members::event_date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `event_date` field
-        pub struct event_date(());
         ///Marker type for the `basis_of_record` field
         pub struct basis_of_record(());
         ///Marker type for the `scientific_name` field
         pub struct scientific_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `event_date` field
+        pub struct event_date(());
     }
 }
 
@@ -1325,85 +1259,85 @@ pub mod occurrence_state {
 pub struct OccurrenceBuilder<'a, S: occurrence_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Data<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Data<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Data<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Data<S>>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<i64>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<i64>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Data<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Data<'a>>,
+        Option<i64>,
+        Option<i64>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Data<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Data<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1508,12 +1442,12 @@ impl<'a> OccurrenceBuilder<'a, occurrence_state::Empty> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `associatedMedia` field (optional)
-    pub fn associated_media(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn associated_media(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
-    pub fn maybe_associated_media(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_associated_media(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1521,15 +1455,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `associatedOccurrences` field (optional)
-    pub fn associated_occurrences(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn associated_occurrences(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `associatedOccurrences` field to an Option value (optional)
-    pub fn maybe_associated_occurrences(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_associated_occurrences(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1537,15 +1468,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `associatedReferences` field (optional)
-    pub fn associated_references(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn associated_references(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `associatedReferences` field to an Option value (optional)
-    pub fn maybe_associated_references(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_associated_references(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1553,12 +1481,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `associatedSequences` field (optional)
-    pub fn associated_sequences(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn associated_sequences(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `associatedSequences` field to an Option value (optional)
-    pub fn maybe_associated_sequences(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_associated_sequences(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1566,12 +1494,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `audioEvidence` field (optional)
-    pub fn audio_evidence(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn audio_evidence(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `audioEvidence` field to an Option value (optional)
-    pub fn maybe_audio_evidence(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_audio_evidence(mut self, value: Option<Data<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1585,7 +1513,7 @@ where
     /// Set the `basisOfRecord` field (required)
     pub fn basis_of_record(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> OccurrenceBuilder<'a, occurrence_state::SetBasisOfRecord<S>> {
         self._fields.5 = Option::Some(value.into());
         OccurrenceBuilder {
@@ -1598,12 +1526,12 @@ where
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `behavior` field (optional)
-    pub fn behavior(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn behavior(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `behavior` field to an Option value (optional)
-    pub fn maybe_behavior(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_behavior(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -1611,12 +1539,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `class` field (optional)
-    pub fn class(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn class(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `class` field to an Option value (optional)
-    pub fn maybe_class(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_class(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -1624,12 +1552,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `collectionCode` field (optional)
-    pub fn collection_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn collection_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `collectionCode` field to an Option value (optional)
-    pub fn maybe_collection_code(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_collection_code(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -1653,12 +1581,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `country` field (optional)
-    pub fn country(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn country(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `country` field to an Option value (optional)
-    pub fn maybe_country(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_country(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -1666,12 +1594,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `countryCode` field (optional)
-    pub fn country_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn country_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `countryCode` field to an Option value (optional)
-    pub fn maybe_country_code(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_country_code(mut self, value: Option<S>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -1679,12 +1607,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `county` field (optional)
-    pub fn county(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn county(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `county` field to an Option value (optional)
-    pub fn maybe_county(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_county(mut self, value: Option<S>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -1711,12 +1639,12 @@ where
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `dataGeneralizations` field (optional)
-    pub fn data_generalizations(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn data_generalizations(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.14 = value.into();
         self
     }
     /// Set the `dataGeneralizations` field to an Option value (optional)
-    pub fn maybe_data_generalizations(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_data_generalizations(mut self, value: Option<S>) -> Self {
         self._fields.14 = value;
         self
     }
@@ -1724,12 +1652,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `datasetName` field (optional)
-    pub fn dataset_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn dataset_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `datasetName` field to an Option value (optional)
-    pub fn maybe_dataset_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_dataset_name(mut self, value: Option<S>) -> Self {
         self._fields.15 = value;
         self
     }
@@ -1737,12 +1665,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `dateIdentified` field (optional)
-    pub fn date_identified(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn date_identified(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `dateIdentified` field to an Option value (optional)
-    pub fn maybe_date_identified(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_date_identified(mut self, value: Option<S>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -1750,12 +1678,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `dcType` field (optional)
-    pub fn dc_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn dc_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.17 = value.into();
         self
     }
     /// Set the `dcType` field to an Option value (optional)
-    pub fn maybe_dc_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_dc_type(mut self, value: Option<S>) -> Self {
         self._fields.17 = value;
         self
     }
@@ -1763,12 +1691,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `decimalLatitude` field (optional)
-    pub fn decimal_latitude(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn decimal_latitude(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.18 = value.into();
         self
     }
     /// Set the `decimalLatitude` field to an Option value (optional)
-    pub fn maybe_decimal_latitude(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_decimal_latitude(mut self, value: Option<S>) -> Self {
         self._fields.18 = value;
         self
     }
@@ -1776,12 +1704,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `decimalLongitude` field (optional)
-    pub fn decimal_longitude(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn decimal_longitude(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.19 = value.into();
         self
     }
     /// Set the `decimalLongitude` field to an Option value (optional)
-    pub fn maybe_decimal_longitude(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_decimal_longitude(mut self, value: Option<S>) -> Self {
         self._fields.19 = value;
         self
     }
@@ -1789,12 +1717,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `dynamicProperties` field (optional)
-    pub fn dynamic_properties(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn dynamic_properties(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.20 = value.into();
         self
     }
     /// Set the `dynamicProperties` field to an Option value (optional)
-    pub fn maybe_dynamic_properties(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_dynamic_properties(mut self, value: Option<S>) -> Self {
         self._fields.20 = value;
         self
     }
@@ -1808,7 +1736,7 @@ where
     /// Set the `eventDate` field (required)
     pub fn event_date(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> OccurrenceBuilder<'a, occurrence_state::SetEventDate<S>> {
         self._fields.21 = Option::Some(value.into());
         OccurrenceBuilder {
@@ -1821,12 +1749,12 @@ where
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `eventID` field (optional)
-    pub fn event_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn event_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.22 = value.into();
         self
     }
     /// Set the `eventID` field to an Option value (optional)
-    pub fn maybe_event_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_event_id(mut self, value: Option<S>) -> Self {
         self._fields.22 = value;
         self
     }
@@ -1834,12 +1762,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `eventRef` field (optional)
-    pub fn event_ref(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn event_ref(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.23 = value.into();
         self
     }
     /// Set the `eventRef` field to an Option value (optional)
-    pub fn maybe_event_ref(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_event_ref(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.23 = value;
         self
     }
@@ -1847,12 +1775,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `eventTime` field (optional)
-    pub fn event_time(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn event_time(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.24 = value.into();
         self
     }
     /// Set the `eventTime` field to an Option value (optional)
-    pub fn maybe_event_time(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_event_time(mut self, value: Option<S>) -> Self {
         self._fields.24 = value;
         self
     }
@@ -1860,12 +1788,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `family` field (optional)
-    pub fn family(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn family(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.25 = value.into();
         self
     }
     /// Set the `family` field to an Option value (optional)
-    pub fn maybe_family(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_family(mut self, value: Option<S>) -> Self {
         self._fields.25 = value;
         self
     }
@@ -1873,12 +1801,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `fieldNotes` field (optional)
-    pub fn field_notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn field_notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.26 = value.into();
         self
     }
     /// Set the `fieldNotes` field to an Option value (optional)
-    pub fn maybe_field_notes(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_field_notes(mut self, value: Option<S>) -> Self {
         self._fields.26 = value;
         self
     }
@@ -1886,12 +1814,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `gbifTaxonKey` field (optional)
-    pub fn gbif_taxon_key(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn gbif_taxon_key(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.27 = value.into();
         self
     }
     /// Set the `gbifTaxonKey` field to an Option value (optional)
-    pub fn maybe_gbif_taxon_key(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_gbif_taxon_key(mut self, value: Option<S>) -> Self {
         self._fields.27 = value;
         self
     }
@@ -1899,12 +1827,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `genus` field (optional)
-    pub fn genus(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn genus(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.28 = value.into();
         self
     }
     /// Set the `genus` field to an Option value (optional)
-    pub fn maybe_genus(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_genus(mut self, value: Option<S>) -> Self {
         self._fields.28 = value;
         self
     }
@@ -1912,12 +1840,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `geodeticDatum` field (optional)
-    pub fn geodetic_datum(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn geodetic_datum(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.29 = value.into();
         self
     }
     /// Set the `geodeticDatum` field to an Option value (optional)
-    pub fn maybe_geodetic_datum(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_geodetic_datum(mut self, value: Option<S>) -> Self {
         self._fields.29 = value;
         self
     }
@@ -1925,12 +1853,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `habitat` field (optional)
-    pub fn habitat(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn habitat(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.30 = value.into();
         self
     }
     /// Set the `habitat` field to an Option value (optional)
-    pub fn maybe_habitat(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_habitat(mut self, value: Option<S>) -> Self {
         self._fields.30 = value;
         self
     }
@@ -1938,15 +1866,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `higherClassification` field (optional)
-    pub fn higher_classification(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn higher_classification(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.31 = value.into();
         self
     }
     /// Set the `higherClassification` field to an Option value (optional)
-    pub fn maybe_higher_classification(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_higher_classification(mut self, value: Option<S>) -> Self {
         self._fields.31 = value;
         self
     }
@@ -1954,15 +1879,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `identificationQualifier` field (optional)
-    pub fn identification_qualifier(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn identification_qualifier(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.32 = value.into();
         self
     }
     /// Set the `identificationQualifier` field to an Option value (optional)
-    pub fn maybe_identification_qualifier(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_identification_qualifier(mut self, value: Option<S>) -> Self {
         self._fields.32 = value;
         self
     }
@@ -1970,15 +1892,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `identificationRemarks` field (optional)
-    pub fn identification_remarks(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn identification_remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.33 = value.into();
         self
     }
     /// Set the `identificationRemarks` field to an Option value (optional)
-    pub fn maybe_identification_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_identification_remarks(mut self, value: Option<S>) -> Self {
         self._fields.33 = value;
         self
     }
@@ -1986,12 +1905,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `identifiedBy` field (optional)
-    pub fn identified_by(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn identified_by(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.34 = value.into();
         self
     }
     /// Set the `identifiedBy` field to an Option value (optional)
-    pub fn maybe_identified_by(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_identified_by(mut self, value: Option<S>) -> Self {
         self._fields.34 = value;
         self
     }
@@ -1999,12 +1918,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `identifiedByID` field (optional)
-    pub fn identified_by_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn identified_by_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.35 = value.into();
         self
     }
     /// Set the `identifiedByID` field to an Option value (optional)
-    pub fn maybe_identified_by_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_identified_by_id(mut self, value: Option<S>) -> Self {
         self._fields.35 = value;
         self
     }
@@ -2012,12 +1931,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `imageEvidence` field (optional)
-    pub fn image_evidence(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn image_evidence(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.36 = value.into();
         self
     }
     /// Set the `imageEvidence` field to an Option value (optional)
-    pub fn maybe_image_evidence(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_image_evidence(mut self, value: Option<Data<S>>) -> Self {
         self._fields.36 = value;
         self
     }
@@ -2038,12 +1957,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `informationWithheld` field (optional)
-    pub fn information_withheld(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn information_withheld(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.38 = value.into();
         self
     }
     /// Set the `informationWithheld` field to an Option value (optional)
-    pub fn maybe_information_withheld(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_information_withheld(mut self, value: Option<S>) -> Self {
         self._fields.38 = value;
         self
     }
@@ -2051,15 +1970,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `infraspecificEpithet` field (optional)
-    pub fn infraspecific_epithet(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn infraspecific_epithet(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.39 = value.into();
         self
     }
     /// Set the `infraspecificEpithet` field to an Option value (optional)
-    pub fn maybe_infraspecific_epithet(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_infraspecific_epithet(mut self, value: Option<S>) -> Self {
         self._fields.39 = value;
         self
     }
@@ -2067,12 +1983,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `institutionCode` field (optional)
-    pub fn institution_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn institution_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.40 = value.into();
         self
     }
     /// Set the `institutionCode` field to an Option value (optional)
-    pub fn maybe_institution_code(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_institution_code(mut self, value: Option<S>) -> Self {
         self._fields.40 = value;
         self
     }
@@ -2080,12 +1996,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `kingdom` field (optional)
-    pub fn kingdom(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn kingdom(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.41 = value.into();
         self
     }
     /// Set the `kingdom` field to an Option value (optional)
-    pub fn maybe_kingdom(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_kingdom(mut self, value: Option<S>) -> Self {
         self._fields.41 = value;
         self
     }
@@ -2093,12 +2009,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `license` field (optional)
-    pub fn license(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn license(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.42 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
-    pub fn maybe_license(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_license(mut self, value: Option<S>) -> Self {
         self._fields.42 = value;
         self
     }
@@ -2106,12 +2022,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `lifeStage` field (optional)
-    pub fn life_stage(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn life_stage(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.43 = value.into();
         self
     }
     /// Set the `lifeStage` field to an Option value (optional)
-    pub fn maybe_life_stage(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_life_stage(mut self, value: Option<S>) -> Self {
         self._fields.43 = value;
         self
     }
@@ -2119,12 +2035,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `locality` field (optional)
-    pub fn locality(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn locality(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.44 = value.into();
         self
     }
     /// Set the `locality` field to an Option value (optional)
-    pub fn maybe_locality(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_locality(mut self, value: Option<S>) -> Self {
         self._fields.44 = value;
         self
     }
@@ -2132,12 +2048,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `locationID` field (optional)
-    pub fn location_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn location_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.45 = value.into();
         self
     }
     /// Set the `locationID` field to an Option value (optional)
-    pub fn maybe_location_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_location_id(mut self, value: Option<S>) -> Self {
         self._fields.45 = value;
         self
     }
@@ -2145,12 +2061,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `locationRemarks` field (optional)
-    pub fn location_remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn location_remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.46 = value.into();
         self
     }
     /// Set the `locationRemarks` field to an Option value (optional)
-    pub fn maybe_location_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_location_remarks(mut self, value: Option<S>) -> Self {
         self._fields.46 = value;
         self
     }
@@ -2210,12 +2126,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `municipality` field (optional)
-    pub fn municipality(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn municipality(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.51 = value.into();
         self
     }
     /// Set the `municipality` field to an Option value (optional)
-    pub fn maybe_municipality(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_municipality(mut self, value: Option<S>) -> Self {
         self._fields.51 = value;
         self
     }
@@ -2223,12 +2139,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `nomenclaturalCode` field (optional)
-    pub fn nomenclatural_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn nomenclatural_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.52 = value.into();
         self
     }
     /// Set the `nomenclaturalCode` field to an Option value (optional)
-    pub fn maybe_nomenclatural_code(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_nomenclatural_code(mut self, value: Option<S>) -> Self {
         self._fields.52 = value;
         self
     }
@@ -2236,12 +2152,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `occurrenceID` field (optional)
-    pub fn occurrence_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn occurrence_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.53 = value.into();
         self
     }
     /// Set the `occurrenceID` field to an Option value (optional)
-    pub fn maybe_occurrence_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_occurrence_id(mut self, value: Option<S>) -> Self {
         self._fields.53 = value;
         self
     }
@@ -2249,12 +2165,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `occurrenceRemarks` field (optional)
-    pub fn occurrence_remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn occurrence_remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.54 = value.into();
         self
     }
     /// Set the `occurrenceRemarks` field to an Option value (optional)
-    pub fn maybe_occurrence_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_occurrence_remarks(mut self, value: Option<S>) -> Self {
         self._fields.54 = value;
         self
     }
@@ -2262,12 +2178,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `occurrenceStatus` field (optional)
-    pub fn occurrence_status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn occurrence_status(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.55 = value.into();
         self
     }
     /// Set the `occurrenceStatus` field to an Option value (optional)
-    pub fn maybe_occurrence_status(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_occurrence_status(mut self, value: Option<S>) -> Self {
         self._fields.55 = value;
         self
     }
@@ -2275,12 +2191,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `order` field (optional)
-    pub fn order(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn order(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.56 = value.into();
         self
     }
     /// Set the `order` field to an Option value (optional)
-    pub fn maybe_order(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_order(mut self, value: Option<S>) -> Self {
         self._fields.56 = value;
         self
     }
@@ -2288,12 +2204,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `organismQuantity` field (optional)
-    pub fn organism_quantity(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn organism_quantity(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.57 = value.into();
         self
     }
     /// Set the `organismQuantity` field to an Option value (optional)
-    pub fn maybe_organism_quantity(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_organism_quantity(mut self, value: Option<S>) -> Self {
         self._fields.57 = value;
         self
     }
@@ -2301,15 +2217,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `organismQuantityType` field (optional)
-    pub fn organism_quantity_type(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn organism_quantity_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.58 = value.into();
         self
     }
     /// Set the `organismQuantityType` field to an Option value (optional)
-    pub fn maybe_organism_quantity_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_organism_quantity_type(mut self, value: Option<S>) -> Self {
         self._fields.58 = value;
         self
     }
@@ -2317,12 +2230,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `phylum` field (optional)
-    pub fn phylum(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn phylum(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.59 = value.into();
         self
     }
     /// Set the `phylum` field to an Option value (optional)
-    pub fn maybe_phylum(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_phylum(mut self, value: Option<S>) -> Self {
         self._fields.59 = value;
         self
     }
@@ -2330,15 +2243,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `previousIdentifications` field (optional)
-    pub fn previous_identifications(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn previous_identifications(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.60 = value.into();
         self
     }
     /// Set the `previousIdentifications` field to an Option value (optional)
-    pub fn maybe_previous_identifications(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_previous_identifications(mut self, value: Option<S>) -> Self {
         self._fields.60 = value;
         self
     }
@@ -2346,12 +2256,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `recordedBy` field (optional)
-    pub fn recorded_by(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn recorded_by(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.61 = value.into();
         self
     }
     /// Set the `recordedBy` field to an Option value (optional)
-    pub fn maybe_recorded_by(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_recorded_by(mut self, value: Option<S>) -> Self {
         self._fields.61 = value;
         self
     }
@@ -2359,12 +2269,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `recordedByID` field (optional)
-    pub fn recorded_by_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn recorded_by_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.62 = value.into();
         self
     }
     /// Set the `recordedByID` field to an Option value (optional)
-    pub fn maybe_recorded_by_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_recorded_by_id(mut self, value: Option<S>) -> Self {
         self._fields.62 = value;
         self
     }
@@ -2372,12 +2282,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `references` field (optional)
-    pub fn references(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn references(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.63 = value.into();
         self
     }
     /// Set the `references` field to an Option value (optional)
-    pub fn maybe_references(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_references(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.63 = value;
         self
     }
@@ -2385,15 +2295,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `reproductiveCondition` field (optional)
-    pub fn reproductive_condition(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn reproductive_condition(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.64 = value.into();
         self
     }
     /// Set the `reproductiveCondition` field to an Option value (optional)
-    pub fn maybe_reproductive_condition(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_reproductive_condition(mut self, value: Option<S>) -> Self {
         self._fields.64 = value;
         self
     }
@@ -2401,12 +2308,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `rightsHolder` field (optional)
-    pub fn rights_holder(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn rights_holder(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.65 = value.into();
         self
     }
     /// Set the `rightsHolder` field to an Option value (optional)
-    pub fn maybe_rights_holder(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_rights_holder(mut self, value: Option<S>) -> Self {
         self._fields.65 = value;
         self
     }
@@ -2414,12 +2321,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `samplingEffort` field (optional)
-    pub fn sampling_effort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sampling_effort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.66 = value.into();
         self
     }
     /// Set the `samplingEffort` field to an Option value (optional)
-    pub fn maybe_sampling_effort(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sampling_effort(mut self, value: Option<S>) -> Self {
         self._fields.66 = value;
         self
     }
@@ -2427,12 +2334,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `samplingProtocol` field (optional)
-    pub fn sampling_protocol(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sampling_protocol(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.67 = value.into();
         self
     }
     /// Set the `samplingProtocol` field to an Option value (optional)
-    pub fn maybe_sampling_protocol(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sampling_protocol(mut self, value: Option<S>) -> Self {
         self._fields.67 = value;
         self
     }
@@ -2446,7 +2353,7 @@ where
     /// Set the `scientificName` field (required)
     pub fn scientific_name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> OccurrenceBuilder<'a, occurrence_state::SetScientificName<S>> {
         self._fields.68 = Option::Some(value.into());
         OccurrenceBuilder {
@@ -2459,18 +2366,12 @@ where
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `scientificNameAuthorship` field (optional)
-    pub fn scientific_name_authorship(
-        mut self,
-        value: impl Into<Option<CowStr<'a>>>,
-    ) -> Self {
+    pub fn scientific_name_authorship(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.69 = value.into();
         self
     }
     /// Set the `scientificNameAuthorship` field to an Option value (optional)
-    pub fn maybe_scientific_name_authorship(
-        mut self,
-        value: Option<CowStr<'a>>,
-    ) -> Self {
+    pub fn maybe_scientific_name_authorship(mut self, value: Option<S>) -> Self {
         self._fields.69 = value;
         self
     }
@@ -2478,12 +2379,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `sex` field (optional)
-    pub fn sex(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sex(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.70 = value.into();
         self
     }
     /// Set the `sex` field to an Option value (optional)
-    pub fn maybe_sex(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sex(mut self, value: Option<S>) -> Self {
         self._fields.70 = value;
         self
     }
@@ -2491,12 +2392,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `specificEpithet` field (optional)
-    pub fn specific_epithet(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn specific_epithet(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.71 = value.into();
         self
     }
     /// Set the `specificEpithet` field to an Option value (optional)
-    pub fn maybe_specific_epithet(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_specific_epithet(mut self, value: Option<S>) -> Self {
         self._fields.71 = value;
         self
     }
@@ -2504,12 +2405,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `spectrogramEvidence` field (optional)
-    pub fn spectrogram_evidence(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn spectrogram_evidence(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.72 = value.into();
         self
     }
     /// Set the `spectrogramEvidence` field to an Option value (optional)
-    pub fn maybe_spectrogram_evidence(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_spectrogram_evidence(mut self, value: Option<Data<S>>) -> Self {
         self._fields.72 = value;
         self
     }
@@ -2517,12 +2418,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `stateProvince` field (optional)
-    pub fn state_province(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn state_province(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.73 = value.into();
         self
     }
     /// Set the `stateProvince` field to an Option value (optional)
-    pub fn maybe_state_province(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_state_province(mut self, value: Option<S>) -> Self {
         self._fields.73 = value;
         self
     }
@@ -2530,12 +2431,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `taxonRank` field (optional)
-    pub fn taxon_rank(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn taxon_rank(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.74 = value.into();
         self
     }
     /// Set the `taxonRank` field to an Option value (optional)
-    pub fn maybe_taxon_rank(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_taxon_rank(mut self, value: Option<S>) -> Self {
         self._fields.74 = value;
         self
     }
@@ -2543,12 +2444,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `taxonomicStatus` field (optional)
-    pub fn taxonomic_status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn taxonomic_status(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.75 = value.into();
         self
     }
     /// Set the `taxonomicStatus` field to an Option value (optional)
-    pub fn maybe_taxonomic_status(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_taxonomic_status(mut self, value: Option<S>) -> Self {
         self._fields.75 = value;
         self
     }
@@ -2556,12 +2457,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `verbatimLocality` field (optional)
-    pub fn verbatim_locality(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn verbatim_locality(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.76 = value.into();
         self
     }
     /// Set the `verbatimLocality` field to an Option value (optional)
-    pub fn maybe_verbatim_locality(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_verbatim_locality(mut self, value: Option<S>) -> Self {
         self._fields.76 = value;
         self
     }
@@ -2569,12 +2470,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `vernacularName` field (optional)
-    pub fn vernacular_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn vernacular_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.77 = value.into();
         self
     }
     /// Set the `vernacularName` field to an Option value (optional)
-    pub fn maybe_vernacular_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_vernacular_name(mut self, value: Option<S>) -> Self {
         self._fields.77 = value;
         self
     }
@@ -2582,12 +2483,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `videoEvidence` field (optional)
-    pub fn video_evidence(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn video_evidence(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.78 = value.into();
         self
     }
     /// Set the `videoEvidence` field to an Option value (optional)
-    pub fn maybe_video_evidence(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_video_evidence(mut self, value: Option<Data<S>>) -> Self {
         self._fields.78 = value;
         self
     }
@@ -2596,10 +2497,10 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S> OccurrenceBuilder<'a, S>
 where
     S: occurrence_state::State,
-    S::EventDate: occurrence_state::IsSet,
     S::BasisOfRecord: occurrence_state::IsSet,
     S::ScientificName: occurrence_state::IsSet,
     S::CreatedAt: occurrence_state::IsSet,
+    S::EventDate: occurrence_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Occurrence<'a> {
@@ -2689,7 +2590,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Occurrence<'a> {
         Occurrence {
             associated_media: self._fields.0,

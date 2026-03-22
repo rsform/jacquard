@@ -10,37 +10,60 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::RepoViewDetail;
 use crate::tools_ozone::moderation::RepoViewNotFound;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRepos<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRepos<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub dids: Vec<Did<'a>>,
+    pub dids: Vec<Did<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetReposOutput<'a> {
-    #[serde(borrow)]
-    pub repos: Vec<GetReposOutputReposItem<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetReposOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub repos: Vec<GetReposOutputReposItem<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum GetReposOutputReposItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum GetReposOutputReposItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "tools.ozone.moderation.defs#repoViewDetail")]
-    RepoViewDetail(Box<RepoViewDetail<'a>>),
+    RepoViewDetail(Box<RepoViewDetail<S>>),
     #[serde(rename = "tools.ozone.moderation.defs#repoViewNotFound")]
-    RepoViewNotFound(Box<RepoViewNotFound<'a>>),
+    RepoViewNotFound(Box<RepoViewNotFound<S>>),
 }
 
 /// Response type for tools.ozone.moderation.getRepos
@@ -48,11 +71,12 @@ pub struct GetReposResponse;
 impl jacquard_common::xrpc::XrpcResp for GetReposResponse {
     const NSID: &'static str = "tools.ozone.moderation.getRepos";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetReposOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetReposOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRepos<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetRepos<S> {
     const NSID: &'static str = "tools.ozone.moderation.getRepos";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetReposResponse;
@@ -63,7 +87,7 @@ pub struct GetReposRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetReposRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.getRepos";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRepos<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetRepos<S>;
     type Response = GetReposResponse;
 }
 
@@ -102,7 +126,7 @@ pub mod get_repos_state {
 /// Builder for constructing an instance of this type
 pub struct GetReposBuilder<'a, S: get_repos_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<Did<'a>>>,),
+    _fields: (Option<Vec<Did<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -132,7 +156,7 @@ where
     /// Set the `dids` field (required)
     pub fn dids(
         mut self,
-        value: impl Into<Vec<Did<'a>>>,
+        value: impl Into<Vec<Did<S>>>,
     ) -> GetReposBuilder<'a, get_repos_state::SetDids<S>> {
         self._fields.0 = Option::Some(value.into());
         GetReposBuilder {

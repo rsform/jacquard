@@ -10,30 +10,39 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Nsid;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct RemoveOptions<'a> {
-    #[serde(borrow)]
-    pub keys: Vec<Nsid<'a>>,
-    #[serde(borrow)]
-    pub scope: RemoveOptionsScope<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RemoveOptions<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub keys: Vec<Nsid<S>>,
+    pub scope: RemoveOptionsScope<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RemoveOptionsScope<'a> {
+pub enum RemoveOptionsScope<S: Bos<str> + AsRef<str> = DefaultStr> {
     Instance,
     Personal,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> RemoveOptionsScope<'a> {
+impl<S: Bos<str> + AsRef<str>> RemoveOptionsScope<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Instance => "instance",
@@ -41,70 +50,56 @@ impl<'a> RemoveOptionsScope<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for RemoveOptionsScope<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "instance" => Self::Instance,
             "personal" => Self::Personal,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for RemoveOptionsScope<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "instance" => Self::Instance,
-            "personal" => Self::Personal,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for RemoveOptionsScope<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for RemoveOptionsScope<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for RemoveOptionsScope<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for RemoveOptionsScope<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for RemoveOptionsScope<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for RemoveOptionsScope<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for RemoveOptionsScope<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for RemoveOptionsScope<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for RemoveOptionsScope<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for RemoveOptionsScope<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for RemoveOptionsScope<'_> {
-    type Output = RemoveOptionsScope<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for RemoveOptionsScope<S> {
+    type Output = RemoveOptionsScope<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             RemoveOptionsScope::Instance => RemoveOptionsScope::Instance,
@@ -115,20 +110,32 @@ impl jacquard_common::IntoStatic for RemoveOptionsScope<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct RemoveOptionsOutput<'a> {}
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RemoveOptionsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Response type for tools.ozone.setting.removeOptions
 pub struct RemoveOptionsResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveOptionsResponse {
     const NSID: &'static str = "tools.ozone.setting.removeOptions";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RemoveOptionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RemoveOptionsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for RemoveOptions<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for RemoveOptions<S> {
     const NSID: &'static str = "tools.ozone.setting.removeOptions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -143,7 +150,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for RemoveOptionsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = RemoveOptions<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = RemoveOptions<S>;
     type Response = RemoveOptionsResponse;
 }
 
@@ -157,44 +164,44 @@ pub mod remove_options_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Keys;
         type Scope;
+        type Keys;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Keys = Unset;
         type Scope = Unset;
-    }
-    ///State transition - sets the `keys` field to Set
-    pub struct SetKeys<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKeys<S> {}
-    impl<S: State> State for SetKeys<S> {
-        type Keys = Set<members::keys>;
-        type Scope = S::Scope;
+        type Keys = Unset;
     }
     ///State transition - sets the `scope` field to Set
     pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScope<S> {}
     impl<S: State> State for SetScope<S> {
-        type Keys = S::Keys;
         type Scope = Set<members::scope>;
+        type Keys = S::Keys;
+    }
+    ///State transition - sets the `keys` field to Set
+    pub struct SetKeys<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKeys<S> {}
+    impl<S: State> State for SetKeys<S> {
+        type Scope = S::Scope;
+        type Keys = Set<members::keys>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `keys` field
-        pub struct keys(());
         ///Marker type for the `scope` field
         pub struct scope(());
+        ///Marker type for the `keys` field
+        pub struct keys(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RemoveOptionsBuilder<'a, S: remove_options_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<Nsid<'a>>>, Option<RemoveOptionsScope<'a>>),
+    _fields: (Option<Vec<Nsid<S>>>, Option<RemoveOptionsScope<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -224,7 +231,7 @@ where
     /// Set the `keys` field (required)
     pub fn keys(
         mut self,
-        value: impl Into<Vec<Nsid<'a>>>,
+        value: impl Into<Vec<Nsid<S>>>,
     ) -> RemoveOptionsBuilder<'a, remove_options_state::SetKeys<S>> {
         self._fields.0 = Option::Some(value.into());
         RemoveOptionsBuilder {
@@ -243,7 +250,7 @@ where
     /// Set the `scope` field (required)
     pub fn scope(
         mut self,
-        value: impl Into<RemoveOptionsScope<'a>>,
+        value: impl Into<RemoveOptionsScope<S>>,
     ) -> RemoveOptionsBuilder<'a, remove_options_state::SetScope<S>> {
         self._fields.1 = Option::Some(value.into());
         RemoveOptionsBuilder {
@@ -257,8 +264,8 @@ where
 impl<'a, S> RemoveOptionsBuilder<'a, S>
 where
     S: remove_options_state::State,
-    S::Keys: remove_options_state::IsSet,
     S::Scope: remove_options_state::IsSet,
+    S::Keys: remove_options_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RemoveOptions<'a> {
@@ -271,10 +278,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RemoveOptions<'a> {
         RemoveOptions {
             keys: self._fields.0.unwrap(),

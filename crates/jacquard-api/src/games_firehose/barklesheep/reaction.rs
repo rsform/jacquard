@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,40 +29,44 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A reaction in a Barklesheep game
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "games.firehose.barklesheep.reaction",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Reaction<'a> {
+pub struct Reaction<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub emoji: CowStr<'a>,
-    #[serde(borrow)]
-    pub game_id: CowStr<'a>,
+    pub emoji: S,
+    pub game_id: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReactionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReactionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Reaction<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Reaction<S>,
 }
 
-impl<'a> Reaction<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ReactionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Reaction<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ReactionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -71,18 +77,17 @@ pub struct ReactionRecord;
 impl XrpcResp for ReactionRecord {
     const NSID: &'static str = "games.firehose.barklesheep.reaction";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReactionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ReactionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ReactionGetRecordOutput<'_>> for Reaction<'_> {
-    fn from(output: ReactionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ReactionGetRecordOutput<S>> for Reaction<S> {
+    fn from(output: ReactionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Reaction<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Reaction<S> {
     const NSID: &'static str = "games.firehose.barklesheep.reaction";
     type Record = ReactionRecord;
 }
@@ -92,7 +97,7 @@ impl Collection for ReactionRecord {
     type Record = ReactionRecord;
 }
 
-impl<'a> LexiconSchema for Reaction<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Reaction<S> {
     fn nsid() -> &'static str {
         "games.firehose.barklesheep.reaction"
     }
@@ -128,58 +133,58 @@ pub mod reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Emoji;
-        type CreatedAt;
         type GameId;
+        type CreatedAt;
+        type Emoji;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Emoji = Unset;
-        type CreatedAt = Unset;
         type GameId = Unset;
-    }
-    ///State transition - sets the `emoji` field to Set
-    pub struct SetEmoji<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmoji<S> {}
-    impl<S: State> State for SetEmoji<S> {
-        type Emoji = Set<members::emoji>;
-        type CreatedAt = S::CreatedAt;
-        type GameId = S::GameId;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Emoji = S::Emoji;
-        type CreatedAt = Set<members::created_at>;
-        type GameId = S::GameId;
+        type CreatedAt = Unset;
+        type Emoji = Unset;
     }
     ///State transition - sets the `game_id` field to Set
     pub struct SetGameId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGameId<S> {}
     impl<S: State> State for SetGameId<S> {
-        type Emoji = S::Emoji;
-        type CreatedAt = S::CreatedAt;
         type GameId = Set<members::game_id>;
+        type CreatedAt = S::CreatedAt;
+        type Emoji = S::Emoji;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type GameId = S::GameId;
+        type CreatedAt = Set<members::created_at>;
+        type Emoji = S::Emoji;
+    }
+    ///State transition - sets the `emoji` field to Set
+    pub struct SetEmoji<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEmoji<S> {}
+    impl<S: State> State for SetEmoji<S> {
+        type GameId = S::GameId;
+        type CreatedAt = S::CreatedAt;
+        type Emoji = Set<members::emoji>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `emoji` field
-        pub struct emoji(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `game_id` field
         pub struct game_id(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `emoji` field
+        pub struct emoji(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReactionBuilder<'a, S: reaction_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Datetime>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -228,7 +233,7 @@ where
     /// Set the `emoji` field (required)
     pub fn emoji(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReactionBuilder<'a, reaction_state::SetEmoji<S>> {
         self._fields.1 = Option::Some(value.into());
         ReactionBuilder {
@@ -247,7 +252,7 @@ where
     /// Set the `gameId` field (required)
     pub fn game_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReactionBuilder<'a, reaction_state::SetGameId<S>> {
         self._fields.2 = Option::Some(value.into());
         ReactionBuilder {
@@ -261,9 +266,9 @@ where
 impl<'a, S> ReactionBuilder<'a, S>
 where
     S: reaction_state::State,
-    S::Emoji: reaction_state::IsSet,
-    S::CreatedAt: reaction_state::IsSet,
     S::GameId: reaction_state::IsSet,
+    S::CreatedAt: reaction_state::IsSet,
+    S::Emoji: reaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Reaction<'a> {
@@ -277,10 +282,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Reaction<'a> {
         Reaction {
             created_at: self._fields.0.unwrap(),

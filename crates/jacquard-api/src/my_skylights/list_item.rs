@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -36,20 +38,32 @@ impl core::fmt::Display for Abandoned {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Builtin<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Builtin<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<BuiltinType<'a>>,
+    pub r#type: Option<BuiltinType<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum BuiltinType<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum BuiltinType<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "my.skylights.listItem#inProgress")]
     InProgress(Box<list_item::InProgress>),
     #[serde(rename = "my.skylights.listItem#queue")]
@@ -73,32 +87,41 @@ impl core::fmt::Display for InProgress {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ListItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub added_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub item: Option<Item<'a>>,
-    #[serde(borrow)]
-    pub list: ListItemList<'a>,
+    pub item: Option<Item<S>>,
+    pub list: ListItemList<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub note: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub position: CowStr<'a>,
+    pub note: Option<S>,
+    pub position: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ListItemList<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ListItemList<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "my.skylights.list")]
-    List(Box<List<'a>>),
+    List(Box<List<S>>),
     #[serde(rename = "my.skylights.listItem#builtin")]
-    Builtin(Box<list_item::Builtin<'a>>),
+    Builtin(Box<list_item::Builtin<S>>),
 }
 
 /// User owns the item
@@ -131,7 +154,7 @@ impl core::fmt::Display for Wishlist {
     }
 }
 
-impl<'a> LexiconSchema for Builtin<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Builtin<S> {
     fn nsid() -> &'static str {
         "my.skylights.listItem"
     }
@@ -146,7 +169,7 @@ impl<'a> LexiconSchema for Builtin<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ListItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListItem<S> {
     fn nsid() -> &'static str {
         "my.skylights.listItem"
     }
@@ -280,49 +303,49 @@ pub mod list_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Position;
         type List;
+        type Position;
         type AddedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Position = Unset;
         type List = Unset;
+        type Position = Unset;
         type AddedAt = Unset;
-    }
-    ///State transition - sets the `position` field to Set
-    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPosition<S> {}
-    impl<S: State> State for SetPosition<S> {
-        type Position = Set<members::position>;
-        type List = S::List;
-        type AddedAt = S::AddedAt;
     }
     ///State transition - sets the `list` field to Set
     pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetList<S> {}
     impl<S: State> State for SetList<S> {
-        type Position = S::Position;
         type List = Set<members::list>;
+        type Position = S::Position;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `position` field to Set
+    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPosition<S> {}
+    impl<S: State> State for SetPosition<S> {
+        type List = S::List;
+        type Position = Set<members::position>;
         type AddedAt = S::AddedAt;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Position = S::Position;
         type List = S::List;
+        type Position = S::Position;
         type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `position` field
-        pub struct position(());
         ///Marker type for the `list` field
         pub struct list(());
+        ///Marker type for the `position` field
+        pub struct position(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
     }
@@ -333,10 +356,10 @@ pub struct ListItemBuilder<'a, S: list_item_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<Item<'a>>,
-        Option<ListItemList<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<Item<S>>,
+        Option<ListItemList<S>>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -380,12 +403,12 @@ where
 
 impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
     /// Set the `item` field (optional)
-    pub fn item(mut self, value: impl Into<Option<Item<'a>>>) -> Self {
+    pub fn item(mut self, value: impl Into<Option<Item<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `item` field to an Option value (optional)
-    pub fn maybe_item(mut self, value: Option<Item<'a>>) -> Self {
+    pub fn maybe_item(mut self, value: Option<Item<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -399,7 +422,7 @@ where
     /// Set the `list` field (required)
     pub fn list(
         mut self,
-        value: impl Into<ListItemList<'a>>,
+        value: impl Into<ListItemList<S>>,
     ) -> ListItemBuilder<'a, list_item_state::SetList<S>> {
         self._fields.2 = Option::Some(value.into());
         ListItemBuilder {
@@ -412,12 +435,12 @@ where
 
 impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
     /// Set the `note` field (optional)
-    pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
-    pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_note(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -431,7 +454,7 @@ where
     /// Set the `position` field (required)
     pub fn position(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ListItemBuilder<'a, list_item_state::SetPosition<S>> {
         self._fields.4 = Option::Some(value.into());
         ListItemBuilder {
@@ -445,8 +468,8 @@ where
 impl<'a, S> ListItemBuilder<'a, S>
 where
     S: list_item_state::State,
-    S::Position: list_item_state::IsSet,
     S::List: list_item_state::IsSet,
+    S::Position: list_item_state::IsSet,
     S::AddedAt: list_item_state::IsSet,
 {
     /// Build the final struct
@@ -463,10 +486,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ListItem<'a> {
         ListItem {
             added_at: self._fields.0.unwrap(),

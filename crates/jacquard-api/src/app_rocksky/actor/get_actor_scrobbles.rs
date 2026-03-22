@@ -10,16 +10,25 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::scrobble::ScrobbleViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetActorScrobbles<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetActorScrobbles<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: AtIdentifier<'a>,
+    pub did: AtIdentifier<S>,
     ///(min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -29,13 +38,21 @@ pub struct GetActorScrobbles<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetActorScrobblesOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetActorScrobblesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub scrobbles: Option<Vec<ScrobbleViewBasic<'a>>>,
+    pub scrobbles: Option<Vec<ScrobbleViewBasic<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.actor.getActorScrobbles
@@ -43,11 +60,12 @@ pub struct GetActorScrobblesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorScrobblesResponse {
     const NSID: &'static str = "app.rocksky.actor.getActorScrobbles";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorScrobblesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetActorScrobblesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorScrobbles<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetActorScrobbles<S> {
     const NSID: &'static str = "app.rocksky.actor.getActorScrobbles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetActorScrobblesResponse;
@@ -58,7 +76,7 @@ pub struct GetActorScrobblesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorScrobblesRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.actor.getActorScrobbles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetActorScrobbles<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetActorScrobbles<S>;
     type Response = GetActorScrobblesResponse;
 }
 
@@ -97,7 +115,7 @@ pub mod get_actor_scrobbles_state {
 /// Builder for constructing an instance of this type
 pub struct GetActorScrobblesBuilder<'a, S: get_actor_scrobbles_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>, Option<i64>, Option<i64>),
+    _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -127,7 +145,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetActorScrobblesBuilder<'a, get_actor_scrobbles_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetActorScrobblesBuilder {

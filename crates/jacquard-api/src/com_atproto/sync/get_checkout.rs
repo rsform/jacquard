@@ -7,6 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::types::string::Did;
 use jacquard_derive::IntoStatic;
@@ -14,9 +15,15 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetCheckout<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetCheckout<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
 }
 
 
@@ -31,18 +38,22 @@ pub struct GetCheckoutResponse;
 impl jacquard_common::xrpc::XrpcResp for GetCheckoutResponse {
     const NSID: &'static str = "com.atproto.sync.getCheckout";
     const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<'de> = GetCheckoutOutput;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = GetCheckoutOutput;
+    type Err = jacquard_common::xrpc::GenericError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(GetCheckoutOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -50,7 +61,8 @@ impl jacquard_common::xrpc::XrpcResp for GetCheckoutResponse {
     }
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetCheckout<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetCheckout<S> {
     const NSID: &'static str = "com.atproto.sync.getCheckout";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetCheckoutResponse;
@@ -61,7 +73,7 @@ pub struct GetCheckoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetCheckoutRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getCheckout";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetCheckout<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetCheckout<S>;
     type Response = GetCheckoutResponse;
 }
 
@@ -100,7 +112,7 @@ pub mod get_checkout_state {
 /// Builder for constructing an instance of this type
 pub struct GetCheckoutBuilder<'a, S: get_checkout_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -130,7 +142,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetCheckoutBuilder<'a, get_checkout_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetCheckoutBuilder {

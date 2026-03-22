@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,38 +30,40 @@ use serde::{Serialize, Deserialize};
 use crate::app_certified::badge::award::Award;
 /// Recipient response to a badge award.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.certified.badge.response",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Response<'a> {
+pub struct Response<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reference to the badge award.
-    #[serde(borrow)]
-    pub badge_award: Award<'a>,
+    pub badge_award: Award<S>,
     ///Client-declared timestamp when this record was originally created
     pub created_at: Datetime,
     ///The recipient’s response for the badge (accepted or rejected).
-    #[serde(borrow)]
-    pub response: ResponseResponse<'a>,
+    pub response: ResponseResponse<S>,
     ///Optional relative weight for accepted badges, assigned by the recipient.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub weight: Option<CowStr<'a>>,
+    pub weight: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The recipient’s response for the badge (accepted or rejected).
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ResponseResponse<'a> {
+pub enum ResponseResponse<S: Bos<str> + AsRef<str> = DefaultStr> {
     Accepted,
     Rejected,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ResponseResponse<'a> {
+impl<S: Bos<str> + AsRef<str>> ResponseResponse<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Accepted => "accepted",
@@ -67,70 +71,56 @@ impl<'a> ResponseResponse<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ResponseResponse<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "accepted" => Self::Accepted,
             "rejected" => Self::Rejected,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ResponseResponse<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "accepted" => Self::Accepted,
-            "rejected" => Self::Rejected,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ResponseResponse<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ResponseResponse<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ResponseResponse<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ResponseResponse<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ResponseResponse<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ResponseResponse<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ResponseResponse<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ResponseResponse<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ResponseResponse<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ResponseResponse<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ResponseResponse<'_> {
-    type Output = ResponseResponse<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ResponseResponse<S> {
+    type Output = ResponseResponse<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ResponseResponse::Accepted => ResponseResponse::Accepted,
@@ -143,22 +133,23 @@ impl jacquard_common::IntoStatic for ResponseResponse<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ResponseGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResponseGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Response<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Response<S>,
 }
 
-impl<'a> Response<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ResponseRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Response<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ResponseRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -169,18 +160,17 @@ pub struct ResponseRecord;
 impl XrpcResp for ResponseRecord {
     const NSID: &'static str = "app.certified.badge.response";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResponseGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ResponseGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ResponseGetRecordOutput<'_>> for Response<'_> {
-    fn from(output: ResponseGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ResponseGetRecordOutput<S>> for Response<S> {
+    fn from(output: ResponseGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Response<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Response<S> {
     const NSID: &'static str = "app.certified.badge.response";
     type Record = ResponseRecord;
 }
@@ -190,7 +180,7 @@ impl Collection for ResponseRecord {
     type Record = ResponseRecord;
 }
 
-impl<'a> LexiconSchema for Response<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Response<S> {
     fn nsid() -> &'static str {
         "app.certified.badge.response"
     }
@@ -225,49 +215,49 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Response;
         type CreatedAt;
+        type Response;
         type BadgeAward;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Response = Unset;
         type CreatedAt = Unset;
+        type Response = Unset;
         type BadgeAward = Unset;
-    }
-    ///State transition - sets the `response` field to Set
-    pub struct SetResponse<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResponse<S> {}
-    impl<S: State> State for SetResponse<S> {
-        type Response = Set<members::response>;
-        type CreatedAt = S::CreatedAt;
-        type BadgeAward = S::BadgeAward;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Response = S::Response;
         type CreatedAt = Set<members::created_at>;
+        type Response = S::Response;
+        type BadgeAward = S::BadgeAward;
+    }
+    ///State transition - sets the `response` field to Set
+    pub struct SetResponse<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResponse<S> {}
+    impl<S: State> State for SetResponse<S> {
+        type CreatedAt = S::CreatedAt;
+        type Response = Set<members::response>;
         type BadgeAward = S::BadgeAward;
     }
     ///State transition - sets the `badge_award` field to Set
     pub struct SetBadgeAward<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBadgeAward<S> {}
     impl<S: State> State for SetBadgeAward<S> {
-        type Response = S::Response;
         type CreatedAt = S::CreatedAt;
+        type Response = S::Response;
         type BadgeAward = Set<members::badge_award>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `response` field
-        pub struct response(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `response` field
+        pub struct response(());
         ///Marker type for the `badge_award` field
         pub struct badge_award(());
     }
@@ -277,10 +267,10 @@ pub mod response_state {
 pub struct ResponseBuilder<'a, S: response_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Award<'a>>,
+        Option<Award<S>>,
         Option<Datetime>,
-        Option<ResponseResponse<'a>>,
-        Option<CowStr<'a>>,
+        Option<ResponseResponse<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -311,7 +301,7 @@ where
     /// Set the `badgeAward` field (required)
     pub fn badge_award(
         mut self,
-        value: impl Into<Award<'a>>,
+        value: impl Into<Award<S>>,
     ) -> ResponseBuilder<'a, response_state::SetBadgeAward<S>> {
         self._fields.0 = Option::Some(value.into());
         ResponseBuilder {
@@ -349,7 +339,7 @@ where
     /// Set the `response` field (required)
     pub fn response(
         mut self,
-        value: impl Into<ResponseResponse<'a>>,
+        value: impl Into<ResponseResponse<S>>,
     ) -> ResponseBuilder<'a, response_state::SetResponse<S>> {
         self._fields.2 = Option::Some(value.into());
         ResponseBuilder {
@@ -362,12 +352,12 @@ where
 
 impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
     /// Set the `weight` field (optional)
-    pub fn weight(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn weight(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `weight` field to an Option value (optional)
-    pub fn maybe_weight(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_weight(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -376,8 +366,8 @@ impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
-    S::Response: response_state::IsSet,
     S::CreatedAt: response_state::IsSet,
+    S::Response: response_state::IsSet,
     S::BadgeAward: response_state::IsSet,
 {
     /// Build the final struct
@@ -393,10 +383,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Response<'a> {
         Response {
             badge_award: self._fields.0.unwrap(),

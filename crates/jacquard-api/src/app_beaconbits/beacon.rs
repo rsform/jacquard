@@ -13,13 +13,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -33,40 +35,40 @@ use crate::community_lexicon::location::address::Address;
 use crate::community_lexicon::location::geo::Geo;
 /// A location-based check-in record
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.beaconbits.beacon", tag = "$type")]
-pub struct Beacon<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.beaconbits.beacon",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Beacon<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Structured address using community lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub address_details: Option<Address<'a>>,
+    pub address_details: Option<Address<S>>,
     ///Chain emoji (root beacon only)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub chain_emoji: Option<CowStr<'a>>,
+    pub chain_emoji: Option<S>,
     ///Custom chain name (root beacon only)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub chain_name: Option<CowStr<'a>>,
+    pub chain_name: Option<S>,
     ///Timestamp when the beacon was created
     pub created_at: Datetime,
     ///Structured location using community lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location: Option<Geo<'a>>,
+    pub location: Option<Geo<S>>,
     ///DIDs of users mentioned in the beacon
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mentions: Option<Vec<Did<'a>>>,
+    pub mentions: Option<Vec<Did<S>>>,
     ///Reference to parent beacon for chaining
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent_beacon: Option<StrongRef<'a>>,
+    pub parent_beacon: Option<StrongRef<S>>,
     ///Reference to associated Bluesky post
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub post: Option<StrongRef<'a>>,
+    pub post: Option<StrongRef<S>>,
     ///Star rating (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rating: Option<i64>,
@@ -75,43 +77,38 @@ pub struct Beacon<'a> {
     pub reveal_at: Option<Datetime>,
     ///User comment or caption
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub shout: Option<CowStr<'a>>,
+    pub shout: Option<S>,
     ///Reference to root post for threading
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thread_root: Option<StrongRef<'a>>,
+    pub thread_root: Option<StrongRef<S>>,
     ///Human-readable address
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub venue_address: Option<CowStr<'a>>,
+    pub venue_address: Option<S>,
     ///Category classification (bar, cafe, restaurant, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub venue_category: Option<CowStr<'a>>,
+    pub venue_category: Option<S>,
     ///Display name of the venue
-    #[serde(borrow)]
-    pub venue_name: CowStr<'a>,
+    pub venue_name: S,
     ///OSM URI identifier (osm://node/123 or osm://way/456)
-    #[serde(borrow)]
-    pub venue_uri: CowStr<'a>,
+    pub venue_uri: S,
     ///Visibility setting for the beacon
-    #[serde(borrow)]
-    pub visibility: BeaconVisibility<'a>,
+    pub visibility: BeaconVisibility<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Visibility setting for the beacon
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum BeaconVisibility<'a> {
+pub enum BeaconVisibility<S: Bos<str> + AsRef<str> = DefaultStr> {
     Public,
     Followers,
     Mutuals,
     Hidden,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> BeaconVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> BeaconVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -121,74 +118,58 @@ impl<'a> BeaconVisibility<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for BeaconVisibility<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "public" => Self::Public,
             "followers" => Self::Followers,
             "mutuals" => Self::Mutuals,
             "hidden" => Self::Hidden,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for BeaconVisibility<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "public" => Self::Public,
-            "followers" => Self::Followers,
-            "mutuals" => Self::Mutuals,
-            "hidden" => Self::Hidden,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for BeaconVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for BeaconVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for BeaconVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for BeaconVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for BeaconVisibility<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for BeaconVisibility<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for BeaconVisibility<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for BeaconVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for BeaconVisibility<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for BeaconVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for BeaconVisibility<'_> {
-    type Output = BeaconVisibility<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for BeaconVisibility<S> {
+    type Output = BeaconVisibility<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             BeaconVisibility::Public => BeaconVisibility::Public,
@@ -203,22 +184,23 @@ impl jacquard_common::IntoStatic for BeaconVisibility<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BeaconGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BeaconGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Beacon<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Beacon<S>,
 }
 
-impl<'a> Beacon<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, BeaconRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Beacon<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, BeaconRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -229,18 +211,17 @@ pub struct BeaconRecord;
 impl XrpcResp for BeaconRecord {
     const NSID: &'static str = "app.beaconbits.beacon";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BeaconGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BeaconGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<BeaconGetRecordOutput<'_>> for Beacon<'_> {
-    fn from(output: BeaconGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<BeaconGetRecordOutput<S>> for Beacon<S> {
+    fn from(output: BeaconGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Beacon<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Beacon<S> {
     const NSID: &'static str = "app.beaconbits.beacon";
     type Record = BeaconRecord;
 }
@@ -250,7 +231,7 @@ impl Collection for BeaconRecord {
     type Record = BeaconRecord;
 }
 
-impl<'a> LexiconSchema for Beacon<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Beacon<S> {
     fn nsid() -> &'static str {
         "app.beaconbits.beacon"
     }
@@ -392,65 +373,65 @@ pub mod beacon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type VenueUri;
         type Visibility;
         type CreatedAt;
+        type VenueUri;
         type VenueName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type VenueUri = Unset;
         type Visibility = Unset;
         type CreatedAt = Unset;
+        type VenueUri = Unset;
         type VenueName = Unset;
-    }
-    ///State transition - sets the `venue_uri` field to Set
-    pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVenueUri<S> {}
-    impl<S: State> State for SetVenueUri<S> {
-        type VenueUri = Set<members::venue_uri>;
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-        type VenueName = S::VenueName;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
-        type VenueUri = S::VenueUri;
         type Visibility = Set<members::visibility>;
         type CreatedAt = S::CreatedAt;
+        type VenueUri = S::VenueUri;
         type VenueName = S::VenueName;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type VenueUri = S::VenueUri;
         type Visibility = S::Visibility;
         type CreatedAt = Set<members::created_at>;
+        type VenueUri = S::VenueUri;
+        type VenueName = S::VenueName;
+    }
+    ///State transition - sets the `venue_uri` field to Set
+    pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVenueUri<S> {}
+    impl<S: State> State for SetVenueUri<S> {
+        type Visibility = S::Visibility;
+        type CreatedAt = S::CreatedAt;
+        type VenueUri = Set<members::venue_uri>;
         type VenueName = S::VenueName;
     }
     ///State transition - sets the `venue_name` field to Set
     pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVenueName<S> {}
     impl<S: State> State for SetVenueName<S> {
-        type VenueUri = S::VenueUri;
         type Visibility = S::Visibility;
         type CreatedAt = S::CreatedAt;
+        type VenueUri = S::VenueUri;
         type VenueName = Set<members::venue_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `venue_uri` field
-        pub struct venue_uri(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `venue_uri` field
+        pub struct venue_uri(());
         ///Marker type for the `venue_name` field
         pub struct venue_name(());
     }
@@ -460,23 +441,23 @@ pub mod beacon_state {
 pub struct BeaconBuilder<'a, S: beacon_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Address<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<Address<S>>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
-        Option<Geo<'a>>,
-        Option<Vec<Did<'a>>>,
-        Option<StrongRef<'a>>,
-        Option<StrongRef<'a>>,
+        Option<Geo<S>>,
+        Option<Vec<Did<S>>>,
+        Option<StrongRef<S>>,
+        Option<StrongRef<S>>,
         Option<i64>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<StrongRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<BeaconVisibility<'a>>,
+        Option<S>,
+        Option<StrongRef<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<BeaconVisibility<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -519,12 +500,12 @@ impl<'a> BeaconBuilder<'a, beacon_state::Empty> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `addressDetails` field (optional)
-    pub fn address_details(mut self, value: impl Into<Option<Address<'a>>>) -> Self {
+    pub fn address_details(mut self, value: impl Into<Option<Address<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `addressDetails` field to an Option value (optional)
-    pub fn maybe_address_details(mut self, value: Option<Address<'a>>) -> Self {
+    pub fn maybe_address_details(mut self, value: Option<Address<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -532,12 +513,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `chainEmoji` field (optional)
-    pub fn chain_emoji(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn chain_emoji(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `chainEmoji` field to an Option value (optional)
-    pub fn maybe_chain_emoji(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_chain_emoji(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -545,12 +526,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `chainName` field (optional)
-    pub fn chain_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn chain_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `chainName` field to an Option value (optional)
-    pub fn maybe_chain_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_chain_name(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -577,12 +558,12 @@ where
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `location` field (optional)
-    pub fn location(mut self, value: impl Into<Option<Geo<'a>>>) -> Self {
+    pub fn location(mut self, value: impl Into<Option<Geo<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
-    pub fn maybe_location(mut self, value: Option<Geo<'a>>) -> Self {
+    pub fn maybe_location(mut self, value: Option<Geo<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -590,12 +571,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `mentions` field (optional)
-    pub fn mentions(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
+    pub fn mentions(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
-    pub fn maybe_mentions(mut self, value: Option<Vec<Did<'a>>>) -> Self {
+    pub fn maybe_mentions(mut self, value: Option<Vec<Did<S>>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -603,12 +584,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `parentBeacon` field (optional)
-    pub fn parent_beacon(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn parent_beacon(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `parentBeacon` field to an Option value (optional)
-    pub fn maybe_parent_beacon(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_parent_beacon(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -616,12 +597,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `post` field (optional)
-    pub fn post(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn post(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `post` field to an Option value (optional)
-    pub fn maybe_post(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_post(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -655,12 +636,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `shout` field (optional)
-    pub fn shout(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn shout(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `shout` field to an Option value (optional)
-    pub fn maybe_shout(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_shout(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -668,12 +649,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `threadRoot` field (optional)
-    pub fn thread_root(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn thread_root(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `threadRoot` field to an Option value (optional)
-    pub fn maybe_thread_root(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_thread_root(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -681,12 +662,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `venueAddress` field (optional)
-    pub fn venue_address(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn venue_address(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `venueAddress` field to an Option value (optional)
-    pub fn maybe_venue_address(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_venue_address(mut self, value: Option<S>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -694,12 +675,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `venueCategory` field (optional)
-    pub fn venue_category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn venue_category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `venueCategory` field to an Option value (optional)
-    pub fn maybe_venue_category(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_venue_category(mut self, value: Option<S>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -713,7 +694,7 @@ where
     /// Set the `venueName` field (required)
     pub fn venue_name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BeaconBuilder<'a, beacon_state::SetVenueName<S>> {
         self._fields.14 = Option::Some(value.into());
         BeaconBuilder {
@@ -732,7 +713,7 @@ where
     /// Set the `venueUri` field (required)
     pub fn venue_uri(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BeaconBuilder<'a, beacon_state::SetVenueUri<S>> {
         self._fields.15 = Option::Some(value.into());
         BeaconBuilder {
@@ -751,7 +732,7 @@ where
     /// Set the `visibility` field (required)
     pub fn visibility(
         mut self,
-        value: impl Into<BeaconVisibility<'a>>,
+        value: impl Into<BeaconVisibility<S>>,
     ) -> BeaconBuilder<'a, beacon_state::SetVisibility<S>> {
         self._fields.16 = Option::Some(value.into());
         BeaconBuilder {
@@ -765,9 +746,9 @@ where
 impl<'a, S> BeaconBuilder<'a, S>
 where
     S: beacon_state::State,
-    S::VenueUri: beacon_state::IsSet,
     S::Visibility: beacon_state::IsSet,
     S::CreatedAt: beacon_state::IsSet,
+    S::VenueUri: beacon_state::IsSet,
     S::VenueName: beacon_state::IsSet,
 {
     /// Build the final struct
@@ -794,13 +775,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Beacon<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Beacon<'a> {
         Beacon {
             address_details: self._fields.0,
             chain_emoji: self._fields.1,

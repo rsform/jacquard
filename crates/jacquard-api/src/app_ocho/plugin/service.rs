@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,37 +30,45 @@ use serde::{Serialize, Deserialize};
 use crate::app_ocho::plugin::Db;
 /// The definitions for the plugin.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.ocho.plugin.service", tag = "$type")]
-pub struct Service<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.ocho.plugin.service",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Service<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub db: Option<Db<'a>>,
+    pub db: Option<Db<S>>,
     ///Additional metadata for the plugin, including Expo client and Go configurations.
-    #[serde(borrow)]
-    pub permissions: Vec<CowStr<'a>>,
+    pub permissions: Vec<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ServiceGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ServiceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Service<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Service<S>,
 }
 
-impl<'a> Service<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ServiceRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Service<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ServiceRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -69,18 +79,17 @@ pub struct ServiceRecord;
 impl XrpcResp for ServiceRecord {
     const NSID: &'static str = "app.ocho.plugin.service";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ServiceGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ServiceGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ServiceGetRecordOutput<'_>> for Service<'_> {
-    fn from(output: ServiceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ServiceGetRecordOutput<S>> for Service<S> {
+    fn from(output: ServiceGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Service<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Service<S> {
     const NSID: &'static str = "app.ocho.plugin.service";
     type Record = ServiceRecord;
 }
@@ -90,7 +99,7 @@ impl Collection for ServiceRecord {
     type Record = ServiceRecord;
 }
 
-impl<'a> LexiconSchema for Service<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Service<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.service"
     }
@@ -140,7 +149,7 @@ pub mod service_state {
 /// Builder for constructing an instance of this type
 pub struct ServiceBuilder<'a, S: service_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Db<'a>>, Option<Vec<CowStr<'a>>>),
+    _fields: (Option<Db<S>>, Option<Vec<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -164,12 +173,12 @@ impl<'a> ServiceBuilder<'a, service_state::Empty> {
 
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `db` field (optional)
-    pub fn db(mut self, value: impl Into<Option<Db<'a>>>) -> Self {
+    pub fn db(mut self, value: impl Into<Option<Db<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `db` field to an Option value (optional)
-    pub fn maybe_db(mut self, value: Option<Db<'a>>) -> Self {
+    pub fn maybe_db(mut self, value: Option<Db<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -183,7 +192,7 @@ where
     /// Set the `permissions` field (required)
     pub fn permissions(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> ServiceBuilder<'a, service_state::SetPermissions<S>> {
         self._fields.1 = Option::Some(value.into());
         ServiceBuilder {
@@ -210,10 +219,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Service<'a> {
         Service {
             db: self._fields.0,

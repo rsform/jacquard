@@ -10,51 +10,64 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::unspecced::SkeletonSearchActor;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSuggestionsSkeleton<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSuggestionsSkeleton<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub relative_to_did: Option<Did<'a>>,
+    pub relative_to_did: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub viewer: Option<Did<'a>>,
+    pub viewer: Option<Did<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSuggestionsSkeletonOutput<'a> {
-    #[serde(borrow)]
-    pub actors: Vec<SkeletonSearchActor<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSuggestionsSkeletonOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub actors: Vec<SkeletonSearchActor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///DEPRECATED: use recIdStr instead.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rec_id: Option<i64>,
     ///Snowflake for this recommendation, use when submitting recommendation events.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rec_id_str: Option<CowStr<'a>>,
+    pub rec_id_str: Option<S>,
     ///DID of the account these suggestions are relative to. If this is returned undefined, suggestions are based on the viewer.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub relative_to_did: Option<Did<'a>>,
+    pub relative_to_did: Option<Did<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.unspecced.getSuggestionsSkeleton
@@ -62,11 +75,12 @@ pub struct GetSuggestionsSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestionsSkeletonResponse {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestionsSkeleton";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSuggestionsSkeletonOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetSuggestionsSkeletonOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSuggestionsSkeleton<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetSuggestionsSkeleton<S> {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestionsSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestionsSkeletonResponse;
@@ -77,7 +91,7 @@ pub struct GetSuggestionsSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestionsSkeletonRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestionsSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSuggestionsSkeleton<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetSuggestionsSkeleton<S>;
     type Response = GetSuggestionsSkeletonResponse;
 }
 
@@ -107,7 +121,7 @@ pub mod get_suggestions_skeleton_state {
 /// Builder for constructing an instance of this type
 pub struct GetSuggestionsSkeletonBuilder<'a, S: get_suggestions_skeleton_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<Did<'a>>, Option<Did<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<Did<S>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -134,12 +148,12 @@ impl<'a> GetSuggestionsSkeletonBuilder<'a, get_suggestions_skeleton_state::Empty
 
 impl<'a, S: get_suggestions_skeleton_state::State> GetSuggestionsSkeletonBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -160,12 +174,12 @@ impl<'a, S: get_suggestions_skeleton_state::State> GetSuggestionsSkeletonBuilder
 
 impl<'a, S: get_suggestions_skeleton_state::State> GetSuggestionsSkeletonBuilder<'a, S> {
     /// Set the `relativeToDid` field (optional)
-    pub fn relative_to_did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn relative_to_did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `relativeToDid` field to an Option value (optional)
-    pub fn maybe_relative_to_did(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_relative_to_did(mut self, value: Option<Did<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -173,12 +187,12 @@ impl<'a, S: get_suggestions_skeleton_state::State> GetSuggestionsSkeletonBuilder
 
 impl<'a, S: get_suggestions_skeleton_state::State> GetSuggestionsSkeletonBuilder<'a, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn viewer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_viewer(mut self, value: Option<Did<S>>) -> Self {
         self._fields.3 = value;
         self
     }

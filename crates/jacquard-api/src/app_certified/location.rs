@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,51 +32,60 @@ use crate::org_hypercerts::Uri;
 use crate::app_certified::location;
 /// A location reference
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.certified.location", tag = "$type")]
-pub struct Location<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.certified.location",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Location<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Client-declared timestamp when this record was originally created
     pub created_at: Datetime,
     ///Additional context about this location, such as its significance to the work or specific boundaries
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The location of where the work was performed as a URI, blob, or inline string.
-    #[serde(borrow)]
-    pub location: LocationLocation<'a>,
+    pub location: LocationLocation<S>,
     ///An identifier for the format of the location data (e.g., coordinate-decimal, geojson-point). See the Location Protocol spec for the full registry: https://spec.decentralizedgeo.org/specification/location-types/#location-type-registry
-    #[serde(borrow)]
-    pub location_type: LocationLocationType<'a>,
+    pub location_type: LocationLocationType<S>,
     ///The version of the Location Protocol
-    #[serde(borrow)]
-    pub lp_version: CowStr<'a>,
+    pub lp_version: S,
     ///Human-readable name for this location (e.g. 'Golden Gate Park', 'San Francisco Bay Area')
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///The Spatial Reference System URI (e.g., http://www.opengis.net/def/crs/OGC/1.3/CRS84) that defines the coordinate system.
-    #[serde(borrow)]
-    pub srs: UriValue<'a>,
+    pub srs: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum LocationLocation<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum LocationLocation<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallBlob")]
-    SmallBlob(Box<SmallBlob<'a>>),
+    SmallBlob(Box<SmallBlob<S>>),
     #[serde(rename = "app.certified.location#string")]
-    String(Box<location::LocationString<'a>>),
+    String(Box<location::LocationString<S>>),
 }
 
 /// An identifier for the format of the location data (e.g., coordinate-decimal, geojson-point). See the Location Protocol spec for the full registry: https://spec.decentralizedgeo.org/specification/location-types/#location-type-registry
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LocationLocationType<'a> {
+pub enum LocationLocationType<S: Bos<str> + AsRef<str> = DefaultStr> {
     CoordinateDecimal,
     GeojsonPoint,
     Geojson,
@@ -83,10 +94,10 @@ pub enum LocationLocationType<'a> {
     Wkt,
     Address,
     ScaledCoordinates,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> LocationLocationType<'a> {
+impl<S: Bos<str> + AsRef<str>> LocationLocationType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::CoordinateDecimal => "coordinate-decimal",
@@ -100,11 +111,9 @@ impl<'a> LocationLocationType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for LocationLocationType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "coordinate-decimal" => Self::CoordinateDecimal,
             "geojson-point" => Self::GeojsonPoint,
             "geojson" => Self::Geojson,
@@ -113,69 +122,51 @@ impl<'a> From<&'a str> for LocationLocationType<'a> {
             "wkt" => Self::Wkt,
             "address" => Self::Address,
             "scaledCoordinates" => Self::ScaledCoordinates,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for LocationLocationType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "coordinate-decimal" => Self::CoordinateDecimal,
-            "geojson-point" => Self::GeojsonPoint,
-            "geojson" => Self::Geojson,
-            "h3" => Self::H3,
-            "geohash" => Self::Geohash,
-            "wkt" => Self::Wkt,
-            "address" => Self::Address,
-            "scaledCoordinates" => Self::ScaledCoordinates,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for LocationLocationType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for LocationLocationType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for LocationLocationType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for LocationLocationType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for LocationLocationType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for LocationLocationType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for LocationLocationType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for LocationLocationType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for LocationLocationType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for LocationLocationType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for LocationLocationType<'_> {
-    type Output = LocationLocationType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for LocationLocationType<S> {
+    type Output = LocationLocationType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             LocationLocationType::CoordinateDecimal => {
@@ -200,33 +191,40 @@ impl jacquard_common::IntoStatic for LocationLocationType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LocationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LocationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Location<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Location<S>,
 }
 
 /// A location represented as a string, e.g. coordinates or a small GeoJSON string.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct LocationString<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LocationString<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The location string value
-    #[serde(borrow)]
-    pub string: CowStr<'a>,
+    pub string: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Location<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LocationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Location<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LocationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -237,18 +235,17 @@ pub struct LocationRecord;
 impl XrpcResp for LocationRecord {
     const NSID: &'static str = "app.certified.location";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LocationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LocationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LocationGetRecordOutput<'_>> for Location<'_> {
-    fn from(output: LocationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LocationGetRecordOutput<S>> for Location<S> {
+    fn from(output: LocationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Location<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Location<S> {
     const NSID: &'static str = "app.certified.location";
     type Record = LocationRecord;
 }
@@ -258,7 +255,7 @@ impl Collection for LocationRecord {
     type Record = LocationRecord;
 }
 
-impl<'a> LexiconSchema for Location<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Location<S> {
     fn nsid() -> &'static str {
         "app.certified.location"
     }
@@ -350,7 +347,7 @@ impl<'a> LexiconSchema for Location<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LocationString<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationString<S> {
     fn nsid() -> &'static str {
         "app.certified.location"
     }
@@ -402,8 +399,8 @@ pub mod location_state {
         type LpVersion;
         type Location;
         type Srs;
-        type LocationType;
         type CreatedAt;
+        type LocationType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -412,8 +409,8 @@ pub mod location_state {
         type LpVersion = Unset;
         type Location = Unset;
         type Srs = Unset;
-        type LocationType = Unset;
         type CreatedAt = Unset;
+        type LocationType = Unset;
     }
     ///State transition - sets the `lp_version` field to Set
     pub struct SetLpVersion<S: State = Empty>(PhantomData<fn() -> S>);
@@ -422,8 +419,8 @@ pub mod location_state {
         type LpVersion = Set<members::lp_version>;
         type Location = S::Location;
         type Srs = S::Srs;
-        type LocationType = S::LocationType;
         type CreatedAt = S::CreatedAt;
+        type LocationType = S::LocationType;
     }
     ///State transition - sets the `location` field to Set
     pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
@@ -432,8 +429,8 @@ pub mod location_state {
         type LpVersion = S::LpVersion;
         type Location = Set<members::location>;
         type Srs = S::Srs;
-        type LocationType = S::LocationType;
         type CreatedAt = S::CreatedAt;
+        type LocationType = S::LocationType;
     }
     ///State transition - sets the `srs` field to Set
     pub struct SetSrs<S: State = Empty>(PhantomData<fn() -> S>);
@@ -442,18 +439,8 @@ pub mod location_state {
         type LpVersion = S::LpVersion;
         type Location = S::Location;
         type Srs = Set<members::srs>;
+        type CreatedAt = S::CreatedAt;
         type LocationType = S::LocationType;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `location_type` field to Set
-    pub struct SetLocationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocationType<S> {}
-    impl<S: State> State for SetLocationType<S> {
-        type LpVersion = S::LpVersion;
-        type Location = S::Location;
-        type Srs = S::Srs;
-        type LocationType = Set<members::location_type>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -462,8 +449,18 @@ pub mod location_state {
         type LpVersion = S::LpVersion;
         type Location = S::Location;
         type Srs = S::Srs;
-        type LocationType = S::LocationType;
         type CreatedAt = Set<members::created_at>;
+        type LocationType = S::LocationType;
+    }
+    ///State transition - sets the `location_type` field to Set
+    pub struct SetLocationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocationType<S> {}
+    impl<S: State> State for SetLocationType<S> {
+        type LpVersion = S::LpVersion;
+        type Location = S::Location;
+        type Srs = S::Srs;
+        type CreatedAt = S::CreatedAt;
+        type LocationType = Set<members::location_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -474,10 +471,10 @@ pub mod location_state {
         pub struct location(());
         ///Marker type for the `srs` field
         pub struct srs(());
-        ///Marker type for the `location_type` field
-        pub struct location_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `location_type` field
+        pub struct location_type(());
     }
 }
 
@@ -486,12 +483,12 @@ pub struct LocationBuilder<'a, S: location_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<LocationLocation<'a>>,
-        Option<LocationLocationType<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
+        Option<S>,
+        Option<LocationLocation<S>>,
+        Option<LocationLocationType<S>>,
+        Option<S>,
+        Option<S>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -535,12 +532,12 @@ where
 
 impl<'a, S: location_state::State> LocationBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -554,7 +551,7 @@ where
     /// Set the `location` field (required)
     pub fn location(
         mut self,
-        value: impl Into<LocationLocation<'a>>,
+        value: impl Into<LocationLocation<S>>,
     ) -> LocationBuilder<'a, location_state::SetLocation<S>> {
         self._fields.2 = Option::Some(value.into());
         LocationBuilder {
@@ -573,7 +570,7 @@ where
     /// Set the `locationType` field (required)
     pub fn location_type(
         mut self,
-        value: impl Into<LocationLocationType<'a>>,
+        value: impl Into<LocationLocationType<S>>,
     ) -> LocationBuilder<'a, location_state::SetLocationType<S>> {
         self._fields.3 = Option::Some(value.into());
         LocationBuilder {
@@ -592,7 +589,7 @@ where
     /// Set the `lpVersion` field (required)
     pub fn lp_version(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LocationBuilder<'a, location_state::SetLpVersion<S>> {
         self._fields.4 = Option::Some(value.into());
         LocationBuilder {
@@ -605,12 +602,12 @@ where
 
 impl<'a, S: location_state::State> LocationBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -624,7 +621,7 @@ where
     /// Set the `srs` field (required)
     pub fn srs(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> LocationBuilder<'a, location_state::SetSrs<S>> {
         self._fields.6 = Option::Some(value.into());
         LocationBuilder {
@@ -641,8 +638,8 @@ where
     S::LpVersion: location_state::IsSet,
     S::Location: location_state::IsSet,
     S::Srs: location_state::IsSet,
-    S::LocationType: location_state::IsSet,
     S::CreatedAt: location_state::IsSet,
+    S::LocationType: location_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Location<'a> {
@@ -660,10 +657,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Location<'a> {
         Location {
             created_at: self._fields.0.unwrap(),

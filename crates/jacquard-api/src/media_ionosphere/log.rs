@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,41 +30,48 @@ use serde::{Serialize, Deserialize};
 use crate::media_ionosphere::Track;
 /// Represents information about what was played
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "media.ionosphere.log", tag = "$type")]
-pub struct Log<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "media.ionosphere.log",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Log<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///Version identifier
-    #[serde(borrow)]
-    pub ionosphere: CowStr<'a>,
-    #[serde(borrow)]
-    pub item: Track<'a>,
+    pub ionosphere: S,
+    pub item: Track<S>,
     ///The programme this log is a part of
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub programme: Option<AtUri<'a>>,
+    pub programme: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LogGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LogGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Log<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Log<S>,
 }
 
-impl<'a> Log<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LogRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Log<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LogRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -73,18 +82,17 @@ pub struct LogRecord;
 impl XrpcResp for LogRecord {
     const NSID: &'static str = "media.ionosphere.log";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LogGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LogGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LogGetRecordOutput<'_>> for Log<'_> {
-    fn from(output: LogGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LogGetRecordOutput<S>> for Log<S> {
+    fn from(output: LogGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Log<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Log<S> {
     const NSID: &'static str = "media.ionosphere.log";
     type Record = LogRecord;
 }
@@ -94,7 +102,7 @@ impl Collection for LogRecord {
     type Record = LogRecord;
 }
 
-impl<'a> LexiconSchema for Log<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Log<S> {
     fn nsid() -> &'static str {
         "media.ionosphere.log"
     }
@@ -130,63 +138,58 @@ pub mod log_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Item;
-        type CreatedAt;
         type Ionosphere;
+        type CreatedAt;
+        type Item;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Item = Unset;
-        type CreatedAt = Unset;
         type Ionosphere = Unset;
-    }
-    ///State transition - sets the `item` field to Set
-    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItem<S> {}
-    impl<S: State> State for SetItem<S> {
-        type Item = Set<members::item>;
-        type CreatedAt = S::CreatedAt;
-        type Ionosphere = S::Ionosphere;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Item = S::Item;
-        type CreatedAt = Set<members::created_at>;
-        type Ionosphere = S::Ionosphere;
+        type CreatedAt = Unset;
+        type Item = Unset;
     }
     ///State transition - sets the `ionosphere` field to Set
     pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIonosphere<S> {}
     impl<S: State> State for SetIonosphere<S> {
-        type Item = S::Item;
-        type CreatedAt = S::CreatedAt;
         type Ionosphere = Set<members::ionosphere>;
+        type CreatedAt = S::CreatedAt;
+        type Item = S::Item;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Ionosphere = S::Ionosphere;
+        type CreatedAt = Set<members::created_at>;
+        type Item = S::Item;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItem<S> {}
+    impl<S: State> State for SetItem<S> {
+        type Ionosphere = S::Ionosphere;
+        type CreatedAt = S::CreatedAt;
+        type Item = Set<members::item>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `item` field
-        pub struct item(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `ionosphere` field
         pub struct ionosphere(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `item` field
+        pub struct item(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LogBuilder<'a, S: log_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Track<'a>>,
-        Option<AtUri<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<Track<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -235,7 +238,7 @@ where
     /// Set the `ionosphere` field (required)
     pub fn ionosphere(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LogBuilder<'a, log_state::SetIonosphere<S>> {
         self._fields.1 = Option::Some(value.into());
         LogBuilder {
@@ -254,7 +257,7 @@ where
     /// Set the `item` field (required)
     pub fn item(
         mut self,
-        value: impl Into<Track<'a>>,
+        value: impl Into<Track<S>>,
     ) -> LogBuilder<'a, log_state::SetItem<S>> {
         self._fields.2 = Option::Some(value.into());
         LogBuilder {
@@ -267,12 +270,12 @@ where
 
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `programme` field (optional)
-    pub fn programme(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn programme(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `programme` field to an Option value (optional)
-    pub fn maybe_programme(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_programme(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -281,9 +284,9 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
 impl<'a, S> LogBuilder<'a, S>
 where
     S: log_state::State,
-    S::Item: log_state::IsSet,
-    S::CreatedAt: log_state::IsSet,
     S::Ionosphere: log_state::IsSet,
+    S::CreatedAt: log_state::IsSet,
+    S::Item: log_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Log<'a> {
@@ -296,13 +299,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Log<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Log<'a> {
         Log {
             created_at: self._fields.0.unwrap(),
             ionosphere: self._fields.1.unwrap(),

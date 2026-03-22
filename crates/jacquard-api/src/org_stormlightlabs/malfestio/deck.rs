@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,61 +29,58 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A collection of flashcards and sources.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.stormlightlabs.malfestio.deck",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Deck<'a> {
+pub struct Deck<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Ordered list of references to cards in this deck.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub card_refs: Option<Vec<AtUri<'a>>>,
+    pub card_refs: Option<Vec<AtUri<S>>>,
     pub created_at: Datetime,
     ///Description of the deck context.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Language code for the deck content (e.g., 'en', 'es', 'fr').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub language: Option<CowStr<'a>>,
+    pub language: Option<S>,
     ///License for the deck content.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub license: Option<CowStr<'a>>,
+    pub license: Option<S>,
     ///References to source materials (articles, lectures) used in this deck.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_refs: Option<Vec<AtUri<'a>>>,
+    pub source_refs: Option<Vec<AtUri<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///Title of the deck.
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
     ///Timestamp of last update.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     ///Visibility setting for the deck.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub visibility: Option<DeckVisibility<'a>>,
+    pub visibility: Option<DeckVisibility<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Visibility setting for the deck.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DeckVisibility<'a> {
+pub enum DeckVisibility<S: Bos<str> + AsRef<str> = DefaultStr> {
     Private,
     Unlisted,
     Public,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> DeckVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> DeckVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Private => "private",
@@ -90,72 +89,57 @@ impl<'a> DeckVisibility<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for DeckVisibility<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "private" => Self::Private,
             "unlisted" => Self::Unlisted,
             "public" => Self::Public,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for DeckVisibility<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "private" => Self::Private,
-            "unlisted" => Self::Unlisted,
-            "public" => Self::Public,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for DeckVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for DeckVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for DeckVisibility<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for DeckVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for DeckVisibility<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for DeckVisibility<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for DeckVisibility<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for DeckVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for DeckVisibility<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for DeckVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for DeckVisibility<'_> {
-    type Output = DeckVisibility<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for DeckVisibility<S> {
+    type Output = DeckVisibility<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             DeckVisibility::Private => DeckVisibility::Private,
@@ -169,22 +153,23 @@ impl jacquard_common::IntoStatic for DeckVisibility<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DeckGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeckGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Deck<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Deck<S>,
 }
 
-impl<'a> Deck<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DeckRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Deck<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DeckRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -195,18 +180,17 @@ pub struct DeckRecord;
 impl XrpcResp for DeckRecord {
     const NSID: &'static str = "org.stormlightlabs.malfestio.deck";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeckGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DeckGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DeckGetRecordOutput<'_>> for Deck<'_> {
-    fn from(output: DeckGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DeckGetRecordOutput<S>> for Deck<S> {
+    fn from(output: DeckGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Deck<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Deck<S> {
     const NSID: &'static str = "org.stormlightlabs.malfestio.deck";
     type Record = DeckRecord;
 }
@@ -216,7 +200,7 @@ impl Collection for DeckRecord {
     type Record = DeckRecord;
 }
 
-impl<'a> LexiconSchema for Deck<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Deck<S> {
     fn nsid() -> &'static str {
         "org.stormlightlabs.malfestio.deck"
     }
@@ -340,16 +324,16 @@ pub mod deck_state {
 pub struct DeckBuilder<'a, S: deck_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<AtUri<'a>>>,
+        Option<Vec<AtUri<S>>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<AtUri<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Vec<AtUri<S>>>,
+        Option<Vec<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<DeckVisibility<'a>>,
+        Option<DeckVisibility<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -374,12 +358,12 @@ impl<'a> DeckBuilder<'a, deck_state::Empty> {
 
 impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     /// Set the `cardRefs` field (optional)
-    pub fn card_refs(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn card_refs(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cardRefs` field to an Option value (optional)
-    pub fn maybe_card_refs(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_card_refs(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -406,12 +390,12 @@ where
 
 impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -419,12 +403,12 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
 
 impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     /// Set the `language` field (optional)
-    pub fn language(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn language(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `language` field to an Option value (optional)
-    pub fn maybe_language(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_language(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -432,12 +416,12 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
 
 impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     /// Set the `license` field (optional)
-    pub fn license(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn license(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
-    pub fn maybe_license(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_license(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -445,12 +429,12 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
 
 impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     /// Set the `sourceRefs` field (optional)
-    pub fn source_refs(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn source_refs(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `sourceRefs` field to an Option value (optional)
-    pub fn maybe_source_refs(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_source_refs(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -458,12 +442,12 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
 
 impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -477,7 +461,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DeckBuilder<'a, deck_state::SetTitle<S>> {
         self._fields.7 = Option::Some(value.into());
         DeckBuilder {
@@ -503,12 +487,12 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
 
 impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(mut self, value: impl Into<Option<DeckVisibility<'a>>>) -> Self {
+    pub fn visibility(mut self, value: impl Into<Option<DeckVisibility<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
-    pub fn maybe_visibility(mut self, value: Option<DeckVisibility<'a>>) -> Self {
+    pub fn maybe_visibility(mut self, value: Option<DeckVisibility<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -537,13 +521,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Deck<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Deck<'a> {
         Deck {
             card_refs: self._fields.0,
             created_at: self._fields.1.unwrap(),

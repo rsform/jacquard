@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, UriValue};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,10 +27,15 @@ use serde::{Serialize, Deserialize};
 use crate::community_lexicon::calendar::get_event;
 /// An event record with RSVP counts and URL.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EventView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EventView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Number of users who have RSVP'd as going.
     pub count_going: i64,
     ///Number of users who have RSVP'd as interested.
@@ -36,32 +43,47 @@ pub struct EventView<'a> {
     ///Number of users who have RSVP'd as not going.
     pub count_not_going: i64,
     ///The canonical URL for this event on Smoke Signal.
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetEvent<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetEvent<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub record_key: CowStr<'a>,
+    pub record_key: S,
     #[serde(borrow)]
-    pub repository: Did<'a>,
+    pub repository: Did<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetEventOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetEventOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: jacquard_common::types::value::Data<'a>,
+    pub value: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -70,18 +92,19 @@ pub struct GetEventOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetEventError<'a> {
+pub enum GetEventError {
     #[serde(rename = "NotFound")]
-    NotFound(Option<CowStr<'a>>),
+    NotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetEventError<'_> {
+impl core::fmt::Display for GetEventError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::NotFound(msg) => {
@@ -91,12 +114,18 @@ impl core::fmt::Display for GetEventError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
-impl<'a> LexiconSchema for EventView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for EventView<S> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.getEvent"
     }
@@ -116,11 +145,12 @@ pub struct GetEventResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEventResponse {
     const NSID: &'static str = "community.lexicon.calendar.getEvent";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetEventOutput<'de>;
-    type Err<'de> = GetEventError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetEventOutput<S>;
+    type Err = GetEventError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetEvent<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetEvent<S> {
     const NSID: &'static str = "community.lexicon.calendar.getEvent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEventResponse;
@@ -131,7 +161,7 @@ pub struct GetEventRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEventRequest {
     const PATH: &'static str = "/xrpc/community.lexicon.calendar.getEvent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetEvent<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetEvent<S>;
     type Response = GetEventResponse;
 }
 
@@ -145,8 +175,8 @@ pub mod event_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CountNotGoing;
         type CountGoing;
+        type CountNotGoing;
         type CountInterested;
         type Url;
     }
@@ -154,26 +184,26 @@ pub mod event_view_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CountNotGoing = Unset;
         type CountGoing = Unset;
+        type CountNotGoing = Unset;
         type CountInterested = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `count_not_going` field to Set
-    pub struct SetCountNotGoing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountNotGoing<S> {}
-    impl<S: State> State for SetCountNotGoing<S> {
-        type CountNotGoing = Set<members::count_not_going>;
-        type CountGoing = S::CountGoing;
-        type CountInterested = S::CountInterested;
-        type Url = S::Url;
     }
     ///State transition - sets the `count_going` field to Set
     pub struct SetCountGoing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountGoing<S> {}
     impl<S: State> State for SetCountGoing<S> {
-        type CountNotGoing = S::CountNotGoing;
         type CountGoing = Set<members::count_going>;
+        type CountNotGoing = S::CountNotGoing;
+        type CountInterested = S::CountInterested;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `count_not_going` field to Set
+    pub struct SetCountNotGoing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountNotGoing<S> {}
+    impl<S: State> State for SetCountNotGoing<S> {
+        type CountGoing = S::CountGoing;
+        type CountNotGoing = Set<members::count_not_going>;
         type CountInterested = S::CountInterested;
         type Url = S::Url;
     }
@@ -181,8 +211,8 @@ pub mod event_view_state {
     pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountInterested<S> {}
     impl<S: State> State for SetCountInterested<S> {
-        type CountNotGoing = S::CountNotGoing;
         type CountGoing = S::CountGoing;
+        type CountNotGoing = S::CountNotGoing;
         type CountInterested = Set<members::count_interested>;
         type Url = S::Url;
     }
@@ -190,18 +220,18 @@ pub mod event_view_state {
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type CountNotGoing = S::CountNotGoing;
         type CountGoing = S::CountGoing;
+        type CountNotGoing = S::CountNotGoing;
         type CountInterested = S::CountInterested;
         type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count_not_going` field
-        pub struct count_not_going(());
         ///Marker type for the `count_going` field
         pub struct count_going(());
+        ///Marker type for the `count_not_going` field
+        pub struct count_not_going(());
         ///Marker type for the `count_interested` field
         pub struct count_interested(());
         ///Marker type for the `url` field
@@ -212,7 +242,7 @@ pub mod event_view_state {
 /// Builder for constructing an instance of this type
 pub struct EventViewBuilder<'a, S: event_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<i64>, Option<i64>, Option<UriValue<'a>>),
+    _fields: (Option<i64>, Option<i64>, Option<i64>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -299,7 +329,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> EventViewBuilder<'a, event_view_state::SetUrl<S>> {
         self._fields.3 = Option::Some(value.into());
         EventViewBuilder {
@@ -313,8 +343,8 @@ where
 impl<'a, S> EventViewBuilder<'a, S>
 where
     S: event_view_state::State,
-    S::CountNotGoing: event_view_state::IsSet,
     S::CountGoing: event_view_state::IsSet,
+    S::CountNotGoing: event_view_state::IsSet,
     S::CountInterested: event_view_state::IsSet,
     S::Url: event_view_state::IsSet,
 {
@@ -331,10 +361,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> EventView<'a> {
         EventView {
             count_going: self._fields.0.unwrap(),
@@ -506,7 +533,7 @@ pub mod get_event_state {
 /// Builder for constructing an instance of this type
 pub struct GetEventBuilder<'a, S: get_event_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Did<'a>>),
+    _fields: (Option<S>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -536,7 +563,7 @@ where
     /// Set the `recordKey` field (required)
     pub fn record_key(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetEventBuilder<'a, get_event_state::SetRecordKey<S>> {
         self._fields.0 = Option::Some(value.into());
         GetEventBuilder {
@@ -555,7 +582,7 @@ where
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetEventBuilder<'a, get_event_state::SetRepository<S>> {
         self._fields.1 = Option::Some(value.into());
         GetEventBuilder {

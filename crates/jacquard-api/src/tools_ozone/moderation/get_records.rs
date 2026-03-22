@@ -10,37 +10,60 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::RecordViewDetail;
 use crate::tools_ozone::moderation::RecordViewNotFound;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRecords<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRecords<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub uris: Vec<AtUri<'a>>,
+    pub uris: Vec<AtUri<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRecordsOutput<'a> {
-    #[serde(borrow)]
-    pub records: Vec<GetRecordsOutputRecordsItem<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRecordsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub records: Vec<GetRecordsOutputRecordsItem<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum GetRecordsOutputRecordsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum GetRecordsOutputRecordsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "tools.ozone.moderation.defs#recordViewDetail")]
-    RecordViewDetail(Box<RecordViewDetail<'a>>),
+    RecordViewDetail(Box<RecordViewDetail<S>>),
     #[serde(rename = "tools.ozone.moderation.defs#recordViewNotFound")]
-    RecordViewNotFound(Box<RecordViewNotFound<'a>>),
+    RecordViewNotFound(Box<RecordViewNotFound<S>>),
 }
 
 /// Response type for tools.ozone.moderation.getRecords
@@ -48,11 +71,12 @@ pub struct GetRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecordsResponse {
     const NSID: &'static str = "tools.ozone.moderation.getRecords";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRecordsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetRecordsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetRecords<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetRecords<S> {
     const NSID: &'static str = "tools.ozone.moderation.getRecords";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecordsResponse;
@@ -63,7 +87,7 @@ pub struct GetRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecordsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.getRecords";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRecords<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetRecords<S>;
     type Response = GetRecordsResponse;
 }
 
@@ -102,7 +126,7 @@ pub mod get_records_state {
 /// Builder for constructing an instance of this type
 pub struct GetRecordsBuilder<'a, S: get_records_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<AtUri<'a>>>,),
+    _fields: (Option<Vec<AtUri<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -132,7 +156,7 @@ where
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
-        value: impl Into<Vec<AtUri<'a>>>,
+        value: impl Into<Vec<AtUri<S>>>,
     ) -> GetRecordsBuilder<'a, get_records_state::SetUris<S>> {
         self._fields.0 = Option::Some(value.into());
         GetRecordsBuilder {

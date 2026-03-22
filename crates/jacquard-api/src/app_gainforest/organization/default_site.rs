@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,40 +29,45 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A declaration of the default site for an organization
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.gainforest.organization.defaultSite",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct DefaultSite<'a> {
+pub struct DefaultSite<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,
     ///The reference to the default site record in the PDS
-    #[serde(borrow)]
-    pub site: AtUri<'a>,
+    pub site: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DefaultSiteGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DefaultSiteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: DefaultSite<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: DefaultSite<S>,
 }
 
-impl<'a> DefaultSite<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DefaultSiteRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> DefaultSite<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DefaultSiteRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -71,18 +78,17 @@ pub struct DefaultSiteRecord;
 impl XrpcResp for DefaultSiteRecord {
     const NSID: &'static str = "app.gainforest.organization.defaultSite";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DefaultSiteGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DefaultSiteGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DefaultSiteGetRecordOutput<'_>> for DefaultSite<'_> {
-    fn from(output: DefaultSiteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DefaultSiteGetRecordOutput<S>> for DefaultSite<S> {
+    fn from(output: DefaultSiteGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for DefaultSite<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for DefaultSite<S> {
     const NSID: &'static str = "app.gainforest.organization.defaultSite";
     type Record = DefaultSiteRecord;
 }
@@ -92,7 +98,7 @@ impl Collection for DefaultSiteRecord {
     type Record = DefaultSiteRecord;
 }
 
-impl<'a> LexiconSchema for DefaultSite<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DefaultSite<S> {
     fn nsid() -> &'static str {
         "app.gainforest.organization.defaultSite"
     }
@@ -154,7 +160,7 @@ pub mod default_site_state {
 /// Builder for constructing an instance of this type
 pub struct DefaultSiteBuilder<'a, S: default_site_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<AtUri<'a>>),
+    _fields: (Option<Datetime>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -203,7 +209,7 @@ where
     /// Set the `site` field (required)
     pub fn site(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> DefaultSiteBuilder<'a, default_site_state::SetSite<S>> {
         self._fields.1 = Option::Some(value.into());
         DefaultSiteBuilder {
@@ -231,10 +237,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DefaultSite<'a> {
         DefaultSite {
             created_at: self._fields.0.unwrap(),

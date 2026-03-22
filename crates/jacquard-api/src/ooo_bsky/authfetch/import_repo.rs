@@ -22,8 +22,8 @@ pub struct ImportRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for ImportRepoResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.importRepo";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
@@ -39,7 +39,7 @@ impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
         body: &'de [u8],
     ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
     where
-        Self: serde::Deserialize<'de>,
+        Self: Deserialize<'de>,
     {
         Ok(
             Box::new(Self {
@@ -56,6 +56,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for ImportRepoRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/vnd.ipld.car",
     );
-    type Request<'de> = ImportRepo;
+    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = ImportRepo;
     type Response = ImportRepoResponse;
 }

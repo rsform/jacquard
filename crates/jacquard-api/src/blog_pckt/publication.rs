@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,33 +29,42 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blog.pckt.publication", tag = "$type")]
-pub struct Publication<'a> {
-    #[serde(borrow)]
-    pub publication: StrongRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "blog.pckt.publication",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Publication<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub publication: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PublicationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PublicationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Publication<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Publication<S>,
 }
 
-impl<'a> Publication<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PublicationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Publication<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PublicationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -64,18 +75,17 @@ pub struct PublicationRecord;
 impl XrpcResp for PublicationRecord {
     const NSID: &'static str = "blog.pckt.publication";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PublicationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PublicationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PublicationGetRecordOutput<'_>> for Publication<'_> {
-    fn from(output: PublicationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PublicationGetRecordOutput<S>> for Publication<S> {
+    fn from(output: PublicationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Publication<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Publication<S> {
     const NSID: &'static str = "blog.pckt.publication";
     type Record = PublicationRecord;
 }
@@ -85,7 +95,7 @@ impl Collection for PublicationRecord {
     type Record = PublicationRecord;
 }
 
-impl<'a> LexiconSchema for Publication<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Publication<S> {
     fn nsid() -> &'static str {
         "blog.pckt.publication"
     }
@@ -135,7 +145,7 @@ pub mod publication_state {
 /// Builder for constructing an instance of this type
 pub struct PublicationBuilder<'a, S: publication_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>,),
+    _fields: (Option<StrongRef<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -165,7 +175,7 @@ where
     /// Set the `publication` field (required)
     pub fn publication(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> PublicationBuilder<'a, publication_state::SetPublication<S>> {
         self._fields.0 = Option::Some(value.into());
         PublicationBuilder {
@@ -191,10 +201,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Publication<'a> {
         Publication {
             publication: self._fields.0.unwrap(),

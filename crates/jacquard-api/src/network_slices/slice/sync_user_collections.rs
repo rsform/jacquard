@@ -10,34 +10,53 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct SyncUserCollections<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SyncUserCollections<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///AT-URI of the slice to sync user data into
-    #[serde(borrow)]
-    pub slice: CowStr<'a>,
+    pub slice: S,
     ///Timeout in seconds for the sync operation  Defaults to `30`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_sync_user_collections_timeout_seconds")]
     pub timeout_seconds: Option<i64>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SyncUserCollectionsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SyncUserCollectionsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Number of records successfully synced
     pub records_synced: i64,
     ///Number of repositories processed during sync
     pub repos_processed: i64,
     ///Whether the sync operation exceeded the timeout
     pub timed_out: bool,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for network.slices.slice.syncUserCollections
@@ -45,11 +64,12 @@ pub struct SyncUserCollectionsResponse;
 impl jacquard_common::xrpc::XrpcResp for SyncUserCollectionsResponse {
     const NSID: &'static str = "network.slices.slice.syncUserCollections";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SyncUserCollectionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SyncUserCollectionsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SyncUserCollections<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SyncUserCollections<S> {
     const NSID: &'static str = "network.slices.slice.syncUserCollections";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -64,7 +84,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SyncUserCollectionsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = SyncUserCollections<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SyncUserCollections<S>;
     type Response = SyncUserCollectionsResponse;
 }
 

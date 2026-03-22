@@ -10,30 +10,49 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteGate<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteGate<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The AT-URI of the gate record to delete.
-    #[serde(borrow)]
-    pub gate_uri: AtUri<'a>,
+    pub gate_uri: AtUri<S>,
     ///The DID of the streamer.
-    #[serde(borrow)]
-    pub streamer: Did<'a>,
+    pub streamer: Did<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct DeleteGateOutput<'a> {}
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeleteGateOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
 
-#[open_union]
+
 #[derive(
     Serialize,
     Deserialize,
@@ -42,25 +61,26 @@ pub struct DeleteGateOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum DeleteGateError<'a> {
+pub enum DeleteGateError {
     /// The request lacks valid authentication credentials.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(Option<CowStr<'a>>),
+    Unauthorized(Option<SmolStr>),
     /// The caller does not have permission to unhide messages for this streamer.
     #[serde(rename = "Forbidden")]
-    Forbidden(Option<CowStr<'a>>),
+    Forbidden(Option<SmolStr>),
     /// The streamer's OAuth session could not be found or is invalid.
     #[serde(rename = "SessionNotFound")]
-    SessionNotFound(Option<CowStr<'a>>),
+    SessionNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for DeleteGateError<'_> {
+impl core::fmt::Display for DeleteGateError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Unauthorized(msg) => {
@@ -84,7 +104,13 @@ impl core::fmt::Display for DeleteGateError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -94,11 +120,12 @@ pub struct DeleteGateResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteGateResponse {
     const NSID: &'static str = "place.stream.moderation.deleteGate";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeleteGateOutput<'de>;
-    type Err<'de> = DeleteGateError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DeleteGateOutput<S>;
+    type Err = DeleteGateError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for DeleteGate<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for DeleteGate<S> {
     const NSID: &'static str = "place.stream.moderation.deleteGate";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -113,7 +140,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteGateRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DeleteGate<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = DeleteGate<S>;
     type Response = DeleteGateResponse;
 }
 
@@ -164,7 +191,7 @@ pub mod delete_gate_state {
 /// Builder for constructing an instance of this type
 pub struct DeleteGateBuilder<'a, S: delete_gate_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<Did<'a>>),
+    _fields: (Option<AtUri<S>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -194,7 +221,7 @@ where
     /// Set the `gateUri` field (required)
     pub fn gate_uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> DeleteGateBuilder<'a, delete_gate_state::SetGateUri<S>> {
         self._fields.0 = Option::Some(value.into());
         DeleteGateBuilder {
@@ -213,7 +240,7 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> DeleteGateBuilder<'a, delete_gate_state::SetStreamer<S>> {
         self._fields.1 = Option::Some(value.into());
         DeleteGateBuilder {
@@ -241,10 +268,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DeleteGate<'a> {
         DeleteGate {
             gate_uri: self._fields.0.unwrap(),

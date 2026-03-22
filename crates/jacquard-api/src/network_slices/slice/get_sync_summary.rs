@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,51 +25,71 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::get_sync_summary;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionSummary<'a> {
-    #[serde(borrow)]
-    pub collection: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollectionSummary<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub collection: S,
     pub estimated_repos: i64,
     pub is_external: bool,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSyncSummary<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSyncSummary<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub collections: Option<Vec<CowStr<'a>>>,
+    pub collections: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub external_collections: Option<Vec<CowStr<'a>>>,
+    pub external_collections: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub repos: Option<Vec<CowStr<'a>>>,
+    pub repos: Option<Vec<S>>,
     #[serde(borrow)]
-    pub slice: CowStr<'a>,
+    pub slice: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetSyncSummaryOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetSyncSummaryOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The actual limit applied (user-specified or default)
     pub applied_limit: i64,
     ///Number of repositories after applying limit
     pub capped_repos: i64,
-    #[serde(borrow)]
-    pub collections_summary: Vec<get_sync_summary::CollectionSummary<'a>>,
+    pub collections_summary: Vec<get_sync_summary::CollectionSummary<S>>,
     ///Total number of repositories that would be synced
     pub total_repos: i64,
     ///Whether the sync would be limited by maxRepos
     pub would_be_capped: bool,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for CollectionSummary<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionSummary<S> {
     fn nsid() -> &'static str {
         "network.slices.slice.getSyncSummary"
     }
@@ -87,11 +109,12 @@ pub struct GetSyncSummaryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSyncSummaryResponse {
     const NSID: &'static str = "network.slices.slice.getSyncSummary";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetSyncSummaryOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetSyncSummaryOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetSyncSummary<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetSyncSummary<S> {
     const NSID: &'static str = "network.slices.slice.getSyncSummary";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSyncSummaryResponse;
@@ -102,7 +125,7 @@ pub struct GetSyncSummaryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSyncSummaryRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getSyncSummary";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetSyncSummary<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetSyncSummary<S>;
     type Response = GetSyncSummaryResponse;
 }
 
@@ -116,49 +139,49 @@ pub mod collection_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
         type EstimatedRepos;
+        type Collection;
         type IsExternal;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
         type EstimatedRepos = Unset;
+        type Collection = Unset;
         type IsExternal = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type EstimatedRepos = S::EstimatedRepos;
-        type IsExternal = S::IsExternal;
     }
     ///State transition - sets the `estimated_repos` field to Set
     pub struct SetEstimatedRepos<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEstimatedRepos<S> {}
     impl<S: State> State for SetEstimatedRepos<S> {
-        type Collection = S::Collection;
         type EstimatedRepos = Set<members::estimated_repos>;
+        type Collection = S::Collection;
+        type IsExternal = S::IsExternal;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type EstimatedRepos = S::EstimatedRepos;
+        type Collection = Set<members::collection>;
         type IsExternal = S::IsExternal;
     }
     ///State transition - sets the `is_external` field to Set
     pub struct SetIsExternal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsExternal<S> {}
     impl<S: State> State for SetIsExternal<S> {
-        type Collection = S::Collection;
         type EstimatedRepos = S::EstimatedRepos;
+        type Collection = S::Collection;
         type IsExternal = Set<members::is_external>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `estimated_repos` field
         pub struct estimated_repos(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `is_external` field
         pub struct is_external(());
     }
@@ -167,7 +190,7 @@ pub mod collection_summary_state {
 /// Builder for constructing an instance of this type
 pub struct CollectionSummaryBuilder<'a, S: collection_summary_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<bool>),
+    _fields: (Option<S>, Option<i64>, Option<bool>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -197,7 +220,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CollectionSummaryBuilder<'a, collection_summary_state::SetCollection<S>> {
         self._fields.0 = Option::Some(value.into());
         CollectionSummaryBuilder {
@@ -249,8 +272,8 @@ where
 impl<'a, S> CollectionSummaryBuilder<'a, S>
 where
     S: collection_summary_state::State,
-    S::Collection: collection_summary_state::IsSet,
     S::EstimatedRepos: collection_summary_state::IsSet,
+    S::Collection: collection_summary_state::IsSet,
     S::IsExternal: collection_summary_state::IsSet,
 {
     /// Build the final struct
@@ -265,10 +288,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CollectionSummary<'a> {
         CollectionSummary {
             collection: self._fields.0.unwrap(),
@@ -417,12 +437,7 @@ pub mod get_sync_summary_state {
 /// Builder for constructing an instance of this type
 pub struct GetSyncSummaryBuilder<'a, S: get_sync_summary_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<Vec<S>>, Option<Vec<S>>, Option<Vec<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -446,12 +461,12 @@ impl<'a> GetSyncSummaryBuilder<'a, get_sync_summary_state::Empty> {
 
 impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
     /// Set the `collections` field (optional)
-    pub fn collections(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn collections(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `collections` field to an Option value (optional)
-    pub fn maybe_collections(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_collections(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -459,15 +474,12 @@ impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
 
 impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
     /// Set the `externalCollections` field (optional)
-    pub fn external_collections(
-        mut self,
-        value: impl Into<Option<Vec<CowStr<'a>>>>,
-    ) -> Self {
+    pub fn external_collections(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `externalCollections` field to an Option value (optional)
-    pub fn maybe_external_collections(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_external_collections(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -475,12 +487,12 @@ impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
 
 impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
     /// Set the `repos` field (optional)
-    pub fn repos(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn repos(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `repos` field to an Option value (optional)
-    pub fn maybe_repos(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_repos(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -494,7 +506,7 @@ where
     /// Set the `slice` field (required)
     pub fn slice(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetSyncSummaryBuilder<'a, get_sync_summary_state::SetSlice<S>> {
         self._fields.3 = Option::Some(value.into());
         GetSyncSummaryBuilder {

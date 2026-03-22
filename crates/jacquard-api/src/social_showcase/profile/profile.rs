@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,45 +31,41 @@ use serde::{Serialize, Deserialize};
 use crate::social_showcase::ShowcaseItem;
 /// User profile record
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "social.showcase.profile.profile",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Profile<'a> {
+pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Custom accent color hex code (e.g. #2e4a6e)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accent_color: Option<CowStr<'a>>,
+    pub accent_color: Option<S>,
     ///Avatar image blob (1000x1000px max)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
+    pub avatar: Option<BlobRef<S>>,
     ///Banner image blob (3000x1000px max)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub banner: Option<BlobRef<'a>>,
+    pub banner: Option<BlobRef<S>>,
     ///Profile description
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub bio: Option<CowStr<'a>>,
+    pub bio: Option<S>,
     ///Total number of collections  Defaults to `0`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_profile_collection_count")]
     pub collection_count: Option<i64>,
     pub created_at: Datetime,
     ///User's DID
-    #[serde(borrow)]
-    pub did: CowStr<'a>,
+    pub did: S,
     ///Display name
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     ///User's handle
-    #[serde(borrow)]
-    pub handle: CowStr<'a>,
+    pub handle: S,
     ///Total number of items in the user's library  Defaults to `0`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_profile_item_count")]
@@ -78,42 +76,41 @@ pub struct Profile<'a> {
     pub schema_version: Option<i64>,
     ///Featured showcase items
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub showcase: Option<Vec<ShowcaseItem<'a>>>,
+    pub showcase: Option<Vec<ShowcaseItem<S>>>,
     ///Profile tags for discovery (max 10)
-    #[serde(borrow)]
-    pub tags: Vec<CowStr<'a>>,
+    pub tags: Vec<S>,
     ///Profile theme preset name
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub theme: Option<CowStr<'a>>,
+    pub theme: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     ///External website URL
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub website: Option<UriValue<'a>>,
+    pub website: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProfileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Profile<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Profile<S>,
 }
 
-impl<'a> Profile<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ProfileRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Profile<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ProfileRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -124,18 +121,17 @@ pub struct ProfileRecord;
 impl XrpcResp for ProfileRecord {
     const NSID: &'static str = "social.showcase.profile.profile";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProfileGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ProfileGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ProfileGetRecordOutput<'_>> for Profile<'_> {
-    fn from(output: ProfileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ProfileGetRecordOutput<S>> for Profile<S> {
+    fn from(output: ProfileGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Profile<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Profile<S> {
     const NSID: &'static str = "social.showcase.profile.profile";
     type Record = ProfileRecord;
 }
@@ -145,7 +141,7 @@ impl Collection for ProfileRecord {
     type Record = ProfileRecord;
 }
 
-impl<'a> LexiconSchema for Profile<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Profile<S> {
     fn nsid() -> &'static str {
         "social.showcase.profile.profile"
     }
@@ -357,67 +353,67 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Handle;
         type Did;
         type Tags;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Handle = Unset;
         type Did = Unset;
         type Tags = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Did = S::Did;
-        type Tags = S::Tags;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
-        type Did = Set<members::did>;
-        type Tags = S::Tags;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Handle = S::Handle;
-        type Did = S::Did;
-        type Tags = Set<members::tags>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Handle = S::Handle;
         type Did = S::Did;
         type Tags = S::Tags;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Handle = Set<members::handle>;
+        type Did = S::Did;
+        type Tags = S::Tags;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type CreatedAt = S::CreatedAt;
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
+        type Tags = S::Tags;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type CreatedAt = S::CreatedAt;
+        type Handle = S::Handle;
+        type Did = S::Did;
+        type Tags = Set<members::tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `handle` field
         pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `tags` field
         pub struct tags(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -425,22 +421,22 @@ pub mod profile_state {
 pub struct ProfileBuilder<'a, S: profile_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<BlobRef<S>>,
+        Option<S>,
         Option<i64>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<i64>,
         Option<i64>,
-        Option<Vec<ShowcaseItem<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<ShowcaseItem<S>>>,
+        Option<Vec<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<UriValue<'a>>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -482,12 +478,12 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `accentColor` field (optional)
-    pub fn accent_color(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn accent_color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `accentColor` field to an Option value (optional)
-    pub fn maybe_accent_color(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_accent_color(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -495,12 +491,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -508,12 +504,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `banner` field (optional)
-    pub fn banner(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn banner(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `banner` field to an Option value (optional)
-    pub fn maybe_banner(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_banner(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -521,12 +517,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `bio` field (optional)
-    pub fn bio(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn bio(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `bio` field to an Option value (optional)
-    pub fn maybe_bio(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_bio(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -572,7 +568,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProfileBuilder<'a, profile_state::SetDid<S>> {
         self._fields.6 = Option::Some(value.into());
         ProfileBuilder {
@@ -585,12 +581,12 @@ where
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -604,7 +600,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProfileBuilder<'a, profile_state::SetHandle<S>> {
         self._fields.8 = Option::Some(value.into());
         ProfileBuilder {
@@ -643,12 +639,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `showcase` field (optional)
-    pub fn showcase(mut self, value: impl Into<Option<Vec<ShowcaseItem<'a>>>>) -> Self {
+    pub fn showcase(mut self, value: impl Into<Option<Vec<ShowcaseItem<S>>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `showcase` field to an Option value (optional)
-    pub fn maybe_showcase(mut self, value: Option<Vec<ShowcaseItem<'a>>>) -> Self {
+    pub fn maybe_showcase(mut self, value: Option<Vec<ShowcaseItem<S>>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -662,7 +658,7 @@ where
     /// Set the `tags` field (required)
     pub fn tags(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> ProfileBuilder<'a, profile_state::SetTags<S>> {
         self._fields.12 = Option::Some(value.into());
         ProfileBuilder {
@@ -675,12 +671,12 @@ where
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `theme` field (optional)
-    pub fn theme(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn theme(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
-    pub fn maybe_theme(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_theme(mut self, value: Option<S>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -701,12 +697,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `website` field (optional)
-    pub fn website(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn website(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `website` field to an Option value (optional)
-    pub fn maybe_website(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_website(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.15 = value;
         self
     }
@@ -715,10 +711,10 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
+    S::CreatedAt: profile_state::IsSet,
     S::Handle: profile_state::IsSet,
     S::Did: profile_state::IsSet,
     S::Tags: profile_state::IsSet,
-    S::CreatedAt: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
@@ -745,10 +741,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Profile<'a> {
         Profile {
             accent_color: self._fields.0,

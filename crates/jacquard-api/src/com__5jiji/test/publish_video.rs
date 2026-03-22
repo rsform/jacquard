@@ -26,7 +26,6 @@ pub struct PublishVideoOutput {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -35,19 +34,23 @@ pub struct PublishVideoOutput {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum PublishVideoError<'a> {
+pub enum PublishVideoError {
     /// The uploaded file was not a video file (or couldn't get converted to a valid video
     #[serde(rename = "NotAVideo")]
-    NotAVideo(Option<CowStr<'a>>),
+    NotAVideo(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for PublishVideoError<'_> {
+impl core::fmt::Display for PublishVideoError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::NotAVideo(msg) => {
@@ -57,7 +60,13 @@ impl core::fmt::Display for PublishVideoError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -67,8 +76,8 @@ pub struct PublishVideoResponse;
 impl jacquard_common::xrpc::XrpcResp for PublishVideoResponse {
     const NSID: &'static str = "com.5jiji.test.publishVideo";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PublishVideoOutput;
-    type Err<'de> = PublishVideoError<'de>;
+    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = PublishVideoOutput;
+    type Err = PublishVideoError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for PublishVideo {
@@ -84,7 +93,7 @@ impl jacquard_common::xrpc::XrpcRequest for PublishVideo {
         body: &'de [u8],
     ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
     where
-        Self: serde::Deserialize<'de>,
+        Self: Deserialize<'de>,
     {
         Ok(
             Box::new(Self {
@@ -101,6 +110,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for PublishVideoRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "*/*",
     );
-    type Request<'de> = PublishVideo;
+    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = PublishVideo;
     type Response = PublishVideoResponse;
 }

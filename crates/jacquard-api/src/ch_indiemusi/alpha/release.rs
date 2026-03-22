@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -31,67 +33,76 @@ use crate::ch_indiemusi::alpha::actor::artist;
 use crate::ch_indiemusi::alpha::release;
 /// Information about an artist contributing to the release
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Artist<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Artist<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artist: Option<artist::Artist<'a>>,
+    pub artist: Option<artist::Artist<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub did: Option<Did<'a>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub did: Option<Did<S>>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A release (album, EP, single) containing recordings of songs or musical works
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "ch.indiemusi.alpha.release", tag = "$type")]
-pub struct Release<'a> {
-    #[serde(borrow)]
-    pub artists: Vec<release::Artist<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "ch.indiemusi.alpha.release",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Release<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub artists: Vec<release::Artist<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artwork_image: Option<BlobRef<'a>>,
+    pub artwork_image: Option<BlobRef<S>>,
     ///GTIN (Global Trade Item Number) with which the release is registered, e.g. EAN or UPC
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gtin: Option<CowStr<'a>>,
+    pub gtin: Option<S>,
     ///List of recordings (ch.indiemusi.alpha.recording) included in this release
-    #[serde(borrow)]
-    pub recordings: Vec<Recording<'a>>,
+    pub recordings: Vec<Recording<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub release_date: Option<Datetime>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReleaseGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReleaseGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Release<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Release<S>,
 }
 
-impl<'a> Release<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ReleaseRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Release<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ReleaseRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Artist<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Artist<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.release"
     }
@@ -124,18 +135,17 @@ pub struct ReleaseRecord;
 impl XrpcResp for ReleaseRecord {
     const NSID: &'static str = "ch.indiemusi.alpha.release";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReleaseGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ReleaseGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ReleaseGetRecordOutput<'_>> for Release<'_> {
-    fn from(output: ReleaseGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ReleaseGetRecordOutput<S>> for Release<S> {
+    fn from(output: ReleaseGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Release<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Release<S> {
     const NSID: &'static str = "ch.indiemusi.alpha.release";
     type Record = ReleaseRecord;
 }
@@ -145,7 +155,7 @@ impl Collection for ReleaseRecord {
     type Record = ReleaseRecord;
 }
 
-impl<'a> LexiconSchema for Release<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Release<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.release"
     }
@@ -353,51 +363,51 @@ pub mod release_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artists;
         type Title;
         type Recordings;
+        type Artists;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artists = Unset;
         type Title = Unset;
         type Recordings = Unset;
-    }
-    ///State transition - sets the `artists` field to Set
-    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtists<S> {}
-    impl<S: State> State for SetArtists<S> {
-        type Artists = Set<members::artists>;
-        type Title = S::Title;
-        type Recordings = S::Recordings;
+        type Artists = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Artists = S::Artists;
         type Title = Set<members::title>;
         type Recordings = S::Recordings;
+        type Artists = S::Artists;
     }
     ///State transition - sets the `recordings` field to Set
     pub struct SetRecordings<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecordings<S> {}
     impl<S: State> State for SetRecordings<S> {
-        type Artists = S::Artists;
         type Title = S::Title;
         type Recordings = Set<members::recordings>;
+        type Artists = S::Artists;
+    }
+    ///State transition - sets the `artists` field to Set
+    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtists<S> {}
+    impl<S: State> State for SetArtists<S> {
+        type Title = S::Title;
+        type Recordings = S::Recordings;
+        type Artists = Set<members::artists>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artists` field
-        pub struct artists(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `recordings` field
         pub struct recordings(());
+        ///Marker type for the `artists` field
+        pub struct artists(());
     }
 }
 
@@ -405,12 +415,12 @@ pub mod release_state {
 pub struct ReleaseBuilder<'a, S: release_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<release::Artist<'a>>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<Recording<'a>>>,
+        Option<Vec<release::Artist<S>>>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<Vec<Recording<S>>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -441,7 +451,7 @@ where
     /// Set the `artists` field (required)
     pub fn artists(
         mut self,
-        value: impl Into<Vec<release::Artist<'a>>>,
+        value: impl Into<Vec<release::Artist<S>>>,
     ) -> ReleaseBuilder<'a, release_state::SetArtists<S>> {
         self._fields.0 = Option::Some(value.into());
         ReleaseBuilder {
@@ -454,12 +464,12 @@ where
 
 impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
     /// Set the `artworkImage` field (optional)
-    pub fn artwork_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn artwork_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `artworkImage` field to an Option value (optional)
-    pub fn maybe_artwork_image(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_artwork_image(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -467,12 +477,12 @@ impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
 
 impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
     /// Set the `gtin` field (optional)
-    pub fn gtin(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn gtin(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `gtin` field to an Option value (optional)
-    pub fn maybe_gtin(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_gtin(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -486,7 +496,7 @@ where
     /// Set the `recordings` field (required)
     pub fn recordings(
         mut self,
-        value: impl Into<Vec<Recording<'a>>>,
+        value: impl Into<Vec<Recording<S>>>,
     ) -> ReleaseBuilder<'a, release_state::SetRecordings<S>> {
         self._fields.3 = Option::Some(value.into());
         ReleaseBuilder {
@@ -518,7 +528,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReleaseBuilder<'a, release_state::SetTitle<S>> {
         self._fields.5 = Option::Some(value.into());
         ReleaseBuilder {
@@ -532,9 +542,9 @@ where
 impl<'a, S> ReleaseBuilder<'a, S>
 where
     S: release_state::State,
-    S::Artists: release_state::IsSet,
     S::Title: release_state::IsSet,
     S::Recordings: release_state::IsSet,
+    S::Artists: release_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Release<'a> {
@@ -551,10 +561,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Release<'a> {
         Release {
             artists: self._fields.0.unwrap(),

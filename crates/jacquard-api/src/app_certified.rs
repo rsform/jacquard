@@ -15,10 +15,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -27,16 +30,22 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A Decentralized Identifier (DID) string.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Did<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Did<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The DID string value.
-    #[serde(borrow)]
-    pub did: jacquard_common::types::string::Did<'a>,
+    pub did: jacquard_common::types::string::Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Did<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Did<S> {
     fn nsid() -> &'static str {
         "app.certified.defs"
     }
@@ -97,7 +106,7 @@ pub mod did_state {
 /// Builder for constructing an instance of this type
 pub struct DidBuilder<'a, S: did_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<jacquard_common::types::string::Did<'a>>,),
+    _fields: (Option<jacquard_common::types::string::Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -127,7 +136,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
+        value: impl Into<jacquard_common::types::string::Did<S>>,
     ) -> DidBuilder<'a, did_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         DidBuilder {
@@ -151,13 +160,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Did<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Did<'a> {
         Did {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

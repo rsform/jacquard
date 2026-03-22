@@ -27,13 +27,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle, AtUri, Cid, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -43,87 +44,107 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::server::InviteCode;
 use crate::com_atproto::admin;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AccountView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AccountView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deactivated_at: Option<Datetime>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub email: Option<CowStr<'a>>,
+    pub email: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email_confirmed_at: Option<Datetime>,
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub handle: Handle<S>,
     pub indexed_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub invite_note: Option<CowStr<'a>>,
+    pub invite_note: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub invited_by: Option<InviteCode<'a>>,
+    pub invited_by: Option<InviteCode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub invites: Option<Vec<InviteCode<'a>>>,
+    pub invites: Option<Vec<InviteCode<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub invites_disabled: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub related_records: Option<Vec<Data<'a>>>,
+    pub related_records: Option<Vec<Data<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub threat_signatures: Option<Vec<admin::ThreatSignature<'a>>>,
+    pub threat_signatures: Option<Vec<admin::ThreatSignature<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RepoBlobRef<'a> {
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RepoBlobRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub cid: Cid<S>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub record_uri: Option<AtUri<'a>>,
+    pub record_uri: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RepoRef<'a> {
-    #[serde(borrow)]
-    pub did: Did<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RepoRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub did: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StatusAttr<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StatusAttr<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub applied: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#ref: Option<CowStr<'a>>,
+    pub r#ref: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreatSignature<'a> {
-    #[serde(borrow)]
-    pub property: CowStr<'a>,
-    #[serde(borrow)]
-    pub value: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ThreatSignature<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub property: S,
+    pub value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for AccountView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AccountView<S> {
     fn nsid() -> &'static str {
         "com.atproto.admin.defs"
     }
@@ -138,7 +159,7 @@ impl<'a> LexiconSchema for AccountView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RepoBlobRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RepoBlobRef<S> {
     fn nsid() -> &'static str {
         "com.atproto.admin.defs"
     }
@@ -153,7 +174,7 @@ impl<'a> LexiconSchema for RepoBlobRef<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RepoRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RepoRef<S> {
     fn nsid() -> &'static str {
         "com.atproto.admin.defs"
     }
@@ -168,7 +189,7 @@ impl<'a> LexiconSchema for RepoRef<'a> {
     }
 }
 
-impl<'a> LexiconSchema for StatusAttr<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for StatusAttr<S> {
     fn nsid() -> &'static str {
         "com.atproto.admin.defs"
     }
@@ -183,7 +204,7 @@ impl<'a> LexiconSchema for StatusAttr<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ThreatSignature<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ThreatSignature<S> {
     fn nsid() -> &'static str {
         "com.atproto.admin.defs"
     }
@@ -208,49 +229,49 @@ pub mod account_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type IndexedAt;
+        type Handle;
         type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type IndexedAt = Unset;
+        type Handle = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type IndexedAt = S::IndexedAt;
-        type Did = S::Did;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Handle = S::Handle;
         type IndexedAt = Set<members::indexed_at>;
+        type Handle = S::Handle;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type IndexedAt = S::IndexedAt;
+        type Handle = Set<members::handle>;
         type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
         type IndexedAt = S::IndexedAt;
+        type Handle = S::Handle;
         type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
     }
@@ -261,17 +282,17 @@ pub struct AccountViewBuilder<'a, S: account_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
+        Option<Did<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<Handle<'a>>,
+        Option<Handle<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<InviteCode<'a>>,
-        Option<Vec<InviteCode<'a>>>,
+        Option<S>,
+        Option<InviteCode<S>>,
+        Option<Vec<InviteCode<S>>>,
         Option<bool>,
-        Option<Vec<Data<'a>>>,
-        Option<Vec<admin::ThreatSignature<'a>>>,
+        Option<Vec<Data<S>>>,
+        Option<Vec<admin::ThreatSignature<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -328,7 +349,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> AccountViewBuilder<'a, account_view_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         AccountViewBuilder {
@@ -341,12 +362,12 @@ where
 
 impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `email` field (optional)
-    pub fn email(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn email(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
-    pub fn maybe_email(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_email(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -373,7 +394,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<Handle<'a>>,
+        value: impl Into<Handle<S>>,
     ) -> AccountViewBuilder<'a, account_view_state::SetHandle<S>> {
         self._fields.4 = Option::Some(value.into());
         AccountViewBuilder {
@@ -405,12 +426,12 @@ where
 
 impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `inviteNote` field (optional)
-    pub fn invite_note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn invite_note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `inviteNote` field to an Option value (optional)
-    pub fn maybe_invite_note(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_invite_note(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -418,12 +439,12 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
 
 impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `invitedBy` field (optional)
-    pub fn invited_by(mut self, value: impl Into<Option<InviteCode<'a>>>) -> Self {
+    pub fn invited_by(mut self, value: impl Into<Option<InviteCode<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `invitedBy` field to an Option value (optional)
-    pub fn maybe_invited_by(mut self, value: Option<InviteCode<'a>>) -> Self {
+    pub fn maybe_invited_by(mut self, value: Option<InviteCode<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -431,12 +452,12 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
 
 impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `invites` field (optional)
-    pub fn invites(mut self, value: impl Into<Option<Vec<InviteCode<'a>>>>) -> Self {
+    pub fn invites(mut self, value: impl Into<Option<Vec<InviteCode<S>>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `invites` field to an Option value (optional)
-    pub fn maybe_invites(mut self, value: Option<Vec<InviteCode<'a>>>) -> Self {
+    pub fn maybe_invites(mut self, value: Option<Vec<InviteCode<S>>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -457,12 +478,12 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
 
 impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `relatedRecords` field (optional)
-    pub fn related_records(mut self, value: impl Into<Option<Vec<Data<'a>>>>) -> Self {
+    pub fn related_records(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `relatedRecords` field to an Option value (optional)
-    pub fn maybe_related_records(mut self, value: Option<Vec<Data<'a>>>) -> Self {
+    pub fn maybe_related_records(mut self, value: Option<Vec<Data<S>>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -472,7 +493,7 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `threatSignatures` field (optional)
     pub fn threat_signatures(
         mut self,
-        value: impl Into<Option<Vec<admin::ThreatSignature<'a>>>>,
+        value: impl Into<Option<Vec<admin::ThreatSignature<S>>>>,
     ) -> Self {
         self._fields.11 = value.into();
         self
@@ -480,7 +501,7 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `threatSignatures` field to an Option value (optional)
     pub fn maybe_threat_signatures(
         mut self,
-        value: Option<Vec<admin::ThreatSignature<'a>>>,
+        value: Option<Vec<admin::ThreatSignature<S>>>,
     ) -> Self {
         self._fields.11 = value;
         self
@@ -490,8 +511,8 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
 impl<'a, S> AccountViewBuilder<'a, S>
 where
     S: account_view_state::State,
-    S::Handle: account_view_state::IsSet,
     S::IndexedAt: account_view_state::IsSet,
+    S::Handle: account_view_state::IsSet,
     S::Did: account_view_state::IsSet,
 {
     /// Build the final struct
@@ -515,7 +536,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> AccountView<'a> {
         AccountView {
             deactivated_at: self._fields.0,
@@ -767,44 +788,44 @@ pub mod repo_blob_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Cid;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Cid = S::Cid;
+        type Did = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Did = S::Did;
         type Cid = Set<members::cid>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Cid = S::Cid;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RepoBlobRefBuilder<'a, S: repo_blob_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Cid<'a>>, Option<Did<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<Cid<S>>, Option<Did<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -834,7 +855,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> RepoBlobRefBuilder<'a, repo_blob_ref_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         RepoBlobRefBuilder {
@@ -853,7 +874,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> RepoBlobRefBuilder<'a, repo_blob_ref_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         RepoBlobRefBuilder {
@@ -866,12 +887,12 @@ where
 
 impl<'a, S: repo_blob_ref_state::State> RepoBlobRefBuilder<'a, S> {
     /// Set the `recordUri` field (optional)
-    pub fn record_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn record_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `recordUri` field to an Option value (optional)
-    pub fn maybe_record_uri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_record_uri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -880,8 +901,8 @@ impl<'a, S: repo_blob_ref_state::State> RepoBlobRefBuilder<'a, S> {
 impl<'a, S> RepoBlobRefBuilder<'a, S>
 where
     S: repo_blob_ref_state::State,
-    S::Did: repo_blob_ref_state::IsSet,
     S::Cid: repo_blob_ref_state::IsSet,
+    S::Did: repo_blob_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RepoBlobRef<'a> {
@@ -895,7 +916,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RepoBlobRef<'a> {
         RepoBlobRef {
             cid: self._fields.0.unwrap(),
@@ -941,7 +962,7 @@ pub mod repo_ref_state {
 /// Builder for constructing an instance of this type
 pub struct RepoRefBuilder<'a, S: repo_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -971,7 +992,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> RepoRefBuilder<'a, repo_ref_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         RepoRefBuilder {
@@ -997,7 +1018,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RepoRef<'a> {
         RepoRef {
             did: self._fields.0.unwrap(),
@@ -1041,7 +1062,7 @@ pub mod status_attr_state {
 /// Builder for constructing an instance of this type
 pub struct StatusAttrBuilder<'a, S: status_attr_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<CowStr<'a>>),
+    _fields: (Option<bool>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1084,12 +1105,12 @@ where
 
 impl<'a, S: status_attr_state::State> StatusAttrBuilder<'a, S> {
     /// Set the `ref` field (optional)
-    pub fn r#ref(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn r#ref(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
-    pub fn maybe_ref(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_ref(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1111,7 +1132,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> StatusAttr<'a> {
         StatusAttr {
             applied: self._fields.0.unwrap(),

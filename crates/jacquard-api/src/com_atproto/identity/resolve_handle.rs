@@ -10,29 +10,44 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ResolveHandle<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResolveHandle<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub handle: Handle<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ResolveHandleOutput<'a> {
-    #[serde(borrow)]
-    pub did: Did<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResolveHandleOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub did: Did<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -41,19 +56,20 @@ pub struct ResolveHandleOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ResolveHandleError<'a> {
+pub enum ResolveHandleError {
     /// The resolution process confirmed that the handle does not resolve to any DID.
     #[serde(rename = "HandleNotFound")]
-    HandleNotFound(Option<CowStr<'a>>),
+    HandleNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for ResolveHandleError<'_> {
+impl core::fmt::Display for ResolveHandleError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::HandleNotFound(msg) => {
@@ -63,7 +79,13 @@ impl core::fmt::Display for ResolveHandleError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -73,11 +95,12 @@ pub struct ResolveHandleResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveHandleResponse {
     const NSID: &'static str = "com.atproto.identity.resolveHandle";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveHandleOutput<'de>;
-    type Err<'de> = ResolveHandleError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ResolveHandleOutput<S>;
+    type Err = ResolveHandleError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ResolveHandle<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ResolveHandle<S> {
     const NSID: &'static str = "com.atproto.identity.resolveHandle";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveHandleResponse;
@@ -88,7 +111,7 @@ pub struct ResolveHandleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveHandleRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.resolveHandle";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ResolveHandle<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ResolveHandle<S>;
     type Response = ResolveHandleResponse;
 }
 
@@ -127,7 +150,7 @@ pub mod resolve_handle_state {
 /// Builder for constructing an instance of this type
 pub struct ResolveHandleBuilder<'a, S: resolve_handle_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Handle<'a>>,),
+    _fields: (Option<Handle<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -157,7 +180,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<Handle<'a>>,
+        value: impl Into<Handle<S>>,
     ) -> ResolveHandleBuilder<'a, resolve_handle_state::SetHandle<S>> {
         self._fields.0 = Option::Some(value.into());
         ResolveHandleBuilder {

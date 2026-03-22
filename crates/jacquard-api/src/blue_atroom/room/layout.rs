@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,109 +31,146 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::blue_atroom::room::layout;
 /// RGB color with 8-bit channels.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Color<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Color<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub blue: i64,
     pub green: i64,
     pub red: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Floor<'a> {
-    #[serde(borrow)]
-    pub surface: layout::Surface<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Floor<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub surface: layout::Surface<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A placed object in the room.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Furnishing<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Furnishing<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Strong reference to a blue.atroom.room.object record.
-    #[serde(borrow)]
-    pub object: StrongRef<'a>,
+    pub object: StrongRef<S>,
     ///Position [x, y, z] in millimeters.
     pub position: Vec<i64>,
     ///Euler rotation [x, y, z] in degrees.
     pub rotation: Vec<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A room layout with placed objects.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blue.atroom.room.layout", tag = "$type")]
-pub struct Layout<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "blue.atroom.room.layout",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Layout<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub floor: layout::Floor<'a>,
-    #[serde(borrow)]
-    pub furnishings: Vec<layout::Furnishing<'a>>,
+    pub floor: layout::Floor<S>,
+    pub furnishings: Vec<layout::Furnishing<S>>,
     ///Room size in millimeters (square room).
     pub size: i64,
-    #[serde(borrow)]
-    pub wall: layout::Wall<'a>,
+    pub wall: layout::Wall<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LayoutGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LayoutGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Layout<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Layout<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Surface<'a> {
-    #[serde(borrow)]
-    pub color: layout::Color<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Surface<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub color: layout::Color<S>,
     ///Texture identifier.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub texture: Option<CowStr<'a>>,
+    pub texture: Option<S>,
     ///Texture tiling [u, v].
     #[serde(skip_serializing_if = "Option::is_none")]
     pub texture_tiling: Option<Vec<i64>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Wall configuration.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Wall<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Wall<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Wall height in millimeters.
     pub height: i64,
-    #[serde(borrow)]
-    pub surface: layout::Surface<'a>,
+    pub surface: layout::Surface<S>,
     ///Wall thickness in millimeters.
     pub thickness: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Layout<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LayoutRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Layout<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LayoutRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Color<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Color<S> {
     fn nsid() -> &'static str {
         "blue.atroom.room.layout"
     }
@@ -206,7 +245,7 @@ impl<'a> LexiconSchema for Color<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Floor<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Floor<S> {
     fn nsid() -> &'static str {
         "blue.atroom.room.layout"
     }
@@ -221,7 +260,7 @@ impl<'a> LexiconSchema for Floor<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Furnishing<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Furnishing<S> {
     fn nsid() -> &'static str {
         "blue.atroom.room.layout"
     }
@@ -287,18 +326,17 @@ pub struct LayoutRecord;
 impl XrpcResp for LayoutRecord {
     const NSID: &'static str = "blue.atroom.room.layout";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LayoutGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LayoutGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LayoutGetRecordOutput<'_>> for Layout<'_> {
-    fn from(output: LayoutGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LayoutGetRecordOutput<S>> for Layout<S> {
+    fn from(output: LayoutGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Layout<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Layout<S> {
     const NSID: &'static str = "blue.atroom.room.layout";
     type Record = LayoutRecord;
 }
@@ -308,7 +346,7 @@ impl Collection for LayoutRecord {
     type Record = LayoutRecord;
 }
 
-impl<'a> LexiconSchema for Layout<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Layout<S> {
     fn nsid() -> &'static str {
         "blue.atroom.room.layout"
     }
@@ -354,7 +392,7 @@ impl<'a> LexiconSchema for Layout<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Surface<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Surface<S> {
     fn nsid() -> &'static str {
         "blue.atroom.room.layout"
     }
@@ -389,7 +427,7 @@ impl<'a> LexiconSchema for Surface<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Wall<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Wall<S> {
     fn nsid() -> &'static str {
         "blue.atroom.room.layout"
     }
@@ -561,13 +599,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Color<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Color<'a> {
         Color {
             blue: self._fields.0.unwrap(),
             green: self._fields.1.unwrap(),
@@ -893,7 +925,7 @@ pub mod floor_state {
 /// Builder for constructing an instance of this type
 pub struct FloorBuilder<'a, S: floor_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<layout::Surface<'a>>,),
+    _fields: (Option<layout::Surface<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -923,7 +955,7 @@ where
     /// Set the `surface` field (required)
     pub fn surface(
         mut self,
-        value: impl Into<layout::Surface<'a>>,
+        value: impl Into<layout::Surface<S>>,
     ) -> FloorBuilder<'a, floor_state::SetSurface<S>> {
         self._fields.0 = Option::Some(value.into());
         FloorBuilder {
@@ -947,13 +979,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Floor<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Floor<'a> {
         Floor {
             surface: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -971,58 +997,58 @@ pub mod furnishing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Object;
         type Rotation;
         type Position;
-        type Object;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Object = Unset;
         type Rotation = Unset;
         type Position = Unset;
-        type Object = Unset;
-    }
-    ///State transition - sets the `rotation` field to Set
-    pub struct SetRotation<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRotation<S> {}
-    impl<S: State> State for SetRotation<S> {
-        type Rotation = Set<members::rotation>;
-        type Position = S::Position;
-        type Object = S::Object;
-    }
-    ///State transition - sets the `position` field to Set
-    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPosition<S> {}
-    impl<S: State> State for SetPosition<S> {
-        type Rotation = S::Rotation;
-        type Position = Set<members::position>;
-        type Object = S::Object;
     }
     ///State transition - sets the `object` field to Set
     pub struct SetObject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObject<S> {}
     impl<S: State> State for SetObject<S> {
+        type Object = Set<members::object>;
         type Rotation = S::Rotation;
         type Position = S::Position;
-        type Object = Set<members::object>;
+    }
+    ///State transition - sets the `rotation` field to Set
+    pub struct SetRotation<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRotation<S> {}
+    impl<S: State> State for SetRotation<S> {
+        type Object = S::Object;
+        type Rotation = Set<members::rotation>;
+        type Position = S::Position;
+    }
+    ///State transition - sets the `position` field to Set
+    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPosition<S> {}
+    impl<S: State> State for SetPosition<S> {
+        type Object = S::Object;
+        type Rotation = S::Rotation;
+        type Position = Set<members::position>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `object` field
+        pub struct object(());
         ///Marker type for the `rotation` field
         pub struct rotation(());
         ///Marker type for the `position` field
         pub struct position(());
-        ///Marker type for the `object` field
-        pub struct object(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FurnishingBuilder<'a, S: furnishing_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>, Option<Vec<i64>>, Option<Vec<i64>>),
+    _fields: (Option<StrongRef<S>>, Option<Vec<i64>>, Option<Vec<i64>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1052,7 +1078,7 @@ where
     /// Set the `object` field (required)
     pub fn object(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> FurnishingBuilder<'a, furnishing_state::SetObject<S>> {
         self._fields.0 = Option::Some(value.into());
         FurnishingBuilder {
@@ -1104,9 +1130,9 @@ where
 impl<'a, S> FurnishingBuilder<'a, S>
 where
     S: furnishing_state::State,
+    S::Object: furnishing_state::IsSet,
     S::Rotation: furnishing_state::IsSet,
     S::Position: furnishing_state::IsSet,
-    S::Object: furnishing_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Furnishing<'a> {
@@ -1120,10 +1146,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Furnishing<'a> {
         Furnishing {
             object: self._fields.0.unwrap(),
@@ -1144,85 +1167,85 @@ pub mod layout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Size;
         type Floor;
+        type Furnishings;
         type Wall;
         type CreatedAt;
-        type Furnishings;
-        type Size;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Size = Unset;
         type Floor = Unset;
+        type Furnishings = Unset;
         type Wall = Unset;
         type CreatedAt = Unset;
-        type Furnishings = Unset;
-        type Size = Unset;
-    }
-    ///State transition - sets the `floor` field to Set
-    pub struct SetFloor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFloor<S> {}
-    impl<S: State> State for SetFloor<S> {
-        type Floor = Set<members::floor>;
-        type Wall = S::Wall;
-        type CreatedAt = S::CreatedAt;
-        type Furnishings = S::Furnishings;
-        type Size = S::Size;
-    }
-    ///State transition - sets the `wall` field to Set
-    pub struct SetWall<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWall<S> {}
-    impl<S: State> State for SetWall<S> {
-        type Floor = S::Floor;
-        type Wall = Set<members::wall>;
-        type CreatedAt = S::CreatedAt;
-        type Furnishings = S::Furnishings;
-        type Size = S::Size;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Floor = S::Floor;
-        type Wall = S::Wall;
-        type CreatedAt = Set<members::created_at>;
-        type Furnishings = S::Furnishings;
-        type Size = S::Size;
-    }
-    ///State transition - sets the `furnishings` field to Set
-    pub struct SetFurnishings<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFurnishings<S> {}
-    impl<S: State> State for SetFurnishings<S> {
-        type Floor = S::Floor;
-        type Wall = S::Wall;
-        type CreatedAt = S::CreatedAt;
-        type Furnishings = Set<members::furnishings>;
-        type Size = S::Size;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSize<S> {}
     impl<S: State> State for SetSize<S> {
+        type Size = Set<members::size>;
         type Floor = S::Floor;
+        type Furnishings = S::Furnishings;
         type Wall = S::Wall;
         type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `floor` field to Set
+    pub struct SetFloor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFloor<S> {}
+    impl<S: State> State for SetFloor<S> {
+        type Size = S::Size;
+        type Floor = Set<members::floor>;
         type Furnishings = S::Furnishings;
-        type Size = Set<members::size>;
+        type Wall = S::Wall;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `furnishings` field to Set
+    pub struct SetFurnishings<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFurnishings<S> {}
+    impl<S: State> State for SetFurnishings<S> {
+        type Size = S::Size;
+        type Floor = S::Floor;
+        type Furnishings = Set<members::furnishings>;
+        type Wall = S::Wall;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `wall` field to Set
+    pub struct SetWall<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWall<S> {}
+    impl<S: State> State for SetWall<S> {
+        type Size = S::Size;
+        type Floor = S::Floor;
+        type Furnishings = S::Furnishings;
+        type Wall = Set<members::wall>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Size = S::Size;
+        type Floor = S::Floor;
+        type Furnishings = S::Furnishings;
+        type Wall = S::Wall;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `size` field
+        pub struct size(());
         ///Marker type for the `floor` field
         pub struct floor(());
+        ///Marker type for the `furnishings` field
+        pub struct furnishings(());
         ///Marker type for the `wall` field
         pub struct wall(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `furnishings` field
-        pub struct furnishings(());
-        ///Marker type for the `size` field
-        pub struct size(());
     }
 }
 
@@ -1231,10 +1254,10 @@ pub struct LayoutBuilder<'a, S: layout_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<layout::Floor<'a>>,
-        Option<Vec<layout::Furnishing<'a>>>,
+        Option<layout::Floor<S>>,
+        Option<Vec<layout::Furnishing<S>>>,
         Option<i64>,
-        Option<layout::Wall<'a>>,
+        Option<layout::Wall<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1284,7 +1307,7 @@ where
     /// Set the `floor` field (required)
     pub fn floor(
         mut self,
-        value: impl Into<layout::Floor<'a>>,
+        value: impl Into<layout::Floor<S>>,
     ) -> LayoutBuilder<'a, layout_state::SetFloor<S>> {
         self._fields.1 = Option::Some(value.into());
         LayoutBuilder {
@@ -1303,7 +1326,7 @@ where
     /// Set the `furnishings` field (required)
     pub fn furnishings(
         mut self,
-        value: impl Into<Vec<layout::Furnishing<'a>>>,
+        value: impl Into<Vec<layout::Furnishing<S>>>,
     ) -> LayoutBuilder<'a, layout_state::SetFurnishings<S>> {
         self._fields.2 = Option::Some(value.into());
         LayoutBuilder {
@@ -1341,7 +1364,7 @@ where
     /// Set the `wall` field (required)
     pub fn wall(
         mut self,
-        value: impl Into<layout::Wall<'a>>,
+        value: impl Into<layout::Wall<S>>,
     ) -> LayoutBuilder<'a, layout_state::SetWall<S>> {
         self._fields.4 = Option::Some(value.into());
         LayoutBuilder {
@@ -1355,11 +1378,11 @@ where
 impl<'a, S> LayoutBuilder<'a, S>
 where
     S: layout_state::State,
+    S::Size: layout_state::IsSet,
     S::Floor: layout_state::IsSet,
+    S::Furnishings: layout_state::IsSet,
     S::Wall: layout_state::IsSet,
     S::CreatedAt: layout_state::IsSet,
-    S::Furnishings: layout_state::IsSet,
-    S::Size: layout_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Layout<'a> {
@@ -1373,13 +1396,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Layout<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Layout<'a> {
         Layout {
             created_at: self._fields.0.unwrap(),
             floor: self._fields.1.unwrap(),
@@ -1426,7 +1443,7 @@ pub mod surface_state {
 /// Builder for constructing an instance of this type
 pub struct SurfaceBuilder<'a, S: surface_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<layout::Color<'a>>, Option<CowStr<'a>>, Option<Vec<i64>>),
+    _fields: (Option<layout::Color<S>>, Option<S>, Option<Vec<i64>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1456,7 +1473,7 @@ where
     /// Set the `color` field (required)
     pub fn color(
         mut self,
-        value: impl Into<layout::Color<'a>>,
+        value: impl Into<layout::Color<S>>,
     ) -> SurfaceBuilder<'a, surface_state::SetColor<S>> {
         self._fields.0 = Option::Some(value.into());
         SurfaceBuilder {
@@ -1469,12 +1486,12 @@ where
 
 impl<'a, S: surface_state::State> SurfaceBuilder<'a, S> {
     /// Set the `texture` field (optional)
-    pub fn texture(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn texture(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `texture` field to an Option value (optional)
-    pub fn maybe_texture(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_texture(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1510,10 +1527,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Surface<'a> {
         Surface {
             color: self._fields.0.unwrap(),
@@ -1534,49 +1548,49 @@ pub mod wall_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Thickness;
         type Height;
+        type Thickness;
         type Surface;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Thickness = Unset;
         type Height = Unset;
+        type Thickness = Unset;
         type Surface = Unset;
-    }
-    ///State transition - sets the `thickness` field to Set
-    pub struct SetThickness<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThickness<S> {}
-    impl<S: State> State for SetThickness<S> {
-        type Thickness = Set<members::thickness>;
-        type Height = S::Height;
-        type Surface = S::Surface;
     }
     ///State transition - sets the `height` field to Set
     pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHeight<S> {}
     impl<S: State> State for SetHeight<S> {
-        type Thickness = S::Thickness;
         type Height = Set<members::height>;
+        type Thickness = S::Thickness;
+        type Surface = S::Surface;
+    }
+    ///State transition - sets the `thickness` field to Set
+    pub struct SetThickness<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThickness<S> {}
+    impl<S: State> State for SetThickness<S> {
+        type Height = S::Height;
+        type Thickness = Set<members::thickness>;
         type Surface = S::Surface;
     }
     ///State transition - sets the `surface` field to Set
     pub struct SetSurface<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSurface<S> {}
     impl<S: State> State for SetSurface<S> {
-        type Thickness = S::Thickness;
         type Height = S::Height;
+        type Thickness = S::Thickness;
         type Surface = Set<members::surface>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `thickness` field
-        pub struct thickness(());
         ///Marker type for the `height` field
         pub struct height(());
+        ///Marker type for the `thickness` field
+        pub struct thickness(());
         ///Marker type for the `surface` field
         pub struct surface(());
     }
@@ -1585,7 +1599,7 @@ pub mod wall_state {
 /// Builder for constructing an instance of this type
 pub struct WallBuilder<'a, S: wall_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<layout::Surface<'a>>, Option<i64>),
+    _fields: (Option<i64>, Option<layout::Surface<S>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1634,7 +1648,7 @@ where
     /// Set the `surface` field (required)
     pub fn surface(
         mut self,
-        value: impl Into<layout::Surface<'a>>,
+        value: impl Into<layout::Surface<S>>,
     ) -> WallBuilder<'a, wall_state::SetSurface<S>> {
         self._fields.1 = Option::Some(value.into());
         WallBuilder {
@@ -1667,8 +1681,8 @@ where
 impl<'a, S> WallBuilder<'a, S>
 where
     S: wall_state::State,
-    S::Thickness: wall_state::IsSet,
     S::Height: wall_state::IsSet,
+    S::Thickness: wall_state::IsSet,
     S::Surface: wall_state::IsSet,
 {
     /// Build the final struct
@@ -1681,13 +1695,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Wall<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Wall<'a> {
         Wall {
             height: self._fields.0.unwrap(),
             surface: self._fields.1.unwrap(),

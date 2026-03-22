@@ -10,40 +10,54 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::FeedViewPost;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetListFeed<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetListFeed<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(borrow)]
-    pub list: AtUri<'a>,
+    pub list: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetListFeedOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetListFeedOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub feed: Vec<FeedViewPost<'a>>,
+    pub cursor: Option<S>,
+    pub feed: Vec<FeedViewPost<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -52,18 +66,19 @@ pub struct GetListFeedOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetListFeedError<'a> {
+pub enum GetListFeedError {
     #[serde(rename = "UnknownList")]
-    UnknownList(Option<CowStr<'a>>),
+    UnknownList(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetListFeedError<'_> {
+impl core::fmt::Display for GetListFeedError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::UnknownList(msg) => {
@@ -73,7 +88,13 @@ impl core::fmt::Display for GetListFeedError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -83,11 +104,12 @@ pub struct GetListFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetListFeedResponse {
     const NSID: &'static str = "app.bsky.feed.getListFeed";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetListFeedOutput<'de>;
-    type Err<'de> = GetListFeedError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetListFeedOutput<S>;
+    type Err = GetListFeedError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetListFeed<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetListFeed<S> {
     const NSID: &'static str = "app.bsky.feed.getListFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetListFeedResponse;
@@ -98,7 +120,7 @@ pub struct GetListFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetListFeedRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.getListFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetListFeed<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetListFeed<S>;
     type Response = GetListFeedResponse;
 }
 
@@ -141,7 +163,7 @@ pub mod get_list_feed_state {
 /// Builder for constructing an instance of this type
 pub struct GetListFeedBuilder<'a, S: get_list_feed_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -165,12 +187,12 @@ impl<'a> GetListFeedBuilder<'a, get_list_feed_state::Empty> {
 
 impl<'a, S: get_list_feed_state::State> GetListFeedBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -197,7 +219,7 @@ where
     /// Set the `list` field (required)
     pub fn list(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetListFeedBuilder<'a, get_list_feed_state::SetList<S>> {
         self._fields.2 = Option::Some(value.into());
         GetListFeedBuilder {

@@ -10,29 +10,44 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::org_passingreads::book::StatefulBook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetLocationBooks<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetLocationBooks<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub h3: CowStr<'a>,
+    pub h3: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetLocationBooksOutput<'a> {
-    #[serde(borrow)]
-    pub books: Vec<StatefulBook<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetLocationBooksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub books: Vec<StatefulBook<S>>,
     ///Human-readable name of the requested location
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location_name: Option<CowStr<'a>>,
+    pub location_name: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for org.passingreads.book.getLocationBooks
@@ -40,11 +55,12 @@ pub struct GetLocationBooksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLocationBooksResponse {
     const NSID: &'static str = "org.passingreads.book.getLocationBooks";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetLocationBooksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetLocationBooksOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetLocationBooks<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetLocationBooks<S> {
     const NSID: &'static str = "org.passingreads.book.getLocationBooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLocationBooksResponse;
@@ -55,7 +71,7 @@ pub struct GetLocationBooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLocationBooksRequest {
     const PATH: &'static str = "/xrpc/org.passingreads.book.getLocationBooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetLocationBooks<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetLocationBooks<S>;
     type Response = GetLocationBooksResponse;
 }
 
@@ -94,7 +110,7 @@ pub mod get_location_books_state {
 /// Builder for constructing an instance of this type
 pub struct GetLocationBooksBuilder<'a, S: get_location_books_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -124,7 +140,7 @@ where
     /// Set the `h3` field (required)
     pub fn h3(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetLocationBooksBuilder<'a, get_location_books_state::SetH3<S>> {
         self._fields.0 = Option::Some(value.into());
         GetLocationBooksBuilder {

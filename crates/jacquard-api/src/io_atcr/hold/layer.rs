@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,47 +29,53 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Represents metadata about a container layer stored in the hold. Stored in the hold's embedded PDS for tracking and analytics.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "io.atcr.hold.layer", tag = "$type")]
-pub struct Layer<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "io.atcr.hold.layer",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Layer<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///RFC3339 timestamp of when the layer was uploaded
     pub created_at: Datetime,
     ///Layer digest (e.g., sha256:abc123...)
-    #[serde(borrow)]
-    pub digest: CowStr<'a>,
+    pub digest: S,
     ///AT-URI of the manifest that included this layer (e.g., at://did:plc:xyz/io.atcr.manifest/abc123)
-    #[serde(borrow)]
-    pub manifest: AtUri<'a>,
+    pub manifest: AtUri<S>,
     ///Media type (e.g., application/vnd.oci.image.layer.v1.tar+gzip)
-    #[serde(borrow)]
-    pub media_type: CowStr<'a>,
+    pub media_type: S,
     ///Size in bytes
     pub size: i64,
     ///DID of user who uploaded this layer
-    #[serde(borrow)]
-    pub user_did: Did<'a>,
+    pub user_did: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LayerGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LayerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Layer<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Layer<S>,
 }
 
-impl<'a> Layer<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LayerRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Layer<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LayerRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -78,18 +86,17 @@ pub struct LayerRecord;
 impl XrpcResp for LayerRecord {
     const NSID: &'static str = "io.atcr.hold.layer";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LayerGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LayerGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LayerGetRecordOutput<'_>> for Layer<'_> {
-    fn from(output: LayerGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LayerGetRecordOutput<S>> for Layer<S> {
+    fn from(output: LayerGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Layer<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Layer<S> {
     const NSID: &'static str = "io.atcr.hold.layer";
     type Record = LayerRecord;
 }
@@ -99,7 +106,7 @@ impl Collection for LayerRecord {
     type Record = LayerRecord;
 }
 
-impl<'a> LexiconSchema for Layer<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Layer<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.layer"
     }
@@ -146,105 +153,105 @@ pub mod layer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Digest;
         type MediaType;
-        type UserDid;
         type CreatedAt;
-        type Size;
         type Manifest;
+        type Digest;
+        type Size;
+        type UserDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Digest = Unset;
         type MediaType = Unset;
-        type UserDid = Unset;
         type CreatedAt = Unset;
-        type Size = Unset;
         type Manifest = Unset;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Digest = Set<members::digest>;
-        type MediaType = S::MediaType;
-        type UserDid = S::UserDid;
-        type CreatedAt = S::CreatedAt;
-        type Size = S::Size;
-        type Manifest = S::Manifest;
+        type Digest = Unset;
+        type Size = Unset;
+        type UserDid = Unset;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
-        type Digest = S::Digest;
         type MediaType = Set<members::media_type>;
-        type UserDid = S::UserDid;
         type CreatedAt = S::CreatedAt;
-        type Size = S::Size;
         type Manifest = S::Manifest;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
         type Digest = S::Digest;
-        type MediaType = S::MediaType;
-        type UserDid = Set<members::user_did>;
-        type CreatedAt = S::CreatedAt;
         type Size = S::Size;
-        type Manifest = S::Manifest;
+        type UserDid = S::UserDid;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Digest = S::Digest;
         type MediaType = S::MediaType;
-        type UserDid = S::UserDid;
         type CreatedAt = Set<members::created_at>;
-        type Size = S::Size;
         type Manifest = S::Manifest;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
         type Digest = S::Digest;
-        type MediaType = S::MediaType;
+        type Size = S::Size;
         type UserDid = S::UserDid;
-        type CreatedAt = S::CreatedAt;
-        type Size = Set<members::size>;
-        type Manifest = S::Manifest;
     }
     ///State transition - sets the `manifest` field to Set
     pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetManifest<S> {}
     impl<S: State> State for SetManifest<S> {
-        type Digest = S::Digest;
         type MediaType = S::MediaType;
-        type UserDid = S::UserDid;
         type CreatedAt = S::CreatedAt;
-        type Size = S::Size;
         type Manifest = Set<members::manifest>;
+        type Digest = S::Digest;
+        type Size = S::Size;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type MediaType = S::MediaType;
+        type CreatedAt = S::CreatedAt;
+        type Manifest = S::Manifest;
+        type Digest = Set<members::digest>;
+        type Size = S::Size;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type MediaType = S::MediaType;
+        type CreatedAt = S::CreatedAt;
+        type Manifest = S::Manifest;
+        type Digest = S::Digest;
+        type Size = Set<members::size>;
+        type UserDid = S::UserDid;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
+        type MediaType = S::MediaType;
+        type CreatedAt = S::CreatedAt;
+        type Manifest = S::Manifest;
+        type Digest = S::Digest;
+        type Size = S::Size;
+        type UserDid = Set<members::user_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `digest` field
-        pub struct digest(());
         ///Marker type for the `media_type` field
         pub struct media_type(());
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `manifest` field
         pub struct manifest(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
+        ///Marker type for the `size` field
+        pub struct size(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
     }
 }
 
@@ -253,11 +260,11 @@ pub struct LayerBuilder<'a, S: layer_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<S>,
         Option<i64>,
-        Option<Did<'a>>,
+        Option<Did<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -307,7 +314,7 @@ where
     /// Set the `digest` field (required)
     pub fn digest(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LayerBuilder<'a, layer_state::SetDigest<S>> {
         self._fields.1 = Option::Some(value.into());
         LayerBuilder {
@@ -326,7 +333,7 @@ where
     /// Set the `manifest` field (required)
     pub fn manifest(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> LayerBuilder<'a, layer_state::SetManifest<S>> {
         self._fields.2 = Option::Some(value.into());
         LayerBuilder {
@@ -345,7 +352,7 @@ where
     /// Set the `mediaType` field (required)
     pub fn media_type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LayerBuilder<'a, layer_state::SetMediaType<S>> {
         self._fields.3 = Option::Some(value.into());
         LayerBuilder {
@@ -383,7 +390,7 @@ where
     /// Set the `userDid` field (required)
     pub fn user_did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> LayerBuilder<'a, layer_state::SetUserDid<S>> {
         self._fields.5 = Option::Some(value.into());
         LayerBuilder {
@@ -397,12 +404,12 @@ where
 impl<'a, S> LayerBuilder<'a, S>
 where
     S: layer_state::State,
-    S::Digest: layer_state::IsSet,
     S::MediaType: layer_state::IsSet,
-    S::UserDid: layer_state::IsSet,
     S::CreatedAt: layer_state::IsSet,
-    S::Size: layer_state::IsSet,
     S::Manifest: layer_state::IsSet,
+    S::Digest: layer_state::IsSet,
+    S::Size: layer_state::IsSet,
+    S::UserDid: layer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Layer<'a> {
@@ -417,13 +424,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Layer<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Layer<'a> {
         Layer {
             created_at: self._fields.0.unwrap(),
             digest: self._fields.1.unwrap(),

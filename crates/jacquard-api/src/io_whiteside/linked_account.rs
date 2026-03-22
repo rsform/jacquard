@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,43 +29,50 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A linked account record containing external account information
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "io.whiteside.linkedAccount", tag = "$type")]
-pub struct LinkedAccount<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "io.whiteside.linkedAccount",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LinkedAccount<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Icon identifier or URL for the linked account
-    #[serde(borrow)]
-    pub icon: CowStr<'a>,
+    pub icon: S,
     ///URL to the linked account
-    #[serde(borrow)]
-    pub link: UriValue<'a>,
+    pub link: UriValue<S>,
     ///Display name of the linked account
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Sort order for displaying linked accounts (lower numbers appear first). Defaults to 999 if not specified.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub order: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LinkedAccountGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LinkedAccountGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: LinkedAccount<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: LinkedAccount<S>,
 }
 
-impl<'a> LinkedAccount<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LinkedAccountRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> LinkedAccount<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LinkedAccountRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -74,18 +83,18 @@ pub struct LinkedAccountRecord;
 impl XrpcResp for LinkedAccountRecord {
     const NSID: &'static str = "io.whiteside.linkedAccount";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LinkedAccountGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LinkedAccountGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LinkedAccountGetRecordOutput<'_>> for LinkedAccount<'_> {
-    fn from(output: LinkedAccountGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LinkedAccountGetRecordOutput<S>>
+for LinkedAccount<S> {
+    fn from(output: LinkedAccountGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for LinkedAccount<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for LinkedAccount<S> {
     const NSID: &'static str = "io.whiteside.linkedAccount";
     type Record = LinkedAccountRecord;
 }
@@ -95,7 +104,7 @@ impl Collection for LinkedAccountRecord {
     type Record = LinkedAccountRecord;
 }
 
-impl<'a> LexiconSchema for LinkedAccount<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LinkedAccount<S> {
     fn nsid() -> &'static str {
         "io.whiteside.linkedAccount"
     }
@@ -171,7 +180,7 @@ pub mod linked_account_state {
 /// Builder for constructing an instance of this type
 pub struct LinkedAccountBuilder<'a, S: linked_account_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<UriValue<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<UriValue<S>>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -201,7 +210,7 @@ where
     /// Set the `icon` field (required)
     pub fn icon(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LinkedAccountBuilder<'a, linked_account_state::SetIcon<S>> {
         self._fields.0 = Option::Some(value.into());
         LinkedAccountBuilder {
@@ -220,7 +229,7 @@ where
     /// Set the `link` field (required)
     pub fn link(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> LinkedAccountBuilder<'a, linked_account_state::SetLink<S>> {
         self._fields.1 = Option::Some(value.into());
         LinkedAccountBuilder {
@@ -239,7 +248,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LinkedAccountBuilder<'a, linked_account_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         LinkedAccountBuilder {
@@ -283,10 +292,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LinkedAccount<'a> {
         LinkedAccount {
             icon: self._fields.0.unwrap(),

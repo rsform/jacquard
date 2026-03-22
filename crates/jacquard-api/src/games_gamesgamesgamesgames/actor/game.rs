@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -30,51 +31,57 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::games_gamesgamesgamesgames::actor::game;
 /// Reference to a game, either by AT URI or external platform ID.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct GameRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GameRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///External platform's ID for the game.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub external_id: Option<CowStr<'a>>,
+    pub external_id: Option<S>,
     ///External platform for ID lookup.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub platform: Option<CowStr<'a>>,
+    pub platform: Option<S>,
     ///AT URI of the game record.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A record indicating the actor owns a game on a specific platform. May include attestation signatures proving ownership was verified by an external service.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "games.gamesgamesgamesgames.actor.game",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Game<'a> {
+pub struct Game<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///Reference to the game record.
-    #[serde(borrow)]
-    pub game: game::GameRef<'a>,
+    pub game: game::GameRef<S>,
     ///The platform where ownership was verified.
-    #[serde(borrow)]
-    pub platform: GamePlatform<'a>,
+    pub platform: GamePlatform<S>,
     ///Attestation signatures proving ownership was verified. Can be inline signatures or strongRefs to remote proof records.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub signatures: Option<Vec<GameSignaturesItem<'a>>>,
+    pub signatures: Option<Vec<GameSignaturesItem<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The platform where ownership was verified.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum GamePlatform<'a> {
+pub enum GamePlatform<S: Bos<str> + AsRef<str> = DefaultStr> {
     Steam,
     Gog,
     Epic,
@@ -83,10 +90,10 @@ pub enum GamePlatform<'a> {
     Nintendo,
     Itchio,
     Humble,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> GamePlatform<'a> {
+impl<S: Bos<str> + AsRef<str>> GamePlatform<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Steam => "steam",
@@ -100,11 +107,9 @@ impl<'a> GamePlatform<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for GamePlatform<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "steam" => Self::Steam,
             "gog" => Self::Gog,
             "epic" => Self::Epic,
@@ -113,69 +118,51 @@ impl<'a> From<&'a str> for GamePlatform<'a> {
             "nintendo" => Self::Nintendo,
             "itchio" => Self::Itchio,
             "humble" => Self::Humble,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for GamePlatform<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "steam" => Self::Steam,
-            "gog" => Self::Gog,
-            "epic" => Self::Epic,
-            "playstation" => Self::Playstation,
-            "xbox" => Self::Xbox,
-            "nintendo" => Self::Nintendo,
-            "itchio" => Self::Itchio,
-            "humble" => Self::Humble,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for GamePlatform<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for GamePlatform<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for GamePlatform<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for GamePlatform<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for GamePlatform<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for GamePlatform<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for GamePlatform<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for GamePlatform<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for GamePlatform<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for GamePlatform<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for GamePlatform<'_> {
-    type Output = GamePlatform<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for GamePlatform<S> {
+    type Output = GamePlatform<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             GamePlatform::Steam => GamePlatform::Steam,
@@ -194,35 +181,42 @@ impl jacquard_common::IntoStatic for GamePlatform<'_> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum GameSignaturesItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum GameSignaturesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.atproto.repo.strongRef")]
-    StrongRef(Box<StrongRef<'a>>),
+    StrongRef(Box<StrongRef<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GameGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GameGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Game<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Game<S>,
 }
 
-impl<'a> Game<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, GameRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Game<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, GameRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for GameRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameRef<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.actor.game"
     }
@@ -244,18 +238,17 @@ pub struct GameRecord;
 impl XrpcResp for GameRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.actor.game";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GameGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GameGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<GameGetRecordOutput<'_>> for Game<'_> {
-    fn from(output: GameGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<GameGetRecordOutput<S>> for Game<S> {
+    fn from(output: GameGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Game<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Game<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.actor.game";
     type Record = GameRecord;
 }
@@ -265,7 +258,7 @@ impl Collection for GameRecord {
     type Record = GameRecord;
 }
 
-impl<'a> LexiconSchema for Game<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Game<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.actor.game"
     }
@@ -420,51 +413,51 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Game;
         type Platform;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Game = Unset;
         type Platform = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Game = S::Game;
-        type Platform = S::Platform;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
-        type CreatedAt = S::CreatedAt;
         type Game = Set<members::game>;
         type Platform = S::Platform;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlatform<S> {}
     impl<S: State> State for SetPlatform<S> {
-        type CreatedAt = S::CreatedAt;
         type Game = S::Game;
         type Platform = Set<members::platform>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Game = S::Game;
+        type Platform = S::Platform;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `game` field
         pub struct game(());
         ///Marker type for the `platform` field
         pub struct platform(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -473,9 +466,9 @@ pub struct GameBuilder<'a, S: game_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<game::GameRef<'a>>,
-        Option<GamePlatform<'a>>,
-        Option<Vec<GameSignaturesItem<'a>>>,
+        Option<game::GameRef<S>>,
+        Option<GamePlatform<S>>,
+        Option<Vec<GameSignaturesItem<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -525,7 +518,7 @@ where
     /// Set the `game` field (required)
     pub fn game(
         mut self,
-        value: impl Into<game::GameRef<'a>>,
+        value: impl Into<game::GameRef<S>>,
     ) -> GameBuilder<'a, game_state::SetGame<S>> {
         self._fields.1 = Option::Some(value.into());
         GameBuilder {
@@ -544,7 +537,7 @@ where
     /// Set the `platform` field (required)
     pub fn platform(
         mut self,
-        value: impl Into<GamePlatform<'a>>,
+        value: impl Into<GamePlatform<S>>,
     ) -> GameBuilder<'a, game_state::SetPlatform<S>> {
         self._fields.2 = Option::Some(value.into());
         GameBuilder {
@@ -559,7 +552,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `signatures` field (optional)
     pub fn signatures(
         mut self,
-        value: impl Into<Option<Vec<GameSignaturesItem<'a>>>>,
+        value: impl Into<Option<Vec<GameSignaturesItem<S>>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -567,7 +560,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     /// Set the `signatures` field to an Option value (optional)
     pub fn maybe_signatures(
         mut self,
-        value: Option<Vec<GameSignaturesItem<'a>>>,
+        value: Option<Vec<GameSignaturesItem<S>>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -577,9 +570,9 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::CreatedAt: game_state::IsSet,
     S::Game: game_state::IsSet,
     S::Platform: game_state::IsSet,
+    S::CreatedAt: game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Game<'a> {
@@ -592,10 +585,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Game<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Game<'a> {
         Game {
             created_at: self._fields.0.unwrap(),
             game: self._fields.1.unwrap(),

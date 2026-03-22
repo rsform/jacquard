@@ -19,12 +19,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -36,34 +38,43 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::tech_tokimeki::kaku;
 /// Width and height representing the aspect ratio of an image
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AspectRatio<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Height component of aspect ratio
     pub height: i64,
     ///Width component of aspect ratio
     pub width: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A view of a collection with author profile and item count
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollectionView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Collection owner profile
-    #[serde(borrow)]
-    pub author: ProfileViewBasic<'a>,
+    pub author: ProfileViewBasic<S>,
     ///CID of the collection record
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///Timestamp when the collection was created
     pub created_at: Datetime,
     ///Collection description
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Timestamp when the collection was indexed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub indexed_at: Option<Datetime>,
@@ -75,67 +86,69 @@ pub struct CollectionView<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub item_count: Option<i64>,
     ///Collection name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///AT-URI of the collection record
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A view of a drawing post with author profile and metadata
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PostView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PostView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Aspect ratio of the image
-    #[serde(borrow)]
-    pub aspect_ratio: kaku::AspectRatio<'a>,
+    pub aspect_ratio: kaku::AspectRatio<S>,
     ///Author profile
-    #[serde(borrow)]
-    pub author: ProfileViewBasic<'a>,
+    pub author: ProfileViewBasic<S>,
     ///CID of the post record
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///Timestamp when the post was created
     pub created_at: Datetime,
     ///URL of the drawing image
-    #[serde(borrow)]
-    pub image: UriValue<'a>,
+    pub image: UriValue<S>,
     ///Timestamp when the post was indexed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub indexed_at: Option<Datetime>,
     ///Reference to linked Bluesky post
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub linked_post: Option<StrongRef<'a>>,
+    pub linked_post: Option<StrongRef<S>>,
     ///Counts of each reaction type
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reaction_counts: Option<kaku::ReactionCounts<'a>>,
+    pub reaction_counts: Option<kaku::ReactionCounts<S>>,
     ///Tags for categorization
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///Optional description or title
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<CowStr<'a>>,
+    pub text: Option<S>,
     ///AT-URI of the post record
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
     ///Current user's reaction to this post
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub viewer_reaction: Option<kaku::ReactionType<'a>>,
+    pub viewer_reaction: Option<kaku::ReactionType<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Counts of each reaction type on a post
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReactionCounts<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReactionCounts<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Count of kami (godly) reactions  Defaults to `0`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_reaction_counts_kami")]
@@ -156,21 +169,23 @@ pub struct ReactionCounts<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_reaction_counts_tasukaru")]
     pub tasukaru: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Type of reaction to a post
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReactionType<'a> {
+pub enum ReactionType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Suki,
     Tasukaru,
     Sugoi,
     Kawaii,
     Kami,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ReactionType<'a> {
+impl<S: Bos<str> + AsRef<str>> ReactionType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Suki => "suki",
@@ -181,70 +196,53 @@ impl<'a> ReactionType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ReactionType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "suki" => Self::Suki,
             "tasukaru" => Self::Tasukaru,
             "sugoi" => Self::Sugoi,
             "kawaii" => Self::Kawaii,
             "kami" => Self::Kami,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ReactionType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "suki" => Self::Suki,
-            "tasukaru" => Self::Tasukaru,
-            "sugoi" => Self::Sugoi,
-            "kawaii" => Self::Kawaii,
-            "kami" => Self::Kami,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for ReactionType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ReactionType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for ReactionType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ReactionType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for ReactionType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ReactionType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ReactionType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ReactionType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for ReactionType<'_> {
-    type Output = ReactionType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ReactionType<S> {
+    type Output = ReactionType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ReactionType::Suki => ReactionType::Suki,
@@ -259,64 +257,72 @@ impl jacquard_common::IntoStatic for ReactionType<'_> {
 
 /// A view of a Bluesky reply to a linked post
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReplyView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReplyView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reply author profile
-    #[serde(borrow)]
-    pub author: ProfileViewBasic<'a>,
+    pub author: ProfileViewBasic<S>,
     ///CID of the Bluesky reply
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///Timestamp when the reply was created
     pub created_at: Datetime,
     ///Reply text content
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
     ///AT-URI of the Bluesky reply
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A view of a response to a drawing request
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RequestResponseView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RequestResponseView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Response author profile
-    #[serde(borrow)]
-    pub author: ProfileViewBasic<'a>,
+    pub author: ProfileViewBasic<S>,
     ///CID of the response record
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///Timestamp when the response was created
     pub created_at: Datetime,
     ///Optional message to the requester
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     ///The drawing post submitted as response
-    #[serde(borrow)]
-    pub post: kaku::PostView<'a>,
+    pub post: kaku::PostView<S>,
     ///AT-URI of the response record
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A view of a drawing request with author profile and response count
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RequestView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RequestView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Request author profile
-    #[serde(borrow)]
-    pub author: ProfileViewBasic<'a>,
+    pub author: ProfileViewBasic<S>,
     ///CID of the request record
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///Timestamp when the request was created
     pub created_at: Datetime,
     ///Timestamp when the request was indexed
@@ -326,28 +332,25 @@ pub struct RequestView<'a> {
     pub is_open: bool,
     ///URLs of reference images for the request
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reference_images: Option<Vec<UriValue<'a>>>,
+    pub reference_images: Option<Vec<UriValue<S>>>,
     ///Number of responses to this request
     #[serde(skip_serializing_if = "Option::is_none")]
     pub response_count: Option<i64>,
     ///Tags for categorization
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///Specific artist the request is directed to
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub target_actor: Option<ProfileViewBasic<'a>>,
+    pub target_actor: Option<ProfileViewBasic<S>>,
     ///Description of what to draw
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
     ///AT-URI of the request record
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for AspectRatio<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AspectRatio<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.defs"
     }
@@ -382,7 +385,7 @@ impl<'a> LexiconSchema for AspectRatio<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CollectionView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionView<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.defs"
     }
@@ -443,7 +446,7 @@ impl<'a> LexiconSchema for CollectionView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PostView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PostView<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.defs"
     }
@@ -490,7 +493,7 @@ impl<'a> LexiconSchema for PostView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ReactionCounts<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReactionCounts<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.defs"
     }
@@ -505,7 +508,7 @@ impl<'a> LexiconSchema for ReactionCounts<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ReplyView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReplyView<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.defs"
     }
@@ -544,7 +547,7 @@ impl<'a> LexiconSchema for ReplyView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RequestResponseView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RequestResponseView<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.defs"
     }
@@ -581,7 +584,7 @@ impl<'a> LexiconSchema for RequestResponseView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RequestView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RequestView<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.defs"
     }
@@ -764,10 +767,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> AspectRatio<'a> {
         AspectRatio {
             height: self._fields.0.unwrap(),
@@ -1421,83 +1421,83 @@ pub mod collection_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Cid;
-        type Uri;
         type Author;
+        type Name;
+        type Uri;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Cid = Unset;
-        type Uri = Unset;
         type Author = Unset;
+        type Name = Unset;
+        type Uri = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Name = S::Name;
         type Cid = Set<members::cid>;
-        type Uri = S::Uri;
         type Author = S::Author;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
         type Name = S::Name;
-        type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Author = S::Author;
+        type Uri = S::Uri;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Name = S::Name;
         type Cid = S::Cid;
-        type Uri = S::Uri;
         type Author = Set<members::author>;
+        type Name = S::Name;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Name = Set<members::name>;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Name = S::Name;
+        type Uri = Set<members::uri>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Cid = S::Cid;
-        type Uri = S::Uri;
         type Author = S::Author;
+        type Name = S::Name;
+        type Uri = S::Uri;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -1507,15 +1507,15 @@ pub mod collection_view_state {
 pub struct CollectionViewBuilder<'a, S: collection_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ProfileViewBasic<'a>>,
-        Option<Cid<'a>>,
+        Option<ProfileViewBasic<S>>,
+        Option<Cid<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
         Option<bool>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
+        Option<S>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1546,7 +1546,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<S>>,
     ) -> CollectionViewBuilder<'a, collection_view_state::SetAuthor<S>> {
         self._fields.0 = Option::Some(value.into());
         CollectionViewBuilder {
@@ -1565,7 +1565,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> CollectionViewBuilder<'a, collection_view_state::SetCid<S>> {
         self._fields.1 = Option::Some(value.into());
         CollectionViewBuilder {
@@ -1597,12 +1597,12 @@ where
 
 impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1655,7 +1655,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CollectionViewBuilder<'a, collection_view_state::SetName<S>> {
         self._fields.7 = Option::Some(value.into());
         CollectionViewBuilder {
@@ -1674,7 +1674,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> CollectionViewBuilder<'a, collection_view_state::SetUri<S>> {
         self._fields.8 = Option::Some(value.into());
         CollectionViewBuilder {
@@ -1688,10 +1688,10 @@ where
 impl<'a, S> CollectionViewBuilder<'a, S>
 where
     S: collection_view_state::State,
-    S::Name: collection_view_state::IsSet,
     S::Cid: collection_view_state::IsSet,
-    S::Uri: collection_view_state::IsSet,
     S::Author: collection_view_state::IsSet,
+    S::Name: collection_view_state::IsSet,
+    S::Uri: collection_view_state::IsSet,
     S::CreatedAt: collection_view_state::IsSet,
 {
     /// Build the final struct
@@ -1712,10 +1712,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CollectionView<'a> {
         CollectionView {
             author: self._fields.0.unwrap(),
@@ -1743,104 +1740,104 @@ pub mod post_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type AspectRatio;
-        type Uri;
         type Cid;
+        type Image;
         type CreatedAt;
         type Author;
-        type Image;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type AspectRatio = Unset;
-        type Uri = Unset;
         type Cid = Unset;
+        type Image = Unset;
         type CreatedAt = Unset;
         type Author = Unset;
-        type Image = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `aspect_ratio` field to Set
     pub struct SetAspectRatio<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAspectRatio<S> {}
     impl<S: State> State for SetAspectRatio<S> {
         type AspectRatio = Set<members::aspect_ratio>;
+        type Cid = S::Cid;
+        type Image = S::Image;
+        type CreatedAt = S::CreatedAt;
+        type Author = S::Author;
         type Uri = S::Uri;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type AspectRatio = S::AspectRatio;
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-        type Image = S::Image;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
         type AspectRatio = S::AspectRatio;
-        type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type Image = S::Image;
         type CreatedAt = S::CreatedAt;
         type Author = S::Author;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type AspectRatio = S::AspectRatio;
         type Uri = S::Uri;
-        type Cid = S::Cid;
-        type CreatedAt = Set<members::created_at>;
-        type Author = S::Author;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type AspectRatio = S::AspectRatio;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Author = Set<members::author>;
-        type Image = S::Image;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
         type AspectRatio = S::AspectRatio;
-        type Uri = S::Uri;
         type Cid = S::Cid;
+        type Image = Set<members::image>;
         type CreatedAt = S::CreatedAt;
         type Author = S::Author;
-        type Image = Set<members::image>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type AspectRatio = S::AspectRatio;
+        type Cid = S::Cid;
+        type Image = S::Image;
+        type CreatedAt = Set<members::created_at>;
+        type Author = S::Author;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type AspectRatio = S::AspectRatio;
+        type Cid = S::Cid;
+        type Image = S::Image;
+        type CreatedAt = S::CreatedAt;
+        type Author = Set<members::author>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type AspectRatio = S::AspectRatio;
+        type Cid = S::Cid;
+        type Image = S::Image;
+        type CreatedAt = S::CreatedAt;
+        type Author = S::Author;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `aspect_ratio` field
         pub struct aspect_ratio(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `image` field
+        pub struct image(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `author` field
         pub struct author(());
-        ///Marker type for the `image` field
-        pub struct image(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -1848,18 +1845,18 @@ pub mod post_view_state {
 pub struct PostViewBuilder<'a, S: post_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<kaku::AspectRatio<'a>>,
-        Option<ProfileViewBasic<'a>>,
-        Option<Cid<'a>>,
+        Option<kaku::AspectRatio<S>>,
+        Option<ProfileViewBasic<S>>,
+        Option<Cid<S>>,
         Option<Datetime>,
-        Option<UriValue<'a>>,
+        Option<UriValue<S>>,
         Option<Datetime>,
-        Option<StrongRef<'a>>,
-        Option<kaku::ReactionCounts<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<kaku::ReactionType<'a>>,
+        Option<StrongRef<S>>,
+        Option<kaku::ReactionCounts<S>>,
+        Option<Vec<S>>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<kaku::ReactionType<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1903,7 +1900,7 @@ where
     /// Set the `aspectRatio` field (required)
     pub fn aspect_ratio(
         mut self,
-        value: impl Into<kaku::AspectRatio<'a>>,
+        value: impl Into<kaku::AspectRatio<S>>,
     ) -> PostViewBuilder<'a, post_view_state::SetAspectRatio<S>> {
         self._fields.0 = Option::Some(value.into());
         PostViewBuilder {
@@ -1922,7 +1919,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<S>>,
     ) -> PostViewBuilder<'a, post_view_state::SetAuthor<S>> {
         self._fields.1 = Option::Some(value.into());
         PostViewBuilder {
@@ -1941,7 +1938,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> PostViewBuilder<'a, post_view_state::SetCid<S>> {
         self._fields.2 = Option::Some(value.into());
         PostViewBuilder {
@@ -1979,7 +1976,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> PostViewBuilder<'a, post_view_state::SetImage<S>> {
         self._fields.4 = Option::Some(value.into());
         PostViewBuilder {
@@ -2005,12 +2002,12 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
 
 impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `linkedPost` field (optional)
-    pub fn linked_post(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn linked_post(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `linkedPost` field to an Option value (optional)
-    pub fn maybe_linked_post(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_linked_post(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -2020,7 +2017,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `reactionCounts` field (optional)
     pub fn reaction_counts(
         mut self,
-        value: impl Into<Option<kaku::ReactionCounts<'a>>>,
+        value: impl Into<Option<kaku::ReactionCounts<S>>>,
     ) -> Self {
         self._fields.7 = value.into();
         self
@@ -2028,7 +2025,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `reactionCounts` field to an Option value (optional)
     pub fn maybe_reaction_counts(
         mut self,
-        value: Option<kaku::ReactionCounts<'a>>,
+        value: Option<kaku::ReactionCounts<S>>,
     ) -> Self {
         self._fields.7 = value;
         self
@@ -2037,12 +2034,12 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
 
 impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -2050,12 +2047,12 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
 
 impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `text` field (optional)
-    pub fn text(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn text(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
-    pub fn maybe_text(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_text(mut self, value: Option<S>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -2069,7 +2066,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> PostViewBuilder<'a, post_view_state::SetUri<S>> {
         self._fields.10 = Option::Some(value.into());
         PostViewBuilder {
@@ -2084,7 +2081,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `viewerReaction` field (optional)
     pub fn viewer_reaction(
         mut self,
-        value: impl Into<Option<kaku::ReactionType<'a>>>,
+        value: impl Into<Option<kaku::ReactionType<S>>>,
     ) -> Self {
         self._fields.11 = value.into();
         self
@@ -2092,7 +2089,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `viewerReaction` field to an Option value (optional)
     pub fn maybe_viewer_reaction(
         mut self,
-        value: Option<kaku::ReactionType<'a>>,
+        value: Option<kaku::ReactionType<S>>,
     ) -> Self {
         self._fields.11 = value;
         self
@@ -2103,11 +2100,11 @@ impl<'a, S> PostViewBuilder<'a, S>
 where
     S: post_view_state::State,
     S::AspectRatio: post_view_state::IsSet,
-    S::Uri: post_view_state::IsSet,
     S::Cid: post_view_state::IsSet,
+    S::Image: post_view_state::IsSet,
     S::CreatedAt: post_view_state::IsSet,
     S::Author: post_view_state::IsSet,
-    S::Image: post_view_state::IsSet,
+    S::Uri: post_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PostView<'a> {
@@ -2130,10 +2127,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PostView<'a> {
         PostView {
             aspect_ratio: self._fields.0.unwrap(),
@@ -2173,7 +2167,7 @@ fn _default_reaction_counts_tasukaru() -> Option<i64> {
     Some(0i64)
 }
 
-impl Default for ReactionCounts<'_> {
+impl Default for ReactionCounts {
     fn default() -> Self {
         Self {
             kami: Some(0i64),
@@ -2196,83 +2190,83 @@ pub mod reply_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
-        type Uri;
         type Cid;
+        type Text;
         type CreatedAt;
+        type Uri;
         type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
-        type Uri = Unset;
         type Cid = Unset;
+        type Text = Unset;
         type CreatedAt = Unset;
+        type Uri = Unset;
         type Author = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Text = S::Text;
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Text = S::Text;
-        type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type Text = S::Text;
         type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Cid = S::Cid;
+        type Text = Set<members::text>;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
         type Author = S::Author;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
-        type Uri = S::Uri;
         type Cid = S::Cid;
+        type Text = S::Text;
         type CreatedAt = Set<members::created_at>;
+        type Uri = S::Uri;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+        type Uri = Set<members::uri>;
         type Author = S::Author;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Text = S::Text;
-        type Uri = S::Uri;
         type Cid = S::Cid;
+        type Text = S::Text;
         type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
         type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `text` field
+        pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `author` field
         pub struct author(());
     }
@@ -2282,11 +2276,11 @@ pub mod reply_view_state {
 pub struct ReplyViewBuilder<'a, S: reply_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ProfileViewBasic<'a>>,
-        Option<Cid<'a>>,
+        Option<ProfileViewBasic<S>>,
+        Option<Cid<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
+        Option<S>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -2317,7 +2311,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<S>>,
     ) -> ReplyViewBuilder<'a, reply_view_state::SetAuthor<S>> {
         self._fields.0 = Option::Some(value.into());
         ReplyViewBuilder {
@@ -2336,7 +2330,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> ReplyViewBuilder<'a, reply_view_state::SetCid<S>> {
         self._fields.1 = Option::Some(value.into());
         ReplyViewBuilder {
@@ -2374,7 +2368,7 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReplyViewBuilder<'a, reply_view_state::SetText<S>> {
         self._fields.3 = Option::Some(value.into());
         ReplyViewBuilder {
@@ -2393,7 +2387,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ReplyViewBuilder<'a, reply_view_state::SetUri<S>> {
         self._fields.4 = Option::Some(value.into());
         ReplyViewBuilder {
@@ -2407,10 +2401,10 @@ where
 impl<'a, S> ReplyViewBuilder<'a, S>
 where
     S: reply_view_state::State,
-    S::Text: reply_view_state::IsSet,
-    S::Uri: reply_view_state::IsSet,
     S::Cid: reply_view_state::IsSet,
+    S::Text: reply_view_state::IsSet,
     S::CreatedAt: reply_view_state::IsSet,
+    S::Uri: reply_view_state::IsSet,
     S::Author: reply_view_state::IsSet,
 {
     /// Build the final struct
@@ -2427,10 +2421,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ReplyView<'a> {
         ReplyView {
             author: self._fields.0.unwrap(),
@@ -2453,85 +2444,85 @@ pub mod request_response_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Author;
-        type Post;
-        type Cid;
         type Uri;
+        type Cid;
+        type CreatedAt;
+        type Post;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Author = Unset;
-        type Post = Unset;
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Author = S::Author;
-        type Post = S::Post;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
+        type Cid = Unset;
+        type CreatedAt = Unset;
+        type Post = Unset;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type CreatedAt = S::CreatedAt;
         type Author = Set<members::author>;
-        type Post = S::Post;
+        type Uri = S::Uri;
         type Cid = S::Cid;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `post` field to Set
-    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPost<S> {}
-    impl<S: State> State for SetPost<S> {
         type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-        type Post = Set<members::post>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
         type Post = S::Post;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
         type Author = S::Author;
-        type Post = S::Post;
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Post = S::Post;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type CreatedAt = S::CreatedAt;
+        type Post = S::Post;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type CreatedAt = Set<members::created_at>;
+        type Post = S::Post;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Post = Set<members::post>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `author` field
         pub struct author(());
-        ///Marker type for the `post` field
-        pub struct post(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `post` field
+        pub struct post(());
     }
 }
 
@@ -2539,12 +2530,12 @@ pub mod request_response_view_state {
 pub struct RequestResponseViewBuilder<'a, S: request_response_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ProfileViewBasic<'a>>,
-        Option<Cid<'a>>,
+        Option<ProfileViewBasic<S>>,
+        Option<Cid<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<kaku::PostView<'a>>,
-        Option<AtUri<'a>>,
+        Option<S>,
+        Option<kaku::PostView<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -2575,7 +2566,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<S>>,
     ) -> RequestResponseViewBuilder<'a, request_response_view_state::SetAuthor<S>> {
         self._fields.0 = Option::Some(value.into());
         RequestResponseViewBuilder {
@@ -2594,7 +2585,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> RequestResponseViewBuilder<'a, request_response_view_state::SetCid<S>> {
         self._fields.1 = Option::Some(value.into());
         RequestResponseViewBuilder {
@@ -2626,12 +2617,12 @@ where
 
 impl<'a, S: request_response_view_state::State> RequestResponseViewBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
-    pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_message(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -2645,7 +2636,7 @@ where
     /// Set the `post` field (required)
     pub fn post(
         mut self,
-        value: impl Into<kaku::PostView<'a>>,
+        value: impl Into<kaku::PostView<S>>,
     ) -> RequestResponseViewBuilder<'a, request_response_view_state::SetPost<S>> {
         self._fields.4 = Option::Some(value.into());
         RequestResponseViewBuilder {
@@ -2664,7 +2655,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> RequestResponseViewBuilder<'a, request_response_view_state::SetUri<S>> {
         self._fields.5 = Option::Some(value.into());
         RequestResponseViewBuilder {
@@ -2678,11 +2669,11 @@ where
 impl<'a, S> RequestResponseViewBuilder<'a, S>
 where
     S: request_response_view_state::State,
-    S::CreatedAt: request_response_view_state::IsSet,
     S::Author: request_response_view_state::IsSet,
-    S::Post: request_response_view_state::IsSet,
-    S::Cid: request_response_view_state::IsSet,
     S::Uri: request_response_view_state::IsSet,
+    S::Cid: request_response_view_state::IsSet,
+    S::CreatedAt: request_response_view_state::IsSet,
+    S::Post: request_response_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RequestResponseView<'a> {
@@ -2699,10 +2690,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RequestResponseView<'a> {
         RequestResponseView {
             author: self._fields.0.unwrap(),
@@ -2726,103 +2714,103 @@ pub mod request_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type Text;
-        type Uri;
         type Author;
+        type Uri;
         type IsOpen;
+        type Text;
+        type Cid;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type Text = Unset;
-        type Uri = Unset;
         type Author = Unset;
+        type Uri = Unset;
         type IsOpen = Unset;
+        type Text = Unset;
+        type Cid = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Author = Set<members::author>;
+        type Uri = S::Uri;
+        type IsOpen = S::IsOpen;
         type Text = S::Text;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type IsOpen = S::IsOpen;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
         type Cid = S::Cid;
-        type Text = Set<members::text>;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type IsOpen = S::IsOpen;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type Text = S::Text;
-        type Uri = Set<members::uri>;
         type Author = S::Author;
+        type Uri = Set<members::uri>;
         type IsOpen = S::IsOpen;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Cid = S::Cid;
         type Text = S::Text;
-        type Uri = S::Uri;
-        type Author = Set<members::author>;
-        type IsOpen = S::IsOpen;
+        type Cid = S::Cid;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `is_open` field to Set
     pub struct SetIsOpen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsOpen<S> {}
     impl<S: State> State for SetIsOpen<S> {
-        type Cid = S::Cid;
-        type Text = S::Text;
-        type Uri = S::Uri;
         type Author = S::Author;
+        type Uri = S::Uri;
         type IsOpen = Set<members::is_open>;
+        type Text = S::Text;
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type IsOpen = S::IsOpen;
+        type Text = Set<members::text>;
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type IsOpen = S::IsOpen;
+        type Text = S::Text;
+        type Cid = Set<members::cid>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Cid = S::Cid;
-        type Text = S::Text;
-        type Uri = S::Uri;
         type Author = S::Author;
+        type Uri = S::Uri;
         type IsOpen = S::IsOpen;
+        type Text = S::Text;
+        type Cid = S::Cid;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `is_open` field
         pub struct is_open(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -2832,17 +2820,17 @@ pub mod request_view_state {
 pub struct RequestViewBuilder<'a, S: request_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ProfileViewBasic<'a>>,
-        Option<Cid<'a>>,
+        Option<ProfileViewBasic<S>>,
+        Option<Cid<S>>,
         Option<Datetime>,
         Option<Datetime>,
         Option<bool>,
-        Option<Vec<UriValue<'a>>>,
+        Option<Vec<UriValue<S>>>,
         Option<i64>,
-        Option<Vec<CowStr<'a>>>,
-        Option<ProfileViewBasic<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
+        Option<Vec<S>>,
+        Option<ProfileViewBasic<S>>,
+        Option<S>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -2873,7 +2861,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<ProfileViewBasic<'a>>,
+        value: impl Into<ProfileViewBasic<S>>,
     ) -> RequestViewBuilder<'a, request_view_state::SetAuthor<S>> {
         self._fields.0 = Option::Some(value.into());
         RequestViewBuilder {
@@ -2892,7 +2880,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> RequestViewBuilder<'a, request_view_state::SetCid<S>> {
         self._fields.1 = Option::Some(value.into());
         RequestViewBuilder {
@@ -2958,13 +2946,13 @@ impl<'a, S: request_view_state::State> RequestViewBuilder<'a, S> {
     /// Set the `referenceImages` field (optional)
     pub fn reference_images(
         mut self,
-        value: impl Into<Option<Vec<UriValue<'a>>>>,
+        value: impl Into<Option<Vec<UriValue<S>>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `referenceImages` field to an Option value (optional)
-    pub fn maybe_reference_images(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
+    pub fn maybe_reference_images(mut self, value: Option<Vec<UriValue<S>>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -2985,12 +2973,12 @@ impl<'a, S: request_view_state::State> RequestViewBuilder<'a, S> {
 
 impl<'a, S: request_view_state::State> RequestViewBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -3000,13 +2988,13 @@ impl<'a, S: request_view_state::State> RequestViewBuilder<'a, S> {
     /// Set the `targetActor` field (optional)
     pub fn target_actor(
         mut self,
-        value: impl Into<Option<ProfileViewBasic<'a>>>,
+        value: impl Into<Option<ProfileViewBasic<S>>>,
     ) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `targetActor` field to an Option value (optional)
-    pub fn maybe_target_actor(mut self, value: Option<ProfileViewBasic<'a>>) -> Self {
+    pub fn maybe_target_actor(mut self, value: Option<ProfileViewBasic<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -3020,7 +3008,7 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RequestViewBuilder<'a, request_view_state::SetText<S>> {
         self._fields.9 = Option::Some(value.into());
         RequestViewBuilder {
@@ -3039,7 +3027,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> RequestViewBuilder<'a, request_view_state::SetUri<S>> {
         self._fields.10 = Option::Some(value.into());
         RequestViewBuilder {
@@ -3053,11 +3041,11 @@ where
 impl<'a, S> RequestViewBuilder<'a, S>
 where
     S: request_view_state::State,
-    S::Cid: request_view_state::IsSet,
-    S::Text: request_view_state::IsSet,
-    S::Uri: request_view_state::IsSet,
     S::Author: request_view_state::IsSet,
+    S::Uri: request_view_state::IsSet,
     S::IsOpen: request_view_state::IsSet,
+    S::Text: request_view_state::IsSet,
+    S::Cid: request_view_state::IsSet,
     S::CreatedAt: request_view_state::IsSet,
 {
     /// Build the final struct
@@ -3080,10 +3068,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RequestView<'a> {
         RequestView {
             author: self._fields.0.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,35 +29,44 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Request to subscribe to a notebook. Requires acceptance to be active.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.weaver.graph.subscribe", tag = "$type")]
-pub struct Subscribe<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.weaver.graph.subscribe",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Subscribe<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///URI of the notebook to subscribe to.
-    #[serde(borrow)]
-    pub notebook: AtUri<'a>,
+    pub notebook: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SubscribeGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SubscribeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Subscribe<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Subscribe<S>,
 }
 
-impl<'a> Subscribe<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SubscribeRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Subscribe<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SubscribeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -66,18 +77,17 @@ pub struct SubscribeRecord;
 impl XrpcResp for SubscribeRecord {
     const NSID: &'static str = "sh.weaver.graph.subscribe";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SubscribeGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SubscribeGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SubscribeGetRecordOutput<'_>> for Subscribe<'_> {
-    fn from(output: SubscribeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SubscribeGetRecordOutput<S>> for Subscribe<S> {
+    fn from(output: SubscribeGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Subscribe<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Subscribe<S> {
     const NSID: &'static str = "sh.weaver.graph.subscribe";
     type Record = SubscribeRecord;
 }
@@ -87,7 +97,7 @@ impl Collection for SubscribeRecord {
     type Record = SubscribeRecord;
 }
 
-impl<'a> LexiconSchema for Subscribe<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Subscribe<S> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.subscribe"
     }
@@ -112,44 +122,44 @@ pub mod subscribe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Notebook;
         type CreatedAt;
+        type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Notebook = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Notebook = Set<members::notebook>;
-        type CreatedAt = S::CreatedAt;
+        type Notebook = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Notebook = S::Notebook;
         type CreatedAt = Set<members::created_at>;
+        type Notebook = S::Notebook;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotebook<S> {}
+    impl<S: State> State for SetNotebook<S> {
+        type CreatedAt = S::CreatedAt;
+        type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SubscribeBuilder<'a, S: subscribe_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<AtUri<'a>>),
+    _fields: (Option<Datetime>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -198,7 +208,7 @@ where
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> SubscribeBuilder<'a, subscribe_state::SetNotebook<S>> {
         self._fields.1 = Option::Some(value.into());
         SubscribeBuilder {
@@ -212,8 +222,8 @@ where
 impl<'a, S> SubscribeBuilder<'a, S>
 where
     S: subscribe_state::State,
-    S::Notebook: subscribe_state::IsSet,
     S::CreatedAt: subscribe_state::IsSet,
+    S::Notebook: subscribe_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Subscribe<'a> {
@@ -226,10 +236,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Subscribe<'a> {
         Subscribe {
             created_at: self._fields.0.unwrap(),

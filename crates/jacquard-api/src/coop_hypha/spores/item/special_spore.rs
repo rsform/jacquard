@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,40 +29,45 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A special spore capture record. Each steal creates a new record with a TID key. Current holder is determined by the most recent createdAt timestamp across all backlinked records for a given origin (subject).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "coop.hypha.spores.item.specialSpore",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct SpecialSpore<'a> {
+pub struct SpecialSpore<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When this capture occurred.
     pub created_at: Datetime,
     ///Origin garden DID. Used for backlink indexing to find all captures of this spore.
-    #[serde(borrow)]
-    pub subject: Did<'a>,
+    pub subject: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SpecialSporeGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SpecialSporeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: SpecialSpore<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: SpecialSpore<S>,
 }
 
-impl<'a> SpecialSpore<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SpecialSporeRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> SpecialSpore<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SpecialSporeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -71,18 +78,17 @@ pub struct SpecialSporeRecord;
 impl XrpcResp for SpecialSporeRecord {
     const NSID: &'static str = "coop.hypha.spores.item.specialSpore";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SpecialSporeGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SpecialSporeGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SpecialSporeGetRecordOutput<'_>> for SpecialSpore<'_> {
-    fn from(output: SpecialSporeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SpecialSporeGetRecordOutput<S>> for SpecialSpore<S> {
+    fn from(output: SpecialSporeGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for SpecialSpore<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for SpecialSpore<S> {
     const NSID: &'static str = "coop.hypha.spores.item.specialSpore";
     type Record = SpecialSporeRecord;
 }
@@ -92,7 +98,7 @@ impl Collection for SpecialSporeRecord {
     type Record = SpecialSporeRecord;
 }
 
-impl<'a> LexiconSchema for SpecialSpore<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SpecialSpore<S> {
     fn nsid() -> &'static str {
         "coop.hypha.spores.item.specialSpore"
     }
@@ -154,7 +160,7 @@ pub mod special_spore_state {
 /// Builder for constructing an instance of this type
 pub struct SpecialSporeBuilder<'a, S: special_spore_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Did<'a>>),
+    _fields: (Option<Datetime>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -203,7 +209,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> SpecialSporeBuilder<'a, special_spore_state::SetSubject<S>> {
         self._fields.1 = Option::Some(value.into());
         SpecialSporeBuilder {
@@ -231,10 +237,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SpecialSpore<'a> {
         SpecialSpore {
             created_at: self._fields.0.unwrap(),

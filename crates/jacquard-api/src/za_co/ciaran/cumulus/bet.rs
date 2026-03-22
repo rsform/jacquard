@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,37 +30,45 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// The record containing a Bet placed on a Cumulus Market
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "za.co.ciaran.cumulus.bet", tag = "$type")]
-pub struct Bet<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "za.co.ciaran.cumulus.bet",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Bet<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///The record containing the Cumulus Market for this Bet
-    #[serde(borrow)]
-    pub market: StrongRef<'a>,
-    #[serde(borrow)]
-    pub position: CowStr<'a>,
+    pub market: StrongRef<S>,
+    pub position: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BetGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BetGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Bet<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Bet<S>,
 }
 
-impl<'a> Bet<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, BetRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Bet<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, BetRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -69,18 +79,17 @@ pub struct BetRecord;
 impl XrpcResp for BetRecord {
     const NSID: &'static str = "za.co.ciaran.cumulus.bet";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BetGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BetGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<BetGetRecordOutput<'_>> for Bet<'_> {
-    fn from(output: BetGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<BetGetRecordOutput<S>> for Bet<S> {
+    fn from(output: BetGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Bet<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Bet<S> {
     const NSID: &'static str = "za.co.ciaran.cumulus.bet";
     type Record = BetRecord;
 }
@@ -90,7 +99,7 @@ impl Collection for BetRecord {
     type Record = BetRecord;
 }
 
-impl<'a> LexiconSchema for Bet<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bet<S> {
     fn nsid() -> &'static str {
         "za.co.ciaran.cumulus.bet"
     }
@@ -137,49 +146,49 @@ pub mod bet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Market;
+        type CreatedAt;
         type Position;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Market = Unset;
+        type CreatedAt = Unset;
         type Position = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Market = S::Market;
-        type Position = S::Position;
     }
     ///State transition - sets the `market` field to Set
     pub struct SetMarket<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMarket<S> {}
     impl<S: State> State for SetMarket<S> {
-        type CreatedAt = S::CreatedAt;
         type Market = Set<members::market>;
+        type CreatedAt = S::CreatedAt;
+        type Position = S::Position;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Market = S::Market;
+        type CreatedAt = Set<members::created_at>;
         type Position = S::Position;
     }
     ///State transition - sets the `position` field to Set
     pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPosition<S> {}
     impl<S: State> State for SetPosition<S> {
-        type CreatedAt = S::CreatedAt;
         type Market = S::Market;
+        type CreatedAt = S::CreatedAt;
         type Position = Set<members::position>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `market` field
         pub struct market(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `position` field
         pub struct position(());
     }
@@ -188,7 +197,7 @@ pub mod bet_state {
 /// Builder for constructing an instance of this type
 pub struct BetBuilder<'a, S: bet_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<StrongRef<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Datetime>, Option<StrongRef<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -237,7 +246,7 @@ where
     /// Set the `market` field (required)
     pub fn market(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> BetBuilder<'a, bet_state::SetMarket<S>> {
         self._fields.1 = Option::Some(value.into());
         BetBuilder {
@@ -256,7 +265,7 @@ where
     /// Set the `position` field (required)
     pub fn position(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> BetBuilder<'a, bet_state::SetPosition<S>> {
         self._fields.2 = Option::Some(value.into());
         BetBuilder {
@@ -270,8 +279,8 @@ where
 impl<'a, S> BetBuilder<'a, S>
 where
     S: bet_state::State,
-    S::CreatedAt: bet_state::IsSet,
     S::Market: bet_state::IsSet,
+    S::CreatedAt: bet_state::IsSet,
     S::Position: bet_state::IsSet,
 {
     /// Build the final struct
@@ -284,13 +293,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Bet<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Bet<'a> {
         Bet {
             created_at: self._fields.0.unwrap(),
             market: self._fields.1.unwrap(),

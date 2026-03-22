@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::IntoStatic;
@@ -16,32 +16,52 @@ use crate::app_rocksky::charts::ChartsView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetScrobblesChart<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetScrobblesChart<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub albumuri: Option<AtUri<'a>>,
+    pub albumuri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub artisturi: Option<AtUri<'a>>,
+    pub artisturi: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did: Option<AtIdentifier<'a>>,
+    pub did: Option<AtIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub genre: Option<CowStr<'a>>,
+    pub genre: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub songuri: Option<AtUri<'a>>,
+    pub songuri: Option<AtUri<S>>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetScrobblesChartOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetScrobblesChartOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: ChartsView<'a>,
+    pub value: ChartsView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for app.rocksky.charts.getScrobblesChart
@@ -49,11 +69,12 @@ pub struct GetScrobblesChartResponse;
 impl jacquard_common::xrpc::XrpcResp for GetScrobblesChartResponse {
     const NSID: &'static str = "app.rocksky.charts.getScrobblesChart";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetScrobblesChartOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetScrobblesChartOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetScrobblesChart<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetScrobblesChart<S> {
     const NSID: &'static str = "app.rocksky.charts.getScrobblesChart";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetScrobblesChartResponse;
@@ -64,7 +85,7 @@ pub struct GetScrobblesChartRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetScrobblesChartRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.charts.getScrobblesChart";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetScrobblesChart<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetScrobblesChart<S>;
     type Response = GetScrobblesChartResponse;
 }
 
@@ -91,11 +112,11 @@ pub mod get_scrobbles_chart_state {
 pub struct GetScrobblesChartBuilder<'a, S: get_scrobbles_chart_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtUri<'a>>,
-        Option<AtUri<'a>>,
-        Option<AtIdentifier<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
+        Option<AtUri<S>>,
+        Option<AtUri<S>>,
+        Option<AtIdentifier<S>>,
+        Option<S>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -120,12 +141,12 @@ impl<'a> GetScrobblesChartBuilder<'a, get_scrobbles_chart_state::Empty> {
 
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `albumuri` field (optional)
-    pub fn albumuri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn albumuri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `albumuri` field to an Option value (optional)
-    pub fn maybe_albumuri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_albumuri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -133,12 +154,12 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
 
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `artisturi` field (optional)
-    pub fn artisturi(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn artisturi(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `artisturi` field to an Option value (optional)
-    pub fn maybe_artisturi(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_artisturi(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -146,12 +167,12 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
 
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `did` field (optional)
-    pub fn did(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
+    pub fn did(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(mut self, value: Option<AtIdentifier<'a>>) -> Self {
+    pub fn maybe_did(mut self, value: Option<AtIdentifier<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -159,12 +180,12 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
 
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_genre(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -172,12 +193,12 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
 
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `songuri` field (optional)
-    pub fn songuri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn songuri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `songuri` field to an Option value (optional)
-    pub fn maybe_songuri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_songuri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.4 = value;
         self
     }

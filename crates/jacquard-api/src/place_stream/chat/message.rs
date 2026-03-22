@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,57 +32,68 @@ use crate::place_stream::richtext::facet::Facet;
 use crate::place_stream::chat::message;
 /// Record containing a Streamplace chat message.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "place.stream.chat.message", tag = "$type")]
-pub struct Message<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "place.stream.chat.message",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Message<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Client-declared timestamp when this message was originally created.
     pub created_at: Datetime,
     ///Annotations of text (mentions, URLs, etc)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Facet<'a>>>,
+    pub facets: Option<Vec<Facet<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reply: Option<message::ReplyRef<'a>>,
+    pub reply: Option<message::ReplyRef<S>>,
     ///The DID of the streamer whose chat this is.
-    #[serde(borrow)]
-    pub streamer: Did<'a>,
+    pub streamer: Did<S>,
     ///The primary message content. May be an empty string, if there are embeds.
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MessageGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MessageGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Message<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Message<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReplyRef<'a> {
-    #[serde(borrow)]
-    pub parent: StrongRef<'a>,
-    #[serde(borrow)]
-    pub root: StrongRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReplyRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub parent: StrongRef<S>,
+    pub root: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Message<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, MessageRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Message<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, MessageRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -91,18 +104,17 @@ pub struct MessageRecord;
 impl XrpcResp for MessageRecord {
     const NSID: &'static str = "place.stream.chat.message";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MessageGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MessageGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<MessageGetRecordOutput<'_>> for Message<'_> {
-    fn from(output: MessageGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<MessageGetRecordOutput<S>> for Message<S> {
+    fn from(output: MessageGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Message<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Message<S> {
     const NSID: &'static str = "place.stream.chat.message";
     type Record = MessageRecord;
 }
@@ -112,7 +124,7 @@ impl Collection for MessageRecord {
     type Record = MessageRecord;
 }
 
-impl<'a> LexiconSchema for Message<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Message<S> {
     fn nsid() -> &'static str {
         "place.stream.chat.message"
     }
@@ -151,7 +163,7 @@ impl<'a> LexiconSchema for Message<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ReplyRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReplyRef<S> {
     fn nsid() -> &'static str {
         "place.stream.chat.message"
     }
@@ -176,51 +188,51 @@ pub mod message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
         type CreatedAt;
         type Streamer;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
         type CreatedAt = Unset;
         type Streamer = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
-        type Streamer = S::Streamer;
+        type Text = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
         type CreatedAt = Set<members::created_at>;
         type Streamer = S::Streamer;
+        type Text = S::Text;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
-        type Text = S::Text;
         type CreatedAt = S::CreatedAt;
         type Streamer = Set<members::streamer>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type CreatedAt = S::CreatedAt;
+        type Streamer = S::Streamer;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
@@ -229,10 +241,10 @@ pub struct MessageBuilder<'a, S: message_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<Vec<Facet<'a>>>,
-        Option<message::ReplyRef<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
+        Option<Vec<Facet<S>>>,
+        Option<message::ReplyRef<S>>,
+        Option<Did<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -276,12 +288,12 @@ where
 
 impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     /// Set the `facets` field (optional)
-    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
+    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
-    pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -289,12 +301,12 @@ impl<'a, S: message_state::State> MessageBuilder<'a, S> {
 
 impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     /// Set the `reply` field (optional)
-    pub fn reply(mut self, value: impl Into<Option<message::ReplyRef<'a>>>) -> Self {
+    pub fn reply(mut self, value: impl Into<Option<message::ReplyRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `reply` field to an Option value (optional)
-    pub fn maybe_reply(mut self, value: Option<message::ReplyRef<'a>>) -> Self {
+    pub fn maybe_reply(mut self, value: Option<message::ReplyRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -308,7 +320,7 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> MessageBuilder<'a, message_state::SetStreamer<S>> {
         self._fields.3 = Option::Some(value.into());
         MessageBuilder {
@@ -327,7 +339,7 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MessageBuilder<'a, message_state::SetText<S>> {
         self._fields.4 = Option::Some(value.into());
         MessageBuilder {
@@ -341,9 +353,9 @@ where
 impl<'a, S> MessageBuilder<'a, S>
 where
     S: message_state::State,
-    S::Text: message_state::IsSet,
     S::CreatedAt: message_state::IsSet,
     S::Streamer: message_state::IsSet,
+    S::Text: message_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Message<'a> {
@@ -359,10 +371,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Message<'a> {
         Message {
             created_at: self._fields.0.unwrap(),
@@ -552,7 +561,7 @@ pub mod reply_ref_state {
 /// Builder for constructing an instance of this type
 pub struct ReplyRefBuilder<'a, S: reply_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>, Option<StrongRef<'a>>),
+    _fields: (Option<StrongRef<S>>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -582,7 +591,7 @@ where
     /// Set the `parent` field (required)
     pub fn parent(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetParent<S>> {
         self._fields.0 = Option::Some(value.into());
         ReplyRefBuilder {
@@ -601,7 +610,7 @@ where
     /// Set the `root` field (required)
     pub fn root(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetRoot<S>> {
         self._fields.1 = Option::Some(value.into());
         ReplyRefBuilder {
@@ -629,10 +638,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ReplyRef<'a> {
         ReplyRef {
             parent: self._fields.0.unwrap(),

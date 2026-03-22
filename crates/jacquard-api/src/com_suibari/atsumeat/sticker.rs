@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -28,68 +29,61 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Definition of a sticker
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "com.suibari.atsumeat.sticker",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Sticker<'a> {
+pub struct Sticker<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The image content, either a string URL (for CDN/Blob) or a BlobRef.
-    #[serde(borrow)]
-    pub image: Data<'a>,
+    pub image: Data<S>,
     ///Type of the image source.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image_type: Option<StickerImageType<'a>>,
+    pub image_type: Option<StickerImageType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     ///Identifier for the sticker model. 'default' for avatar stickers, 'cid:<cid>' for custom stickers.
-    #[serde(borrow)]
-    pub model: CowStr<'a>,
+    pub model: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///The timestamp when this sticker was obtained.
     pub obtained_at: Datetime,
     ///The DID of the user from whom this sticker was obtained (for provenance).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub obtained_from: Option<Did<'a>>,
+    pub obtained_from: Option<Did<S>>,
     ///The DID of the original creator/minter of this sticker.
-    #[serde(borrow)]
-    pub original_owner: Did<'a>,
+    pub original_owner: Did<S>,
     ///The shape of the sticker canvas.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub shape: Option<StickerShape<'a>>,
+    pub shape: Option<StickerShape<S>>,
     ///Cryptographic signature from the server verifying the sticker's authenticity/provenance.
-    #[serde(borrow)]
-    pub signature: CowStr<'a>,
+    pub signature: S,
     ///The original JSON payload that was signed by the server.
-    #[serde(borrow)]
-    pub signed_payload: CowStr<'a>,
+    pub signed_payload: S,
     ///The DID of the user depicted in the sticker, if applicable (e.g. for avatar stickers).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_did: Option<Did<'a>>,
+    pub subject_did: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Type of the image source.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StickerImageType<'a> {
+pub enum StickerImageType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Avatar,
     Custom,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> StickerImageType<'a> {
+impl<S: Bos<str> + AsRef<str>> StickerImageType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Avatar => "avatar",
@@ -97,70 +91,56 @@ impl<'a> StickerImageType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for StickerImageType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "avatar" => Self::Avatar,
             "custom" => Self::Custom,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for StickerImageType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "avatar" => Self::Avatar,
-            "custom" => Self::Custom,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for StickerImageType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for StickerImageType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for StickerImageType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for StickerImageType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for StickerImageType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for StickerImageType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for StickerImageType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for StickerImageType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for StickerImageType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for StickerImageType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for StickerImageType<'_> {
-    type Output = StickerImageType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for StickerImageType<S> {
+    type Output = StickerImageType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             StickerImageType::Avatar => StickerImageType::Avatar,
@@ -173,7 +153,7 @@ impl jacquard_common::IntoStatic for StickerImageType<'_> {
 /// The shape of the sticker canvas.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StickerShape<'a> {
+pub enum StickerShape<S: Bos<str> + AsRef<str> = DefaultStr> {
     Circle,
     Square,
     Rectangle,
@@ -182,10 +162,10 @@ pub enum StickerShape<'a> {
     Diamond,
     Butterfly,
     Transparent,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> StickerShape<'a> {
+impl<S: Bos<str> + AsRef<str>> StickerShape<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Circle => "circle",
@@ -199,11 +179,9 @@ impl<'a> StickerShape<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for StickerShape<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "circle" => Self::Circle,
             "square" => Self::Square,
             "rectangle" => Self::Rectangle,
@@ -212,69 +190,51 @@ impl<'a> From<&'a str> for StickerShape<'a> {
             "diamond" => Self::Diamond,
             "butterfly" => Self::Butterfly,
             "transparent" => Self::Transparent,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for StickerShape<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "circle" => Self::Circle,
-            "square" => Self::Square,
-            "rectangle" => Self::Rectangle,
-            "star" => Self::Star,
-            "heart" => Self::Heart,
-            "diamond" => Self::Diamond,
-            "butterfly" => Self::Butterfly,
-            "transparent" => Self::Transparent,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for StickerShape<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for StickerShape<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for StickerShape<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for StickerShape<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for StickerShape<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for StickerShape<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for StickerShape<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for StickerShape<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for StickerShape<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for StickerShape<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for StickerShape<'_> {
-    type Output = StickerShape<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for StickerShape<S> {
+    type Output = StickerShape<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             StickerShape::Circle => StickerShape::Circle,
@@ -293,22 +253,23 @@ impl jacquard_common::IntoStatic for StickerShape<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StickerGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StickerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Sticker<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Sticker<S>,
 }
 
-impl<'a> Sticker<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, StickerRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Sticker<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, StickerRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -319,18 +280,17 @@ pub struct StickerRecord;
 impl XrpcResp for StickerRecord {
     const NSID: &'static str = "com.suibari.atsumeat.sticker";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StickerGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StickerGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<StickerGetRecordOutput<'_>> for Sticker<'_> {
-    fn from(output: StickerGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<StickerGetRecordOutput<S>> for Sticker<S> {
+    fn from(output: StickerGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Sticker<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Sticker<S> {
     const NSID: &'static str = "com.suibari.atsumeat.sticker";
     type Record = StickerRecord;
 }
@@ -340,7 +300,7 @@ impl Collection for StickerRecord {
     type Record = StickerRecord;
 }
 
-impl<'a> LexiconSchema for Sticker<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Sticker<S> {
     fn nsid() -> &'static str {
         "com.suibari.atsumeat.sticker"
     }
@@ -472,105 +432,105 @@ pub mod sticker_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ObtainedAt;
-        type SignedPayload;
         type Model;
-        type OriginalOwner;
-        type Signature;
         type Image;
+        type OriginalOwner;
+        type ObtainedAt;
+        type Signature;
+        type SignedPayload;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ObtainedAt = Unset;
-        type SignedPayload = Unset;
         type Model = Unset;
-        type OriginalOwner = Unset;
-        type Signature = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `obtained_at` field to Set
-    pub struct SetObtainedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObtainedAt<S> {}
-    impl<S: State> State for SetObtainedAt<S> {
-        type ObtainedAt = Set<members::obtained_at>;
-        type SignedPayload = S::SignedPayload;
-        type Model = S::Model;
-        type OriginalOwner = S::OriginalOwner;
-        type Signature = S::Signature;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `signed_payload` field to Set
-    pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
-    impl<S: State> State for SetSignedPayload<S> {
-        type ObtainedAt = S::ObtainedAt;
-        type SignedPayload = Set<members::signed_payload>;
-        type Model = S::Model;
-        type OriginalOwner = S::OriginalOwner;
-        type Signature = S::Signature;
-        type Image = S::Image;
+        type OriginalOwner = Unset;
+        type ObtainedAt = Unset;
+        type Signature = Unset;
+        type SignedPayload = Unset;
     }
     ///State transition - sets the `model` field to Set
     pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetModel<S> {}
     impl<S: State> State for SetModel<S> {
-        type ObtainedAt = S::ObtainedAt;
-        type SignedPayload = S::SignedPayload;
         type Model = Set<members::model>;
+        type Image = S::Image;
         type OriginalOwner = S::OriginalOwner;
-        type Signature = S::Signature;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `original_owner` field to Set
-    pub struct SetOriginalOwner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOriginalOwner<S> {}
-    impl<S: State> State for SetOriginalOwner<S> {
         type ObtainedAt = S::ObtainedAt;
-        type SignedPayload = S::SignedPayload;
-        type Model = S::Model;
-        type OriginalOwner = Set<members::original_owner>;
         type Signature = S::Signature;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
-        type ObtainedAt = S::ObtainedAt;
         type SignedPayload = S::SignedPayload;
-        type Model = S::Model;
-        type OriginalOwner = S::OriginalOwner;
-        type Signature = Set<members::signature>;
-        type Image = S::Image;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type ObtainedAt = S::ObtainedAt;
-        type SignedPayload = S::SignedPayload;
         type Model = S::Model;
-        type OriginalOwner = S::OriginalOwner;
-        type Signature = S::Signature;
         type Image = Set<members::image>;
+        type OriginalOwner = S::OriginalOwner;
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
+        type SignedPayload = S::SignedPayload;
+    }
+    ///State transition - sets the `original_owner` field to Set
+    pub struct SetOriginalOwner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOriginalOwner<S> {}
+    impl<S: State> State for SetOriginalOwner<S> {
+        type Model = S::Model;
+        type Image = S::Image;
+        type OriginalOwner = Set<members::original_owner>;
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
+        type SignedPayload = S::SignedPayload;
+    }
+    ///State transition - sets the `obtained_at` field to Set
+    pub struct SetObtainedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObtainedAt<S> {}
+    impl<S: State> State for SetObtainedAt<S> {
+        type Model = S::Model;
+        type Image = S::Image;
+        type OriginalOwner = S::OriginalOwner;
+        type ObtainedAt = Set<members::obtained_at>;
+        type Signature = S::Signature;
+        type SignedPayload = S::SignedPayload;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type Model = S::Model;
+        type Image = S::Image;
+        type OriginalOwner = S::OriginalOwner;
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = Set<members::signature>;
+        type SignedPayload = S::SignedPayload;
+    }
+    ///State transition - sets the `signed_payload` field to Set
+    pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
+    impl<S: State> State for SetSignedPayload<S> {
+        type Model = S::Model;
+        type Image = S::Image;
+        type OriginalOwner = S::OriginalOwner;
+        type ObtainedAt = S::ObtainedAt;
+        type Signature = S::Signature;
+        type SignedPayload = Set<members::signed_payload>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `obtained_at` field
-        pub struct obtained_at(());
-        ///Marker type for the `signed_payload` field
-        pub struct signed_payload(());
         ///Marker type for the `model` field
         pub struct model(());
-        ///Marker type for the `original_owner` field
-        pub struct original_owner(());
-        ///Marker type for the `signature` field
-        pub struct signature(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `original_owner` field
+        pub struct original_owner(());
+        ///Marker type for the `obtained_at` field
+        pub struct obtained_at(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
+        ///Marker type for the `signed_payload` field
+        pub struct signed_payload(());
     }
 }
 
@@ -578,19 +538,19 @@ pub mod sticker_state {
 pub struct StickerBuilder<'a, S: sticker_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Data<'a>>,
-        Option<StickerImageType<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<Data<S>>,
+        Option<StickerImageType<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
-        Option<Did<'a>>,
-        Option<Did<'a>>,
-        Option<StickerShape<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<Vec<CowStr<'a>>>,
+        Option<Did<S>>,
+        Option<Did<S>>,
+        Option<StickerShape<S>>,
+        Option<S>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<Vec<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -635,7 +595,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> StickerBuilder<'a, sticker_state::SetImage<S>> {
         self._fields.0 = Option::Some(value.into());
         StickerBuilder {
@@ -648,12 +608,12 @@ where
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `imageType` field (optional)
-    pub fn image_type(mut self, value: impl Into<Option<StickerImageType<'a>>>) -> Self {
+    pub fn image_type(mut self, value: impl Into<Option<StickerImageType<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `imageType` field to an Option value (optional)
-    pub fn maybe_image_type(mut self, value: Option<StickerImageType<'a>>) -> Self {
+    pub fn maybe_image_type(mut self, value: Option<StickerImageType<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -661,12 +621,12 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `message` field (optional)
-    pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
-    pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_message(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -680,7 +640,7 @@ where
     /// Set the `model` field (required)
     pub fn model(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> StickerBuilder<'a, sticker_state::SetModel<S>> {
         self._fields.3 = Option::Some(value.into());
         StickerBuilder {
@@ -693,12 +653,12 @@ where
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -725,12 +685,12 @@ where
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `obtainedFrom` field (optional)
-    pub fn obtained_from(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn obtained_from(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `obtainedFrom` field to an Option value (optional)
-    pub fn maybe_obtained_from(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_obtained_from(mut self, value: Option<Did<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -744,7 +704,7 @@ where
     /// Set the `originalOwner` field (required)
     pub fn original_owner(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> StickerBuilder<'a, sticker_state::SetOriginalOwner<S>> {
         self._fields.7 = Option::Some(value.into());
         StickerBuilder {
@@ -757,12 +717,12 @@ where
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `shape` field (optional)
-    pub fn shape(mut self, value: impl Into<Option<StickerShape<'a>>>) -> Self {
+    pub fn shape(mut self, value: impl Into<Option<StickerShape<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `shape` field to an Option value (optional)
-    pub fn maybe_shape(mut self, value: Option<StickerShape<'a>>) -> Self {
+    pub fn maybe_shape(mut self, value: Option<StickerShape<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -776,7 +736,7 @@ where
     /// Set the `signature` field (required)
     pub fn signature(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> StickerBuilder<'a, sticker_state::SetSignature<S>> {
         self._fields.9 = Option::Some(value.into());
         StickerBuilder {
@@ -795,7 +755,7 @@ where
     /// Set the `signedPayload` field (required)
     pub fn signed_payload(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> StickerBuilder<'a, sticker_state::SetSignedPayload<S>> {
         self._fields.10 = Option::Some(value.into());
         StickerBuilder {
@@ -808,12 +768,12 @@ where
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `subjectDid` field (optional)
-    pub fn subject_did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn subject_did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `subjectDid` field to an Option value (optional)
-    pub fn maybe_subject_did(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_subject_did(mut self, value: Option<Did<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -821,12 +781,12 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -835,12 +795,12 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 impl<'a, S> StickerBuilder<'a, S>
 where
     S: sticker_state::State,
-    S::ObtainedAt: sticker_state::IsSet,
-    S::SignedPayload: sticker_state::IsSet,
     S::Model: sticker_state::IsSet,
-    S::OriginalOwner: sticker_state::IsSet,
-    S::Signature: sticker_state::IsSet,
     S::Image: sticker_state::IsSet,
+    S::OriginalOwner: sticker_state::IsSet,
+    S::ObtainedAt: sticker_state::IsSet,
+    S::Signature: sticker_state::IsSet,
+    S::SignedPayload: sticker_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sticker<'a> {
@@ -864,7 +824,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Sticker<'a> {
         Sticker {
             image: self._fields.0.unwrap(),

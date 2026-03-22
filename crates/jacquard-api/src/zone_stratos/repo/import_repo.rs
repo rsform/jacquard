@@ -10,9 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -22,16 +24,24 @@ pub struct ImportRepo {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ImportRepoOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImportRepoOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Number of records successfully imported.
     pub imported: i64,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -40,22 +50,23 @@ pub struct ImportRepoOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ImportRepoError<'a> {
+pub enum ImportRepoError {
     /// The CAR file is malformed, has missing blocks, or contains records with mismatched CIDs.
     #[serde(rename = "InvalidCar")]
-    InvalidCar(Option<CowStr<'a>>),
+    InvalidCar(Option<SmolStr>),
     /// The destination already has records for this DID. Import is only supported for empty repos.
     #[serde(rename = "RepoAlreadyExists")]
-    RepoAlreadyExists(Option<CowStr<'a>>),
+    RepoAlreadyExists(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for ImportRepoError<'_> {
+impl core::fmt::Display for ImportRepoError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidCar(msg) => {
@@ -72,7 +83,13 @@ impl core::fmt::Display for ImportRepoError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -82,8 +99,8 @@ pub struct ImportRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for ImportRepoResponse {
     const NSID: &'static str = "zone.stratos.repo.importRepo";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ImportRepoOutput<'de>;
-    type Err<'de> = ImportRepoError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ImportRepoOutput<S>;
+    type Err = ImportRepoError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
@@ -99,7 +116,7 @@ impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
         body: &'de [u8],
     ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
     where
-        Self: serde::Deserialize<'de>,
+        Self: Deserialize<'de>,
     {
         Ok(
             Box::new(Self {
@@ -116,6 +133,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for ImportRepoRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/vnd.ipld.car",
     );
-    type Request<'de> = ImportRepo;
+    type Request<S: Bos<str> + AsRef<str>> = ImportRepo;
     type Response = ImportRepoResponse;
 }

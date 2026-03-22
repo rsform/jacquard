@@ -10,28 +10,47 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Binding<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Binding<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Path segments to resolve against scope
-    #[serde(borrow)]
-    pub path: Vec<CowStr<'a>>,
+    pub path: Vec<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct BindingOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BindingOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Response<'a>,
+    pub value: Response<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for at.inlay.Binding
@@ -39,11 +58,12 @@ pub struct BindingResponse;
 impl jacquard_common::xrpc::XrpcResp for BindingResponse {
     const NSID: &'static str = "at.inlay.Binding";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BindingOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BindingOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Binding<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Binding<S> {
     const NSID: &'static str = "at.inlay.Binding";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -58,7 +78,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for BindingRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Binding<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Binding<S>;
     type Response = BindingResponse;
 }
 
@@ -97,7 +117,7 @@ pub mod binding_state {
 /// Builder for constructing an instance of this type
 pub struct BindingBuilder<'a, S: binding_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<CowStr<'a>>>,),
+    _fields: (Option<Vec<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -127,7 +147,7 @@ where
     /// Set the `path` field (required)
     pub fn path(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> BindingBuilder<'a, binding_state::SetPath<S>> {
         self._fields.0 = Option::Some(value.into());
         BindingBuilder {
@@ -153,10 +173,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Binding<'a> {
         Binding {
             path: self._fields.0.unwrap(),

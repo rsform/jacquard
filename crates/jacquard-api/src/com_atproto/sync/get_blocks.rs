@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::types::string::{Did, Cid};
 use jacquard_derive::{IntoStatic, open_union};
@@ -15,11 +15,17 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetBlocks<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetBlocks<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub cids: Vec<Cid<'a>>,
+    pub cids: Vec<Cid<S>>,
     #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
 }
 
 
@@ -30,7 +36,6 @@ pub struct GetBlocksOutput {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -39,26 +44,30 @@ pub struct GetBlocksOutput {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetBlocksError<'a> {
+pub enum GetBlocksError {
     #[serde(rename = "BlockNotFound")]
-    BlockNotFound(Option<CowStr<'a>>),
+    BlockNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     #[serde(rename = "RepoTakendown")]
-    RepoTakendown(Option<CowStr<'a>>),
+    RepoTakendown(Option<jacquard_common::deps::smol_str::SmolStr>),
     #[serde(rename = "RepoSuspended")]
-    RepoSuspended(Option<CowStr<'a>>),
+    RepoSuspended(Option<jacquard_common::deps::smol_str::SmolStr>),
     #[serde(rename = "RepoDeactivated")]
-    RepoDeactivated(Option<CowStr<'a>>),
+    RepoDeactivated(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for GetBlocksError<'_> {
+impl core::fmt::Display for GetBlocksError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::BlockNotFound(msg) => {
@@ -96,7 +105,13 @@ impl core::fmt::Display for GetBlocksError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -106,18 +121,22 @@ pub struct GetBlocksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBlocksResponse {
     const NSID: &'static str = "com.atproto.sync.getBlocks";
     const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<'de> = GetBlocksOutput;
-    type Err<'de> = GetBlocksError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = GetBlocksOutput;
+    type Err = GetBlocksError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(GetBlocksOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -125,7 +144,8 @@ impl jacquard_common::xrpc::XrpcResp for GetBlocksResponse {
     }
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetBlocks<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetBlocks<S> {
     const NSID: &'static str = "com.atproto.sync.getBlocks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBlocksResponse;
@@ -136,7 +156,7 @@ pub struct GetBlocksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBlocksRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getBlocks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBlocks<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetBlocks<S>;
     type Response = GetBlocksResponse;
 }
 
@@ -187,7 +207,7 @@ pub mod get_blocks_state {
 /// Builder for constructing an instance of this type
 pub struct GetBlocksBuilder<'a, S: get_blocks_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<Cid<'a>>>, Option<Did<'a>>),
+    _fields: (Option<Vec<Cid<S>>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -217,7 +237,7 @@ where
     /// Set the `cids` field (required)
     pub fn cids(
         mut self,
-        value: impl Into<Vec<Cid<'a>>>,
+        value: impl Into<Vec<Cid<S>>>,
     ) -> GetBlocksBuilder<'a, get_blocks_state::SetCids<S>> {
         self._fields.0 = Option::Some(value.into());
         GetBlocksBuilder {
@@ -236,7 +256,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetBlocksBuilder<'a, get_blocks_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         GetBlocksBuilder {

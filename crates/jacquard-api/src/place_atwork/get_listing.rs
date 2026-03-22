@@ -10,41 +10,54 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::place_atwork::listing::Listing;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetListing<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetListing<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub repo: AtIdentifier<'a>,
+    pub repo: AtIdentifier<S>,
     #[serde(borrow)]
-    pub rkey: CowStr<'a>,
+    pub rkey: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetListingOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetListingOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///CID of the listing record
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
+    pub cid: Option<Cid<S>>,
     ///AT-URI of the listing
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
     ///The job listing record
-    #[serde(borrow)]
-    pub value: Listing<'a>,
+    pub value: Listing<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -53,25 +66,26 @@ pub struct GetListingOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetListingError<'a> {
+pub enum GetListingError {
     /// The requested listing does not exist
     #[serde(rename = "ListingNotFound")]
-    ListingNotFound(Option<CowStr<'a>>),
+    ListingNotFound(Option<SmolStr>),
     /// Failed to parse the listing data
     #[serde(rename = "ListingParseFailed")]
-    ListingParseFailed(Option<CowStr<'a>>),
+    ListingParseFailed(Option<SmolStr>),
     /// Failed to fetch the listing from storage
     #[serde(rename = "ListingFetchFailed")]
-    ListingFetchFailed(Option<CowStr<'a>>),
+    ListingFetchFailed(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetListingError<'_> {
+impl core::fmt::Display for GetListingError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::ListingNotFound(msg) => {
@@ -95,7 +109,13 @@ impl core::fmt::Display for GetListingError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -105,11 +125,12 @@ pub struct GetListingResponse;
 impl jacquard_common::xrpc::XrpcResp for GetListingResponse {
     const NSID: &'static str = "place.atwork.getListing";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetListingOutput<'de>;
-    type Err<'de> = GetListingError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetListingOutput<S>;
+    type Err = GetListingError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetListing<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetListing<S> {
     const NSID: &'static str = "place.atwork.getListing";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetListingResponse;
@@ -120,7 +141,7 @@ pub struct GetListingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetListingRequest {
     const PATH: &'static str = "/xrpc/place.atwork.getListing";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetListing<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetListing<S>;
     type Response = GetListingResponse;
 }
 
@@ -171,7 +192,7 @@ pub mod get_listing_state {
 /// Builder for constructing an instance of this type
 pub struct GetListingBuilder<'a, S: get_listing_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<AtIdentifier<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -201,7 +222,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetListingBuilder<'a, get_listing_state::SetRepo<S>> {
         self._fields.0 = Option::Some(value.into());
         GetListingBuilder {
@@ -220,7 +241,7 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetListingBuilder<'a, get_listing_state::SetRkey<S>> {
         self._fields.1 = Option::Some(value.into());
         GetListingBuilder {

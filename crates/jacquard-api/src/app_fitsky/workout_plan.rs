@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,34 +31,39 @@ use serde::{Serialize, Deserialize};
 use crate::app_fitsky::workout_plan;
 /// A reusable workout plan template
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.fitsky.workoutPlan", tag = "$type")]
-pub struct WorkoutPlan<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.fitsky.workoutPlan",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct WorkoutPlan<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub exercises: Vec<workout_plan::PlanExercise<'a>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub exercises: Vec<workout_plan::PlanExercise<S>>,
+    pub name: S,
     ///Open Graph preview image for social sharing
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub og_image: Option<BlobRef<'a>>,
-    #[serde(borrow)]
-    pub r#type: WorkoutPlanType<'a>,
+    pub og_image: Option<BlobRef<S>>,
+    pub r#type: WorkoutPlanType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WorkoutPlanType<'a> {
+pub enum WorkoutPlanType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Weightlifting,
     Bodyweight,
     Yoga,
     Hiit,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> WorkoutPlanType<'a> {
+impl<S: Bos<str> + AsRef<str>> WorkoutPlanType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Weightlifting => "weightlifting",
@@ -66,74 +73,58 @@ impl<'a> WorkoutPlanType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for WorkoutPlanType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "weightlifting" => Self::Weightlifting,
             "bodyweight" => Self::Bodyweight,
             "yoga" => Self::Yoga,
             "hiit" => Self::Hiit,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for WorkoutPlanType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "weightlifting" => Self::Weightlifting,
-            "bodyweight" => Self::Bodyweight,
-            "yoga" => Self::Yoga,
-            "hiit" => Self::Hiit,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WorkoutPlanType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WorkoutPlanType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for WorkoutPlanType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for WorkoutPlanType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for WorkoutPlanType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for WorkoutPlanType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for WorkoutPlanType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for WorkoutPlanType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for WorkoutPlanType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for WorkoutPlanType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for WorkoutPlanType<'_> {
-    type Output = WorkoutPlanType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for WorkoutPlanType<S> {
+    type Output = WorkoutPlanType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             WorkoutPlanType::Weightlifting => WorkoutPlanType::Weightlifting,
@@ -148,36 +139,42 @@ impl jacquard_common::IntoStatic for WorkoutPlanType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct WorkoutPlanGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct WorkoutPlanGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: WorkoutPlan<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: WorkoutPlan<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PlanExercise<'a> {
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PlanExercise<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notes: Option<CowStr<'a>>,
+    pub notes: Option<S>,
     pub target_reps: i64,
     pub target_sets: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> WorkoutPlan<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, WorkoutPlanRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> WorkoutPlan<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, WorkoutPlanRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -188,18 +185,17 @@ pub struct WorkoutPlanRecord;
 impl XrpcResp for WorkoutPlanRecord {
     const NSID: &'static str = "app.fitsky.workoutPlan";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = WorkoutPlanGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = WorkoutPlanGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<WorkoutPlanGetRecordOutput<'_>> for WorkoutPlan<'_> {
-    fn from(output: WorkoutPlanGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<WorkoutPlanGetRecordOutput<S>> for WorkoutPlan<S> {
+    fn from(output: WorkoutPlanGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for WorkoutPlan<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for WorkoutPlan<S> {
     const NSID: &'static str = "app.fitsky.workoutPlan";
     type Record = WorkoutPlanRecord;
 }
@@ -209,7 +205,7 @@ impl Collection for WorkoutPlanRecord {
     type Record = WorkoutPlanRecord;
 }
 
-impl<'a> LexiconSchema for WorkoutPlan<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for WorkoutPlan<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workoutPlan"
     }
@@ -287,7 +283,7 @@ impl<'a> LexiconSchema for WorkoutPlan<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PlanExercise<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlanExercise<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workoutPlan"
     }
@@ -353,65 +349,65 @@ pub mod workout_plan_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Exercises;
-        type Type;
         type Name;
+        type Type;
+        type Exercises;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Exercises = Unset;
-        type Type = Unset;
         type Name = Unset;
+        type Type = Unset;
+        type Exercises = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `exercises` field to Set
-    pub struct SetExercises<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExercises<S> {}
-    impl<S: State> State for SetExercises<S> {
-        type Exercises = Set<members::exercises>;
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
         type Type = S::Type;
-        type Name = S::Name;
+        type Exercises = S::Exercises;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Exercises = S::Exercises;
-        type Type = Set<members::r#type>;
         type Name = S::Name;
+        type Type = Set<members::r#type>;
+        type Exercises = S::Exercises;
         type CreatedAt = S::CreatedAt;
     }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Exercises = S::Exercises;
+    ///State transition - sets the `exercises` field to Set
+    pub struct SetExercises<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExercises<S> {}
+    impl<S: State> State for SetExercises<S> {
+        type Name = S::Name;
         type Type = S::Type;
-        type Name = Set<members::name>;
+        type Exercises = Set<members::exercises>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Exercises = S::Exercises;
-        type Type = S::Type;
         type Name = S::Name;
+        type Type = S::Type;
+        type Exercises = S::Exercises;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `exercises` field
-        pub struct exercises(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `exercises` field
+        pub struct exercises(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -422,10 +418,10 @@ pub struct WorkoutPlanBuilder<'a, S: workout_plan_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<Vec<workout_plan::PlanExercise<'a>>>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<WorkoutPlanType<'a>>,
+        Option<Vec<workout_plan::PlanExercise<S>>>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<WorkoutPlanType<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -475,7 +471,7 @@ where
     /// Set the `exercises` field (required)
     pub fn exercises(
         mut self,
-        value: impl Into<Vec<workout_plan::PlanExercise<'a>>>,
+        value: impl Into<Vec<workout_plan::PlanExercise<S>>>,
     ) -> WorkoutPlanBuilder<'a, workout_plan_state::SetExercises<S>> {
         self._fields.1 = Option::Some(value.into());
         WorkoutPlanBuilder {
@@ -494,7 +490,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> WorkoutPlanBuilder<'a, workout_plan_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         WorkoutPlanBuilder {
@@ -507,12 +503,12 @@ where
 
 impl<'a, S: workout_plan_state::State> WorkoutPlanBuilder<'a, S> {
     /// Set the `ogImage` field (optional)
-    pub fn og_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn og_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `ogImage` field to an Option value (optional)
-    pub fn maybe_og_image(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_og_image(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -526,7 +522,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<WorkoutPlanType<'a>>,
+        value: impl Into<WorkoutPlanType<S>>,
     ) -> WorkoutPlanBuilder<'a, workout_plan_state::SetType<S>> {
         self._fields.4 = Option::Some(value.into());
         WorkoutPlanBuilder {
@@ -540,9 +536,9 @@ where
 impl<'a, S> WorkoutPlanBuilder<'a, S>
 where
     S: workout_plan_state::State,
-    S::Exercises: workout_plan_state::IsSet,
-    S::Type: workout_plan_state::IsSet,
     S::Name: workout_plan_state::IsSet,
+    S::Type: workout_plan_state::IsSet,
+    S::Exercises: workout_plan_state::IsSet,
     S::CreatedAt: workout_plan_state::IsSet,
 {
     /// Build the final struct
@@ -559,10 +555,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> WorkoutPlan<'a> {
         WorkoutPlan {
             created_at: self._fields.0.unwrap(),
@@ -707,58 +700,58 @@ pub mod plan_exercise_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type TargetReps;
         type Name;
         type TargetSets;
-        type TargetReps;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type TargetReps = Unset;
         type Name = Unset;
         type TargetSets = Unset;
-        type TargetReps = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type TargetSets = S::TargetSets;
-        type TargetReps = S::TargetReps;
-    }
-    ///State transition - sets the `target_sets` field to Set
-    pub struct SetTargetSets<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetSets<S> {}
-    impl<S: State> State for SetTargetSets<S> {
-        type Name = S::Name;
-        type TargetSets = Set<members::target_sets>;
-        type TargetReps = S::TargetReps;
     }
     ///State transition - sets the `target_reps` field to Set
     pub struct SetTargetReps<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTargetReps<S> {}
     impl<S: State> State for SetTargetReps<S> {
+        type TargetReps = Set<members::target_reps>;
         type Name = S::Name;
         type TargetSets = S::TargetSets;
-        type TargetReps = Set<members::target_reps>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type TargetReps = S::TargetReps;
+        type Name = Set<members::name>;
+        type TargetSets = S::TargetSets;
+    }
+    ///State transition - sets the `target_sets` field to Set
+    pub struct SetTargetSets<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTargetSets<S> {}
+    impl<S: State> State for SetTargetSets<S> {
+        type TargetReps = S::TargetReps;
+        type Name = S::Name;
+        type TargetSets = Set<members::target_sets>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `target_reps` field
+        pub struct target_reps(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `target_sets` field
         pub struct target_sets(());
-        ///Marker type for the `target_reps` field
-        pub struct target_reps(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PlanExerciseBuilder<'a, S: plan_exercise_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>, Option<i64>),
+    _fields: (Option<S>, Option<S>, Option<i64>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -788,7 +781,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PlanExerciseBuilder<'a, plan_exercise_state::SetName<S>> {
         self._fields.0 = Option::Some(value.into());
         PlanExerciseBuilder {
@@ -801,12 +794,12 @@ where
 
 impl<'a, S: plan_exercise_state::State> PlanExerciseBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
-    pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_notes(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -853,9 +846,9 @@ where
 impl<'a, S> PlanExerciseBuilder<'a, S>
 where
     S: plan_exercise_state::State,
+    S::TargetReps: plan_exercise_state::IsSet,
     S::Name: plan_exercise_state::IsSet,
     S::TargetSets: plan_exercise_state::IsSet,
-    S::TargetReps: plan_exercise_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlanExercise<'a> {
@@ -870,10 +863,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PlanExercise<'a> {
         PlanExercise {
             name: self._fields.0.unwrap(),

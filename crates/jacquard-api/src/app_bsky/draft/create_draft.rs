@@ -10,31 +10,48 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::draft::Draft;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateDraft<'a> {
-    #[serde(borrow)]
-    pub draft: Draft<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateDraft<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub draft: Draft<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateDraftOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateDraftOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The ID of the created draft.
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -43,19 +60,20 @@ pub struct CreateDraftOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateDraftError<'a> {
+pub enum CreateDraftError {
     /// Trying to insert a new draft when the limit was already reached.
     #[serde(rename = "DraftLimitReached")]
-    DraftLimitReached(Option<CowStr<'a>>),
+    DraftLimitReached(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for CreateDraftError<'_> {
+impl core::fmt::Display for CreateDraftError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::DraftLimitReached(msg) => {
@@ -65,7 +83,13 @@ impl core::fmt::Display for CreateDraftError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -75,11 +99,12 @@ pub struct CreateDraftResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateDraftResponse {
     const NSID: &'static str = "app.bsky.draft.createDraft";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateDraftOutput<'de>;
-    type Err<'de> = CreateDraftError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CreateDraftOutput<S>;
+    type Err = CreateDraftError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateDraft<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CreateDraft<S> {
     const NSID: &'static str = "app.bsky.draft.createDraft";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -94,7 +119,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateDraftRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CreateDraft<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CreateDraft<S>;
     type Response = CreateDraftResponse;
 }
 
@@ -133,7 +158,7 @@ pub mod create_draft_state {
 /// Builder for constructing an instance of this type
 pub struct CreateDraftBuilder<'a, S: create_draft_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Draft<'a>>,),
+    _fields: (Option<Draft<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -163,7 +188,7 @@ where
     /// Set the `draft` field (required)
     pub fn draft(
         mut self,
-        value: impl Into<Draft<'a>>,
+        value: impl Into<Draft<S>>,
     ) -> CreateDraftBuilder<'a, create_draft_state::SetDraft<S>> {
         self._fields.0 = Option::Some(value.into());
         CreateDraftBuilder {
@@ -189,10 +214,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CreateDraft<'a> {
         CreateDraft {
             draft: self._fields.0.unwrap(),

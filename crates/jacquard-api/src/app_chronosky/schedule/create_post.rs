@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Datetime, Language};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -35,101 +37,130 @@ use crate::app_bsky::richtext::facet::Facet;
 use crate::com_atproto::label::SelfLabels;
 use crate::app_chronosky::schedule::create_post;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreatePost<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreatePost<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether to disable quote posts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_quote_posts: Option<bool>,
     ///Chronosky-internal scheduled post ID of the parent post (for scheduling threads or replies). Not an AT Protocol URI or Record Key.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent_post_id: Option<CowStr<'a>>,
+    pub parent_post_id: Option<S>,
     ///Array of posts to schedule (1 element = single post, multiple = thread)
-    #[serde(borrow)]
-    pub posts: Vec<create_post::ThreadPostInput<'a>>,
+    pub posts: Vec<create_post::ThreadPostInput<S>>,
     ///Scheduled publish time
     pub scheduled_at: Datetime,
     ///Thread gate rules to control who can reply
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub threadgate_rules: Option<Vec<CreatePostThreadgateRulesItem<'a>>>,
+    pub threadgate_rules: Option<Vec<CreatePostThreadgateRulesItem<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum CreatePostThreadgateRulesItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum CreatePostThreadgateRulesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
-    ThreadgateMentionRule(Box<MentionRule<'a>>),
+    ThreadgateMentionRule(Box<MentionRule<S>>),
     #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
-    ThreadgateFollowerRule(Box<FollowerRule<'a>>),
+    ThreadgateFollowerRule(Box<FollowerRule<S>>),
     #[serde(rename = "app.bsky.feed.threadgate#followingRule")]
-    ThreadgateFollowingRule(Box<FollowingRule<'a>>),
+    ThreadgateFollowingRule(Box<FollowingRule<S>>),
     #[serde(rename = "app.bsky.feed.threadgate#listRule")]
-    ThreadgateListRule(Box<ListRule<'a>>),
+    ThreadgateListRule(Box<ListRule<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreatePostOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreatePostOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Chronosky schedule ID (parent post ID for threads)
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
     ///Number of posts created (1 for single post, N for thread)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub post_count: Option<i64>,
     pub scheduled_at: Datetime,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Individual post input for thread scheduling.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadPostInput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ThreadPostInput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Post creation timestamp (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///Embedded content (images, external links, records).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub embed: Option<ThreadPostInputEmbed<'a>>,
+    pub embed: Option<ThreadPostInputEmbed<S>>,
     ///Rich text facets (mentions, links, tags)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Facet<'a>>>,
+    pub facets: Option<Vec<Facet<S>>>,
     ///Self-applied content labels for content warnings (AT Protocol standard).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<SelfLabels<'a>>,
+    pub labels: Option<SelfLabels<S>>,
     ///Language codes (ISO 639-1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub langs: Option<Vec<Language>>,
     ///Post text content
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ThreadPostInputEmbed<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ThreadPostInputEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.embed.images")]
-    Images(Box<Images<'a>>),
+    Images(Box<Images<S>>),
     #[serde(rename = "app.bsky.embed.external")]
-    External(Box<ExternalRecord<'a>>),
+    External(Box<ExternalRecord<S>>),
     #[serde(rename = "app.bsky.embed.record")]
-    Record(Box<Record<'a>>),
+    Record(Box<Record<S>>),
     #[serde(rename = "app.bsky.embed.video")]
-    Video(Box<Video<'a>>),
+    Video(Box<Video<S>>),
     #[serde(rename = "app.bsky.embed.recordWithMedia")]
-    RecordWithMedia(Box<RecordWithMedia<'a>>),
+    RecordWithMedia(Box<RecordWithMedia<S>>),
 }
 
 /// Response type for app.chronosky.schedule.createPost
@@ -137,11 +168,12 @@ pub struct CreatePostResponse;
 impl jacquard_common::xrpc::XrpcResp for CreatePostResponse {
     const NSID: &'static str = "app.chronosky.schedule.createPost";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreatePostOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CreatePostOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreatePost<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CreatePost<S> {
     const NSID: &'static str = "app.chronosky.schedule.createPost";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -156,11 +188,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreatePostRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CreatePost<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CreatePost<S>;
     type Response = CreatePostResponse;
 }
 
-impl<'a> LexiconSchema for ThreadPostInput<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ThreadPostInput<S> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.createPost"
     }
@@ -268,10 +300,10 @@ pub struct CreatePostBuilder<'a, S: create_post_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<bool>,
-        Option<CowStr<'a>>,
-        Option<Vec<create_post::ThreadPostInput<'a>>>,
+        Option<S>,
+        Option<Vec<create_post::ThreadPostInput<S>>>,
         Option<Datetime>,
-        Option<Vec<CreatePostThreadgateRulesItem<'a>>>,
+        Option<Vec<CreatePostThreadgateRulesItem<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -309,12 +341,12 @@ impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
 
 impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
     /// Set the `parentPostId` field (optional)
-    pub fn parent_post_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn parent_post_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `parentPostId` field to an Option value (optional)
-    pub fn maybe_parent_post_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_parent_post_id(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -328,7 +360,7 @@ where
     /// Set the `posts` field (required)
     pub fn posts(
         mut self,
-        value: impl Into<Vec<create_post::ThreadPostInput<'a>>>,
+        value: impl Into<Vec<create_post::ThreadPostInput<S>>>,
     ) -> CreatePostBuilder<'a, create_post_state::SetPosts<S>> {
         self._fields.2 = Option::Some(value.into());
         CreatePostBuilder {
@@ -362,7 +394,7 @@ impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
     /// Set the `threadgateRules` field (optional)
     pub fn threadgate_rules(
         mut self,
-        value: impl Into<Option<Vec<CreatePostThreadgateRulesItem<'a>>>>,
+        value: impl Into<Option<Vec<CreatePostThreadgateRulesItem<S>>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
@@ -370,7 +402,7 @@ impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
     /// Set the `threadgateRules` field to an Option value (optional)
     pub fn maybe_threadgate_rules(
         mut self,
-        value: Option<Vec<CreatePostThreadgateRulesItem<'a>>>,
+        value: Option<Vec<CreatePostThreadgateRulesItem<S>>>,
     ) -> Self {
         self._fields.4 = value;
         self
@@ -397,10 +429,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CreatePost<'a> {
         CreatePost {
             disable_quote_posts: self._fields.0,

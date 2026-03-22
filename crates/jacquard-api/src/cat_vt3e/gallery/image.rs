@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,61 +30,64 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// defines an image in the gallery
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "cat.vt3e.gallery.image", tag = "$type")]
-pub struct Image<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "cat.vt3e.gallery.image",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alt: Option<CowStr<'a>>,
+    pub alt: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub aspect_ratio: Option<i64>,
     ///provides a blurred preview of the image for use while loading, see github.com/woltapp/blurhash
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub blurhash: Option<CowStr<'a>>,
+    pub blurhash: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub caption: Option<CowStr<'a>>,
+    pub caption: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub checksum: Option<CowStr<'a>>,
+    pub checksum: Option<S>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub dominant_colour: Option<CowStr<'a>>,
+    pub dominant_colour: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
-    #[serde(borrow)]
-    pub image: BlobRef<'a>,
+    pub image: BlobRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size_in_bytes: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImageGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Image<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Image<S>,
 }
 
-impl<'a> Image<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ImageRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Image<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ImageRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -93,18 +98,17 @@ pub struct ImageRecord;
 impl XrpcResp for ImageRecord {
     const NSID: &'static str = "cat.vt3e.gallery.image";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ImageGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ImageGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ImageGetRecordOutput<'_>> for Image<'_> {
-    fn from(output: ImageGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ImageGetRecordOutput<S>> for Image<S> {
+    fn from(output: ImageGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Image<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Image<S> {
     const NSID: &'static str = "cat.vt3e.gallery.image";
     type Record = ImageRecord;
 }
@@ -114,7 +118,7 @@ impl Collection for ImageRecord {
     type Record = ImageRecord;
 }
 
-impl<'a> LexiconSchema for Image<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Image<S> {
     fn nsid() -> &'static str {
         "cat.vt3e.gallery.image"
     }
@@ -247,17 +251,17 @@ pub mod image_state {
 pub struct ImageBuilder<'a, S: image_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
-        Option<BlobRef<'a>>,
+        Option<BlobRef<S>>,
         Option<i64>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -296,12 +300,12 @@ impl<'a> ImageBuilder<'a, image_state::Empty> {
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `alt` field (optional)
-    pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
-    pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_alt(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -322,12 +326,12 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `blurhash` field (optional)
-    pub fn blurhash(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn blurhash(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `blurhash` field to an Option value (optional)
-    pub fn maybe_blurhash(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_blurhash(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -335,12 +339,12 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `caption` field (optional)
-    pub fn caption(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn caption(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `caption` field to an Option value (optional)
-    pub fn maybe_caption(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_caption(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -348,12 +352,12 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `checksum` field (optional)
-    pub fn checksum(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn checksum(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `checksum` field to an Option value (optional)
-    pub fn maybe_checksum(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_checksum(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -380,12 +384,12 @@ where
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `dominantColour` field (optional)
-    pub fn dominant_colour(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn dominant_colour(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `dominantColour` field to an Option value (optional)
-    pub fn maybe_dominant_colour(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_dominant_colour(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -412,7 +416,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> ImageBuilder<'a, image_state::SetImage<S>> {
         self._fields.8 = Option::Some(value.into());
         ImageBuilder {
@@ -438,12 +442,12 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -487,13 +491,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Image<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Image<'a> {
         Image {
             alt: self._fields.0,
             aspect_ratio: self._fields.1,

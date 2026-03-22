@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,14 +31,17 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::app_certified::actor::organization;
 /// Extended metadata for an organization actor. Complements the base actor profile with organization-specific fields like legal structure and reference links.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.certified.actor.organization",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Organization<'a> {
+pub struct Organization<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Client-declared timestamp when this record was originally created.
     pub created_at: Datetime,
     ///When the organization was established. Stored as datetime per ATProto conventions (no date-only format exists). Clients should use midnight UTC (e.g., '2005-01-01T00:00:00.000Z'); consumers should treat only the date portion as canonical.
@@ -44,52 +49,57 @@ pub struct Organization<'a> {
     pub founded_date: Option<Datetime>,
     ///A strong reference to the location where the organization is based. The record referenced must conform with the lexicon app.certified.location.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location: Option<StrongRef<'a>>,
+    pub location: Option<StrongRef<S>>,
     ///Legal or operational structures of the organization (e.g. 'nonprofit', 'ngo', 'government', 'social-enterprise', 'cooperative').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub organization_type: Option<Vec<CowStr<'a>>>,
+    pub organization_type: Option<Vec<S>>,
     ///Additional reference URLs (social media profiles, contact pages, donation links, etc.) with a display label for each URL.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub urls: Option<Vec<organization::UrlItem<'a>>>,
+    pub urls: Option<Vec<organization::UrlItem<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct OrganizationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct OrganizationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Organization<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Organization<S>,
 }
 
 /// A labeled URL reference.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct UrlItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UrlItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional human-readable label for this URL (e.g. 'Support page', 'Donation page').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub label: Option<CowStr<'a>>,
+    pub label: Option<S>,
     ///The URL.
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Organization<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, OrganizationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Organization<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, OrganizationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -100,18 +110,17 @@ pub struct OrganizationRecord;
 impl XrpcResp for OrganizationRecord {
     const NSID: &'static str = "app.certified.actor.organization";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = OrganizationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = OrganizationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<OrganizationGetRecordOutput<'_>> for Organization<'_> {
-    fn from(output: OrganizationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<OrganizationGetRecordOutput<S>> for Organization<S> {
+    fn from(output: OrganizationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Organization<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Organization<S> {
     const NSID: &'static str = "app.certified.actor.organization";
     type Record = OrganizationRecord;
 }
@@ -121,7 +130,7 @@ impl Collection for OrganizationRecord {
     type Record = OrganizationRecord;
 }
 
-impl<'a> LexiconSchema for Organization<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Organization<S> {
     fn nsid() -> &'static str {
         "app.certified.actor.organization"
     }
@@ -146,7 +155,7 @@ impl<'a> LexiconSchema for Organization<'a> {
     }
 }
 
-impl<'a> LexiconSchema for UrlItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for UrlItem<S> {
     fn nsid() -> &'static str {
         "app.certified.actor.organization"
     }
@@ -245,9 +254,9 @@ pub struct OrganizationBuilder<'a, S: organization_state::State> {
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
-        Option<StrongRef<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<organization::UrlItem<'a>>>,
+        Option<StrongRef<S>>,
+        Option<Vec<S>>,
+        Option<Vec<organization::UrlItem<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -304,12 +313,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `location` field (optional)
-    pub fn location(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn location(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
-    pub fn maybe_location(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_location(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -317,15 +326,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `organizationType` field (optional)
-    pub fn organization_type(
-        mut self,
-        value: impl Into<Option<Vec<CowStr<'a>>>>,
-    ) -> Self {
+    pub fn organization_type(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `organizationType` field to an Option value (optional)
-    pub fn maybe_organization_type(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_organization_type(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -335,13 +341,13 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `urls` field (optional)
     pub fn urls(
         mut self,
-        value: impl Into<Option<Vec<organization::UrlItem<'a>>>>,
+        value: impl Into<Option<Vec<organization::UrlItem<S>>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `urls` field to an Option value (optional)
-    pub fn maybe_urls(mut self, value: Option<Vec<organization::UrlItem<'a>>>) -> Self {
+    pub fn maybe_urls(mut self, value: Option<Vec<organization::UrlItem<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -366,10 +372,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Organization<'a> {
         Organization {
             created_at: self._fields.0.unwrap(),
@@ -553,7 +556,7 @@ pub mod url_item_state {
 /// Builder for constructing an instance of this type
 pub struct UrlItemBuilder<'a, S: url_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _fields: (Option<S>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -577,12 +580,12 @@ impl<'a> UrlItemBuilder<'a, url_item_state::Empty> {
 
 impl<'a, S: url_item_state::State> UrlItemBuilder<'a, S> {
     /// Set the `label` field (optional)
-    pub fn label(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn label(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `label` field to an Option value (optional)
-    pub fn maybe_label(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_label(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -596,7 +599,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> UrlItemBuilder<'a, url_item_state::SetUrl<S>> {
         self._fields.1 = Option::Some(value.into());
         UrlItemBuilder {
@@ -623,10 +626,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> UrlItem<'a> {
         UrlItem {
             label: self._fields.0,

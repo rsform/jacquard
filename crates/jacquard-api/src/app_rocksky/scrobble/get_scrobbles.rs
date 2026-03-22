@@ -10,17 +10,26 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::scrobble::ScrobbleViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetScrobbles<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetScrobbles<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did: Option<AtIdentifier<'a>>,
+    pub did: Option<AtIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub following: Option<bool>,
     ///(min: 1)
@@ -32,13 +41,21 @@ pub struct GetScrobbles<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetScrobblesOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetScrobblesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub scrobbles: Option<Vec<ScrobbleViewBasic<'a>>>,
+    pub scrobbles: Option<Vec<ScrobbleViewBasic<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.scrobble.getScrobbles
@@ -46,11 +63,12 @@ pub struct GetScrobblesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetScrobblesResponse {
     const NSID: &'static str = "app.rocksky.scrobble.getScrobbles";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetScrobblesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetScrobblesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetScrobbles<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetScrobbles<S> {
     const NSID: &'static str = "app.rocksky.scrobble.getScrobbles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetScrobblesResponse;
@@ -61,7 +79,7 @@ pub struct GetScrobblesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetScrobblesRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.scrobble.getScrobbles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetScrobbles<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetScrobbles<S>;
     type Response = GetScrobblesResponse;
 }
 
@@ -87,7 +105,7 @@ pub mod get_scrobbles_state {
 /// Builder for constructing an instance of this type
 pub struct GetScrobblesBuilder<'a, S: get_scrobbles_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>, Option<bool>, Option<i64>, Option<i64>),
+    _fields: (Option<AtIdentifier<S>>, Option<bool>, Option<i64>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -111,12 +129,12 @@ impl<'a> GetScrobblesBuilder<'a, get_scrobbles_state::Empty> {
 
 impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
     /// Set the `did` field (optional)
-    pub fn did(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
+    pub fn did(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(mut self, value: Option<AtIdentifier<'a>>) -> Self {
+    pub fn maybe_did(mut self, value: Option<AtIdentifier<S>>) -> Self {
         self._fields.0 = value;
         self
     }

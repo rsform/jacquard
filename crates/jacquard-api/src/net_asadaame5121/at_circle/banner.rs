@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,40 +31,44 @@ use serde::{Serialize, Deserialize};
 use crate::net_asadaame5121::at_circle::RingRef;
 /// A banner image for a ring
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "net.asadaame5121.at-circle.banner",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Banner<'a> {
-    #[serde(borrow)]
-    pub banner: BlobRef<'a>,
+pub struct Banner<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub banner: BlobRef<S>,
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub ring: RingRef<'a>,
+    pub ring: RingRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BannerGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BannerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Banner<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Banner<S>,
 }
 
-impl<'a> Banner<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, BannerRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Banner<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, BannerRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -73,18 +79,17 @@ pub struct BannerRecord;
 impl XrpcResp for BannerRecord {
     const NSID: &'static str = "net.asadaame5121.at-circle.banner";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BannerGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BannerGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<BannerGetRecordOutput<'_>> for Banner<'_> {
-    fn from(output: BannerGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<BannerGetRecordOutput<S>> for Banner<S> {
+    fn from(output: BannerGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Banner<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Banner<S> {
     const NSID: &'static str = "net.asadaame5121.at-circle.banner";
     type Record = BannerRecord;
 }
@@ -94,7 +99,7 @@ impl Collection for BannerRecord {
     type Record = BannerRecord;
 }
 
-impl<'a> LexiconSchema for Banner<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Banner<S> {
     fn nsid() -> &'static str {
         "net.asadaame5121.at-circle.banner"
     }
@@ -159,58 +164,58 @@ pub mod banner_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ring;
         type Banner;
         type CreatedAt;
+        type Ring;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ring = Unset;
         type Banner = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `ring` field to Set
-    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRing<S> {}
-    impl<S: State> State for SetRing<S> {
-        type Ring = Set<members::ring>;
-        type Banner = S::Banner;
-        type CreatedAt = S::CreatedAt;
+        type Ring = Unset;
     }
     ///State transition - sets the `banner` field to Set
     pub struct SetBanner<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBanner<S> {}
     impl<S: State> State for SetBanner<S> {
-        type Ring = S::Ring;
         type Banner = Set<members::banner>;
         type CreatedAt = S::CreatedAt;
+        type Ring = S::Ring;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Ring = S::Ring;
         type Banner = S::Banner;
         type CreatedAt = Set<members::created_at>;
+        type Ring = S::Ring;
+    }
+    ///State transition - sets the `ring` field to Set
+    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRing<S> {}
+    impl<S: State> State for SetRing<S> {
+        type Banner = S::Banner;
+        type CreatedAt = S::CreatedAt;
+        type Ring = Set<members::ring>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ring` field
-        pub struct ring(());
         ///Marker type for the `banner` field
         pub struct banner(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `ring` field
+        pub struct ring(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BannerBuilder<'a, S: banner_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>, Option<Datetime>, Option<RingRef<'a>>),
+    _fields: (Option<BlobRef<S>>, Option<Datetime>, Option<RingRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -240,7 +245,7 @@ where
     /// Set the `banner` field (required)
     pub fn banner(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> BannerBuilder<'a, banner_state::SetBanner<S>> {
         self._fields.0 = Option::Some(value.into());
         BannerBuilder {
@@ -278,7 +283,7 @@ where
     /// Set the `ring` field (required)
     pub fn ring(
         mut self,
-        value: impl Into<RingRef<'a>>,
+        value: impl Into<RingRef<S>>,
     ) -> BannerBuilder<'a, banner_state::SetRing<S>> {
         self._fields.2 = Option::Some(value.into());
         BannerBuilder {
@@ -292,9 +297,9 @@ where
 impl<'a, S> BannerBuilder<'a, S>
 where
     S: banner_state::State,
-    S::Ring: banner_state::IsSet,
     S::Banner: banner_state::IsSet,
     S::CreatedAt: banner_state::IsSet,
+    S::Ring: banner_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Banner<'a> {
@@ -306,13 +311,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Banner<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Banner<'a> {
         Banner {
             banner: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

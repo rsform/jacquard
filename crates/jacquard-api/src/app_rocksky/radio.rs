@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,115 +30,123 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A declaration of a radio station.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.rocksky.radio", tag = "$type")]
-pub struct Radio<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.rocksky.radio",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Radio<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The date when the radio station was created.
     pub created_at: Datetime,
     ///A description of the radio station.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The genre of the radio station.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genre: Option<CowStr<'a>>,
+    pub genre: Option<S>,
     ///The logo of the radio station.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub logo: Option<BlobRef<'a>>,
+    pub logo: Option<BlobRef<S>>,
     ///The name of the radio station.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///The URL of the radio station.
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
     ///The website of the radio station.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub website: Option<UriValue<'a>>,
+    pub website: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RadioGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RadioGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Radio<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Radio<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct RadioViewBasic<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RadioViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The date and time when the radio was created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///A brief description of the radio.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The unique identifier of the radio.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///The name of the radio.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct RadioViewDetailed<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RadioViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The date and time when the radio was created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///A brief description of the radio.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The genre of the radio.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genre: Option<CowStr<'a>>,
+    pub genre: Option<S>,
     ///The unique identifier of the radio.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///The logo of the radio station.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub logo: Option<CowStr<'a>>,
+    pub logo: Option<S>,
     ///The name of the radio.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///The streaming URL of the radio.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<UriValue<'a>>,
+    pub url: Option<UriValue<S>>,
     ///The website of the radio.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub website: Option<UriValue<'a>>,
+    pub website: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Radio<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, RadioRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Radio<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, RadioRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -147,18 +157,17 @@ pub struct RadioRecord;
 impl XrpcResp for RadioRecord {
     const NSID: &'static str = "app.rocksky.radio";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RadioGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RadioGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<RadioGetRecordOutput<'_>> for Radio<'_> {
-    fn from(output: RadioGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<RadioGetRecordOutput<S>> for Radio<S> {
+    fn from(output: RadioGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Radio<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Radio<S> {
     const NSID: &'static str = "app.rocksky.radio";
     type Record = RadioRecord;
 }
@@ -168,7 +177,7 @@ impl Collection for RadioRecord {
     type Record = RadioRecord;
 }
 
-impl<'a> LexiconSchema for Radio<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Radio<S> {
     fn nsid() -> &'static str {
         "app.rocksky.radio"
     }
@@ -285,7 +294,7 @@ impl<'a> LexiconSchema for Radio<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RadioViewBasic<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RadioViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.radio.defs"
     }
@@ -300,7 +309,7 @@ impl<'a> LexiconSchema for RadioViewBasic<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RadioViewDetailed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RadioViewDetailed<S> {
     fn nsid() -> &'static str {
         "app.rocksky.radio.defs"
     }
@@ -325,51 +334,51 @@ pub mod radio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Name;
         type Url;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Name = Unset;
         type Url = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Name = S::Name;
-        type Url = Set<members::url>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
         type Url = S::Url;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `url` field
         pub struct url(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -378,12 +387,12 @@ pub struct RadioBuilder<'a, S: radio_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<UriValue<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -427,12 +436,12 @@ where
 
 impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -440,12 +449,12 @@ impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
 
 impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_genre(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -453,12 +462,12 @@ impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
 
 impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
     /// Set the `logo` field (optional)
-    pub fn logo(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn logo(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `logo` field to an Option value (optional)
-    pub fn maybe_logo(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_logo(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -472,7 +481,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RadioBuilder<'a, radio_state::SetName<S>> {
         self._fields.4 = Option::Some(value.into());
         RadioBuilder {
@@ -491,7 +500,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> RadioBuilder<'a, radio_state::SetUrl<S>> {
         self._fields.5 = Option::Some(value.into());
         RadioBuilder {
@@ -504,12 +513,12 @@ where
 
 impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
     /// Set the `website` field (optional)
-    pub fn website(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn website(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `website` field to an Option value (optional)
-    pub fn maybe_website(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_website(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -518,9 +527,9 @@ impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
 impl<'a, S> RadioBuilder<'a, S>
 where
     S: radio_state::State,
+    S::CreatedAt: radio_state::IsSet,
     S::Name: radio_state::IsSet,
     S::Url: radio_state::IsSet,
-    S::CreatedAt: radio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Radio<'a> {
@@ -536,13 +545,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Radio<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Radio<'a> {
         Radio {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

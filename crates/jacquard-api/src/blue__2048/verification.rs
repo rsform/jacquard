@@ -14,12 +14,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Datetime};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -28,26 +30,29 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Holds the signature for another record showing it has verified it to the best of it's ability and it should be trusted if the signatures match.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct VerificationRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct VerificationRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///The at://uri for the public did:key to verify the remote record. This also counts as the authority of the verification (example @2048.blue). As well as the type of verification by the collection name (blue.2048.key.game).
-    #[serde(borrow)]
-    pub key_ref: AtUri<'a>,
+    pub key_ref: AtUri<S>,
     ///The at://uri for the record that is being verified.
-    #[serde(borrow)]
-    pub record_ref: AtUri<'a>,
+    pub record_ref: AtUri<S>,
     ///The public verifiable signature of the record. Serialization of the records valued
-    #[serde(borrow)]
-    pub signature: CowStr<'a>,
+    pub signature: S,
     ///DID of the subject the verification applies to.
-    #[serde(borrow)]
-    pub subject: Did<'a>,
+    pub subject: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for VerificationRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for VerificationRef<S> {
     fn nsid() -> &'static str {
         "blue.2048.verification.defs"
     }
@@ -73,84 +78,84 @@ pub mod verification_ref_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Subject;
-        type KeyRef;
-        type Signature;
         type RecordRef;
+        type KeyRef;
+        type Subject;
+        type Signature;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Subject = Unset;
-        type KeyRef = Unset;
-        type Signature = Unset;
         type RecordRef = Unset;
+        type KeyRef = Unset;
+        type Subject = Unset;
+        type Signature = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type RecordRef = S::RecordRef;
         type KeyRef = S::KeyRef;
-        type Signature = S::Signature;
-        type RecordRef = S::RecordRef;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
-        type Subject = Set<members::subject>;
-        type KeyRef = S::KeyRef;
-        type Signature = S::Signature;
-        type RecordRef = S::RecordRef;
-    }
-    ///State transition - sets the `key_ref` field to Set
-    pub struct SetKeyRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKeyRef<S> {}
-    impl<S: State> State for SetKeyRef<S> {
-        type CreatedAt = S::CreatedAt;
         type Subject = S::Subject;
-        type KeyRef = Set<members::key_ref>;
         type Signature = S::Signature;
-        type RecordRef = S::RecordRef;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
-        type KeyRef = S::KeyRef;
-        type Signature = Set<members::signature>;
-        type RecordRef = S::RecordRef;
     }
     ///State transition - sets the `record_ref` field to Set
     pub struct SetRecordRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecordRef<S> {}
     impl<S: State> State for SetRecordRef<S> {
         type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
-        type KeyRef = S::KeyRef;
-        type Signature = S::Signature;
         type RecordRef = Set<members::record_ref>;
+        type KeyRef = S::KeyRef;
+        type Subject = S::Subject;
+        type Signature = S::Signature;
+    }
+    ///State transition - sets the `key_ref` field to Set
+    pub struct SetKeyRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKeyRef<S> {}
+    impl<S: State> State for SetKeyRef<S> {
+        type CreatedAt = S::CreatedAt;
+        type RecordRef = S::RecordRef;
+        type KeyRef = Set<members::key_ref>;
+        type Subject = S::Subject;
+        type Signature = S::Signature;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type RecordRef = S::RecordRef;
+        type KeyRef = S::KeyRef;
+        type Subject = Set<members::subject>;
+        type Signature = S::Signature;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type CreatedAt = S::CreatedAt;
+        type RecordRef = S::RecordRef;
+        type KeyRef = S::KeyRef;
+        type Subject = S::Subject;
+        type Signature = Set<members::signature>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `key_ref` field
-        pub struct key_ref(());
-        ///Marker type for the `signature` field
-        pub struct signature(());
         ///Marker type for the `record_ref` field
         pub struct record_ref(());
+        ///Marker type for the `key_ref` field
+        pub struct key_ref(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
     }
 }
 
@@ -159,10 +164,10 @@ pub struct VerificationRefBuilder<'a, S: verification_ref_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<AtUri<'a>>,
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
+        Option<AtUri<S>>,
+        Option<AtUri<S>>,
+        Option<S>,
+        Option<Did<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -212,7 +217,7 @@ where
     /// Set the `keyRef` field (required)
     pub fn key_ref(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> VerificationRefBuilder<'a, verification_ref_state::SetKeyRef<S>> {
         self._fields.1 = Option::Some(value.into());
         VerificationRefBuilder {
@@ -231,7 +236,7 @@ where
     /// Set the `recordRef` field (required)
     pub fn record_ref(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> VerificationRefBuilder<'a, verification_ref_state::SetRecordRef<S>> {
         self._fields.2 = Option::Some(value.into());
         VerificationRefBuilder {
@@ -250,7 +255,7 @@ where
     /// Set the `signature` field (required)
     pub fn signature(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> VerificationRefBuilder<'a, verification_ref_state::SetSignature<S>> {
         self._fields.3 = Option::Some(value.into());
         VerificationRefBuilder {
@@ -269,7 +274,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> VerificationRefBuilder<'a, verification_ref_state::SetSubject<S>> {
         self._fields.4 = Option::Some(value.into());
         VerificationRefBuilder {
@@ -284,10 +289,10 @@ impl<'a, S> VerificationRefBuilder<'a, S>
 where
     S: verification_ref_state::State,
     S::CreatedAt: verification_ref_state::IsSet,
-    S::Subject: verification_ref_state::IsSet,
-    S::KeyRef: verification_ref_state::IsSet,
-    S::Signature: verification_ref_state::IsSet,
     S::RecordRef: verification_ref_state::IsSet,
+    S::KeyRef: verification_ref_state::IsSet,
+    S::Subject: verification_ref_state::IsSet,
+    S::Signature: verification_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationRef<'a> {
@@ -303,10 +308,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> VerificationRef<'a> {
         VerificationRef {
             created_at: self._fields.0.unwrap(),

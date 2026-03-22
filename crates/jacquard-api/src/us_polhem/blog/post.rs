@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,55 +30,57 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::embed::images::Image;
 /// Record describing a blog post.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "us.polhem.blog.post", tag = "$type")]
-pub struct Post<'a> {
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "us.polhem.blog.post",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Post<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub content: S,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub excerpt: Option<CowStr<'a>>,
+    pub excerpt: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub featured_image: Option<Image<'a>>,
+    pub featured_image: Option<Image<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub images: Option<Vec<Image<'a>>>,
-    #[serde(borrow)]
-    pub slug: CowStr<'a>,
+    pub images: Option<Vec<Image<S>>>,
+    pub slug: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<AtUri<'a>>>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub tags: Option<Vec<AtUri<S>>>,
+    pub title: S,
     ///Tells the visibility of the article to AppView.  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_post_visibility")]
-    #[serde(borrow)]
-    pub visibility: Option<CowStr<'a>>,
+    pub visibility: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PostGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PostGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Post<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Post<S>,
 }
 
-impl<'a> Post<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PostRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Post<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PostRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -87,18 +91,17 @@ pub struct PostRecord;
 impl XrpcResp for PostRecord {
     const NSID: &'static str = "us.polhem.blog.post";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PostGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PostGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PostGetRecordOutput<'_>> for Post<'_> {
-    fn from(output: PostGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PostGetRecordOutput<S>> for Post<S> {
+    fn from(output: PostGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Post<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Post<S> {
     const NSID: &'static str = "us.polhem.blog.post";
     type Record = PostRecord;
 }
@@ -108,7 +111,7 @@ impl Collection for PostRecord {
     type Record = PostRecord;
 }
 
-impl<'a> LexiconSchema for Post<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Post<S> {
     fn nsid() -> &'static str {
         "us.polhem.blog.post"
     }
@@ -166,8 +169,8 @@ impl<'a> LexiconSchema for Post<'a> {
     }
 }
 
-fn _default_post_visibility() -> Option<CowStr<'static>> {
-    Some(CowStr::from("public"))
+fn _default_post_visibility<S: From<&'static str>>() -> ::core::option::Option<S> {
+    Some(S::from("public"))
 }
 
 pub mod post_state {
@@ -180,65 +183,65 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
         type Content;
         type Title;
+        type Slug;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
         type Content = Unset;
         type Title = Unset;
+        type Slug = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Slug = Set<members::slug>;
-        type Content = S::Content;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Slug = S::Slug;
         type Content = Set<members::content>;
         type Title = S::Title;
+        type Slug = S::Slug;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Slug = S::Slug;
         type Content = S::Content;
         type Title = Set<members::title>;
+        type Slug = S::Slug;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Content = S::Content;
+        type Title = S::Title;
+        type Slug = Set<members::slug>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Slug = S::Slug;
         type Content = S::Content;
         type Title = S::Title;
+        type Slug = S::Slug;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -248,15 +251,15 @@ pub mod post_state {
 pub struct PostBuilder<'a, S: post_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Image<'a>>,
-        Option<Vec<Image<'a>>>,
-        Option<CowStr<'a>>,
-        Option<Vec<AtUri<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<Image<S>>,
+        Option<Vec<Image<S>>>,
+        Option<S>,
+        Option<Vec<AtUri<S>>>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -287,7 +290,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PostBuilder<'a, post_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         PostBuilder {
@@ -319,12 +322,12 @@ where
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `excerpt` field (optional)
-    pub fn excerpt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn excerpt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `excerpt` field to an Option value (optional)
-    pub fn maybe_excerpt(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_excerpt(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -332,12 +335,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `featuredImage` field (optional)
-    pub fn featured_image(mut self, value: impl Into<Option<Image<'a>>>) -> Self {
+    pub fn featured_image(mut self, value: impl Into<Option<Image<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `featuredImage` field to an Option value (optional)
-    pub fn maybe_featured_image(mut self, value: Option<Image<'a>>) -> Self {
+    pub fn maybe_featured_image(mut self, value: Option<Image<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -345,12 +348,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `images` field (optional)
-    pub fn images(mut self, value: impl Into<Option<Vec<Image<'a>>>>) -> Self {
+    pub fn images(mut self, value: impl Into<Option<Vec<Image<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `images` field to an Option value (optional)
-    pub fn maybe_images(mut self, value: Option<Vec<Image<'a>>>) -> Self {
+    pub fn maybe_images(mut self, value: Option<Vec<Image<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -364,7 +367,7 @@ where
     /// Set the `slug` field (required)
     pub fn slug(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PostBuilder<'a, post_state::SetSlug<S>> {
         self._fields.5 = Option::Some(value.into());
         PostBuilder {
@@ -377,12 +380,12 @@ where
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -396,7 +399,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PostBuilder<'a, post_state::SetTitle<S>> {
         self._fields.7 = Option::Some(value.into());
         PostBuilder {
@@ -409,12 +412,12 @@ where
 
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn visibility(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
-    pub fn maybe_visibility(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_visibility(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -423,9 +426,9 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::Slug: post_state::IsSet,
     S::Content: post_state::IsSet,
     S::Title: post_state::IsSet,
+    S::Slug: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
 {
     /// Build the final struct
@@ -444,13 +447,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Post<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Post<'a> {
         Post {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

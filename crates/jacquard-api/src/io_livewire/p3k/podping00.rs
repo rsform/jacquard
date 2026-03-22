@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,36 +29,45 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Podping v0.0.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "io.livewire.p3k.podping00", tag = "$type")]
-pub struct Podping00<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "io.livewire.p3k.podping00",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Podping00<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The timestamp of when the podping was created.
     pub created_at: Datetime,
     ///The feed URL that updated.
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Podping00GetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Podping00GetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Podping00<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Podping00<S>,
 }
 
-impl<'a> Podping00<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, Podping00Record>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Podping00<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, Podping00Record>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -67,18 +78,17 @@ pub struct Podping00Record;
 impl XrpcResp for Podping00Record {
     const NSID: &'static str = "io.livewire.p3k.podping00";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = Podping00GetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = Podping00GetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<Podping00GetRecordOutput<'_>> for Podping00<'_> {
-    fn from(output: Podping00GetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<Podping00GetRecordOutput<S>> for Podping00<S> {
+    fn from(output: Podping00GetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Podping00<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Podping00<S> {
     const NSID: &'static str = "io.livewire.p3k.podping00";
     type Record = Podping00Record;
 }
@@ -88,7 +98,7 @@ impl Collection for Podping00Record {
     type Record = Podping00Record;
 }
 
-impl<'a> LexiconSchema for Podping00<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Podping00<S> {
     fn nsid() -> &'static str {
         "io.livewire.p3k.podping00"
     }
@@ -150,7 +160,7 @@ pub mod podping00_state {
 /// Builder for constructing an instance of this type
 pub struct Podping00Builder<'a, S: podping00_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<UriValue<'a>>),
+    _fields: (Option<Datetime>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -199,7 +209,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> Podping00Builder<'a, podping00_state::SetUrl<S>> {
         self._fields.1 = Option::Some(value.into());
         Podping00Builder {
@@ -227,10 +237,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Podping00<'a> {
         Podping00 {
             created_at: self._fields.0.unwrap(),

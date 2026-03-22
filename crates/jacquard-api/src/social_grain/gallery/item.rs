@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,40 +28,48 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.grain.gallery.item", tag = "$type")]
-pub struct Item<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.grain.gallery.item",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Item<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub gallery: AtUri<'a>,
-    #[serde(borrow)]
-    pub item: AtUri<'a>,
+    pub gallery: AtUri<S>,
+    pub item: AtUri<S>,
     /// Defaults to `0`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_item_position")]
     pub position: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ItemGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ItemGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Item<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Item<S>,
 }
 
-impl<'a> Item<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ItemRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Item<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ItemRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -70,18 +80,17 @@ pub struct ItemRecord;
 impl XrpcResp for ItemRecord {
     const NSID: &'static str = "social.grain.gallery.item";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ItemGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ItemGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ItemGetRecordOutput<'_>> for Item<'_> {
-    fn from(output: ItemGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ItemGetRecordOutput<S>> for Item<S> {
+    fn from(output: ItemGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Item<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Item<S> {
     const NSID: &'static str = "social.grain.gallery.item";
     type Record = ItemRecord;
 }
@@ -91,7 +100,7 @@ impl Collection for ItemRecord {
     type Record = ItemRecord;
 }
 
-impl<'a> LexiconSchema for Item<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Item<S> {
     fn nsid() -> &'static str {
         "social.grain.gallery.item"
     }
@@ -171,7 +180,7 @@ pub mod item_state {
 /// Builder for constructing an instance of this type
 pub struct ItemBuilder<'a, S: item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<AtUri<'a>>, Option<AtUri<'a>>, Option<i64>),
+    _fields: (Option<Datetime>, Option<AtUri<S>>, Option<AtUri<S>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -220,7 +229,7 @@ where
     /// Set the `gallery` field (required)
     pub fn gallery(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ItemBuilder<'a, item_state::SetGallery<S>> {
         self._fields.1 = Option::Some(value.into());
         ItemBuilder {
@@ -239,7 +248,7 @@ where
     /// Set the `item` field (required)
     pub fn item(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ItemBuilder<'a, item_state::SetItem<S>> {
         self._fields.2 = Option::Some(value.into());
         ItemBuilder {
@@ -281,13 +290,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Item<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Item<'a> {
         Item {
             created_at: self._fields.0.unwrap(),
             gallery: self._fields.1.unwrap(),

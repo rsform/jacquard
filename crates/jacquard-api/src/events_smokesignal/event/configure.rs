@@ -10,37 +10,56 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, UriValue};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Configure<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Configure<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When true, the RSVP button redirects to an external ticketing URL instead of creating a direct RSVP.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_direct_rsvp: Option<bool>,
     ///AT-URI of the event to configure.
-    #[serde(borrow)]
-    pub event: AtUri<'a>,
+    pub event: AtUri<S>,
     ///When true, RSVPs require a confirmed email address.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub require_confirmed_email: Option<bool>,
     ///URL to redirect users to for external ticketing (e.g., ti.to, eventbrite).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rsvp_redirect_url: Option<UriValue<'a>>,
+    pub rsvp_redirect_url: Option<UriValue<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct ConfigureOutput<'a> {}
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ConfigureOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
 
-#[open_union]
+
 #[derive(
     Serialize,
     Deserialize,
@@ -49,25 +68,26 @@ pub struct ConfigureOutput<'a> {}
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ConfigureError<'a> {
+pub enum ConfigureError {
     /// The specified event does not exist.
     #[serde(rename = "EventNotFound")]
-    EventNotFound(Option<CowStr<'a>>),
+    EventNotFound(Option<SmolStr>),
     /// The authenticated user does not own this event.
     #[serde(rename = "NotAuthorized")]
-    NotAuthorized(Option<CowStr<'a>>),
+    NotAuthorized(Option<SmolStr>),
     /// The provided redirect URL is invalid or not allowed.
     #[serde(rename = "InvalidRedirectUrl")]
-    InvalidRedirectUrl(Option<CowStr<'a>>),
+    InvalidRedirectUrl(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for ConfigureError<'_> {
+impl core::fmt::Display for ConfigureError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::EventNotFound(msg) => {
@@ -91,7 +111,13 @@ impl core::fmt::Display for ConfigureError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -101,11 +127,12 @@ pub struct ConfigureResponse;
 impl jacquard_common::xrpc::XrpcResp for ConfigureResponse {
     const NSID: &'static str = "events.smokesignal.event.configure";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ConfigureOutput<'de>;
-    type Err<'de> = ConfigureError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ConfigureOutput<S>;
+    type Err = ConfigureError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Configure<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Configure<S> {
     const NSID: &'static str = "events.smokesignal.event.configure";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -120,7 +147,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ConfigureRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Configure<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Configure<S>;
     type Response = ConfigureResponse;
 }
 
@@ -159,7 +186,7 @@ pub mod configure_state {
 /// Builder for constructing an instance of this type
 pub struct ConfigureBuilder<'a, S: configure_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<AtUri<'a>>, Option<bool>, Option<UriValue<'a>>),
+    _fields: (Option<bool>, Option<AtUri<S>>, Option<bool>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -202,7 +229,7 @@ where
     /// Set the `event` field (required)
     pub fn event(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ConfigureBuilder<'a, configure_state::SetEvent<S>> {
         self._fields.1 = Option::Some(value.into());
         ConfigureBuilder {
@@ -228,12 +255,12 @@ impl<'a, S: configure_state::State> ConfigureBuilder<'a, S> {
 
 impl<'a, S: configure_state::State> ConfigureBuilder<'a, S> {
     /// Set the `rsvpRedirectUrl` field (optional)
-    pub fn rsvp_redirect_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn rsvp_redirect_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `rsvpRedirectUrl` field to an Option value (optional)
-    pub fn maybe_rsvp_redirect_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_rsvp_redirect_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -257,10 +284,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Configure<'a> {
         Configure {
             disable_direct_rsvp: self._fields.0,

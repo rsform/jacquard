@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,42 +26,59 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::feed::describe_feed_generator;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Feed<'a> {
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Feed<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Links<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Links<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub privacy_policy: Option<CowStr<'a>>,
+    pub privacy_policy: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub terms_of_service: Option<CowStr<'a>>,
+    pub terms_of_service: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DescribeFeedGeneratorOutput<'a> {
-    #[serde(borrow)]
-    pub did: Did<'a>,
-    #[serde(borrow)]
-    pub feeds: Vec<describe_feed_generator::Feed<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DescribeFeedGeneratorOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub did: Did<S>,
+    pub feeds: Vec<describe_feed_generator::Feed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub links: Option<describe_feed_generator::Links<'a>>,
+    pub links: Option<describe_feed_generator::Links<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Feed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Feed<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.feed.describeFeedGenerator"
     }
@@ -74,7 +93,7 @@ impl<'a> LexiconSchema for Feed<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Links<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Links<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.feed.describeFeedGenerator"
     }
@@ -98,8 +117,8 @@ pub struct DescribeFeedGeneratorResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeFeedGeneratorResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.describeFeedGenerator";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DescribeFeedGeneratorOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DescribeFeedGeneratorOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for DescribeFeedGenerator {
@@ -113,7 +132,7 @@ pub struct DescribeFeedGeneratorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeFeedGeneratorRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.describeFeedGenerator";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = DescribeFeedGenerator;
+    type Request<S: Bos<str> + AsRef<str>> = DescribeFeedGenerator;
     type Response = DescribeFeedGeneratorResponse;
 }
 
@@ -152,7 +171,7 @@ pub mod feed_state {
 /// Builder for constructing an instance of this type
 pub struct FeedBuilder<'a, S: feed_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -182,7 +201,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> FeedBuilder<'a, feed_state::SetUri<S>> {
         self._fields.0 = Option::Some(value.into());
         FeedBuilder {
@@ -206,13 +225,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Feed<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Feed<'a> {
         Feed {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

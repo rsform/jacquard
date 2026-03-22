@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -31,91 +33,112 @@ use crate::com_deckbelcher::richtext::Document;
 use crate::com_deckbelcher::collection::list;
 /// A card saved to the list.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CardItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CardItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when this item was added to the list.
     pub added_at: Datetime,
     ///Reference to the card (scryfall printing + oracle card).
-    #[serde(borrow)]
-    pub r#ref: CardRef<'a>,
+    pub r#ref: CardRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A deck saved to the list.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DeckItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeckItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when this item was added to the list.
     pub added_at: Datetime,
     ///Reference to the deck record.
-    #[serde(borrow)]
-    pub r#ref: StrongRef<'a>,
+    pub r#ref: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A curated list of cards and/or decks.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "com.deckbelcher.collection.list",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct List<'a> {
+pub struct List<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when the list was created.
     pub created_at: Datetime,
     ///Description of the list.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<Document<'a>>,
+    pub description: Option<Document<S>>,
     ///Items in the list.
-    #[serde(borrow)]
-    pub items: Vec<ListItemsItem<'a>>,
+    pub items: Vec<ListItemsItem<S>>,
     ///Name of the list.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Timestamp when the list was last updated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ListItemsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ListItemsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.deckbelcher.collection.list#cardItem")]
-    CardItem(Box<list::CardItem<'a>>),
+    CardItem(Box<list::CardItem<S>>),
     #[serde(rename = "com.deckbelcher.collection.list#deckItem")]
-    DeckItem(Box<list::DeckItem<'a>>),
+    DeckItem(Box<list::DeckItem<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ListGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: List<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: List<S>,
 }
 
-impl<'a> List<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ListRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> List<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ListRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for CardItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardItem<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.collection.list"
     }
@@ -130,7 +153,7 @@ impl<'a> LexiconSchema for CardItem<'a> {
     }
 }
 
-impl<'a> LexiconSchema for DeckItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DeckItem<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.collection.list"
     }
@@ -152,18 +175,17 @@ pub struct ListRecord;
 impl XrpcResp for ListRecord {
     const NSID: &'static str = "com.deckbelcher.collection.list";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ListGetRecordOutput<'_>> for List<'_> {
-    fn from(output: ListGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ListGetRecordOutput<S>> for List<S> {
+    fn from(output: ListGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for List<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for List<S> {
     const NSID: &'static str = "com.deckbelcher.collection.list";
     type Record = ListRecord;
 }
@@ -173,7 +195,7 @@ impl Collection for ListRecord {
     type Record = ListRecord;
 }
 
-impl<'a> LexiconSchema for List<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for List<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.collection.list"
     }
@@ -259,7 +281,7 @@ pub mod card_item_state {
 /// Builder for constructing an instance of this type
 pub struct CardItemBuilder<'a, S: card_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<CardRef<'a>>),
+    _fields: (Option<Datetime>, Option<CardRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -308,7 +330,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<CardRef<'a>>,
+        value: impl Into<CardRef<S>>,
     ) -> CardItemBuilder<'a, card_item_state::SetRef<S>> {
         self._fields.1 = Option::Some(value.into());
         CardItemBuilder {
@@ -336,10 +358,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CardItem<'a> {
         CardItem {
             added_at: self._fields.0.unwrap(),
@@ -558,7 +577,7 @@ pub mod deck_item_state {
 /// Builder for constructing an instance of this type
 pub struct DeckItemBuilder<'a, S: deck_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<StrongRef<'a>>),
+    _fields: (Option<Datetime>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -607,7 +626,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> DeckItemBuilder<'a, deck_item_state::SetRef<S>> {
         self._fields.1 = Option::Some(value.into());
         DeckItemBuilder {
@@ -635,10 +654,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DeckItem<'a> {
         DeckItem {
             added_at: self._fields.0.unwrap(),
@@ -658,49 +674,49 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Items;
+        type Name;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Items = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Items = S::Items;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `items` field to Set
     pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetItems<S> {}
     impl<S: State> State for SetItems<S> {
-        type Name = S::Name;
         type Items = Set<members::items>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Items = S::Items;
+        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Items = S::Items;
+        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `items` field
         pub struct items(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -711,9 +727,9 @@ pub struct ListBuilder<'a, S: list_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<Document<'a>>,
-        Option<Vec<ListItemsItem<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Document<S>>,
+        Option<Vec<ListItemsItem<S>>>,
+        Option<S>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -758,12 +774,12 @@ where
 
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<Document<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<Document<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<Document<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<Document<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -777,7 +793,7 @@ where
     /// Set the `items` field (required)
     pub fn items(
         mut self,
-        value: impl Into<Vec<ListItemsItem<'a>>>,
+        value: impl Into<Vec<ListItemsItem<S>>>,
     ) -> ListBuilder<'a, list_state::SetItems<S>> {
         self._fields.2 = Option::Some(value.into());
         ListBuilder {
@@ -796,7 +812,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ListBuilder<'a, list_state::SetName<S>> {
         self._fields.3 = Option::Some(value.into());
         ListBuilder {
@@ -823,8 +839,8 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::Name: list_state::IsSet,
     S::Items: list_state::IsSet,
+    S::Name: list_state::IsSet,
     S::CreatedAt: list_state::IsSet,
 {
     /// Build the final struct
@@ -839,13 +855,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> List<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> List<'a> {
         List {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

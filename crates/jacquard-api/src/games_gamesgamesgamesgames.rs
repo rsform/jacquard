@@ -41,13 +41,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::{Did, AtUri, Datetime, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -57,87 +59,96 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::games_gamesgamesgamesgames;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ActorCreditView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ActorCreditView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub actor_uri: Option<AtUri<'a>>,
-    #[serde(borrow)]
-    pub credits: Vec<games_gamesgamesgamesgames::CreditEntry<'a>>,
+    pub actor_uri: Option<AtUri<S>>,
+    pub credits: Vec<games_gamesgamesgamesgames::CreditEntry<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub display_name: Option<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ActorProfileDetailView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ActorProfileDetailView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
+    pub avatar: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description_facets: Option<Vec<Facet<'a>>>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub description_facets: Option<Vec<Facet<S>>>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pronouns: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub pronouns: Option<S>,
+    pub uri: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub websites: Option<Vec<games_gamesgamesgamesgames::Website<'a>>>,
+    pub websites: Option<Vec<games_gamesgamesgamesgames::Website<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ActorProfileSummaryView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ActorProfileSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub avatar: Option<BlobRef<S>>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub display_name: Option<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct AgeRating<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AgeRating<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_descriptors: Option<Vec<CowStr<'a>>>,
-    #[serde(borrow)]
-    pub organization: AgeRatingOrganization<'a>,
-    #[serde(borrow)]
-    pub rating: CowStr<'a>,
+    pub content_descriptors: Option<Vec<S>>,
+    pub organization: AgeRatingOrganization<S>,
+    pub rating: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AgeRatingOrganization<'a> {
+pub enum AgeRatingOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     Esrb,
     Pegi,
     Cero,
@@ -145,10 +156,10 @@ pub enum AgeRatingOrganization<'a> {
     Grac,
     ClassInd,
     Acb,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> AgeRatingOrganization<'a> {
+impl<S: Bos<str> + AsRef<str>> AgeRatingOrganization<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Esrb => "esrb",
@@ -161,11 +172,9 @@ impl<'a> AgeRatingOrganization<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for AgeRatingOrganization<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "esrb" => Self::Esrb,
             "pegi" => Self::Pegi,
             "cero" => Self::Cero,
@@ -173,68 +182,51 @@ impl<'a> From<&'a str> for AgeRatingOrganization<'a> {
             "grac" => Self::Grac,
             "classInd" => Self::ClassInd,
             "acb" => Self::Acb,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for AgeRatingOrganization<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "esrb" => Self::Esrb,
-            "pegi" => Self::Pegi,
-            "cero" => Self::Cero,
-            "usk" => Self::Usk,
-            "grac" => Self::Grac,
-            "classInd" => Self::ClassInd,
-            "acb" => Self::Acb,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for AgeRatingOrganization<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for AgeRatingOrganization<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for AgeRatingOrganization<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for AgeRatingOrganization<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for AgeRatingOrganization<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for AgeRatingOrganization<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for AgeRatingOrganization<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for AgeRatingOrganization<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for AgeRatingOrganization<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for AgeRatingOrganization<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for AgeRatingOrganization<'_> {
-    type Output = AgeRatingOrganization<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for AgeRatingOrganization<S> {
+    type Output = AgeRatingOrganization<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             AgeRatingOrganization::Esrb => AgeRatingOrganization::Esrb,
@@ -252,48 +244,55 @@ impl jacquard_common::IntoStatic for AgeRatingOrganization<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct AlternativeName<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AlternativeName<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<CowStr<'a>>,
+    pub comment: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub locale: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub locale: Option<S>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-pub type ApplicationType<'a> = CowStr<'a>;
+pub type ApplicationType<'a> = S;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionSummaryView<'a> {
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollectionSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub slug: Option<CowStr<'a>>,
+    pub slug: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<CollectionSummaryViewType<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub r#type: Option<CollectionSummaryViewType<S>>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CollectionSummaryViewType<'a> {
+pub enum CollectionSummaryViewType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Franchise,
     Series,
     Curated,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> CollectionSummaryViewType<'a> {
+impl<S: Bos<str> + AsRef<str>> CollectionSummaryViewType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Franchise => "franchise",
@@ -302,72 +301,57 @@ impl<'a> CollectionSummaryViewType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for CollectionSummaryViewType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "franchise" => Self::Franchise,
             "series" => Self::Series,
             "curated" => Self::Curated,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for CollectionSummaryViewType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "franchise" => Self::Franchise,
-            "series" => Self::Series,
-            "curated" => Self::Curated,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CollectionSummaryViewType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CollectionSummaryViewType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for CollectionSummaryViewType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for CollectionSummaryViewType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for CollectionSummaryViewType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for CollectionSummaryViewType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for CollectionSummaryViewType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for CollectionSummaryViewType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for CollectionSummaryViewType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for CollectionSummaryViewType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for CollectionSummaryViewType<'_> {
-    type Output = CollectionSummaryViewType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for CollectionSummaryViewType<S> {
+    type Output = CollectionSummaryViewType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             CollectionSummaryViewType::Franchise => CollectionSummaryViewType::Franchise,
@@ -382,15 +366,15 @@ impl jacquard_common::IntoStatic for CollectionSummaryViewType<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CompanyRole<'a> {
+pub enum CompanyRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     Developer,
     Publisher,
     Porter,
     Supporter,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> CompanyRole<'a> {
+impl<S: Bos<str> + AsRef<str>> CompanyRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Developer => "developer",
@@ -400,68 +384,52 @@ impl<'a> CompanyRole<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for CompanyRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "developer" => Self::Developer,
             "publisher" => Self::Publisher,
             "porter" => Self::Porter,
             "supporter" => Self::Supporter,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for CompanyRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "developer" => Self::Developer,
-            "publisher" => Self::Publisher,
-            "porter" => Self::Porter,
-            "supporter" => Self::Supporter,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for CompanyRole<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for CompanyRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for CompanyRole<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CompanyRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for CompanyRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for CompanyRole<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for CompanyRole<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for CompanyRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for CompanyRole<'_> {
-    type Output = CompanyRole<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for CompanyRole<S> {
+    type Output = CompanyRole<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             CompanyRole::Developer => CompanyRole::Developer,
@@ -474,98 +442,106 @@ impl jacquard_common::IntoStatic for CompanyRole<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CreditEntry<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreditEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub department: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub role: games_gamesgamesgamesgames::IndividualRole<'a>,
+    pub department: Option<S>,
+    pub role: games_gamesgamesgamesgames::IndividualRole<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EngineSummaryView<'a> {
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EngineSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub slug: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub slug: Option<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ExternalIds<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExternalIds<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub apple_app_store: Option<CowStr<'a>>,
+    pub apple_app_store: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub epic_games: Option<CowStr<'a>>,
+    pub epic_games: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gog: Option<CowStr<'a>>,
+    pub gog: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub google_play: Option<CowStr<'a>>,
+    pub google_play: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub humble_bundle: Option<CowStr<'a>>,
+    pub humble_bundle: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub igdb: Option<CowStr<'a>>,
+    pub igdb: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub itch_io: Option<games_gamesgamesgamesgames::ItchIoId<'a>>,
+    pub itch_io: Option<games_gamesgamesgamesgames::ItchIoId<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub nintendo_eshop: Option<CowStr<'a>>,
+    pub nintendo_eshop: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub play_station: Option<CowStr<'a>>,
+    pub play_station: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub steam: Option<CowStr<'a>>,
+    pub steam: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub twitch: Option<CowStr<'a>>,
+    pub twitch: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub xbox: Option<CowStr<'a>>,
+    pub xbox: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ExternalVideo<'a> {
-    #[serde(borrow)]
-    pub platform: ExternalVideoPlatform<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExternalVideo<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub platform: ExternalVideoPlatform<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub video_id: CowStr<'a>,
+    pub title: Option<S>,
+    pub video_id: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ExternalVideoPlatform<'a> {
+pub enum ExternalVideoPlatform<S: Bos<str> + AsRef<str> = DefaultStr> {
     Youtube,
     Twitch,
     Vimeo,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ExternalVideoPlatform<'a> {
+impl<S: Bos<str> + AsRef<str>> ExternalVideoPlatform<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Youtube => "youtube",
@@ -574,72 +550,57 @@ impl<'a> ExternalVideoPlatform<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ExternalVideoPlatform<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "youtube" => Self::Youtube,
             "twitch" => Self::Twitch,
             "vimeo" => Self::Vimeo,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ExternalVideoPlatform<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "youtube" => Self::Youtube,
-            "twitch" => Self::Twitch,
-            "vimeo" => Self::Vimeo,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ExternalVideoPlatform<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ExternalVideoPlatform<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ExternalVideoPlatform<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ExternalVideoPlatform<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ExternalVideoPlatform<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ExternalVideoPlatform<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ExternalVideoPlatform<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ExternalVideoPlatform<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ExternalVideoPlatform<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ExternalVideoPlatform<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ExternalVideoPlatform<'_> {
-    type Output = ExternalVideoPlatform<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ExternalVideoPlatform<S> {
+    type Output = ExternalVideoPlatform<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ExternalVideoPlatform::Youtube => ExternalVideoPlatform::Youtube,
@@ -653,170 +614,154 @@ impl jacquard_common::IntoStatic for ExternalVideoPlatform<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GameDetailView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GameDetailView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub actor_credits: Option<Vec<games_gamesgamesgamesgames::ActorCreditView<'a>>>,
+    pub actor_credits: Option<Vec<games_gamesgamesgamesgames::ActorCreditView<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub age_ratings: Option<Vec<games_gamesgamesgamesgames::AgeRating<'a>>>,
+    pub age_ratings: Option<Vec<games_gamesgamesgamesgames::AgeRating<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternative_names: Option<Vec<games_gamesgamesgamesgames::AlternativeName<'a>>>,
+    pub alternative_names: Option<Vec<games_gamesgamesgamesgames::AlternativeName<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub application_type: Option<games_gamesgamesgamesgames::ApplicationType<'a>>,
+    pub application_type: Option<games_gamesgamesgamesgames::ApplicationType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub collections: Option<Vec<AtUri<'a>>>,
+    pub collections: Option<Vec<AtUri<S>>>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub engines: Option<Vec<AtUri<'a>>>,
+    pub engines: Option<Vec<AtUri<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub external_ids: Option<games_gamesgamesgamesgames::ExternalIds<'a>>,
+    pub external_ids: Option<games_gamesgamesgamesgames::ExternalIds<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genres: Option<Vec<games_gamesgamesgamesgames::Genre<'a>>>,
+    pub genres: Option<Vec<games_gamesgamesgamesgames::Genre<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<Vec<CowStr<'a>>>,
+    pub keywords: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub language_supports: Option<Vec<games_gamesgamesgamesgames::LanguageSupport<'a>>>,
+    pub language_supports: Option<Vec<games_gamesgamesgamesgames::LanguageSupport<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub media: Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>,
+    pub media: Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub modes: Option<Vec<games_gamesgamesgamesgames::Mode<'a>>>,
+    pub modes: Option<Vec<games_gamesgamesgamesgames::Mode<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub multiplayer_modes: Option<Vec<games_gamesgamesgamesgames::MultiplayerMode<'a>>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub multiplayer_modes: Option<Vec<games_gamesgamesgamesgames::MultiplayerMode<S>>>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub org_credits: Option<Vec<games_gamesgamesgamesgames::OrgCreditView<'a>>>,
+    pub org_credits: Option<Vec<games_gamesgamesgamesgames::OrgCreditView<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent: Option<AtUri<'a>>,
+    pub parent: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub player_perspectives: Option<
-        Vec<games_gamesgamesgamesgames::PlayerPerspective<'a>>,
+        Vec<games_gamesgamesgamesgames::PlayerPerspective<S>>,
     >,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub published_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub releases: Option<Vec<games_gamesgamesgamesgames::Release<'a>>>,
+    pub releases: Option<Vec<games_gamesgamesgamesgames::Release<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub slug: Option<CowStr<'a>>,
+    pub slug: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub storyline: Option<CowStr<'a>>,
+    pub storyline: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub summary: Option<CowStr<'a>>,
+    pub summary: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub themes: Option<Vec<games_gamesgamesgamesgames::Theme<'a>>>,
+    pub themes: Option<Vec<games_gamesgamesgamesgames::Theme<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub time_to_beat: Option<games_gamesgamesgamesgames::TimeToBeat<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub time_to_beat: Option<games_gamesgamesgamesgames::TimeToBeat<S>>,
+    pub uri: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub videos: Option<Vec<games_gamesgamesgamesgames::ExternalVideo<'a>>>,
+    pub videos: Option<Vec<games_gamesgamesgamesgames::ExternalVideo<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub websites: Option<Vec<games_gamesgamesgamesgames::Website<'a>>>,
+    pub websites: Option<Vec<games_gamesgamesgamesgames::Website<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GameFeedViewItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GameFeedViewItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub feed_context: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub game: games_gamesgamesgamesgames::GameView<'a>,
+    pub feed_context: Option<S>,
+    pub game: games_gamesgamesgamesgames::GameView<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GameSummaryView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GameSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub application_type: Option<games_gamesgamesgamesgames::ApplicationType<'a>>,
+    pub application_type: Option<games_gamesgamesgamesgames::ApplicationType<S>>,
     ///Earliest release date as YYYYMMDD integer.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub first_release_date: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub media: Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub media: Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub slug: Option<CowStr<'a>>,
+    pub slug: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub summary: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub summary: Option<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GameView<'a> {
-    #[serde(borrow)]
-    pub application_type: games_gamesgamesgamesgames::ApplicationType<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GameView<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub application_type: games_gamesgamesgamesgames::ApplicationType<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genres: Option<Vec<games_gamesgamesgamesgames::Genre<'a>>>,
+    pub genres: Option<Vec<games_gamesgamesgamesgames::Genre<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub like_count: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub media: Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub media: Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub releases: Option<Vec<games_gamesgamesgamesgames::Release<'a>>>,
+    pub releases: Option<Vec<games_gamesgamesgamesgames::Release<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub slug: Option<CowStr<'a>>,
+    pub slug: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub summary: Option<CowStr<'a>>,
+    pub summary: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub themes: Option<Vec<games_gamesgamesgamesgames::Theme<'a>>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub themes: Option<Vec<games_gamesgamesgamesgames::Theme<S>>>,
+    pub uri: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub viewer: Option<games_gamesgamesgamesgames::ViewerState<'a>>,
+    pub viewer: Option<games_gamesgamesgamesgames::ViewerState<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Genre<'a> {
+pub enum Genre<S: Bos<str> + AsRef<str> = DefaultStr> {
     Fighting,
     Music,
     Platform,
@@ -827,10 +772,10 @@ pub enum Genre<'a> {
     Rts,
     Shooter,
     Simulator,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> Genre<'a> {
+impl<S: Bos<str> + AsRef<str>> Genre<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Fighting => "fighting",
@@ -846,11 +791,9 @@ impl<'a> Genre<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for Genre<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "fighting" => Self::Fighting,
             "music" => Self::Music,
             "platform" => Self::Platform,
@@ -861,65 +804,44 @@ impl<'a> From<&'a str> for Genre<'a> {
             "rts" => Self::Rts,
             "shooter" => Self::Shooter,
             "simulator" => Self::Simulator,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for Genre<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "fighting" => Self::Fighting,
-            "music" => Self::Music,
-            "platform" => Self::Platform,
-            "pointAndClick" => Self::PointAndClick,
-            "puzzle" => Self::Puzzle,
-            "racing" => Self::Racing,
-            "rpg" => Self::Rpg,
-            "rts" => Self::Rts,
-            "shooter" => Self::Shooter,
-            "simulator" => Self::Simulator,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Genre<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for Genre<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for Genre<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Genre<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for Genre<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for Genre<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for Genre<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Genre<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for Genre<'_> {
-    type Output = Genre<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for Genre<S> {
+    type Output = Genre<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             Genre::Fighting => Genre::Fighting,
@@ -939,7 +861,7 @@ impl jacquard_common::IntoStatic for Genre<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum IndividualRole<'a> {
+pub enum IndividualRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     Director,
     Producer,
     Designer,
@@ -954,10 +876,10 @@ pub enum IndividualRole<'a> {
     Localization,
     CommunityManager,
     Marketing,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> IndividualRole<'a> {
+impl<S: Bos<str> + AsRef<str>> IndividualRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Director => "director",
@@ -977,11 +899,9 @@ impl<'a> IndividualRole<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for IndividualRole<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "director" => Self::Director,
             "producer" => Self::Producer,
             "designer" => Self::Designer,
@@ -996,69 +916,45 @@ impl<'a> From<&'a str> for IndividualRole<'a> {
             "localization" => Self::Localization,
             "communityManager" => Self::CommunityManager,
             "marketing" => Self::Marketing,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for IndividualRole<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "director" => Self::Director,
-            "producer" => Self::Producer,
-            "designer" => Self::Designer,
-            "programmer" => Self::Programmer,
-            "artist" => Self::Artist,
-            "animator" => Self::Animator,
-            "writer" => Self::Writer,
-            "composer" => Self::Composer,
-            "soundDesigner" => Self::SoundDesigner,
-            "voiceActor" => Self::VoiceActor,
-            "qa" => Self::Qa,
-            "localization" => Self::Localization,
-            "communityManager" => Self::CommunityManager,
-            "marketing" => Self::Marketing,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for IndividualRole<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for IndividualRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for IndividualRole<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for IndividualRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for IndividualRole<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for IndividualRole<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for IndividualRole<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for IndividualRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for IndividualRole<'_> {
-    type Output = IndividualRole<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for IndividualRole<S> {
+    type Output = IndividualRole<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             IndividualRole::Director => IndividualRole::Director,
@@ -1081,70 +977,83 @@ impl jacquard_common::IntoStatic for IndividualRole<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ItchIoId<'a> {
-    #[serde(borrow)]
-    pub developer: CowStr<'a>,
-    #[serde(borrow)]
-    pub game: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ItchIoId<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub developer: S,
+    pub game: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct LanguageSupport<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LanguageSupport<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub audio: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub interface: Option<bool>,
-    #[serde(borrow)]
-    pub language: CowStr<'a>,
+    pub language: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subtitles: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct MediaItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MediaItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub blob: Option<BlobRef<'a>>,
+    pub blob: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub locale: Option<CowStr<'a>>,
+    pub locale: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub media_type: Option<CowStr<'a>>,
+    pub media_type: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Mode<'a> {
+pub enum Mode<S: Bos<str> + AsRef<str> = DefaultStr> {
     BattleRoyale,
     Cooperative,
     Mmo,
     Multiplayer,
     SinglePlayer,
     SplitScreen,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> Mode<'a> {
+impl<S: Bos<str> + AsRef<str>> Mode<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::BattleRoyale => "battleRoyale",
@@ -1156,72 +1065,53 @@ impl<'a> Mode<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for Mode<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "battleRoyale" => Self::BattleRoyale,
             "cooperative" => Self::Cooperative,
             "mmo" => Self::Mmo,
             "multiplayer" => Self::Multiplayer,
             "singlePlayer" => Self::SinglePlayer,
             "splitScreen" => Self::SplitScreen,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for Mode<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "battleRoyale" => Self::BattleRoyale,
-            "cooperative" => Self::Cooperative,
-            "mmo" => Self::Mmo,
-            "multiplayer" => Self::Multiplayer,
-            "singlePlayer" => Self::SinglePlayer,
-            "splitScreen" => Self::SplitScreen,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Mode<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for Mode<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for Mode<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Mode<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for Mode<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for Mode<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for Mode<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Mode<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for Mode<'_> {
-    type Output = Mode<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for Mode<S> {
+    type Output = Mode<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             Mode::BattleRoyale => Mode::BattleRoyale,
@@ -1236,10 +1126,15 @@ impl jacquard_common::IntoStatic for Mode<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct MultiplayerMode<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MultiplayerMode<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub has_campaign_coop: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1259,81 +1154,81 @@ pub struct MultiplayerMode<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub online_max: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub platform: Option<CowStr<'a>>,
+    pub platform: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct OrgCreditView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct OrgCreditView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub org_uri: Option<AtUri<'a>>,
-    #[serde(borrow)]
-    pub roles: Vec<games_gamesgamesgamesgames::CompanyRole<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub org_uri: Option<AtUri<S>>,
+    pub roles: Vec<games_gamesgamesgamesgames::CompanyRole<S>>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct OrgProfileDetailView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct OrgProfileDetailView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
+    pub avatar: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country: Option<CowStr<'a>>,
+    pub country: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description_facets: Option<Vec<Facet<'a>>>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub description_facets: Option<Vec<Facet<S>>>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub founded_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub media: Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>,
+    pub media: Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent: Option<AtUri<'a>>,
+    pub parent: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<OrgProfileDetailViewStatus<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub status: Option<OrgProfileDetailViewStatus<S>>,
+    pub uri: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub websites: Option<Vec<games_gamesgamesgamesgames::Website<'a>>>,
+    pub websites: Option<Vec<games_gamesgamesgamesgames::Website<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum OrgProfileDetailViewStatus<'a> {
+pub enum OrgProfileDetailViewStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Active,
     Inactive,
     Merged,
     Acquired,
     Defunct,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> OrgProfileDetailViewStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> OrgProfileDetailViewStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Active => "active",
@@ -1344,76 +1239,59 @@ impl<'a> OrgProfileDetailViewStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for OrgProfileDetailViewStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "active" => Self::Active,
             "inactive" => Self::Inactive,
             "merged" => Self::Merged,
             "acquired" => Self::Acquired,
             "defunct" => Self::Defunct,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for OrgProfileDetailViewStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "active" => Self::Active,
-            "inactive" => Self::Inactive,
-            "merged" => Self::Merged,
-            "acquired" => Self::Acquired,
-            "defunct" => Self::Defunct,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for OrgProfileDetailViewStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for OrgProfileDetailViewStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for OrgProfileDetailViewStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for OrgProfileDetailViewStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for OrgProfileDetailViewStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for OrgProfileDetailViewStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for OrgProfileDetailViewStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for OrgProfileDetailViewStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for OrgProfileDetailViewStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for OrgProfileDetailViewStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for OrgProfileDetailViewStatus<'_> {
-    type Output = OrgProfileDetailViewStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for OrgProfileDetailViewStatus<S> {
+    type Output = OrgProfileDetailViewStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             OrgProfileDetailViewStatus::Active => OrgProfileDetailViewStatus::Active,
@@ -1429,34 +1307,37 @@ impl jacquard_common::IntoStatic for OrgProfileDetailViewStatus<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct OrgProfileSummaryView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct OrgProfileSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub avatar: Option<BlobRef<S>>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub display_name: Option<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PlatformCategory<'a> {
+pub enum PlatformCategory<S: Bos<str> + AsRef<str> = DefaultStr> {
     Console,
     Portable,
     Computer,
     Arcade,
     OperatingSystem,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> PlatformCategory<'a> {
+impl<S: Bos<str> + AsRef<str>> PlatformCategory<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Console => "console",
@@ -1467,70 +1348,53 @@ impl<'a> PlatformCategory<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for PlatformCategory<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "console" => Self::Console,
             "portable" => Self::Portable,
             "computer" => Self::Computer,
             "arcade" => Self::Arcade,
             "operatingSystem" => Self::OperatingSystem,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for PlatformCategory<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "console" => Self::Console,
-            "portable" => Self::Portable,
-            "computer" => Self::Computer,
-            "arcade" => Self::Arcade,
-            "operatingSystem" => Self::OperatingSystem,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for PlatformCategory<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for PlatformCategory<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for PlatformCategory<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for PlatformCategory<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for PlatformCategory<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for PlatformCategory<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for PlatformCategory<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for PlatformCategory<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for PlatformCategory<'_> {
-    type Output = PlatformCategory<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for PlatformCategory<S> {
+    type Output = PlatformCategory<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             PlatformCategory::Console => PlatformCategory::Console,
@@ -1545,29 +1409,34 @@ impl jacquard_common::IntoStatic for PlatformCategory<'_> {
 
 /// Features supported by a game on a specific storefront/platform.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PlatformFeatures<'a> {
-    #[serde(borrow)]
-    pub features: Vec<CowStr<'a>>,
-    #[serde(borrow)]
-    pub platform: PlatformFeaturesPlatform<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PlatformFeatures<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub features: Vec<S>,
+    pub platform: PlatformFeaturesPlatform<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PlatformFeaturesPlatform<'a> {
+pub enum PlatformFeaturesPlatform<S: Bos<str> + AsRef<str> = DefaultStr> {
     Steam,
     Gog,
     EpicGames,
     PlayStation,
     Xbox,
     NintendoEshop,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> PlatformFeaturesPlatform<'a> {
+impl<S: Bos<str> + AsRef<str>> PlatformFeaturesPlatform<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Steam => "steam",
@@ -1579,78 +1448,60 @@ impl<'a> PlatformFeaturesPlatform<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for PlatformFeaturesPlatform<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "steam" => Self::Steam,
             "gog" => Self::Gog,
             "epicGames" => Self::EpicGames,
             "playStation" => Self::PlayStation,
             "xbox" => Self::Xbox,
             "nintendoEshop" => Self::NintendoEshop,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for PlatformFeaturesPlatform<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "steam" => Self::Steam,
-            "gog" => Self::Gog,
-            "epicGames" => Self::EpicGames,
-            "playStation" => Self::PlayStation,
-            "xbox" => Self::Xbox,
-            "nintendoEshop" => Self::NintendoEshop,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for PlatformFeaturesPlatform<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for PlatformFeaturesPlatform<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for PlatformFeaturesPlatform<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for PlatformFeaturesPlatform<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for PlatformFeaturesPlatform<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for PlatformFeaturesPlatform<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for PlatformFeaturesPlatform<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for PlatformFeaturesPlatform<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for PlatformFeaturesPlatform<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for PlatformFeaturesPlatform<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for PlatformFeaturesPlatform<'_> {
-    type Output = PlatformFeaturesPlatform<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for PlatformFeaturesPlatform<S> {
+    type Output = PlatformFeaturesPlatform<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             PlatformFeaturesPlatform::Steam => PlatformFeaturesPlatform::Steam,
@@ -1671,67 +1522,65 @@ impl jacquard_common::IntoStatic for PlatformFeaturesPlatform<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PlatformSummaryView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PlatformSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub abbreviation: Option<CowStr<'a>>,
+    pub abbreviation: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub category: Option<games_gamesgamesgamesgames::PlatformCategory<'a>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub category: Option<games_gamesgamesgamesgames::PlatformCategory<S>>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub slug: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub slug: Option<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct PlatformVersion<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PlatformVersion<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub connectivity: Option<CowStr<'a>>,
+    pub connectivity: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cpu: Option<CowStr<'a>>,
+    pub cpu: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub gpu: Option<CowStr<'a>>,
+    pub gpu: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub max_resolution: Option<CowStr<'a>>,
+    pub max_resolution: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub media: Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>,
+    pub media: Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub memory: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub memory: Option<S>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub os: Option<CowStr<'a>>,
+    pub os: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub output: Option<CowStr<'a>>,
+    pub output: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub storage: Option<CowStr<'a>>,
+    pub storage: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub summary: Option<CowStr<'a>>,
+    pub summary: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PlayerPerspective<'a> {
+pub enum PlayerPerspective<S: Bos<str> + AsRef<str> = DefaultStr> {
     Auditory,
     FirstPerson,
     Isometric,
@@ -1740,10 +1589,10 @@ pub enum PlayerPerspective<'a> {
     ThirdPerson,
     TopDown,
     Vr,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> PlayerPerspective<'a> {
+impl<S: Bos<str> + AsRef<str>> PlayerPerspective<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Auditory => "auditory",
@@ -1757,11 +1606,9 @@ impl<'a> PlayerPerspective<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for PlayerPerspective<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "auditory" => Self::Auditory,
             "firstPerson" => Self::FirstPerson,
             "isometric" => Self::Isometric,
@@ -1770,63 +1617,45 @@ impl<'a> From<&'a str> for PlayerPerspective<'a> {
             "thirdPerson" => Self::ThirdPerson,
             "topDown" => Self::TopDown,
             "vr" => Self::Vr,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for PlayerPerspective<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "auditory" => Self::Auditory,
-            "firstPerson" => Self::FirstPerson,
-            "isometric" => Self::Isometric,
-            "sideView" => Self::SideView,
-            "text" => Self::Text,
-            "thirdPerson" => Self::ThirdPerson,
-            "topDown" => Self::TopDown,
-            "vr" => Self::Vr,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for PlayerPerspective<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for PlayerPerspective<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for PlayerPerspective<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for PlayerPerspective<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for PlayerPerspective<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for PlayerPerspective<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for PlayerPerspective<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for PlayerPerspective<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for PlayerPerspective<'_> {
-    type Output = PlayerPerspective<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for PlayerPerspective<S> {
+    type Output = PlayerPerspective<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             PlayerPerspective::Auditory => PlayerPerspective::Auditory,
@@ -1843,33 +1672,35 @@ impl jacquard_common::IntoStatic for PlayerPerspective<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileSummaryView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProfileSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub avatar: Option<BlobRef<S>>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub profile_type: ProfileSummaryViewProfileType<'a>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub display_name: Option<S>,
+    pub profile_type: ProfileSummaryViewProfileType<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileSummaryViewProfileType<'a> {
+pub enum ProfileSummaryViewProfileType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Actor,
     Org,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ProfileSummaryViewProfileType<'a> {
+impl<S: Bos<str> + AsRef<str>> ProfileSummaryViewProfileType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Actor => "actor",
@@ -1877,70 +1708,56 @@ impl<'a> ProfileSummaryViewProfileType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ProfileSummaryViewProfileType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "actor" => Self::Actor,
             "org" => Self::Org,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ProfileSummaryViewProfileType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "actor" => Self::Actor,
-            "org" => Self::Org,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ProfileSummaryViewProfileType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ProfileSummaryViewProfileType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ProfileSummaryViewProfileType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ProfileSummaryViewProfileType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ProfileSummaryViewProfileType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ProfileSummaryViewProfileType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ProfileSummaryViewProfileType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ProfileSummaryViewProfileType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ProfileSummaryViewProfileType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ProfileSummaryViewProfileType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ProfileSummaryViewProfileType<'_> {
-    type Output = ProfileSummaryViewProfileType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileSummaryViewProfileType<S> {
+    type Output = ProfileSummaryViewProfileType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ProfileSummaryViewProfileType::Actor => ProfileSummaryViewProfileType::Actor,
@@ -1953,45 +1770,52 @@ impl jacquard_common::IntoStatic for ProfileSummaryViewProfileType<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Release<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Release<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Free-text platform name, used when no platform record exists.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub platform: Option<CowStr<'a>>,
+    pub platform: Option<S>,
     ///AT URI of a platform record.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub platform_uri: Option<AtUri<'a>>,
+    pub platform_uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub release_dates: Option<Vec<games_gamesgamesgamesgames::ReleaseDate<'a>>>,
+    pub release_dates: Option<Vec<games_gamesgamesgamesgames::ReleaseDate<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ReleaseDate<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReleaseDate<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub region: Option<ReleaseDateRegion<'a>>,
+    pub region: Option<ReleaseDateRegion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub released_at: Option<CowStr<'a>>,
+    pub released_at: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub released_at_format: Option<CowStr<'a>>,
+    pub released_at_format: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<ReleaseDateStatus<'a>>,
+    pub status: Option<ReleaseDateStatus<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReleaseDateRegion<'a> {
+pub enum ReleaseDateRegion<S: Bos<str> + AsRef<str> = DefaultStr> {
     Worldwide,
     Europe,
     NorthAmerica,
@@ -2002,10 +1826,10 @@ pub enum ReleaseDateRegion<'a> {
     Asia,
     Korea,
     Brazil,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ReleaseDateRegion<'a> {
+impl<S: Bos<str> + AsRef<str>> ReleaseDateRegion<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Worldwide => "worldwide",
@@ -2021,11 +1845,9 @@ impl<'a> ReleaseDateRegion<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ReleaseDateRegion<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "worldwide" => Self::Worldwide,
             "europe" => Self::Europe,
             "northAmerica" => Self::NorthAmerica,
@@ -2036,71 +1858,51 @@ impl<'a> From<&'a str> for ReleaseDateRegion<'a> {
             "asia" => Self::Asia,
             "korea" => Self::Korea,
             "brazil" => Self::Brazil,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ReleaseDateRegion<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "worldwide" => Self::Worldwide,
-            "europe" => Self::Europe,
-            "northAmerica" => Self::NorthAmerica,
-            "australia" => Self::Australia,
-            "newZealand" => Self::NewZealand,
-            "japan" => Self::Japan,
-            "china" => Self::China,
-            "asia" => Self::Asia,
-            "korea" => Self::Korea,
-            "brazil" => Self::Brazil,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ReleaseDateRegion<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ReleaseDateRegion<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ReleaseDateRegion<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ReleaseDateRegion<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ReleaseDateRegion<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ReleaseDateRegion<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ReleaseDateRegion<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ReleaseDateRegion<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ReleaseDateRegion<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ReleaseDateRegion<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ReleaseDateRegion<'_> {
-    type Output = ReleaseDateRegion<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ReleaseDateRegion<S> {
+    type Output = ReleaseDateRegion<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ReleaseDateRegion::Worldwide => ReleaseDateRegion::Worldwide,
@@ -2120,7 +1922,7 @@ impl jacquard_common::IntoStatic for ReleaseDateRegion<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReleaseDateStatus<'a> {
+pub enum ReleaseDateStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     AdvancedAccess,
     Alpha,
     Beta,
@@ -2130,10 +1932,10 @@ pub enum ReleaseDateStatus<'a> {
     NextGenOptimizationRelease,
     Offline,
     Release,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ReleaseDateStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> ReleaseDateStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::AdvancedAccess => "advancedAccess",
@@ -2148,11 +1950,9 @@ impl<'a> ReleaseDateStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ReleaseDateStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "advancedAccess" => Self::AdvancedAccess,
             "alpha" => Self::Alpha,
             "beta" => Self::Beta,
@@ -2162,70 +1962,51 @@ impl<'a> From<&'a str> for ReleaseDateStatus<'a> {
             "nextGenOptimizationRelease" => Self::NextGenOptimizationRelease,
             "offline" => Self::Offline,
             "release" => Self::Release,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ReleaseDateStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "advancedAccess" => Self::AdvancedAccess,
-            "alpha" => Self::Alpha,
-            "beta" => Self::Beta,
-            "cancelled" => Self::Cancelled,
-            "digitalCompatibilityRelease" => Self::DigitalCompatibilityRelease,
-            "earlyAccess" => Self::EarlyAccess,
-            "nextGenOptimizationRelease" => Self::NextGenOptimizationRelease,
-            "offline" => Self::Offline,
-            "release" => Self::Release,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ReleaseDateStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ReleaseDateStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ReleaseDateStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ReleaseDateStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ReleaseDateStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ReleaseDateStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ReleaseDateStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ReleaseDateStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ReleaseDateStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ReleaseDateStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ReleaseDateStatus<'_> {
-    type Output = ReleaseDateStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ReleaseDateStatus<S> {
+    type Output = ReleaseDateStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ReleaseDateStatus::AdvancedAccess => ReleaseDateStatus::AdvancedAccess,
@@ -2247,43 +2028,52 @@ impl jacquard_common::IntoStatic for ReleaseDateStatus<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SkeletonGameFeedItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SkeletonGameFeedItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub feed_context: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub game: AtUri<'a>,
+    pub feed_context: Option<S>,
+    pub game: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// System requirements for a game on a specific platform.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SystemRequirements<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SystemRequirements<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub minimum: Option<games_gamesgamesgamesgames::SystemSpec<'a>>,
-    #[serde(borrow)]
-    pub platform: SystemRequirementsPlatform<'a>,
+    pub minimum: Option<games_gamesgamesgamesgames::SystemSpec<S>>,
+    pub platform: SystemRequirementsPlatform<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recommended: Option<games_gamesgamesgamesgames::SystemSpec<'a>>,
+    pub recommended: Option<games_gamesgamesgamesgames::SystemSpec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SystemRequirementsPlatform<'a> {
+pub enum SystemRequirementsPlatform<S: Bos<str> + AsRef<str> = DefaultStr> {
     Windows,
     Mac,
     Linux,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SystemRequirementsPlatform<'a> {
+impl<S: Bos<str> + AsRef<str>> SystemRequirementsPlatform<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Windows => "windows",
@@ -2292,72 +2082,57 @@ impl<'a> SystemRequirementsPlatform<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SystemRequirementsPlatform<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "windows" => Self::Windows,
             "mac" => Self::Mac,
             "linux" => Self::Linux,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SystemRequirementsPlatform<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "windows" => Self::Windows,
-            "mac" => Self::Mac,
-            "linux" => Self::Linux,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SystemRequirementsPlatform<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SystemRequirementsPlatform<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for SystemRequirementsPlatform<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SystemRequirementsPlatform<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for SystemRequirementsPlatform<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SystemRequirementsPlatform<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SystemRequirementsPlatform<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for SystemRequirementsPlatform<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for SystemRequirementsPlatform<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for SystemRequirementsPlatform<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for SystemRequirementsPlatform<'_> {
-    type Output = SystemRequirementsPlatform<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SystemRequirementsPlatform<S> {
+    type Output = SystemRequirementsPlatform<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SystemRequirementsPlatform::Windows => SystemRequirementsPlatform::Windows,
@@ -2372,39 +2147,38 @@ impl jacquard_common::IntoStatic for SystemRequirementsPlatform<'_> {
 
 /// Hardware/software specification for a platform.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SystemSpec<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SystemSpec<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_notes: Option<CowStr<'a>>,
+    pub additional_notes: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub directx: Option<CowStr<'a>>,
+    pub directx: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub graphics: Option<CowStr<'a>>,
+    pub graphics: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub memory: Option<CowStr<'a>>,
+    pub memory: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub os: Option<CowStr<'a>>,
+    pub os: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub processor: Option<CowStr<'a>>,
+    pub processor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sound_card: Option<CowStr<'a>>,
+    pub sound_card: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub storage: Option<CowStr<'a>>,
+    pub storage: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Theme<'a> {
+pub enum Theme<S: Bos<str> + AsRef<str> = DefaultStr> {
     _4x,
     Action,
     Business,
@@ -2427,10 +2201,10 @@ pub enum Theme<'a> {
     Survival,
     Thriller,
     Warfare,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> Theme<'a> {
+impl<S: Bos<str> + AsRef<str>> Theme<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::_4x => "4x",
@@ -2458,11 +2232,9 @@ impl<'a> Theme<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for Theme<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "4x" => Self::_4x,
             "action" => Self::Action,
             "business" => Self::Business,
@@ -2485,77 +2257,44 @@ impl<'a> From<&'a str> for Theme<'a> {
             "survival" => Self::Survival,
             "thriller" => Self::Thriller,
             "warfare" => Self::Warfare,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for Theme<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "4x" => Self::_4x,
-            "action" => Self::Action,
-            "business" => Self::Business,
-            "comedy" => Self::Comedy,
-            "drama" => Self::Drama,
-            "educational" => Self::Educational,
-            "erotic" => Self::Erotic,
-            "fantasy" => Self::Fantasy,
-            "historical" => Self::Historical,
-            "horror" => Self::Horror,
-            "kids" => Self::Kids,
-            "mystery" => Self::Mystery,
-            "nonfiction" => Self::Nonfiction,
-            "openWorld" => Self::OpenWorld,
-            "party" => Self::Party,
-            "romance" => Self::Romance,
-            "sandbox" => Self::Sandbox,
-            "scifi" => Self::Scifi,
-            "stealth" => Self::Stealth,
-            "survival" => Self::Survival,
-            "thriller" => Self::Thriller,
-            "warfare" => Self::Warfare,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for Theme<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for Theme<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for Theme<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Theme<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for Theme<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for Theme<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for Theme<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Theme<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for Theme<'_> {
-    type Output = Theme<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for Theme<S> {
+    type Output = Theme<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             Theme::_4x => Theme::_4x,
@@ -2586,43 +2325,61 @@ impl jacquard_common::IntoStatic for Theme<'_> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct TimeToBeat<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TimeToBeat<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub completely: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hastily: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub normally: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewerState<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ViewerState<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub like: Option<AtUri<'a>>,
+    pub like: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Website<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Website<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<WebsiteType<'a>>,
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub r#type: Option<WebsiteType<S>>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WebsiteType<'a> {
+pub enum WebsiteType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Official,
     Wiki,
     Steam,
@@ -2643,10 +2400,10 @@ pub enum WebsiteType<'a> {
     Nintendo,
     Meta,
     Other,
-    UnknownValue(CowStr<'a>),
+    UnknownValue(S),
 }
 
-impl<'a> WebsiteType<'a> {
+impl<S: Bos<str> + AsRef<str>> WebsiteType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Official => "official",
@@ -2672,11 +2429,9 @@ impl<'a> WebsiteType<'a> {
             Self::UnknownValue(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for WebsiteType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "official" => Self::Official,
             "wiki" => Self::Wiki,
             "steam" => Self::Steam,
@@ -2697,81 +2452,51 @@ impl<'a> From<&'a str> for WebsiteType<'a> {
             "nintendo" => Self::Nintendo,
             "meta" => Self::Meta,
             "other" => Self::Other,
-            _ => Self::UnknownValue(CowStr::from(s)),
+            _ => Self::UnknownValue(s),
         }
     }
 }
 
-impl<'a> From<String> for WebsiteType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "official" => Self::Official,
-            "wiki" => Self::Wiki,
-            "steam" => Self::Steam,
-            "gog" => Self::Gog,
-            "epicGames" => Self::EpicGames,
-            "itchIo" => Self::ItchIo,
-            "twitter" => Self::Twitter,
-            "instagram" => Self::Instagram,
-            "youtube" => Self::Youtube,
-            "twitch" => Self::Twitch,
-            "discord" => Self::Discord,
-            "reddit" => Self::Reddit,
-            "facebook" => Self::Facebook,
-            "wikipedia" => Self::Wikipedia,
-            "bluesky" => Self::Bluesky,
-            "xbox" => Self::Xbox,
-            "playstation" => Self::Playstation,
-            "nintendo" => Self::Nintendo,
-            "meta" => Self::Meta,
-            "other" => Self::Other,
-            _ => Self::UnknownValue(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for WebsiteType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WebsiteType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for WebsiteType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for WebsiteType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for WebsiteType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for WebsiteType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for WebsiteType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for WebsiteType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for WebsiteType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for WebsiteType<S> {
     fn default() -> Self {
         Self::UnknownValue(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for WebsiteType<'_> {
-    type Output = WebsiteType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for WebsiteType<S> {
+    type Output = WebsiteType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             WebsiteType::Official => WebsiteType::Official,
@@ -2799,7 +2524,7 @@ impl jacquard_common::IntoStatic for WebsiteType<'_> {
     }
 }
 
-impl<'a> LexiconSchema for ActorCreditView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActorCreditView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2824,7 +2549,7 @@ impl<'a> LexiconSchema for ActorCreditView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ActorProfileDetailView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActorProfileDetailView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2909,7 +2634,7 @@ impl<'a> LexiconSchema for ActorProfileDetailView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ActorProfileSummaryView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActorProfileSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2974,7 +2699,7 @@ impl<'a> LexiconSchema for ActorProfileSummaryView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for AgeRating<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AgeRating<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2989,7 +2714,7 @@ impl<'a> LexiconSchema for AgeRating<'a> {
     }
 }
 
-impl<'a> LexiconSchema for AlternativeName<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AlternativeName<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3004,7 +2729,7 @@ impl<'a> LexiconSchema for AlternativeName<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CollectionSummaryView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3019,7 +2744,7 @@ impl<'a> LexiconSchema for CollectionSummaryView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CreditEntry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CreditEntry<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3044,7 +2769,7 @@ impl<'a> LexiconSchema for CreditEntry<'a> {
     }
 }
 
-impl<'a> LexiconSchema for EngineSummaryView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for EngineSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3059,7 +2784,7 @@ impl<'a> LexiconSchema for EngineSummaryView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ExternalIds<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExternalIds<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3074,7 +2799,7 @@ impl<'a> LexiconSchema for ExternalIds<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ExternalVideo<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExternalVideo<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3089,7 +2814,7 @@ impl<'a> LexiconSchema for ExternalVideo<'a> {
     }
 }
 
-impl<'a> LexiconSchema for GameDetailView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameDetailView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3104,7 +2829,7 @@ impl<'a> LexiconSchema for GameDetailView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for GameFeedViewItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameFeedViewItem<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3129,7 +2854,7 @@ impl<'a> LexiconSchema for GameFeedViewItem<'a> {
     }
 }
 
-impl<'a> LexiconSchema for GameSummaryView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3144,7 +2869,7 @@ impl<'a> LexiconSchema for GameSummaryView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for GameView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3168,7 +2893,7 @@ impl<'a> LexiconSchema for GameView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ItchIoId<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ItchIoId<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3183,7 +2908,7 @@ impl<'a> LexiconSchema for ItchIoId<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LanguageSupport<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LanguageSupport<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3198,7 +2923,7 @@ impl<'a> LexiconSchema for LanguageSupport<'a> {
     }
 }
 
-impl<'a> LexiconSchema for MediaItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for MediaItem<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3251,7 +2976,7 @@ impl<'a> LexiconSchema for MediaItem<'a> {
     }
 }
 
-impl<'a> LexiconSchema for MultiplayerMode<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for MultiplayerMode<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3266,7 +2991,7 @@ impl<'a> LexiconSchema for MultiplayerMode<'a> {
     }
 }
 
-impl<'a> LexiconSchema for OrgCreditView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for OrgCreditView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3291,7 +3016,7 @@ impl<'a> LexiconSchema for OrgCreditView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for OrgProfileDetailView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for OrgProfileDetailView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3366,7 +3091,7 @@ impl<'a> LexiconSchema for OrgProfileDetailView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for OrgProfileSummaryView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for OrgProfileSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3431,7 +3156,7 @@ impl<'a> LexiconSchema for OrgProfileSummaryView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PlatformFeatures<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlatformFeatures<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3446,7 +3171,7 @@ impl<'a> LexiconSchema for PlatformFeatures<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PlatformSummaryView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlatformSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3461,7 +3186,7 @@ impl<'a> LexiconSchema for PlatformSummaryView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PlatformVersion<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlatformVersion<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3476,7 +3201,7 @@ impl<'a> LexiconSchema for PlatformVersion<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ProfileSummaryView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3541,7 +3266,7 @@ impl<'a> LexiconSchema for ProfileSummaryView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Release<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Release<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3556,7 +3281,7 @@ impl<'a> LexiconSchema for Release<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ReleaseDate<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReleaseDate<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3571,7 +3296,7 @@ impl<'a> LexiconSchema for ReleaseDate<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SkeletonGameFeedItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SkeletonGameFeedItem<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3596,7 +3321,7 @@ impl<'a> LexiconSchema for SkeletonGameFeedItem<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SystemRequirements<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SystemRequirements<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3611,7 +3336,7 @@ impl<'a> LexiconSchema for SystemRequirements<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SystemSpec<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SystemSpec<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3626,7 +3351,7 @@ impl<'a> LexiconSchema for SystemSpec<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TimeToBeat<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TimeToBeat<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3641,7 +3366,7 @@ impl<'a> LexiconSchema for TimeToBeat<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ViewerState<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViewerState<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3656,7 +3381,7 @@ impl<'a> LexiconSchema for ViewerState<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Website<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Website<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3681,37 +3406,37 @@ pub mod actor_credit_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Credits;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Credits = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Credits = S::Credits;
+        type Uri = Unset;
     }
     ///State transition - sets the `credits` field to Set
     pub struct SetCredits<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCredits<S> {}
     impl<S: State> State for SetCredits<S> {
-        type Uri = S::Uri;
         type Credits = Set<members::credits>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Credits = S::Credits;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `credits` field
         pub struct credits(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -3719,10 +3444,10 @@ pub mod actor_credit_view_state {
 pub struct ActorCreditViewBuilder<'a, S: actor_credit_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtUri<'a>>,
-        Option<Vec<games_gamesgamesgamesgames::CreditEntry<'a>>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
+        Option<AtUri<S>>,
+        Option<Vec<games_gamesgamesgamesgames::CreditEntry<S>>>,
+        Option<S>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -3747,12 +3472,12 @@ impl<'a> ActorCreditViewBuilder<'a, actor_credit_view_state::Empty> {
 
 impl<'a, S: actor_credit_view_state::State> ActorCreditViewBuilder<'a, S> {
     /// Set the `actorUri` field (optional)
-    pub fn actor_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn actor_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `actorUri` field to an Option value (optional)
-    pub fn maybe_actor_uri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_actor_uri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -3766,7 +3491,7 @@ where
     /// Set the `credits` field (required)
     pub fn credits(
         mut self,
-        value: impl Into<Vec<games_gamesgamesgamesgames::CreditEntry<'a>>>,
+        value: impl Into<Vec<games_gamesgamesgamesgames::CreditEntry<S>>>,
     ) -> ActorCreditViewBuilder<'a, actor_credit_view_state::SetCredits<S>> {
         self._fields.1 = Option::Some(value.into());
         ActorCreditViewBuilder {
@@ -3779,12 +3504,12 @@ where
 
 impl<'a, S: actor_credit_view_state::State> ActorCreditViewBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -3798,7 +3523,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ActorCreditViewBuilder<'a, actor_credit_view_state::SetUri<S>> {
         self._fields.3 = Option::Some(value.into());
         ActorCreditViewBuilder {
@@ -3812,8 +3537,8 @@ where
 impl<'a, S> ActorCreditViewBuilder<'a, S>
 where
     S: actor_credit_view_state::State,
-    S::Uri: actor_credit_view_state::IsSet,
     S::Credits: actor_credit_view_state::IsSet,
+    S::Uri: actor_credit_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ActorCreditView<'a> {
@@ -3828,10 +3553,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ActorCreditView<'a> {
         ActorCreditView {
             actor_uri: self._fields.0,
@@ -5632,15 +5354,15 @@ pub mod actor_profile_detail_view_state {
 pub struct ActorProfileDetailViewBuilder<'a, S: actor_profile_detail_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<BlobRef<'a>>,
+        Option<BlobRef<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<Vec<games_gamesgamesgamesgames::Website<'a>>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<Vec<games_gamesgamesgamesgames::Website<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -5671,12 +5393,12 @@ impl<
     S: actor_profile_detail_view_state::State,
 > ActorProfileDetailViewBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -5703,12 +5425,12 @@ impl<
     S: actor_profile_detail_view_state::State,
 > ActorProfileDetailViewBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -5721,13 +5443,13 @@ impl<
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
-        value: impl Into<Option<Vec<Facet<'a>>>>,
+        value: impl Into<Option<Vec<Facet<S>>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
-    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -5741,7 +5463,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ActorProfileDetailViewBuilder<'a, actor_profile_detail_view_state::SetDid<S>> {
         self._fields.4 = Option::Some(value.into());
         ActorProfileDetailViewBuilder {
@@ -5757,12 +5479,12 @@ impl<
     S: actor_profile_detail_view_state::State,
 > ActorProfileDetailViewBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -5773,12 +5495,12 @@ impl<
     S: actor_profile_detail_view_state::State,
 > ActorProfileDetailViewBuilder<'a, S> {
     /// Set the `pronouns` field (optional)
-    pub fn pronouns(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn pronouns(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
-    pub fn maybe_pronouns(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_pronouns(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -5792,7 +5514,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ActorProfileDetailViewBuilder<'a, actor_profile_detail_view_state::SetUri<S>> {
         self._fields.7 = Option::Some(value.into());
         ActorProfileDetailViewBuilder {
@@ -5810,7 +5532,7 @@ impl<
     /// Set the `websites` field (optional)
     pub fn websites(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Website<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Website<S>>>>,
     ) -> Self {
         self._fields.8 = value.into();
         self
@@ -5818,7 +5540,7 @@ impl<
     /// Set the `websites` field to an Option value (optional)
     pub fn maybe_websites(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::Website<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::Website<S>>>,
     ) -> Self {
         self._fields.8 = value;
         self
@@ -5849,10 +5571,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ActorProfileDetailView<'a> {
         ActorProfileDetailView {
             avatar: self._fields.0,
@@ -5879,37 +5598,37 @@ pub mod actor_profile_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Did;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Did = S::Did;
+        type Uri = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Uri = S::Uri;
         type Did = Set<members::did>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Did = S::Did;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -5919,12 +5638,7 @@ pub struct ActorProfileSummaryViewBuilder<
     S: actor_profile_summary_view_state::State,
 > {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<BlobRef<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-    ),
+    _fields: (Option<BlobRef<S>>, Option<Did<S>>, Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -5954,12 +5668,12 @@ impl<
     S: actor_profile_summary_view_state::State,
 > ActorProfileSummaryViewBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -5973,7 +5687,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ActorProfileSummaryViewBuilder<
         'a,
         actor_profile_summary_view_state::SetDid<S>,
@@ -5992,12 +5706,12 @@ impl<
     S: actor_profile_summary_view_state::State,
 > ActorProfileSummaryViewBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -6011,7 +5725,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ActorProfileSummaryViewBuilder<
         'a,
         actor_profile_summary_view_state::SetUri<S>,
@@ -6028,8 +5742,8 @@ where
 impl<'a, S> ActorProfileSummaryViewBuilder<'a, S>
 where
     S: actor_profile_summary_view_state::State,
-    S::Uri: actor_profile_summary_view_state::IsSet,
     S::Did: actor_profile_summary_view_state::IsSet,
+    S::Uri: actor_profile_summary_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ActorProfileSummaryView<'a> {
@@ -6044,10 +5758,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ActorProfileSummaryView<'a> {
         ActorProfileSummaryView {
             avatar: self._fields.0,
@@ -6107,10 +5818,10 @@ pub mod collection_summary_view_state {
 pub struct CollectionSummaryViewBuilder<'a, S: collection_summary_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CollectionSummaryViewType<'a>>,
-        Option<AtUri<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<CollectionSummaryViewType<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -6144,7 +5855,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CollectionSummaryViewBuilder<'a, collection_summary_view_state::SetName<S>> {
         self._fields.0 = Option::Some(value.into());
         CollectionSummaryViewBuilder {
@@ -6157,12 +5868,12 @@ where
 
 impl<'a, S: collection_summary_view_state::State> CollectionSummaryViewBuilder<'a, S> {
     /// Set the `slug` field (optional)
-    pub fn slug(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `slug` field to an Option value (optional)
-    pub fn maybe_slug(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_slug(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -6172,13 +5883,13 @@ impl<'a, S: collection_summary_view_state::State> CollectionSummaryViewBuilder<'
     /// Set the `type` field (optional)
     pub fn r#type(
         mut self,
-        value: impl Into<Option<CollectionSummaryViewType<'a>>>,
+        value: impl Into<Option<CollectionSummaryViewType<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
-    pub fn maybe_type(mut self, value: Option<CollectionSummaryViewType<'a>>) -> Self {
+    pub fn maybe_type(mut self, value: Option<CollectionSummaryViewType<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -6192,7 +5903,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> CollectionSummaryViewBuilder<'a, collection_summary_view_state::SetUri<S>> {
         self._fields.3 = Option::Some(value.into());
         CollectionSummaryViewBuilder {
@@ -6222,10 +5933,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CollectionSummaryView<'a> {
         CollectionSummaryView {
             name: self._fields.0.unwrap(),
@@ -6272,10 +5980,7 @@ pub mod credit_entry_state {
 /// Builder for constructing an instance of this type
 pub struct CreditEntryBuilder<'a, S: credit_entry_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<games_gamesgamesgamesgames::IndividualRole<'a>>,
-    ),
+    _fields: (Option<S>, Option<games_gamesgamesgamesgames::IndividualRole<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -6299,12 +6004,12 @@ impl<'a> CreditEntryBuilder<'a, credit_entry_state::Empty> {
 
 impl<'a, S: credit_entry_state::State> CreditEntryBuilder<'a, S> {
     /// Set the `department` field (optional)
-    pub fn department(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn department(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `department` field to an Option value (optional)
-    pub fn maybe_department(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_department(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -6318,7 +6023,7 @@ where
     /// Set the `role` field (required)
     pub fn role(
         mut self,
-        value: impl Into<games_gamesgamesgamesgames::IndividualRole<'a>>,
+        value: impl Into<games_gamesgamesgamesgames::IndividualRole<S>>,
     ) -> CreditEntryBuilder<'a, credit_entry_state::SetRole<S>> {
         self._fields.1 = Option::Some(value.into());
         CreditEntryBuilder {
@@ -6345,10 +6050,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CreditEntry<'a> {
         CreditEntry {
             department: self._fields.0,
@@ -6368,44 +6070,44 @@ pub mod engine_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Name;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Name = S::Name;
+        type Uri = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Uri = S::Uri;
         type Name = Set<members::name>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Name = S::Name;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EngineSummaryViewBuilder<'a, S: engine_summary_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -6435,7 +6137,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EngineSummaryViewBuilder<'a, engine_summary_view_state::SetName<S>> {
         self._fields.0 = Option::Some(value.into());
         EngineSummaryViewBuilder {
@@ -6448,12 +6150,12 @@ where
 
 impl<'a, S: engine_summary_view_state::State> EngineSummaryViewBuilder<'a, S> {
     /// Set the `slug` field (optional)
-    pub fn slug(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `slug` field to an Option value (optional)
-    pub fn maybe_slug(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_slug(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -6467,7 +6169,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> EngineSummaryViewBuilder<'a, engine_summary_view_state::SetUri<S>> {
         self._fields.2 = Option::Some(value.into());
         EngineSummaryViewBuilder {
@@ -6481,8 +6183,8 @@ where
 impl<'a, S> EngineSummaryViewBuilder<'a, S>
 where
     S: engine_summary_view_state::State,
-    S::Uri: engine_summary_view_state::IsSet,
     S::Name: engine_summary_view_state::IsSet,
+    S::Uri: engine_summary_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EngineSummaryView<'a> {
@@ -6496,10 +6198,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> EngineSummaryView<'a> {
         EngineSummaryView {
             name: self._fields.0.unwrap(),
@@ -6520,51 +6219,51 @@ pub mod game_detail_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type CreatedAt;
         type Name;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
+        type Uri = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
         type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Uri = S::Uri;
         type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -6572,34 +6271,34 @@ pub mod game_detail_view_state {
 pub struct GameDetailViewBuilder<'a, S: game_detail_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<games_gamesgamesgamesgames::ActorCreditView<'a>>>,
-        Option<Vec<games_gamesgamesgamesgames::AgeRating<'a>>>,
-        Option<Vec<games_gamesgamesgamesgames::AlternativeName<'a>>>,
-        Option<games_gamesgamesgamesgames::ApplicationType<'a>>,
-        Option<Vec<AtUri<'a>>>,
+        Option<Vec<games_gamesgamesgamesgames::ActorCreditView<S>>>,
+        Option<Vec<games_gamesgamesgamesgames::AgeRating<S>>>,
+        Option<Vec<games_gamesgamesgamesgames::AlternativeName<S>>>,
+        Option<games_gamesgamesgamesgames::ApplicationType<S>>,
+        Option<Vec<AtUri<S>>>,
         Option<Datetime>,
-        Option<Vec<AtUri<'a>>>,
-        Option<games_gamesgamesgamesgames::ExternalIds<'a>>,
-        Option<Vec<games_gamesgamesgamesgames::Genre<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Vec<games_gamesgamesgamesgames::LanguageSupport<'a>>>,
-        Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>,
-        Option<Vec<games_gamesgamesgamesgames::Mode<'a>>>,
-        Option<Vec<games_gamesgamesgamesgames::MultiplayerMode<'a>>>,
-        Option<CowStr<'a>>,
-        Option<Vec<games_gamesgamesgamesgames::OrgCreditView<'a>>>,
-        Option<AtUri<'a>>,
-        Option<Vec<games_gamesgamesgamesgames::PlayerPerspective<'a>>>,
+        Option<Vec<AtUri<S>>>,
+        Option<games_gamesgamesgamesgames::ExternalIds<S>>,
+        Option<Vec<games_gamesgamesgamesgames::Genre<S>>>,
+        Option<Vec<S>>,
+        Option<Vec<games_gamesgamesgamesgames::LanguageSupport<S>>>,
+        Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>,
+        Option<Vec<games_gamesgamesgamesgames::Mode<S>>>,
+        Option<Vec<games_gamesgamesgamesgames::MultiplayerMode<S>>>,
+        Option<S>,
+        Option<Vec<games_gamesgamesgamesgames::OrgCreditView<S>>>,
+        Option<AtUri<S>>,
+        Option<Vec<games_gamesgamesgamesgames::PlayerPerspective<S>>>,
         Option<Datetime>,
-        Option<Vec<games_gamesgamesgamesgames::Release<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<games_gamesgamesgamesgames::Theme<'a>>>,
-        Option<games_gamesgamesgamesgames::TimeToBeat<'a>>,
-        Option<AtUri<'a>>,
-        Option<Vec<games_gamesgamesgamesgames::ExternalVideo<'a>>>,
-        Option<Vec<games_gamesgamesgamesgames::Website<'a>>>,
+        Option<Vec<games_gamesgamesgamesgames::Release<S>>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Vec<games_gamesgamesgamesgames::Theme<S>>>,
+        Option<games_gamesgamesgamesgames::TimeToBeat<S>>,
+        Option<AtUri<S>>,
+        Option<Vec<games_gamesgamesgamesgames::ExternalVideo<S>>>,
+        Option<Vec<games_gamesgamesgamesgames::Website<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -6655,7 +6354,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `actorCredits` field (optional)
     pub fn actor_credits(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::ActorCreditView<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::ActorCreditView<S>>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
@@ -6663,7 +6362,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `actorCredits` field to an Option value (optional)
     pub fn maybe_actor_credits(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::ActorCreditView<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::ActorCreditView<S>>>,
     ) -> Self {
         self._fields.0 = value;
         self
@@ -6674,7 +6373,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `ageRatings` field (optional)
     pub fn age_ratings(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::AgeRating<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::AgeRating<S>>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -6682,7 +6381,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `ageRatings` field to an Option value (optional)
     pub fn maybe_age_ratings(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::AgeRating<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::AgeRating<S>>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -6693,7 +6392,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `alternativeNames` field (optional)
     pub fn alternative_names(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::AlternativeName<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::AlternativeName<S>>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -6701,7 +6400,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `alternativeNames` field to an Option value (optional)
     pub fn maybe_alternative_names(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::AlternativeName<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::AlternativeName<S>>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -6712,7 +6411,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `applicationType` field (optional)
     pub fn application_type(
         mut self,
-        value: impl Into<Option<games_gamesgamesgamesgames::ApplicationType<'a>>>,
+        value: impl Into<Option<games_gamesgamesgamesgames::ApplicationType<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -6720,7 +6419,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `applicationType` field to an Option value (optional)
     pub fn maybe_application_type(
         mut self,
-        value: Option<games_gamesgamesgamesgames::ApplicationType<'a>>,
+        value: Option<games_gamesgamesgamesgames::ApplicationType<S>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -6729,12 +6428,12 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
 
 impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `collections` field (optional)
-    pub fn collections(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn collections(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `collections` field to an Option value (optional)
-    pub fn maybe_collections(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_collections(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -6761,12 +6460,12 @@ where
 
 impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `engines` field (optional)
-    pub fn engines(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn engines(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `engines` field to an Option value (optional)
-    pub fn maybe_engines(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_engines(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -6776,7 +6475,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `externalIds` field (optional)
     pub fn external_ids(
         mut self,
-        value: impl Into<Option<games_gamesgamesgamesgames::ExternalIds<'a>>>,
+        value: impl Into<Option<games_gamesgamesgamesgames::ExternalIds<S>>>,
     ) -> Self {
         self._fields.7 = value.into();
         self
@@ -6784,7 +6483,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `externalIds` field to an Option value (optional)
     pub fn maybe_external_ids(
         mut self,
-        value: Option<games_gamesgamesgamesgames::ExternalIds<'a>>,
+        value: Option<games_gamesgamesgamesgames::ExternalIds<S>>,
     ) -> Self {
         self._fields.7 = value;
         self
@@ -6795,7 +6494,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `genres` field (optional)
     pub fn genres(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Genre<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Genre<S>>>>,
     ) -> Self {
         self._fields.8 = value.into();
         self
@@ -6803,7 +6502,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `genres` field to an Option value (optional)
     pub fn maybe_genres(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::Genre<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::Genre<S>>>,
     ) -> Self {
         self._fields.8 = value;
         self
@@ -6812,12 +6511,12 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
 
 impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_keywords(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -6827,7 +6526,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `languageSupports` field (optional)
     pub fn language_supports(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::LanguageSupport<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::LanguageSupport<S>>>>,
     ) -> Self {
         self._fields.10 = value.into();
         self
@@ -6835,7 +6534,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `languageSupports` field to an Option value (optional)
     pub fn maybe_language_supports(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::LanguageSupport<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::LanguageSupport<S>>>,
     ) -> Self {
         self._fields.10 = value;
         self
@@ -6846,7 +6545,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `media` field (optional)
     pub fn media(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>>,
     ) -> Self {
         self._fields.11 = value.into();
         self
@@ -6854,7 +6553,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `media` field to an Option value (optional)
     pub fn maybe_media(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>,
     ) -> Self {
         self._fields.11 = value;
         self
@@ -6865,7 +6564,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `modes` field (optional)
     pub fn modes(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Mode<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Mode<S>>>>,
     ) -> Self {
         self._fields.12 = value.into();
         self
@@ -6873,7 +6572,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `modes` field to an Option value (optional)
     pub fn maybe_modes(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::Mode<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::Mode<S>>>,
     ) -> Self {
         self._fields.12 = value;
         self
@@ -6884,7 +6583,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `multiplayerModes` field (optional)
     pub fn multiplayer_modes(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::MultiplayerMode<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::MultiplayerMode<S>>>>,
     ) -> Self {
         self._fields.13 = value.into();
         self
@@ -6892,7 +6591,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `multiplayerModes` field to an Option value (optional)
     pub fn maybe_multiplayer_modes(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::MultiplayerMode<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::MultiplayerMode<S>>>,
     ) -> Self {
         self._fields.13 = value;
         self
@@ -6907,7 +6606,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GameDetailViewBuilder<'a, game_detail_view_state::SetName<S>> {
         self._fields.14 = Option::Some(value.into());
         GameDetailViewBuilder {
@@ -6922,7 +6621,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `orgCredits` field (optional)
     pub fn org_credits(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::OrgCreditView<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::OrgCreditView<S>>>>,
     ) -> Self {
         self._fields.15 = value.into();
         self
@@ -6930,7 +6629,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `orgCredits` field to an Option value (optional)
     pub fn maybe_org_credits(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::OrgCreditView<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::OrgCreditView<S>>>,
     ) -> Self {
         self._fields.15 = value;
         self
@@ -6939,12 +6638,12 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
 
 impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `parent` field (optional)
-    pub fn parent(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn parent(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
-    pub fn maybe_parent(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_parent(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -6954,7 +6653,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `playerPerspectives` field (optional)
     pub fn player_perspectives(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::PlayerPerspective<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::PlayerPerspective<S>>>>,
     ) -> Self {
         self._fields.17 = value.into();
         self
@@ -6962,7 +6661,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `playerPerspectives` field to an Option value (optional)
     pub fn maybe_player_perspectives(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::PlayerPerspective<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::PlayerPerspective<S>>>,
     ) -> Self {
         self._fields.17 = value;
         self
@@ -6986,7 +6685,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `releases` field (optional)
     pub fn releases(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Release<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Release<S>>>>,
     ) -> Self {
         self._fields.19 = value.into();
         self
@@ -6994,7 +6693,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `releases` field to an Option value (optional)
     pub fn maybe_releases(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::Release<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::Release<S>>>,
     ) -> Self {
         self._fields.19 = value;
         self
@@ -7003,12 +6702,12 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
 
 impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `slug` field (optional)
-    pub fn slug(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.20 = value.into();
         self
     }
     /// Set the `slug` field to an Option value (optional)
-    pub fn maybe_slug(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_slug(mut self, value: Option<S>) -> Self {
         self._fields.20 = value;
         self
     }
@@ -7016,12 +6715,12 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
 
 impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `storyline` field (optional)
-    pub fn storyline(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn storyline(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.21 = value.into();
         self
     }
     /// Set the `storyline` field to an Option value (optional)
-    pub fn maybe_storyline(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_storyline(mut self, value: Option<S>) -> Self {
         self._fields.21 = value;
         self
     }
@@ -7029,12 +6728,12 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
 
 impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `summary` field (optional)
-    pub fn summary(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn summary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.22 = value.into();
         self
     }
     /// Set the `summary` field to an Option value (optional)
-    pub fn maybe_summary(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_summary(mut self, value: Option<S>) -> Self {
         self._fields.22 = value;
         self
     }
@@ -7044,7 +6743,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `themes` field (optional)
     pub fn themes(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Theme<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Theme<S>>>>,
     ) -> Self {
         self._fields.23 = value.into();
         self
@@ -7052,7 +6751,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `themes` field to an Option value (optional)
     pub fn maybe_themes(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::Theme<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::Theme<S>>>,
     ) -> Self {
         self._fields.23 = value;
         self
@@ -7063,7 +6762,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `timeToBeat` field (optional)
     pub fn time_to_beat(
         mut self,
-        value: impl Into<Option<games_gamesgamesgamesgames::TimeToBeat<'a>>>,
+        value: impl Into<Option<games_gamesgamesgamesgames::TimeToBeat<S>>>,
     ) -> Self {
         self._fields.24 = value.into();
         self
@@ -7071,7 +6770,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `timeToBeat` field to an Option value (optional)
     pub fn maybe_time_to_beat(
         mut self,
-        value: Option<games_gamesgamesgamesgames::TimeToBeat<'a>>,
+        value: Option<games_gamesgamesgamesgames::TimeToBeat<S>>,
     ) -> Self {
         self._fields.24 = value;
         self
@@ -7086,7 +6785,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GameDetailViewBuilder<'a, game_detail_view_state::SetUri<S>> {
         self._fields.25 = Option::Some(value.into());
         GameDetailViewBuilder {
@@ -7101,7 +6800,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `videos` field (optional)
     pub fn videos(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::ExternalVideo<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::ExternalVideo<S>>>>,
     ) -> Self {
         self._fields.26 = value.into();
         self
@@ -7109,7 +6808,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `videos` field to an Option value (optional)
     pub fn maybe_videos(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::ExternalVideo<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::ExternalVideo<S>>>,
     ) -> Self {
         self._fields.26 = value;
         self
@@ -7120,7 +6819,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `websites` field (optional)
     pub fn websites(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Website<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Website<S>>>>,
     ) -> Self {
         self._fields.27 = value.into();
         self
@@ -7128,7 +6827,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `websites` field to an Option value (optional)
     pub fn maybe_websites(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::Website<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::Website<S>>>,
     ) -> Self {
         self._fields.27 = value;
         self
@@ -7138,9 +6837,9 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
 impl<'a, S> GameDetailViewBuilder<'a, S>
 where
     S: game_detail_view_state::State,
-    S::Uri: game_detail_view_state::IsSet,
     S::CreatedAt: game_detail_view_state::IsSet,
     S::Name: game_detail_view_state::IsSet,
+    S::Uri: game_detail_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GameDetailView<'a> {
@@ -7179,10 +6878,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> GameDetailView<'a> {
         GameDetailView {
             actor_credits: self._fields.0,
@@ -7253,7 +6949,7 @@ pub mod game_feed_view_item_state {
 /// Builder for constructing an instance of this type
 pub struct GameFeedViewItemBuilder<'a, S: game_feed_view_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<games_gamesgamesgamesgames::GameView<'a>>),
+    _fields: (Option<S>, Option<games_gamesgamesgamesgames::GameView<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -7277,12 +6973,12 @@ impl<'a> GameFeedViewItemBuilder<'a, game_feed_view_item_state::Empty> {
 
 impl<'a, S: game_feed_view_item_state::State> GameFeedViewItemBuilder<'a, S> {
     /// Set the `feedContext` field (optional)
-    pub fn feed_context(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn feed_context(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `feedContext` field to an Option value (optional)
-    pub fn maybe_feed_context(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_feed_context(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -7296,7 +6992,7 @@ where
     /// Set the `game` field (required)
     pub fn game(
         mut self,
-        value: impl Into<games_gamesgamesgamesgames::GameView<'a>>,
+        value: impl Into<games_gamesgamesgamesgames::GameView<S>>,
     ) -> GameFeedViewItemBuilder<'a, game_feed_view_item_state::SetGame<S>> {
         self._fields.1 = Option::Some(value.into());
         GameFeedViewItemBuilder {
@@ -7323,10 +7019,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> GameFeedViewItem<'a> {
         GameFeedViewItem {
             feed_context: self._fields.0,
@@ -7384,13 +7077,13 @@ pub mod game_summary_view_state {
 pub struct GameSummaryViewBuilder<'a, S: game_summary_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<games_gamesgamesgamesgames::ApplicationType<'a>>,
+        Option<games_gamesgamesgamesgames::ApplicationType<S>>,
         Option<i64>,
-        Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
+        Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -7417,7 +7110,7 @@ impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
     /// Set the `applicationType` field (optional)
     pub fn application_type(
         mut self,
-        value: impl Into<Option<games_gamesgamesgamesgames::ApplicationType<'a>>>,
+        value: impl Into<Option<games_gamesgamesgamesgames::ApplicationType<S>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
@@ -7425,7 +7118,7 @@ impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
     /// Set the `applicationType` field to an Option value (optional)
     pub fn maybe_application_type(
         mut self,
-        value: Option<games_gamesgamesgamesgames::ApplicationType<'a>>,
+        value: Option<games_gamesgamesgamesgames::ApplicationType<S>>,
     ) -> Self {
         self._fields.0 = value;
         self
@@ -7449,7 +7142,7 @@ impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
     /// Set the `media` field (optional)
     pub fn media(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -7457,7 +7150,7 @@ impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
     /// Set the `media` field to an Option value (optional)
     pub fn maybe_media(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -7472,7 +7165,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GameSummaryViewBuilder<'a, game_summary_view_state::SetName<S>> {
         self._fields.3 = Option::Some(value.into());
         GameSummaryViewBuilder {
@@ -7485,12 +7178,12 @@ where
 
 impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
     /// Set the `slug` field (optional)
-    pub fn slug(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `slug` field to an Option value (optional)
-    pub fn maybe_slug(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_slug(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -7498,12 +7191,12 @@ impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
 
 impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
     /// Set the `summary` field (optional)
-    pub fn summary(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn summary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `summary` field to an Option value (optional)
-    pub fn maybe_summary(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_summary(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -7517,7 +7210,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GameSummaryViewBuilder<'a, game_summary_view_state::SetUri<S>> {
         self._fields.6 = Option::Some(value.into());
         GameSummaryViewBuilder {
@@ -7550,10 +7243,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> GameSummaryView<'a> {
         GameSummaryView {
             application_type: self._fields.0,
@@ -7578,51 +7268,51 @@ pub mod game_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Name;
         type ApplicationType;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Name = Unset;
         type ApplicationType = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Name = S::Name;
-        type ApplicationType = S::ApplicationType;
+        type Uri = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Uri = S::Uri;
         type Name = Set<members::name>;
         type ApplicationType = S::ApplicationType;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `application_type` field to Set
     pub struct SetApplicationType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetApplicationType<S> {}
     impl<S: State> State for SetApplicationType<S> {
-        type Uri = S::Uri;
         type Name = S::Name;
         type ApplicationType = Set<members::application_type>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Name = S::Name;
+        type ApplicationType = S::ApplicationType;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `application_type` field
         pub struct application_type(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -7630,17 +7320,17 @@ pub mod game_view_state {
 pub struct GameViewBuilder<'a, S: game_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<games_gamesgamesgamesgames::ApplicationType<'a>>,
-        Option<Vec<games_gamesgamesgamesgames::Genre<'a>>>,
+        Option<games_gamesgamesgamesgames::ApplicationType<S>>,
+        Option<Vec<games_gamesgamesgamesgames::Genre<S>>>,
         Option<i64>,
-        Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>,
-        Option<CowStr<'a>>,
-        Option<Vec<games_gamesgamesgamesgames::Release<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<games_gamesgamesgamesgames::Theme<'a>>>,
-        Option<AtUri<'a>>,
-        Option<games_gamesgamesgamesgames::ViewerState<'a>>,
+        Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>,
+        Option<S>,
+        Option<Vec<games_gamesgamesgamesgames::Release<S>>>,
+        Option<S>,
+        Option<S>,
+        Option<Vec<games_gamesgamesgamesgames::Theme<S>>>,
+        Option<AtUri<S>>,
+        Option<games_gamesgamesgamesgames::ViewerState<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -7671,7 +7361,7 @@ where
     /// Set the `applicationType` field (required)
     pub fn application_type(
         mut self,
-        value: impl Into<games_gamesgamesgamesgames::ApplicationType<'a>>,
+        value: impl Into<games_gamesgamesgamesgames::ApplicationType<S>>,
     ) -> GameViewBuilder<'a, game_view_state::SetApplicationType<S>> {
         self._fields.0 = Option::Some(value.into());
         GameViewBuilder {
@@ -7686,7 +7376,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     /// Set the `genres` field (optional)
     pub fn genres(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Genre<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Genre<S>>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -7694,7 +7384,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     /// Set the `genres` field to an Option value (optional)
     pub fn maybe_genres(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::Genre<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::Genre<S>>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -7718,7 +7408,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     /// Set the `media` field (optional)
     pub fn media(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -7726,7 +7416,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     /// Set the `media` field to an Option value (optional)
     pub fn maybe_media(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -7741,7 +7431,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GameViewBuilder<'a, game_view_state::SetName<S>> {
         self._fields.4 = Option::Some(value.into());
         GameViewBuilder {
@@ -7756,7 +7446,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     /// Set the `releases` field (optional)
     pub fn releases(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Release<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Release<S>>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
@@ -7764,7 +7454,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     /// Set the `releases` field to an Option value (optional)
     pub fn maybe_releases(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::Release<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::Release<S>>>,
     ) -> Self {
         self._fields.5 = value;
         self
@@ -7773,12 +7463,12 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
 
 impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     /// Set the `slug` field (optional)
-    pub fn slug(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `slug` field to an Option value (optional)
-    pub fn maybe_slug(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_slug(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -7786,12 +7476,12 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
 
 impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     /// Set the `summary` field (optional)
-    pub fn summary(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn summary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `summary` field to an Option value (optional)
-    pub fn maybe_summary(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_summary(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -7801,7 +7491,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     /// Set the `themes` field (optional)
     pub fn themes(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Theme<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Theme<S>>>>,
     ) -> Self {
         self._fields.8 = value.into();
         self
@@ -7809,7 +7499,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     /// Set the `themes` field to an Option value (optional)
     pub fn maybe_themes(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::Theme<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::Theme<S>>>,
     ) -> Self {
         self._fields.8 = value;
         self
@@ -7824,7 +7514,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GameViewBuilder<'a, game_view_state::SetUri<S>> {
         self._fields.9 = Option::Some(value.into());
         GameViewBuilder {
@@ -7839,7 +7529,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(
         mut self,
-        value: impl Into<Option<games_gamesgamesgamesgames::ViewerState<'a>>>,
+        value: impl Into<Option<games_gamesgamesgamesgames::ViewerState<S>>>,
     ) -> Self {
         self._fields.10 = value.into();
         self
@@ -7847,7 +7537,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     /// Set the `viewer` field to an Option value (optional)
     pub fn maybe_viewer(
         mut self,
-        value: Option<games_gamesgamesgamesgames::ViewerState<'a>>,
+        value: Option<games_gamesgamesgamesgames::ViewerState<S>>,
     ) -> Self {
         self._fields.10 = value;
         self
@@ -7857,9 +7547,9 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
 impl<'a, S> GameViewBuilder<'a, S>
 where
     S: game_view_state::State,
-    S::Uri: game_view_state::IsSet,
     S::Name: game_view_state::IsSet,
     S::ApplicationType: game_view_state::IsSet,
+    S::Uri: game_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GameView<'a> {
@@ -7881,10 +7571,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> GameView<'a> {
         GameView {
             application_type: self._fields.0.unwrap(),
@@ -7913,37 +7600,37 @@ pub mod org_credit_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Roles;
         type Uri;
+        type Roles;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Roles = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `roles` field to Set
-    pub struct SetRoles<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoles<S> {}
-    impl<S: State> State for SetRoles<S> {
-        type Roles = Set<members::roles>;
-        type Uri = S::Uri;
+        type Roles = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Roles = S::Roles;
         type Uri = Set<members::uri>;
+        type Roles = S::Roles;
+    }
+    ///State transition - sets the `roles` field to Set
+    pub struct SetRoles<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoles<S> {}
+    impl<S: State> State for SetRoles<S> {
+        type Uri = S::Uri;
+        type Roles = Set<members::roles>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `roles` field
-        pub struct roles(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `roles` field
+        pub struct roles(());
     }
 }
 
@@ -7951,10 +7638,10 @@ pub mod org_credit_view_state {
 pub struct OrgCreditViewBuilder<'a, S: org_credit_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<Vec<games_gamesgamesgamesgames::CompanyRole<'a>>>,
-        Option<AtUri<'a>>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<Vec<games_gamesgamesgamesgames::CompanyRole<S>>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -7979,12 +7666,12 @@ impl<'a> OrgCreditViewBuilder<'a, org_credit_view_state::Empty> {
 
 impl<'a, S: org_credit_view_state::State> OrgCreditViewBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -7992,12 +7679,12 @@ impl<'a, S: org_credit_view_state::State> OrgCreditViewBuilder<'a, S> {
 
 impl<'a, S: org_credit_view_state::State> OrgCreditViewBuilder<'a, S> {
     /// Set the `orgUri` field (optional)
-    pub fn org_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn org_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `orgUri` field to an Option value (optional)
-    pub fn maybe_org_uri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_org_uri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -8011,7 +7698,7 @@ where
     /// Set the `roles` field (required)
     pub fn roles(
         mut self,
-        value: impl Into<Vec<games_gamesgamesgamesgames::CompanyRole<'a>>>,
+        value: impl Into<Vec<games_gamesgamesgamesgames::CompanyRole<S>>>,
     ) -> OrgCreditViewBuilder<'a, org_credit_view_state::SetRoles<S>> {
         self._fields.2 = Option::Some(value.into());
         OrgCreditViewBuilder {
@@ -8030,7 +7717,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> OrgCreditViewBuilder<'a, org_credit_view_state::SetUri<S>> {
         self._fields.3 = Option::Some(value.into());
         OrgCreditViewBuilder {
@@ -8044,8 +7731,8 @@ where
 impl<'a, S> OrgCreditViewBuilder<'a, S>
 where
     S: org_credit_view_state::State,
-    S::Roles: org_credit_view_state::IsSet,
     S::Uri: org_credit_view_state::IsSet,
+    S::Roles: org_credit_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> OrgCreditView<'a> {
@@ -8060,10 +7747,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> OrgCreditView<'a> {
         OrgCreditView {
             display_name: self._fields.0,
@@ -8085,37 +7769,37 @@ pub mod org_profile_detail_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Did;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Did = S::Did;
+        type Uri = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Uri = S::Uri;
         type Did = Set<members::did>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Did = S::Did;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -8123,19 +7807,19 @@ pub mod org_profile_detail_view_state {
 pub struct OrgProfileDetailViewBuilder<'a, S: org_profile_detail_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
+        Option<BlobRef<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<Did<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>,
-        Option<AtUri<'a>>,
-        Option<OrgProfileDetailViewStatus<'a>>,
-        Option<AtUri<'a>>,
-        Option<Vec<games_gamesgamesgamesgames::Website<'a>>>,
+        Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>,
+        Option<AtUri<S>>,
+        Option<OrgProfileDetailViewStatus<S>>,
+        Option<AtUri<S>>,
+        Option<Vec<games_gamesgamesgamesgames::Website<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -8177,12 +7861,12 @@ impl<'a> OrgProfileDetailViewBuilder<'a, org_profile_detail_view_state::Empty> {
 
 impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -8190,12 +7874,12 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
 
 impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
     /// Set the `country` field (optional)
-    pub fn country(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn country(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `country` field to an Option value (optional)
-    pub fn maybe_country(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_country(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -8216,12 +7900,12 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
 
 impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -8231,13 +7915,13 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
-        value: impl Into<Option<Vec<Facet<'a>>>>,
+        value: impl Into<Option<Vec<Facet<S>>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
-    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -8251,7 +7935,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> OrgProfileDetailViewBuilder<'a, org_profile_detail_view_state::SetDid<S>> {
         self._fields.5 = Option::Some(value.into());
         OrgProfileDetailViewBuilder {
@@ -8264,12 +7948,12 @@ where
 
 impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -8292,7 +7976,7 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     /// Set the `media` field (optional)
     pub fn media(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>>,
     ) -> Self {
         self._fields.8 = value.into();
         self
@@ -8300,7 +7984,7 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     /// Set the `media` field to an Option value (optional)
     pub fn maybe_media(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::MediaItem<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::MediaItem<S>>>,
     ) -> Self {
         self._fields.8 = value;
         self
@@ -8309,12 +7993,12 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
 
 impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
     /// Set the `parent` field (optional)
-    pub fn parent(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn parent(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
-    pub fn maybe_parent(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_parent(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -8324,16 +8008,13 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     /// Set the `status` field (optional)
     pub fn status(
         mut self,
-        value: impl Into<Option<OrgProfileDetailViewStatus<'a>>>,
+        value: impl Into<Option<OrgProfileDetailViewStatus<S>>>,
     ) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(
-        mut self,
-        value: Option<OrgProfileDetailViewStatus<'a>>,
-    ) -> Self {
+    pub fn maybe_status(mut self, value: Option<OrgProfileDetailViewStatus<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -8347,7 +8028,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> OrgProfileDetailViewBuilder<'a, org_profile_detail_view_state::SetUri<S>> {
         self._fields.11 = Option::Some(value.into());
         OrgProfileDetailViewBuilder {
@@ -8362,7 +8043,7 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     /// Set the `websites` field (optional)
     pub fn websites(
         mut self,
-        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Website<'a>>>>,
+        value: impl Into<Option<Vec<games_gamesgamesgamesgames::Website<S>>>>,
     ) -> Self {
         self._fields.12 = value.into();
         self
@@ -8370,7 +8051,7 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     /// Set the `websites` field to an Option value (optional)
     pub fn maybe_websites(
         mut self,
-        value: Option<Vec<games_gamesgamesgamesgames::Website<'a>>>,
+        value: Option<Vec<games_gamesgamesgamesgames::Website<S>>>,
     ) -> Self {
         self._fields.12 = value;
         self
@@ -8380,8 +8061,8 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
 impl<'a, S> OrgProfileDetailViewBuilder<'a, S>
 where
     S: org_profile_detail_view_state::State,
-    S::Uri: org_profile_detail_view_state::IsSet,
     S::Did: org_profile_detail_view_state::IsSet,
+    S::Uri: org_profile_detail_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> OrgProfileDetailView<'a> {
@@ -8405,10 +8086,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> OrgProfileDetailView<'a> {
         OrgProfileDetailView {
             avatar: self._fields.0,
@@ -8476,12 +8154,7 @@ pub mod org_profile_summary_view_state {
 /// Builder for constructing an instance of this type
 pub struct OrgProfileSummaryViewBuilder<'a, S: org_profile_summary_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<BlobRef<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-    ),
+    _fields: (Option<BlobRef<S>>, Option<Did<S>>, Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -8508,12 +8181,12 @@ impl<'a> OrgProfileSummaryViewBuilder<'a, org_profile_summary_view_state::Empty>
 
 impl<'a, S: org_profile_summary_view_state::State> OrgProfileSummaryViewBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -8527,7 +8200,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> OrgProfileSummaryViewBuilder<'a, org_profile_summary_view_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         OrgProfileSummaryViewBuilder {
@@ -8540,12 +8213,12 @@ where
 
 impl<'a, S: org_profile_summary_view_state::State> OrgProfileSummaryViewBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -8559,7 +8232,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> OrgProfileSummaryViewBuilder<'a, org_profile_summary_view_state::SetUri<S>> {
         self._fields.3 = Option::Some(value.into());
         OrgProfileSummaryViewBuilder {
@@ -8589,10 +8262,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> OrgProfileSummaryView<'a> {
         OrgProfileSummaryView {
             avatar: self._fields.0,
@@ -8614,44 +8284,44 @@ pub mod platform_features_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Features;
         type Platform;
+        type Features;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Features = Unset;
         type Platform = Unset;
-    }
-    ///State transition - sets the `features` field to Set
-    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeatures<S> {}
-    impl<S: State> State for SetFeatures<S> {
-        type Features = Set<members::features>;
-        type Platform = S::Platform;
+        type Features = Unset;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlatform<S> {}
     impl<S: State> State for SetPlatform<S> {
-        type Features = S::Features;
         type Platform = Set<members::platform>;
+        type Features = S::Features;
+    }
+    ///State transition - sets the `features` field to Set
+    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeatures<S> {}
+    impl<S: State> State for SetFeatures<S> {
+        type Platform = S::Platform;
+        type Features = Set<members::features>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `features` field
-        pub struct features(());
         ///Marker type for the `platform` field
         pub struct platform(());
+        ///Marker type for the `features` field
+        pub struct features(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PlatformFeaturesBuilder<'a, S: platform_features_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<CowStr<'a>>>, Option<PlatformFeaturesPlatform<'a>>),
+    _fields: (Option<Vec<S>>, Option<PlatformFeaturesPlatform<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -8681,7 +8351,7 @@ where
     /// Set the `features` field (required)
     pub fn features(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> PlatformFeaturesBuilder<'a, platform_features_state::SetFeatures<S>> {
         self._fields.0 = Option::Some(value.into());
         PlatformFeaturesBuilder {
@@ -8700,7 +8370,7 @@ where
     /// Set the `platform` field (required)
     pub fn platform(
         mut self,
-        value: impl Into<PlatformFeaturesPlatform<'a>>,
+        value: impl Into<PlatformFeaturesPlatform<S>>,
     ) -> PlatformFeaturesBuilder<'a, platform_features_state::SetPlatform<S>> {
         self._fields.1 = Option::Some(value.into());
         PlatformFeaturesBuilder {
@@ -8714,8 +8384,8 @@ where
 impl<'a, S> PlatformFeaturesBuilder<'a, S>
 where
     S: platform_features_state::State,
-    S::Features: platform_features_state::IsSet,
     S::Platform: platform_features_state::IsSet,
+    S::Features: platform_features_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlatformFeatures<'a> {
@@ -8728,10 +8398,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PlatformFeatures<'a> {
         PlatformFeatures {
             features: self._fields.0.unwrap(),
@@ -8751,37 +8418,37 @@ pub mod platform_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Uri;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Uri = S::Uri;
+        type Name = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
         type Uri = Set<members::uri>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Uri = S::Uri;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -8789,11 +8456,11 @@ pub mod platform_summary_view_state {
 pub struct PlatformSummaryViewBuilder<'a, S: platform_summary_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<games_gamesgamesgamesgames::PlatformCategory<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
+        Option<S>,
+        Option<games_gamesgamesgamesgames::PlatformCategory<S>>,
+        Option<S>,
+        Option<S>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -8818,12 +8485,12 @@ impl<'a> PlatformSummaryViewBuilder<'a, platform_summary_view_state::Empty> {
 
 impl<'a, S: platform_summary_view_state::State> PlatformSummaryViewBuilder<'a, S> {
     /// Set the `abbreviation` field (optional)
-    pub fn abbreviation(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn abbreviation(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `abbreviation` field to an Option value (optional)
-    pub fn maybe_abbreviation(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_abbreviation(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -8833,7 +8500,7 @@ impl<'a, S: platform_summary_view_state::State> PlatformSummaryViewBuilder<'a, S
     /// Set the `category` field (optional)
     pub fn category(
         mut self,
-        value: impl Into<Option<games_gamesgamesgamesgames::PlatformCategory<'a>>>,
+        value: impl Into<Option<games_gamesgamesgamesgames::PlatformCategory<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -8841,7 +8508,7 @@ impl<'a, S: platform_summary_view_state::State> PlatformSummaryViewBuilder<'a, S
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(
         mut self,
-        value: Option<games_gamesgamesgamesgames::PlatformCategory<'a>>,
+        value: Option<games_gamesgamesgamesgames::PlatformCategory<S>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -8856,7 +8523,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PlatformSummaryViewBuilder<'a, platform_summary_view_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         PlatformSummaryViewBuilder {
@@ -8869,12 +8536,12 @@ where
 
 impl<'a, S: platform_summary_view_state::State> PlatformSummaryViewBuilder<'a, S> {
     /// Set the `slug` field (optional)
-    pub fn slug(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `slug` field to an Option value (optional)
-    pub fn maybe_slug(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_slug(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -8888,7 +8555,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> PlatformSummaryViewBuilder<'a, platform_summary_view_state::SetUri<S>> {
         self._fields.4 = Option::Some(value.into());
         PlatformSummaryViewBuilder {
@@ -8902,8 +8569,8 @@ where
 impl<'a, S> PlatformSummaryViewBuilder<'a, S>
 where
     S: platform_summary_view_state::State,
-    S::Name: platform_summary_view_state::IsSet,
     S::Uri: platform_summary_view_state::IsSet,
+    S::Name: platform_summary_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlatformSummaryView<'a> {
@@ -8919,10 +8586,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PlatformSummaryView<'a> {
         PlatformSummaryView {
             abbreviation: self._fields.0,
@@ -8945,51 +8609,51 @@ pub mod profile_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ProfileType;
         type Uri;
         type Did;
+        type ProfileType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ProfileType = Unset;
         type Uri = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `profile_type` field to Set
-    pub struct SetProfileType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProfileType<S> {}
-    impl<S: State> State for SetProfileType<S> {
-        type ProfileType = Set<members::profile_type>;
-        type Uri = S::Uri;
-        type Did = S::Did;
+        type ProfileType = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type ProfileType = S::ProfileType;
         type Uri = Set<members::uri>;
         type Did = S::Did;
+        type ProfileType = S::ProfileType;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type ProfileType = S::ProfileType;
         type Uri = S::Uri;
         type Did = Set<members::did>;
+        type ProfileType = S::ProfileType;
+    }
+    ///State transition - sets the `profile_type` field to Set
+    pub struct SetProfileType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetProfileType<S> {}
+    impl<S: State> State for SetProfileType<S> {
+        type Uri = S::Uri;
+        type Did = S::Did;
+        type ProfileType = Set<members::profile_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `profile_type` field
-        pub struct profile_type(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `profile_type` field
+        pub struct profile_type(());
     }
 }
 
@@ -8997,11 +8661,11 @@ pub mod profile_summary_view_state {
 pub struct ProfileSummaryViewBuilder<'a, S: profile_summary_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<BlobRef<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<ProfileSummaryViewProfileType<'a>>,
-        Option<AtUri<'a>>,
+        Option<BlobRef<S>>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<ProfileSummaryViewProfileType<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -9026,12 +8690,12 @@ impl<'a> ProfileSummaryViewBuilder<'a, profile_summary_view_state::Empty> {
 
 impl<'a, S: profile_summary_view_state::State> ProfileSummaryViewBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -9045,7 +8709,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ProfileSummaryViewBuilder<'a, profile_summary_view_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         ProfileSummaryViewBuilder {
@@ -9058,12 +8722,12 @@ where
 
 impl<'a, S: profile_summary_view_state::State> ProfileSummaryViewBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -9077,7 +8741,7 @@ where
     /// Set the `profileType` field (required)
     pub fn profile_type(
         mut self,
-        value: impl Into<ProfileSummaryViewProfileType<'a>>,
+        value: impl Into<ProfileSummaryViewProfileType<S>>,
     ) -> ProfileSummaryViewBuilder<'a, profile_summary_view_state::SetProfileType<S>> {
         self._fields.3 = Option::Some(value.into());
         ProfileSummaryViewBuilder {
@@ -9096,7 +8760,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ProfileSummaryViewBuilder<'a, profile_summary_view_state::SetUri<S>> {
         self._fields.4 = Option::Some(value.into());
         ProfileSummaryViewBuilder {
@@ -9110,9 +8774,9 @@ where
 impl<'a, S> ProfileSummaryViewBuilder<'a, S>
 where
     S: profile_summary_view_state::State,
-    S::ProfileType: profile_summary_view_state::IsSet,
     S::Uri: profile_summary_view_state::IsSet,
     S::Did: profile_summary_view_state::IsSet,
+    S::ProfileType: profile_summary_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileSummaryView<'a> {
@@ -9128,10 +8792,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ProfileSummaryView<'a> {
         ProfileSummaryView {
             avatar: self._fields.0,
@@ -9179,7 +8840,7 @@ pub mod skeleton_game_feed_item_state {
 /// Builder for constructing an instance of this type
 pub struct SkeletonGameFeedItemBuilder<'a, S: skeleton_game_feed_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -9206,12 +8867,12 @@ impl<'a> SkeletonGameFeedItemBuilder<'a, skeleton_game_feed_item_state::Empty> {
 
 impl<'a, S: skeleton_game_feed_item_state::State> SkeletonGameFeedItemBuilder<'a, S> {
     /// Set the `feedContext` field (optional)
-    pub fn feed_context(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn feed_context(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `feedContext` field to an Option value (optional)
-    pub fn maybe_feed_context(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_feed_context(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -9225,7 +8886,7 @@ where
     /// Set the `game` field (required)
     pub fn game(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> SkeletonGameFeedItemBuilder<'a, skeleton_game_feed_item_state::SetGame<S>> {
         self._fields.1 = Option::Some(value.into());
         SkeletonGameFeedItemBuilder {
@@ -9252,10 +8913,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SkeletonGameFeedItem<'a> {
         SkeletonGameFeedItem {
             feed_context: self._fields.0,
@@ -9300,7 +8958,7 @@ pub mod website_state {
 /// Builder for constructing an instance of this type
 pub struct WebsiteBuilder<'a, S: website_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<WebsiteType<'a>>, Option<UriValue<'a>>),
+    _fields: (Option<WebsiteType<S>>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -9324,12 +8982,12 @@ impl<'a> WebsiteBuilder<'a, website_state::Empty> {
 
 impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(mut self, value: impl Into<Option<WebsiteType<'a>>>) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<WebsiteType<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
-    pub fn maybe_type(mut self, value: Option<WebsiteType<'a>>) -> Self {
+    pub fn maybe_type(mut self, value: Option<WebsiteType<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -9343,7 +9001,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> WebsiteBuilder<'a, website_state::SetUrl<S>> {
         self._fields.1 = Option::Some(value.into());
         WebsiteBuilder {
@@ -9370,10 +9028,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Website<'a> {
         Website {
             r#type: self._fields.0,

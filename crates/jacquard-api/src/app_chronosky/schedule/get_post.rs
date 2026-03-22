@@ -10,29 +10,44 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::app_chronosky::schedule::list_posts::ScheduledPost;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPost<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPost<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPostOutput<'a> {
-    #[serde(borrow)]
-    pub post: ScheduledPost<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPostOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub post: ScheduledPost<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -41,18 +56,19 @@ pub struct GetPostOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetPostError<'a> {
+pub enum GetPostError {
     #[serde(rename = "PostNotFound")]
-    PostNotFound(Option<CowStr<'a>>),
+    PostNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetPostError<'_> {
+impl core::fmt::Display for GetPostError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::PostNotFound(msg) => {
@@ -62,7 +78,13 @@ impl core::fmt::Display for GetPostError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -72,11 +94,12 @@ pub struct GetPostResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
     const NSID: &'static str = "app.chronosky.schedule.getPost";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPostOutput<'de>;
-    type Err<'de> = GetPostError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetPostOutput<S>;
+    type Err = GetPostError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPost<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetPost<S> {
     const NSID: &'static str = "app.chronosky.schedule.getPost";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPostResponse;
@@ -87,7 +110,7 @@ pub struct GetPostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.schedule.getPost";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPost<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetPost<S>;
     type Response = GetPostResponse;
 }
 
@@ -126,7 +149,7 @@ pub mod get_post_state {
 /// Builder for constructing an instance of this type
 pub struct GetPostBuilder<'a, S: get_post_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -156,7 +179,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetPostBuilder<'a, get_post_state::SetId<S>> {
         self._fields.0 = Option::Some(value.into());
         GetPostBuilder {

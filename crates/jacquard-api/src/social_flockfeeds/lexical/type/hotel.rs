@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -38,2410 +39,3755 @@ use crate::social_flockfeeds::lexical::r#type::product;
 <br /><br />
 See also the <a href="/docs/hotels.html">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.*/
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Embedded<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accepted_payment_method: Option<EmbeddedAcceptedPaymentMethod<'a>>,
+    pub accepted_payment_method: Option<EmbeddedAcceptedPaymentMethod<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub actionable_feedback_policy: Option<EmbeddedActionableFeedbackPolicy<'a>>,
+    pub actionable_feedback_policy: Option<EmbeddedActionableFeedbackPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_property: Option<EmbeddedAdditionalProperty<'a>>,
+    pub additional_property: Option<EmbeddedAdditionalProperty<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<EmbeddedAdditionalType<'a>>,
+    pub additional_type: Option<EmbeddedAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub address: Option<EmbeddedAddress<'a>>,
+    pub address: Option<EmbeddedAddress<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub agent_interaction_statistic: Option<EmbeddedAgentInteractionStatistic<'a>>,
+    pub agent_interaction_statistic: Option<EmbeddedAgentInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<EmbeddedAggregateRating<'a>>,
+    pub aggregate_rating: Option<EmbeddedAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<EmbeddedAlternateName<'a>>,
+    pub alternate_name: Option<EmbeddedAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alumni: Option<EmbeddedAlumni<'a>>,
+    pub alumni: Option<EmbeddedAlumni<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub amenity_feature: Option<EmbeddedAmenityFeature<'a>>,
+    pub amenity_feature: Option<EmbeddedAmenityFeature<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub area_served: Option<EmbeddedAreaServed<'a>>,
+    pub area_served: Option<EmbeddedAreaServed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audience: Option<EmbeddedAudience<'a>>,
+    pub audience: Option<EmbeddedAudience<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub available_language: Option<EmbeddedAvailableLanguage<'a>>,
+    pub available_language: Option<EmbeddedAvailableLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<EmbeddedAward<'a>>,
+    pub award: Option<EmbeddedAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<EmbeddedAwards<'a>>,
+    pub awards: Option<EmbeddedAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub branch_code: Option<EmbeddedBranchCode<'a>>,
+    pub branch_code: Option<EmbeddedBranchCode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub branch_of: Option<EmbeddedBranchOf<'a>>,
+    pub branch_of: Option<EmbeddedBranchOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub brand: Option<EmbeddedBrand<'a>>,
+    pub brand: Option<EmbeddedBrand<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub checkin_time: Option<EmbeddedCheckinTime<'a>>,
+    pub checkin_time: Option<EmbeddedCheckinTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub checkout_time: Option<EmbeddedCheckoutTime<'a>>,
+    pub checkout_time: Option<EmbeddedCheckoutTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub company_registration: Option<EmbeddedCompanyRegistration<'a>>,
+    pub company_registration: Option<EmbeddedCompanyRegistration<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contact_point: Option<EmbeddedContactPoint<'a>>,
+    pub contact_point: Option<EmbeddedContactPoint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contact_points: Option<EmbeddedContactPoints<'a>>,
+    pub contact_points: Option<EmbeddedContactPoints<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contained_in: Option<EmbeddedContainedIn<'a>>,
+    pub contained_in: Option<EmbeddedContainedIn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contained_in_place: Option<EmbeddedContainedInPlace<'a>>,
+    pub contained_in_place: Option<EmbeddedContainedInPlace<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contains_place: Option<EmbeddedContainsPlace<'a>>,
+    pub contains_place: Option<EmbeddedContainsPlace<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub corrections_policy: Option<EmbeddedCorrectionsPolicy<'a>>,
+    pub corrections_policy: Option<EmbeddedCorrectionsPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub currencies_accepted: Option<EmbeddedCurrenciesAccepted<'a>>,
+    pub currencies_accepted: Option<EmbeddedCurrenciesAccepted<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub department: Option<EmbeddedDepartment<'a>>,
+    pub department: Option<EmbeddedDepartment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<EmbeddedDescription<'a>>,
+    pub description: Option<EmbeddedDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub dissolution_date: Option<EmbeddedDissolutionDate<'a>>,
+    pub dissolution_date: Option<EmbeddedDissolutionDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub diversity_policy: Option<EmbeddedDiversityPolicy<'a>>,
+    pub diversity_policy: Option<EmbeddedDiversityPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub diversity_staffing_report: Option<EmbeddedDiversityStaffingReport<'a>>,
+    pub diversity_staffing_report: Option<EmbeddedDiversityStaffingReport<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub duns: Option<EmbeddedDuns<'a>>,
+    pub duns: Option<EmbeddedDuns<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub email: Option<EmbeddedEmail<'a>>,
+    pub email: Option<EmbeddedEmail<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub employee: Option<EmbeddedEmployee<'a>>,
+    pub employee: Option<EmbeddedEmployee<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub employees: Option<EmbeddedEmployees<'a>>,
+    pub employees: Option<EmbeddedEmployees<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ethics_policy: Option<EmbeddedEthicsPolicy<'a>>,
+    pub ethics_policy: Option<EmbeddedEthicsPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub event: Option<EmbeddedEvent<'a>>,
+    pub event: Option<EmbeddedEvent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub events: Option<EmbeddedEvents<'a>>,
+    pub events: Option<EmbeddedEvents<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub fax_number: Option<EmbeddedFaxNumber<'a>>,
+    pub fax_number: Option<EmbeddedFaxNumber<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub founder: Option<EmbeddedFounder<'a>>,
+    pub founder: Option<EmbeddedFounder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub founders: Option<EmbeddedFounders<'a>>,
+    pub founders: Option<EmbeddedFounders<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub founding_date: Option<EmbeddedFoundingDate<'a>>,
+    pub founding_date: Option<EmbeddedFoundingDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub founding_location: Option<EmbeddedFoundingLocation<'a>>,
+    pub founding_location: Option<EmbeddedFoundingLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funder: Option<EmbeddedFunder<'a>>,
+    pub funder: Option<EmbeddedFunder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<EmbeddedFunding<'a>>,
+    pub funding: Option<EmbeddedFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo: Option<EmbeddedGeo<'a>>,
+    pub geo: Option<EmbeddedGeo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_contains: Option<EmbeddedGeoContains<'a>>,
+    pub geo_contains: Option<EmbeddedGeoContains<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_covered_by: Option<EmbeddedGeoCoveredBy<'a>>,
+    pub geo_covered_by: Option<EmbeddedGeoCoveredBy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_covers: Option<EmbeddedGeoCovers<'a>>,
+    pub geo_covers: Option<EmbeddedGeoCovers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_crosses: Option<EmbeddedGeoCrosses<'a>>,
+    pub geo_crosses: Option<EmbeddedGeoCrosses<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_disjoint: Option<EmbeddedGeoDisjoint<'a>>,
+    pub geo_disjoint: Option<EmbeddedGeoDisjoint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_equals: Option<EmbeddedGeoEquals<'a>>,
+    pub geo_equals: Option<EmbeddedGeoEquals<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_intersects: Option<EmbeddedGeoIntersects<'a>>,
+    pub geo_intersects: Option<EmbeddedGeoIntersects<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_overlaps: Option<EmbeddedGeoOverlaps<'a>>,
+    pub geo_overlaps: Option<EmbeddedGeoOverlaps<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_touches: Option<EmbeddedGeoTouches<'a>>,
+    pub geo_touches: Option<EmbeddedGeoTouches<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_within: Option<EmbeddedGeoWithin<'a>>,
+    pub geo_within: Option<EmbeddedGeoWithin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub global_location_number: Option<EmbeddedGlobalLocationNumber<'a>>,
+    pub global_location_number: Option<EmbeddedGlobalLocationNumber<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_certification: Option<EmbeddedHasCertification<'a>>,
+    pub has_certification: Option<EmbeddedHasCertification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_credential: Option<EmbeddedHasCredential<'a>>,
+    pub has_credential: Option<EmbeddedHasCredential<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_drive_through_service: Option<EmbeddedHasDriveThroughService<'a>>,
+    pub has_drive_through_service: Option<EmbeddedHasDriveThroughService<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_gs1_digital_link: Option<EmbeddedHasGs1DigitalLink<'a>>,
+    pub has_gs1_digital_link: Option<EmbeddedHasGs1DigitalLink<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_map: Option<EmbeddedHasMap<'a>>,
+    pub has_map: Option<EmbeddedHasMap<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_member_program: Option<EmbeddedHasMemberProgram<'a>>,
+    pub has_member_program: Option<EmbeddedHasMemberProgram<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_merchant_return_policy: Option<EmbeddedHasMerchantReturnPolicy<'a>>,
+    pub has_merchant_return_policy: Option<EmbeddedHasMerchantReturnPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_offer_catalog: Option<EmbeddedHasOfferCatalog<'a>>,
+    pub has_offer_catalog: Option<EmbeddedHasOfferCatalog<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_pos: Option<EmbeddedHasPos<'a>>,
+    pub has_pos: Option<EmbeddedHasPos<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_product_return_policy: Option<EmbeddedHasProductReturnPolicy<'a>>,
+    pub has_product_return_policy: Option<EmbeddedHasProductReturnPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_shipping_service: Option<EmbeddedHasShippingService<'a>>,
+    pub has_shipping_service: Option<EmbeddedHasShippingService<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<EmbeddedIdentifier<'a>>,
+    pub identifier: Option<EmbeddedIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<EmbeddedImage<'a>>,
+    pub image: Option<EmbeddedImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interaction_statistic: Option<EmbeddedInteractionStatistic<'a>>,
+    pub interaction_statistic: Option<EmbeddedInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_accessible_for_free: Option<EmbeddedIsAccessibleForFree<'a>>,
+    pub is_accessible_for_free: Option<EmbeddedIsAccessibleForFree<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub isic_v4: Option<EmbeddedIsicV4<'a>>,
+    pub isic_v4: Option<EmbeddedIsicV4<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub iso6523_code: Option<EmbeddedIso6523Code<'a>>,
+    pub iso6523_code: Option<EmbeddedIso6523Code<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<EmbeddedKeywords<'a>>,
+    pub keywords: Option<EmbeddedKeywords<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub knows_about: Option<EmbeddedKnowsAbout<'a>>,
+    pub knows_about: Option<EmbeddedKnowsAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub knows_language: Option<EmbeddedKnowsLanguage<'a>>,
+    pub knows_language: Option<EmbeddedKnowsLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub latitude: Option<EmbeddedLatitude<'a>>,
+    pub latitude: Option<EmbeddedLatitude<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub legal_address: Option<EmbeddedLegalAddress<'a>>,
+    pub legal_address: Option<EmbeddedLegalAddress<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub legal_name: Option<EmbeddedLegalName<'a>>,
+    pub legal_name: Option<EmbeddedLegalName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub legal_representative: Option<EmbeddedLegalRepresentative<'a>>,
+    pub legal_representative: Option<EmbeddedLegalRepresentative<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lei_code: Option<EmbeddedLeiCode<'a>>,
+    pub lei_code: Option<EmbeddedLeiCode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location: Option<EmbeddedLocation<'a>>,
+    pub location: Option<EmbeddedLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub logo: Option<EmbeddedLogo<'a>>,
+    pub logo: Option<EmbeddedLogo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub longitude: Option<EmbeddedLongitude<'a>>,
+    pub longitude: Option<EmbeddedLongitude<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub makes_offer: Option<EmbeddedMakesOffer<'a>>,
+    pub makes_offer: Option<EmbeddedMakesOffer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub map: Option<EmbeddedMap<'a>>,
+    pub map: Option<EmbeddedMap<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub maps: Option<EmbeddedMaps<'a>>,
+    pub maps: Option<EmbeddedMaps<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub maximum_attendee_capacity: Option<EmbeddedMaximumAttendeeCapacity<'a>>,
+    pub maximum_attendee_capacity: Option<EmbeddedMaximumAttendeeCapacity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub member: Option<EmbeddedMember<'a>>,
+    pub member: Option<EmbeddedMember<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub member_of: Option<EmbeddedMemberOf<'a>>,
+    pub member_of: Option<EmbeddedMemberOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub members: Option<EmbeddedMembers<'a>>,
+    pub members: Option<EmbeddedMembers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub naics: Option<EmbeddedNaics<'a>>,
+    pub naics: Option<EmbeddedNaics<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<EmbeddedName<'a>>,
+    pub name: Option<EmbeddedName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub nonprofit_status: Option<EmbeddedNonprofitStatus<'a>>,
+    pub nonprofit_status: Option<EmbeddedNonprofitStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub number_of_employees: Option<EmbeddedNumberOfEmployees<'a>>,
+    pub number_of_employees: Option<EmbeddedNumberOfEmployees<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub number_of_rooms: Option<EmbeddedNumberOfRooms<'a>>,
+    pub number_of_rooms: Option<EmbeddedNumberOfRooms<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub opening_hours: Option<EmbeddedOpeningHours<'a>>,
+    pub opening_hours: Option<EmbeddedOpeningHours<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub opening_hours_specification: Option<EmbeddedOpeningHoursSpecification<'a>>,
+    pub opening_hours_specification: Option<EmbeddedOpeningHoursSpecification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ownership_funding_info: Option<EmbeddedOwnershipFundingInfo<'a>>,
+    pub ownership_funding_info: Option<EmbeddedOwnershipFundingInfo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub owns: Option<EmbeddedOwns<'a>>,
+    pub owns: Option<EmbeddedOwns<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent_organization: Option<EmbeddedParentOrganization<'a>>,
+    pub parent_organization: Option<EmbeddedParentOrganization<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub payment_accepted: Option<EmbeddedPaymentAccepted<'a>>,
+    pub payment_accepted: Option<EmbeddedPaymentAccepted<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pets_allowed: Option<EmbeddedPetsAllowed<'a>>,
+    pub pets_allowed: Option<EmbeddedPetsAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub photo: Option<EmbeddedPhoto<'a>>,
+    pub photo: Option<EmbeddedPhoto<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub photos: Option<EmbeddedPhotos<'a>>,
+    pub photos: Option<EmbeddedPhotos<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<EmbeddedPotentialAction<'a>>,
+    pub potential_action: Option<EmbeddedPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub price_range: Option<EmbeddedPriceRange<'a>>,
+    pub price_range: Option<EmbeddedPriceRange<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub public_access: Option<EmbeddedPublicAccess<'a>>,
+    pub public_access: Option<EmbeddedPublicAccess<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publishing_principles: Option<EmbeddedPublishingPrinciples<'a>>,
+    pub publishing_principles: Option<EmbeddedPublishingPrinciples<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<EmbeddedReview<'a>>,
+    pub review: Option<EmbeddedReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<EmbeddedReviews<'a>>,
+    pub reviews: Option<EmbeddedReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<EmbeddedSameAs<'a>>,
+    pub same_as: Option<EmbeddedSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub seeks: Option<EmbeddedSeeks<'a>>,
+    pub seeks: Option<EmbeddedSeeks<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub service_area: Option<EmbeddedServiceArea<'a>>,
+    pub service_area: Option<EmbeddedServiceArea<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub skills: Option<EmbeddedSkills<'a>>,
+    pub skills: Option<EmbeddedSkills<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub slogan: Option<EmbeddedSlogan<'a>>,
+    pub slogan: Option<EmbeddedSlogan<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub smoking_allowed: Option<EmbeddedSmokingAllowed<'a>>,
+    pub smoking_allowed: Option<EmbeddedSmokingAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub special_opening_hours_specification: Option<
-        EmbeddedSpecialOpeningHoursSpecification<'a>,
+        EmbeddedSpecialOpeningHoursSpecification<S>,
     >,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sponsor: Option<EmbeddedSponsor<'a>>,
+    pub sponsor: Option<EmbeddedSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub star_rating: Option<EmbeddedStarRating<'a>>,
+    pub star_rating: Option<EmbeddedStarRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sub_organization: Option<EmbeddedSubOrganization<'a>>,
+    pub sub_organization: Option<EmbeddedSubOrganization<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<EmbeddedSubjectOf<'a>>,
+    pub subject_of: Option<EmbeddedSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tax_id: Option<EmbeddedTaxId<'a>>,
+    pub tax_id: Option<EmbeddedTaxId<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub telephone: Option<EmbeddedTelephone<'a>>,
+    pub telephone: Option<EmbeddedTelephone<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tour_booking_page: Option<EmbeddedTourBookingPage<'a>>,
+    pub tour_booking_page: Option<EmbeddedTourBookingPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub unnamed_sources_policy: Option<EmbeddedUnnamedSourcesPolicy<'a>>,
+    pub unnamed_sources_policy: Option<EmbeddedUnnamedSourcesPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<EmbeddedUrl<'a>>,
+    pub url: Option<EmbeddedUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub vat_id: Option<EmbeddedVatId<'a>>,
+    pub vat_id: Option<EmbeddedVatId<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAcceptedPaymentMethod<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAcceptedPaymentMethod<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedActionableFeedbackPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedActionableFeedbackPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAdditionalProperty<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAdditionalProperty<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAddress<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAddress<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAgentInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAgentInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlumni<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlumni<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAmenityFeature<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAmenityFeature<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAreaServed<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAreaServed<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAudience<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAvailableLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAvailableLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedBranchCode<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedBranchCode<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedBranchOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedBranchOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedBrand<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedBrand<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Brand#embedded")]
-    BrandEmbedded(Box<brand::Embedded<'a>>),
+    BrandEmbedded(Box<brand::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCheckinTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCheckinTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCheckoutTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCheckoutTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCompanyRegistration<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCompanyRegistration<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContactPoint<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContactPoint<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContactPoints<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContactPoints<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContainedIn<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContainedIn<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContainedInPlace<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContainedInPlace<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContainsPlace<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContainsPlace<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCorrectionsPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCorrectionsPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCurrenciesAccepted<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCurrenciesAccepted<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDepartment<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDepartment<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDissolutionDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDissolutionDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDiversityPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDiversityPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDiversityStaffingReport<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDiversityStaffingReport<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Article#embedded")]
-    ArticleEmbedded(Box<article::Embedded<'a>>),
+    ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDuns<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDuns<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEmail<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEmail<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEmployee<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEmployee<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEmployees<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEmployees<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEthicsPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEthicsPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEvent<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEvent<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEvents<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEvents<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFaxNumber<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFaxNumber<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFounder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFounder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFounders<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFounders<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFoundingDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFoundingDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFoundingLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFoundingLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFunder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGeo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGeo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGeoContains<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGeoContains<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGeoCoveredBy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGeoCoveredBy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGeoCovers<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGeoCovers<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGeoCrosses<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGeoCrosses<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGeoDisjoint<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGeoDisjoint<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGeoEquals<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGeoEquals<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGeoIntersects<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGeoIntersects<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGeoOverlaps<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGeoOverlaps<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGeoTouches<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGeoTouches<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGeoWithin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGeoWithin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGlobalLocationNumber<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGlobalLocationNumber<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasCertification<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasCertification<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasCredential<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasCredential<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasDriveThroughService<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasDriveThroughService<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasGs1DigitalLink<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasGs1DigitalLink<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasMap<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasMap<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasMemberProgram<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasMemberProgram<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasMerchantReturnPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasMerchantReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasOfferCatalog<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasOfferCatalog<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasPos<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasPos<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasProductReturnPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasProductReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasShippingService<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasShippingService<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsAccessibleForFree<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsAccessibleForFree<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsicV4<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsicV4<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIso6523Code<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIso6523Code<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedKeywords<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedKnowsAbout<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedKnowsAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedKnowsLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedKnowsLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLatitude<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLatitude<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLegalAddress<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLegalAddress<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLegalName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLegalName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLegalRepresentative<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLegalRepresentative<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLeiCode<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLeiCode<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLogo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLogo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLongitude<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLongitude<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMakesOffer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMakesOffer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMap<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMap<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaps<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaps<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaximumAttendeeCapacity<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaximumAttendeeCapacity<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMember<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMember<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMemberOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMemberOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMembers<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMembers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedNaics<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedNaics<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedNonprofitStatus<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedNonprofitStatus<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedNumberOfEmployees<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedNumberOfEmployees<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedNumberOfRooms<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedNumberOfRooms<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedOpeningHours<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedOpeningHours<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedOpeningHoursSpecification<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedOpeningHoursSpecification<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedOwnershipFundingInfo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedOwnershipFundingInfo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedOwns<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedOwns<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedParentOrganization<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedParentOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPaymentAccepted<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPaymentAccepted<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPetsAllowed<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPetsAllowed<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPhoto<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPhoto<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPhotos<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPhotos<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPriceRange<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPriceRange<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublicAccess<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublicAccess<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublishingPrinciples<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSeeks<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSeeks<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedServiceArea<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedServiceArea<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSkills<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSkills<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSlogan<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSlogan<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSmokingAllowed<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSmokingAllowed<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSpecialOpeningHoursSpecification<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSpecialOpeningHoursSpecification<
+    S: Bos<str> + AsRef<str> = DefaultStr,
+> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSponsor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedStarRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedStarRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSubOrganization<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSubOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTaxId<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTaxId<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTelephone<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTelephone<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTourBookingPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTourBookingPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUnnamedSourcesPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUnnamedSourcesPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedVatId<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedVatId<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "social.flockfeeds.lexical.type.Hotel",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Hotel<'a> {
+pub struct Hotel<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accepted_payment_method: Option<HotelAcceptedPaymentMethod<'a>>,
+    pub accepted_payment_method: Option<HotelAcceptedPaymentMethod<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub actionable_feedback_policy: Option<HotelActionableFeedbackPolicy<'a>>,
+    pub actionable_feedback_policy: Option<HotelActionableFeedbackPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_property: Option<HotelAdditionalProperty<'a>>,
+    pub additional_property: Option<HotelAdditionalProperty<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<HotelAdditionalType<'a>>,
+    pub additional_type: Option<HotelAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub address: Option<HotelAddress<'a>>,
+    pub address: Option<HotelAddress<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub agent_interaction_statistic: Option<HotelAgentInteractionStatistic<'a>>,
+    pub agent_interaction_statistic: Option<HotelAgentInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<HotelAggregateRating<'a>>,
+    pub aggregate_rating: Option<HotelAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<HotelAlternateName<'a>>,
+    pub alternate_name: Option<HotelAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alumni: Option<HotelAlumni<'a>>,
+    pub alumni: Option<HotelAlumni<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub amenity_feature: Option<HotelAmenityFeature<'a>>,
+    pub amenity_feature: Option<HotelAmenityFeature<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub area_served: Option<HotelAreaServed<'a>>,
+    pub area_served: Option<HotelAreaServed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audience: Option<HotelAudience<'a>>,
+    pub audience: Option<HotelAudience<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub available_language: Option<HotelAvailableLanguage<'a>>,
+    pub available_language: Option<HotelAvailableLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<HotelAward<'a>>,
+    pub award: Option<HotelAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<HotelAwards<'a>>,
+    pub awards: Option<HotelAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub branch_code: Option<HotelBranchCode<'a>>,
+    pub branch_code: Option<HotelBranchCode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub branch_of: Option<HotelBranchOf<'a>>,
+    pub branch_of: Option<HotelBranchOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub brand: Option<HotelBrand<'a>>,
+    pub brand: Option<HotelBrand<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub checkin_time: Option<HotelCheckinTime<'a>>,
+    pub checkin_time: Option<HotelCheckinTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub checkout_time: Option<HotelCheckoutTime<'a>>,
+    pub checkout_time: Option<HotelCheckoutTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub company_registration: Option<HotelCompanyRegistration<'a>>,
+    pub company_registration: Option<HotelCompanyRegistration<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contact_point: Option<HotelContactPoint<'a>>,
+    pub contact_point: Option<HotelContactPoint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contact_points: Option<HotelContactPoints<'a>>,
+    pub contact_points: Option<HotelContactPoints<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contained_in: Option<HotelContainedIn<'a>>,
+    pub contained_in: Option<HotelContainedIn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contained_in_place: Option<HotelContainedInPlace<'a>>,
+    pub contained_in_place: Option<HotelContainedInPlace<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contains_place: Option<HotelContainsPlace<'a>>,
+    pub contains_place: Option<HotelContainsPlace<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub corrections_policy: Option<HotelCorrectionsPolicy<'a>>,
+    pub corrections_policy: Option<HotelCorrectionsPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub currencies_accepted: Option<HotelCurrenciesAccepted<'a>>,
+    pub currencies_accepted: Option<HotelCurrenciesAccepted<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub department: Option<HotelDepartment<'a>>,
+    pub department: Option<HotelDepartment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<HotelDescription<'a>>,
+    pub description: Option<HotelDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<HotelDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<HotelDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub dissolution_date: Option<HotelDissolutionDate<'a>>,
+    pub dissolution_date: Option<HotelDissolutionDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub diversity_policy: Option<HotelDiversityPolicy<'a>>,
+    pub diversity_policy: Option<HotelDiversityPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub diversity_staffing_report: Option<HotelDiversityStaffingReport<'a>>,
+    pub diversity_staffing_report: Option<HotelDiversityStaffingReport<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub duns: Option<HotelDuns<'a>>,
+    pub duns: Option<HotelDuns<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub email: Option<HotelEmail<'a>>,
+    pub email: Option<HotelEmail<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub employee: Option<HotelEmployee<'a>>,
+    pub employee: Option<HotelEmployee<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub employees: Option<HotelEmployees<'a>>,
+    pub employees: Option<HotelEmployees<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ethics_policy: Option<HotelEthicsPolicy<'a>>,
+    pub ethics_policy: Option<HotelEthicsPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub event: Option<HotelEvent<'a>>,
+    pub event: Option<HotelEvent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub events: Option<HotelEvents<'a>>,
+    pub events: Option<HotelEvents<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub fax_number: Option<HotelFaxNumber<'a>>,
+    pub fax_number: Option<HotelFaxNumber<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub founder: Option<HotelFounder<'a>>,
+    pub founder: Option<HotelFounder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub founders: Option<HotelFounders<'a>>,
+    pub founders: Option<HotelFounders<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub founding_date: Option<HotelFoundingDate<'a>>,
+    pub founding_date: Option<HotelFoundingDate<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub founding_location: Option<HotelFoundingLocation<'a>>,
+    pub founding_location: Option<HotelFoundingLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funder: Option<HotelFunder<'a>>,
+    pub funder: Option<HotelFunder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<HotelFunding<'a>>,
+    pub funding: Option<HotelFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo: Option<HotelGeo<'a>>,
+    pub geo: Option<HotelGeo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_contains: Option<HotelGeoContains<'a>>,
+    pub geo_contains: Option<HotelGeoContains<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_covered_by: Option<HotelGeoCoveredBy<'a>>,
+    pub geo_covered_by: Option<HotelGeoCoveredBy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_covers: Option<HotelGeoCovers<'a>>,
+    pub geo_covers: Option<HotelGeoCovers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_crosses: Option<HotelGeoCrosses<'a>>,
+    pub geo_crosses: Option<HotelGeoCrosses<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_disjoint: Option<HotelGeoDisjoint<'a>>,
+    pub geo_disjoint: Option<HotelGeoDisjoint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_equals: Option<HotelGeoEquals<'a>>,
+    pub geo_equals: Option<HotelGeoEquals<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_intersects: Option<HotelGeoIntersects<'a>>,
+    pub geo_intersects: Option<HotelGeoIntersects<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_overlaps: Option<HotelGeoOverlaps<'a>>,
+    pub geo_overlaps: Option<HotelGeoOverlaps<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_touches: Option<HotelGeoTouches<'a>>,
+    pub geo_touches: Option<HotelGeoTouches<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geo_within: Option<HotelGeoWithin<'a>>,
+    pub geo_within: Option<HotelGeoWithin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub global_location_number: Option<HotelGlobalLocationNumber<'a>>,
+    pub global_location_number: Option<HotelGlobalLocationNumber<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_certification: Option<HotelHasCertification<'a>>,
+    pub has_certification: Option<HotelHasCertification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_credential: Option<HotelHasCredential<'a>>,
+    pub has_credential: Option<HotelHasCredential<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_drive_through_service: Option<HotelHasDriveThroughService<'a>>,
+    pub has_drive_through_service: Option<HotelHasDriveThroughService<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_gs1_digital_link: Option<HotelHasGs1DigitalLink<'a>>,
+    pub has_gs1_digital_link: Option<HotelHasGs1DigitalLink<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_map: Option<HotelHasMap<'a>>,
+    pub has_map: Option<HotelHasMap<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_member_program: Option<HotelHasMemberProgram<'a>>,
+    pub has_member_program: Option<HotelHasMemberProgram<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_merchant_return_policy: Option<HotelHasMerchantReturnPolicy<'a>>,
+    pub has_merchant_return_policy: Option<HotelHasMerchantReturnPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_offer_catalog: Option<HotelHasOfferCatalog<'a>>,
+    pub has_offer_catalog: Option<HotelHasOfferCatalog<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_pos: Option<HotelHasPos<'a>>,
+    pub has_pos: Option<HotelHasPos<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_product_return_policy: Option<HotelHasProductReturnPolicy<'a>>,
+    pub has_product_return_policy: Option<HotelHasProductReturnPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_shipping_service: Option<HotelHasShippingService<'a>>,
+    pub has_shipping_service: Option<HotelHasShippingService<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<HotelIdentifier<'a>>,
+    pub identifier: Option<HotelIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<HotelImage<'a>>,
+    pub image: Option<HotelImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interaction_statistic: Option<HotelInteractionStatistic<'a>>,
+    pub interaction_statistic: Option<HotelInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_accessible_for_free: Option<HotelIsAccessibleForFree<'a>>,
+    pub is_accessible_for_free: Option<HotelIsAccessibleForFree<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub isic_v4: Option<HotelIsicV4<'a>>,
+    pub isic_v4: Option<HotelIsicV4<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub iso6523_code: Option<HotelIso6523Code<'a>>,
+    pub iso6523_code: Option<HotelIso6523Code<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<HotelKeywords<'a>>,
+    pub keywords: Option<HotelKeywords<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub knows_about: Option<HotelKnowsAbout<'a>>,
+    pub knows_about: Option<HotelKnowsAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub knows_language: Option<HotelKnowsLanguage<'a>>,
+    pub knows_language: Option<HotelKnowsLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub latitude: Option<HotelLatitude<'a>>,
+    pub latitude: Option<HotelLatitude<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub legal_address: Option<HotelLegalAddress<'a>>,
+    pub legal_address: Option<HotelLegalAddress<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub legal_name: Option<HotelLegalName<'a>>,
+    pub legal_name: Option<HotelLegalName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub legal_representative: Option<HotelLegalRepresentative<'a>>,
+    pub legal_representative: Option<HotelLegalRepresentative<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lei_code: Option<HotelLeiCode<'a>>,
+    pub lei_code: Option<HotelLeiCode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location: Option<HotelLocation<'a>>,
+    pub location: Option<HotelLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub logo: Option<HotelLogo<'a>>,
+    pub logo: Option<HotelLogo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub longitude: Option<HotelLongitude<'a>>,
+    pub longitude: Option<HotelLongitude<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<HotelMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<HotelMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub makes_offer: Option<HotelMakesOffer<'a>>,
+    pub makes_offer: Option<HotelMakesOffer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub map: Option<HotelMap<'a>>,
+    pub map: Option<HotelMap<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub maps: Option<HotelMaps<'a>>,
+    pub maps: Option<HotelMaps<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub maximum_attendee_capacity: Option<HotelMaximumAttendeeCapacity<'a>>,
+    pub maximum_attendee_capacity: Option<HotelMaximumAttendeeCapacity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub member: Option<HotelMember<'a>>,
+    pub member: Option<HotelMember<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub member_of: Option<HotelMemberOf<'a>>,
+    pub member_of: Option<HotelMemberOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub members: Option<HotelMembers<'a>>,
+    pub members: Option<HotelMembers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub naics: Option<HotelNaics<'a>>,
+    pub naics: Option<HotelNaics<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<HotelName<'a>>,
+    pub name: Option<HotelName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub nonprofit_status: Option<HotelNonprofitStatus<'a>>,
+    pub nonprofit_status: Option<HotelNonprofitStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub number_of_employees: Option<HotelNumberOfEmployees<'a>>,
+    pub number_of_employees: Option<HotelNumberOfEmployees<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub number_of_rooms: Option<HotelNumberOfRooms<'a>>,
+    pub number_of_rooms: Option<HotelNumberOfRooms<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub opening_hours: Option<HotelOpeningHours<'a>>,
+    pub opening_hours: Option<HotelOpeningHours<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub opening_hours_specification: Option<HotelOpeningHoursSpecification<'a>>,
+    pub opening_hours_specification: Option<HotelOpeningHoursSpecification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ownership_funding_info: Option<HotelOwnershipFundingInfo<'a>>,
+    pub ownership_funding_info: Option<HotelOwnershipFundingInfo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub owns: Option<HotelOwns<'a>>,
+    pub owns: Option<HotelOwns<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent_organization: Option<HotelParentOrganization<'a>>,
+    pub parent_organization: Option<HotelParentOrganization<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub payment_accepted: Option<HotelPaymentAccepted<'a>>,
+    pub payment_accepted: Option<HotelPaymentAccepted<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pets_allowed: Option<HotelPetsAllowed<'a>>,
+    pub pets_allowed: Option<HotelPetsAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub photo: Option<HotelPhoto<'a>>,
+    pub photo: Option<HotelPhoto<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub photos: Option<HotelPhotos<'a>>,
+    pub photos: Option<HotelPhotos<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<HotelPotentialAction<'a>>,
+    pub potential_action: Option<HotelPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub price_range: Option<HotelPriceRange<'a>>,
+    pub price_range: Option<HotelPriceRange<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub public_access: Option<HotelPublicAccess<'a>>,
+    pub public_access: Option<HotelPublicAccess<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publishing_principles: Option<HotelPublishingPrinciples<'a>>,
+    pub publishing_principles: Option<HotelPublishingPrinciples<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<HotelReview<'a>>,
+    pub review: Option<HotelReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<HotelReviews<'a>>,
+    pub reviews: Option<HotelReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<HotelSameAs<'a>>,
+    pub same_as: Option<HotelSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub seeks: Option<HotelSeeks<'a>>,
+    pub seeks: Option<HotelSeeks<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub service_area: Option<HotelServiceArea<'a>>,
+    pub service_area: Option<HotelServiceArea<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub skills: Option<HotelSkills<'a>>,
+    pub skills: Option<HotelSkills<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub slogan: Option<HotelSlogan<'a>>,
+    pub slogan: Option<HotelSlogan<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub smoking_allowed: Option<HotelSmokingAllowed<'a>>,
+    pub smoking_allowed: Option<HotelSmokingAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub special_opening_hours_specification: Option<
-        HotelSpecialOpeningHoursSpecification<'a>,
+        HotelSpecialOpeningHoursSpecification<S>,
     >,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sponsor: Option<HotelSponsor<'a>>,
+    pub sponsor: Option<HotelSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub star_rating: Option<HotelStarRating<'a>>,
+    pub star_rating: Option<HotelStarRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sub_organization: Option<HotelSubOrganization<'a>>,
+    pub sub_organization: Option<HotelSubOrganization<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<HotelSubjectOf<'a>>,
+    pub subject_of: Option<HotelSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tax_id: Option<HotelTaxId<'a>>,
+    pub tax_id: Option<HotelTaxId<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub telephone: Option<HotelTelephone<'a>>,
+    pub telephone: Option<HotelTelephone<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tour_booking_page: Option<HotelTourBookingPage<'a>>,
+    pub tour_booking_page: Option<HotelTourBookingPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub unnamed_sources_policy: Option<HotelUnnamedSourcesPolicy<'a>>,
+    pub unnamed_sources_policy: Option<HotelUnnamedSourcesPolicy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<HotelUrl<'a>>,
+    pub url: Option<HotelUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub vat_id: Option<HotelVatId<'a>>,
+    pub vat_id: Option<HotelVatId<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAcceptedPaymentMethod<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAcceptedPaymentMethod<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelActionableFeedbackPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelActionableFeedbackPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAdditionalProperty<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAdditionalProperty<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAddress<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAddress<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAgentInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAgentInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAlumni<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAlumni<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAmenityFeature<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAmenityFeature<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAreaServed<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAreaServed<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAudience<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAvailableLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAvailableLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelBranchCode<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelBranchCode<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelBranchOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelBranchOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelBrand<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelBrand<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Brand#embedded")]
-    BrandEmbedded(Box<brand::Embedded<'a>>),
+    BrandEmbedded(Box<brand::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelCheckinTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelCheckinTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelCheckoutTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelCheckoutTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelCompanyRegistration<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelCompanyRegistration<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelContactPoint<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelContactPoint<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelContactPoints<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelContactPoints<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelContainedIn<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelContainedIn<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelContainedInPlace<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelContainedInPlace<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelContainsPlace<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelContainsPlace<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelCorrectionsPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelCorrectionsPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelCurrenciesAccepted<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelCurrenciesAccepted<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelDepartment<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelDepartment<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelDissolutionDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelDissolutionDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelDiversityPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelDiversityPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelDiversityStaffingReport<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelDiversityStaffingReport<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Article#embedded")]
-    ArticleEmbedded(Box<article::Embedded<'a>>),
+    ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelDuns<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelDuns<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelEmail<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelEmail<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelEmployee<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelEmployee<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelEmployees<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelEmployees<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelEthicsPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelEthicsPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelEvent<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelEvent<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelEvents<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelEvents<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelFaxNumber<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelFaxNumber<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelFounder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelFounder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelFounders<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelFounders<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelFoundingDate<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelFoundingDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelFoundingLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelFoundingLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelFunder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelGeo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelGeo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelGeoContains<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelGeoContains<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelGeoCoveredBy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelGeoCoveredBy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelGeoCovers<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelGeoCovers<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelGeoCrosses<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelGeoCrosses<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelGeoDisjoint<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelGeoDisjoint<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelGeoEquals<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelGeoEquals<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelGeoIntersects<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelGeoIntersects<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelGeoOverlaps<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelGeoOverlaps<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelGeoTouches<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelGeoTouches<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelGeoWithin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelGeoWithin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelGlobalLocationNumber<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelGlobalLocationNumber<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelHasCertification<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelHasCertification<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelHasCredential<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelHasCredential<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelHasDriveThroughService<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelHasDriveThroughService<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelHasGs1DigitalLink<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelHasGs1DigitalLink<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelHasMap<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelHasMap<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelHasMemberProgram<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelHasMemberProgram<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelHasMerchantReturnPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelHasMerchantReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelHasOfferCatalog<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelHasOfferCatalog<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelHasPos<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelHasPos<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelHasProductReturnPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelHasProductReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelHasShippingService<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelHasShippingService<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelIsAccessibleForFree<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelIsAccessibleForFree<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelIsicV4<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelIsicV4<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelIso6523Code<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelIso6523Code<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelKeywords<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelKnowsAbout<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelKnowsAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelKnowsLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelKnowsLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelLatitude<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelLatitude<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelLegalAddress<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelLegalAddress<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelLegalName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelLegalName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelLegalRepresentative<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelLegalRepresentative<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelLeiCode<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelLeiCode<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelLogo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelLogo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelLongitude<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelLongitude<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelMakesOffer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelMakesOffer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelMap<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelMap<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelMaps<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelMaps<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelMaximumAttendeeCapacity<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelMaximumAttendeeCapacity<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelMember<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelMember<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelMemberOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelMemberOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelMembers<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelMembers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelNaics<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelNaics<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelNonprofitStatus<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelNonprofitStatus<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelNumberOfEmployees<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelNumberOfEmployees<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelNumberOfRooms<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelNumberOfRooms<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelOpeningHours<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelOpeningHours<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelOpeningHoursSpecification<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelOpeningHoursSpecification<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelOwnershipFundingInfo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelOwnershipFundingInfo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelOwns<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelOwns<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelParentOrganization<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelParentOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelPaymentAccepted<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelPaymentAccepted<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelPetsAllowed<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelPetsAllowed<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelPhoto<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelPhoto<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelPhotos<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelPhotos<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelPriceRange<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelPriceRange<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelPublicAccess<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelPublicAccess<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelPublishingPrinciples<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelPublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelSeeks<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelSeeks<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelServiceArea<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelServiceArea<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelSkills<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelSkills<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelSlogan<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelSlogan<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelSmokingAllowed<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelSmokingAllowed<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelSpecialOpeningHoursSpecification<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelSpecialOpeningHoursSpecification<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelSponsor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelStarRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelStarRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelSubOrganization<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelSubOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelTaxId<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelTaxId<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelTelephone<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelTelephone<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelTourBookingPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelTourBookingPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelUnnamedSourcesPolicy<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelUnnamedSourcesPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum HotelVatId<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum HotelVatId<S: Bos<str> + AsRef<str> = DefaultStr> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct HotelGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct HotelGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Hotel<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Hotel<S>,
 }
 
-impl<'a> Hotel<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, HotelRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Hotel<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, HotelRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Embedded<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Embedded<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Hotel"
     }
@@ -2463,18 +3809,17 @@ pub struct HotelRecord;
 impl XrpcResp for HotelRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Hotel";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = HotelGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = HotelGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<HotelGetRecordOutput<'_>> for Hotel<'_> {
-    fn from(output: HotelGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<HotelGetRecordOutput<S>> for Hotel<S> {
+    fn from(output: HotelGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Hotel<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Hotel<S> {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Hotel";
     type Record = HotelRecord;
 }
@@ -2484,7 +3829,7 @@ impl Collection for HotelRecord {
     type Record = HotelRecord;
 }
 
-impl<'a> LexiconSchema for Hotel<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Hotel<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Hotel"
     }
@@ -5346,139 +6691,139 @@ pub mod hotel_state {
 pub struct HotelBuilder<'a, S: hotel_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<HotelAcceptedPaymentMethod<'a>>,
-        Option<HotelActionableFeedbackPolicy<'a>>,
-        Option<HotelAdditionalProperty<'a>>,
-        Option<HotelAdditionalType<'a>>,
-        Option<HotelAddress<'a>>,
-        Option<HotelAgentInteractionStatistic<'a>>,
-        Option<HotelAggregateRating<'a>>,
-        Option<HotelAlternateName<'a>>,
-        Option<HotelAlumni<'a>>,
-        Option<HotelAmenityFeature<'a>>,
-        Option<HotelAreaServed<'a>>,
-        Option<HotelAudience<'a>>,
-        Option<HotelAvailableLanguage<'a>>,
-        Option<HotelAward<'a>>,
-        Option<HotelAwards<'a>>,
-        Option<HotelBranchCode<'a>>,
-        Option<HotelBranchOf<'a>>,
-        Option<HotelBrand<'a>>,
-        Option<HotelCheckinTime<'a>>,
-        Option<HotelCheckoutTime<'a>>,
-        Option<HotelCompanyRegistration<'a>>,
-        Option<HotelContactPoint<'a>>,
-        Option<HotelContactPoints<'a>>,
-        Option<HotelContainedIn<'a>>,
-        Option<HotelContainedInPlace<'a>>,
-        Option<HotelContainsPlace<'a>>,
-        Option<HotelCorrectionsPolicy<'a>>,
-        Option<HotelCurrenciesAccepted<'a>>,
-        Option<HotelDepartment<'a>>,
-        Option<HotelDescription<'a>>,
-        Option<HotelDisambiguatingDescription<'a>>,
-        Option<HotelDissolutionDate<'a>>,
-        Option<HotelDiversityPolicy<'a>>,
-        Option<HotelDiversityStaffingReport<'a>>,
-        Option<HotelDuns<'a>>,
-        Option<HotelEmail<'a>>,
-        Option<HotelEmployee<'a>>,
-        Option<HotelEmployees<'a>>,
-        Option<HotelEthicsPolicy<'a>>,
-        Option<HotelEvent<'a>>,
-        Option<HotelEvents<'a>>,
-        Option<HotelFaxNumber<'a>>,
-        Option<HotelFounder<'a>>,
-        Option<HotelFounders<'a>>,
-        Option<HotelFoundingDate<'a>>,
-        Option<HotelFoundingLocation<'a>>,
-        Option<HotelFunder<'a>>,
-        Option<HotelFunding<'a>>,
-        Option<HotelGeo<'a>>,
-        Option<HotelGeoContains<'a>>,
-        Option<HotelGeoCoveredBy<'a>>,
-        Option<HotelGeoCovers<'a>>,
-        Option<HotelGeoCrosses<'a>>,
-        Option<HotelGeoDisjoint<'a>>,
-        Option<HotelGeoEquals<'a>>,
-        Option<HotelGeoIntersects<'a>>,
-        Option<HotelGeoOverlaps<'a>>,
-        Option<HotelGeoTouches<'a>>,
-        Option<HotelGeoWithin<'a>>,
-        Option<HotelGlobalLocationNumber<'a>>,
-        Option<HotelHasCertification<'a>>,
-        Option<HotelHasCredential<'a>>,
-        Option<HotelHasDriveThroughService<'a>>,
-        Option<HotelHasGs1DigitalLink<'a>>,
-        Option<HotelHasMap<'a>>,
-        Option<HotelHasMemberProgram<'a>>,
-        Option<HotelHasMerchantReturnPolicy<'a>>,
-        Option<HotelHasOfferCatalog<'a>>,
-        Option<HotelHasPos<'a>>,
-        Option<HotelHasProductReturnPolicy<'a>>,
-        Option<HotelHasShippingService<'a>>,
-        Option<HotelIdentifier<'a>>,
-        Option<HotelImage<'a>>,
-        Option<HotelInteractionStatistic<'a>>,
-        Option<HotelIsAccessibleForFree<'a>>,
-        Option<HotelIsicV4<'a>>,
-        Option<HotelIso6523Code<'a>>,
-        Option<HotelKeywords<'a>>,
-        Option<HotelKnowsAbout<'a>>,
-        Option<HotelKnowsLanguage<'a>>,
-        Option<HotelLatitude<'a>>,
-        Option<HotelLegalAddress<'a>>,
-        Option<HotelLegalName<'a>>,
-        Option<HotelLegalRepresentative<'a>>,
-        Option<HotelLeiCode<'a>>,
-        Option<HotelLocation<'a>>,
-        Option<HotelLogo<'a>>,
-        Option<HotelLongitude<'a>>,
-        Option<HotelMainEntityOfPage<'a>>,
-        Option<HotelMakesOffer<'a>>,
-        Option<HotelMap<'a>>,
-        Option<HotelMaps<'a>>,
-        Option<HotelMaximumAttendeeCapacity<'a>>,
-        Option<HotelMember<'a>>,
-        Option<HotelMemberOf<'a>>,
-        Option<HotelMembers<'a>>,
-        Option<HotelNaics<'a>>,
-        Option<HotelName<'a>>,
-        Option<HotelNonprofitStatus<'a>>,
-        Option<HotelNumberOfEmployees<'a>>,
-        Option<HotelNumberOfRooms<'a>>,
-        Option<HotelOpeningHours<'a>>,
-        Option<HotelOpeningHoursSpecification<'a>>,
-        Option<HotelOwnershipFundingInfo<'a>>,
-        Option<HotelOwns<'a>>,
-        Option<HotelParentOrganization<'a>>,
-        Option<HotelPaymentAccepted<'a>>,
-        Option<HotelPetsAllowed<'a>>,
-        Option<HotelPhoto<'a>>,
-        Option<HotelPhotos<'a>>,
-        Option<HotelPotentialAction<'a>>,
-        Option<HotelPriceRange<'a>>,
-        Option<HotelPublicAccess<'a>>,
-        Option<HotelPublishingPrinciples<'a>>,
-        Option<HotelReview<'a>>,
-        Option<HotelReviews<'a>>,
-        Option<HotelSameAs<'a>>,
-        Option<HotelSeeks<'a>>,
-        Option<HotelServiceArea<'a>>,
-        Option<HotelSkills<'a>>,
-        Option<HotelSlogan<'a>>,
-        Option<HotelSmokingAllowed<'a>>,
-        Option<HotelSpecialOpeningHoursSpecification<'a>>,
-        Option<HotelSponsor<'a>>,
-        Option<HotelStarRating<'a>>,
-        Option<HotelSubOrganization<'a>>,
-        Option<HotelSubjectOf<'a>>,
-        Option<HotelTaxId<'a>>,
-        Option<HotelTelephone<'a>>,
-        Option<HotelTourBookingPage<'a>>,
-        Option<HotelUnnamedSourcesPolicy<'a>>,
-        Option<HotelUrl<'a>>,
-        Option<HotelVatId<'a>>,
+        Option<HotelAcceptedPaymentMethod<S>>,
+        Option<HotelActionableFeedbackPolicy<S>>,
+        Option<HotelAdditionalProperty<S>>,
+        Option<HotelAdditionalType<S>>,
+        Option<HotelAddress<S>>,
+        Option<HotelAgentInteractionStatistic<S>>,
+        Option<HotelAggregateRating<S>>,
+        Option<HotelAlternateName<S>>,
+        Option<HotelAlumni<S>>,
+        Option<HotelAmenityFeature<S>>,
+        Option<HotelAreaServed<S>>,
+        Option<HotelAudience<S>>,
+        Option<HotelAvailableLanguage<S>>,
+        Option<HotelAward<S>>,
+        Option<HotelAwards<S>>,
+        Option<HotelBranchCode<S>>,
+        Option<HotelBranchOf<S>>,
+        Option<HotelBrand<S>>,
+        Option<HotelCheckinTime<S>>,
+        Option<HotelCheckoutTime<S>>,
+        Option<HotelCompanyRegistration<S>>,
+        Option<HotelContactPoint<S>>,
+        Option<HotelContactPoints<S>>,
+        Option<HotelContainedIn<S>>,
+        Option<HotelContainedInPlace<S>>,
+        Option<HotelContainsPlace<S>>,
+        Option<HotelCorrectionsPolicy<S>>,
+        Option<HotelCurrenciesAccepted<S>>,
+        Option<HotelDepartment<S>>,
+        Option<HotelDescription<S>>,
+        Option<HotelDisambiguatingDescription<S>>,
+        Option<HotelDissolutionDate<S>>,
+        Option<HotelDiversityPolicy<S>>,
+        Option<HotelDiversityStaffingReport<S>>,
+        Option<HotelDuns<S>>,
+        Option<HotelEmail<S>>,
+        Option<HotelEmployee<S>>,
+        Option<HotelEmployees<S>>,
+        Option<HotelEthicsPolicy<S>>,
+        Option<HotelEvent<S>>,
+        Option<HotelEvents<S>>,
+        Option<HotelFaxNumber<S>>,
+        Option<HotelFounder<S>>,
+        Option<HotelFounders<S>>,
+        Option<HotelFoundingDate<S>>,
+        Option<HotelFoundingLocation<S>>,
+        Option<HotelFunder<S>>,
+        Option<HotelFunding<S>>,
+        Option<HotelGeo<S>>,
+        Option<HotelGeoContains<S>>,
+        Option<HotelGeoCoveredBy<S>>,
+        Option<HotelGeoCovers<S>>,
+        Option<HotelGeoCrosses<S>>,
+        Option<HotelGeoDisjoint<S>>,
+        Option<HotelGeoEquals<S>>,
+        Option<HotelGeoIntersects<S>>,
+        Option<HotelGeoOverlaps<S>>,
+        Option<HotelGeoTouches<S>>,
+        Option<HotelGeoWithin<S>>,
+        Option<HotelGlobalLocationNumber<S>>,
+        Option<HotelHasCertification<S>>,
+        Option<HotelHasCredential<S>>,
+        Option<HotelHasDriveThroughService<S>>,
+        Option<HotelHasGs1DigitalLink<S>>,
+        Option<HotelHasMap<S>>,
+        Option<HotelHasMemberProgram<S>>,
+        Option<HotelHasMerchantReturnPolicy<S>>,
+        Option<HotelHasOfferCatalog<S>>,
+        Option<HotelHasPos<S>>,
+        Option<HotelHasProductReturnPolicy<S>>,
+        Option<HotelHasShippingService<S>>,
+        Option<HotelIdentifier<S>>,
+        Option<HotelImage<S>>,
+        Option<HotelInteractionStatistic<S>>,
+        Option<HotelIsAccessibleForFree<S>>,
+        Option<HotelIsicV4<S>>,
+        Option<HotelIso6523Code<S>>,
+        Option<HotelKeywords<S>>,
+        Option<HotelKnowsAbout<S>>,
+        Option<HotelKnowsLanguage<S>>,
+        Option<HotelLatitude<S>>,
+        Option<HotelLegalAddress<S>>,
+        Option<HotelLegalName<S>>,
+        Option<HotelLegalRepresentative<S>>,
+        Option<HotelLeiCode<S>>,
+        Option<HotelLocation<S>>,
+        Option<HotelLogo<S>>,
+        Option<HotelLongitude<S>>,
+        Option<HotelMainEntityOfPage<S>>,
+        Option<HotelMakesOffer<S>>,
+        Option<HotelMap<S>>,
+        Option<HotelMaps<S>>,
+        Option<HotelMaximumAttendeeCapacity<S>>,
+        Option<HotelMember<S>>,
+        Option<HotelMemberOf<S>>,
+        Option<HotelMembers<S>>,
+        Option<HotelNaics<S>>,
+        Option<HotelName<S>>,
+        Option<HotelNonprofitStatus<S>>,
+        Option<HotelNumberOfEmployees<S>>,
+        Option<HotelNumberOfRooms<S>>,
+        Option<HotelOpeningHours<S>>,
+        Option<HotelOpeningHoursSpecification<S>>,
+        Option<HotelOwnershipFundingInfo<S>>,
+        Option<HotelOwns<S>>,
+        Option<HotelParentOrganization<S>>,
+        Option<HotelPaymentAccepted<S>>,
+        Option<HotelPetsAllowed<S>>,
+        Option<HotelPhoto<S>>,
+        Option<HotelPhotos<S>>,
+        Option<HotelPotentialAction<S>>,
+        Option<HotelPriceRange<S>>,
+        Option<HotelPublicAccess<S>>,
+        Option<HotelPublishingPrinciples<S>>,
+        Option<HotelReview<S>>,
+        Option<HotelReviews<S>>,
+        Option<HotelSameAs<S>>,
+        Option<HotelSeeks<S>>,
+        Option<HotelServiceArea<S>>,
+        Option<HotelSkills<S>>,
+        Option<HotelSlogan<S>>,
+        Option<HotelSmokingAllowed<S>>,
+        Option<HotelSpecialOpeningHoursSpecification<S>>,
+        Option<HotelSponsor<S>>,
+        Option<HotelStarRating<S>>,
+        Option<HotelSubOrganization<S>>,
+        Option<HotelSubjectOf<S>>,
+        Option<HotelTaxId<S>>,
+        Option<HotelTelephone<S>>,
+        Option<HotelTourBookingPage<S>>,
+        Option<HotelUnnamedSourcesPolicy<S>>,
+        Option<HotelUrl<S>>,
+        Option<HotelVatId<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -5639,7 +6984,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `acceptedPaymentMethod` field (optional)
     pub fn accepted_payment_method(
         mut self,
-        value: impl Into<Option<HotelAcceptedPaymentMethod<'a>>>,
+        value: impl Into<Option<HotelAcceptedPaymentMethod<S>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
@@ -5647,7 +6992,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `acceptedPaymentMethod` field to an Option value (optional)
     pub fn maybe_accepted_payment_method(
         mut self,
-        value: Option<HotelAcceptedPaymentMethod<'a>>,
+        value: Option<HotelAcceptedPaymentMethod<S>>,
     ) -> Self {
         self._fields.0 = value;
         self
@@ -5658,7 +7003,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `actionableFeedbackPolicy` field (optional)
     pub fn actionable_feedback_policy(
         mut self,
-        value: impl Into<Option<HotelActionableFeedbackPolicy<'a>>>,
+        value: impl Into<Option<HotelActionableFeedbackPolicy<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -5666,7 +7011,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `actionableFeedbackPolicy` field to an Option value (optional)
     pub fn maybe_actionable_feedback_policy(
         mut self,
-        value: Option<HotelActionableFeedbackPolicy<'a>>,
+        value: Option<HotelActionableFeedbackPolicy<S>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -5677,7 +7022,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `additionalProperty` field (optional)
     pub fn additional_property(
         mut self,
-        value: impl Into<Option<HotelAdditionalProperty<'a>>>,
+        value: impl Into<Option<HotelAdditionalProperty<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -5685,7 +7030,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `additionalProperty` field to an Option value (optional)
     pub fn maybe_additional_property(
         mut self,
-        value: Option<HotelAdditionalProperty<'a>>,
+        value: Option<HotelAdditionalProperty<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -5696,7 +7041,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `additionalType` field (optional)
     pub fn additional_type(
         mut self,
-        value: impl Into<Option<HotelAdditionalType<'a>>>,
+        value: impl Into<Option<HotelAdditionalType<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -5704,7 +7049,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `additionalType` field to an Option value (optional)
     pub fn maybe_additional_type(
         mut self,
-        value: Option<HotelAdditionalType<'a>>,
+        value: Option<HotelAdditionalType<S>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -5713,12 +7058,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `address` field (optional)
-    pub fn address(mut self, value: impl Into<Option<HotelAddress<'a>>>) -> Self {
+    pub fn address(mut self, value: impl Into<Option<HotelAddress<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `address` field to an Option value (optional)
-    pub fn maybe_address(mut self, value: Option<HotelAddress<'a>>) -> Self {
+    pub fn maybe_address(mut self, value: Option<HotelAddress<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -5728,7 +7073,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `agentInteractionStatistic` field (optional)
     pub fn agent_interaction_statistic(
         mut self,
-        value: impl Into<Option<HotelAgentInteractionStatistic<'a>>>,
+        value: impl Into<Option<HotelAgentInteractionStatistic<S>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
@@ -5736,7 +7081,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `agentInteractionStatistic` field to an Option value (optional)
     pub fn maybe_agent_interaction_statistic(
         mut self,
-        value: Option<HotelAgentInteractionStatistic<'a>>,
+        value: Option<HotelAgentInteractionStatistic<S>>,
     ) -> Self {
         self._fields.5 = value;
         self
@@ -5747,7 +7092,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `aggregateRating` field (optional)
     pub fn aggregate_rating(
         mut self,
-        value: impl Into<Option<HotelAggregateRating<'a>>>,
+        value: impl Into<Option<HotelAggregateRating<S>>>,
     ) -> Self {
         self._fields.6 = value.into();
         self
@@ -5755,7 +7100,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `aggregateRating` field to an Option value (optional)
     pub fn maybe_aggregate_rating(
         mut self,
-        value: Option<HotelAggregateRating<'a>>,
+        value: Option<HotelAggregateRating<S>>,
     ) -> Self {
         self._fields.6 = value;
         self
@@ -5766,16 +7111,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `alternateName` field (optional)
     pub fn alternate_name(
         mut self,
-        value: impl Into<Option<HotelAlternateName<'a>>>,
+        value: impl Into<Option<HotelAlternateName<S>>>,
     ) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(
-        mut self,
-        value: Option<HotelAlternateName<'a>>,
-    ) -> Self {
+    pub fn maybe_alternate_name(mut self, value: Option<HotelAlternateName<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -5783,12 +7125,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `alumni` field (optional)
-    pub fn alumni(mut self, value: impl Into<Option<HotelAlumni<'a>>>) -> Self {
+    pub fn alumni(mut self, value: impl Into<Option<HotelAlumni<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `alumni` field to an Option value (optional)
-    pub fn maybe_alumni(mut self, value: Option<HotelAlumni<'a>>) -> Self {
+    pub fn maybe_alumni(mut self, value: Option<HotelAlumni<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -5798,7 +7140,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `amenityFeature` field (optional)
     pub fn amenity_feature(
         mut self,
-        value: impl Into<Option<HotelAmenityFeature<'a>>>,
+        value: impl Into<Option<HotelAmenityFeature<S>>>,
     ) -> Self {
         self._fields.9 = value.into();
         self
@@ -5806,7 +7148,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `amenityFeature` field to an Option value (optional)
     pub fn maybe_amenity_feature(
         mut self,
-        value: Option<HotelAmenityFeature<'a>>,
+        value: Option<HotelAmenityFeature<S>>,
     ) -> Self {
         self._fields.9 = value;
         self
@@ -5815,12 +7157,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `areaServed` field (optional)
-    pub fn area_served(mut self, value: impl Into<Option<HotelAreaServed<'a>>>) -> Self {
+    pub fn area_served(mut self, value: impl Into<Option<HotelAreaServed<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `areaServed` field to an Option value (optional)
-    pub fn maybe_area_served(mut self, value: Option<HotelAreaServed<'a>>) -> Self {
+    pub fn maybe_area_served(mut self, value: Option<HotelAreaServed<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -5828,12 +7170,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `audience` field (optional)
-    pub fn audience(mut self, value: impl Into<Option<HotelAudience<'a>>>) -> Self {
+    pub fn audience(mut self, value: impl Into<Option<HotelAudience<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
-    pub fn maybe_audience(mut self, value: Option<HotelAudience<'a>>) -> Self {
+    pub fn maybe_audience(mut self, value: Option<HotelAudience<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -5843,7 +7185,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `availableLanguage` field (optional)
     pub fn available_language(
         mut self,
-        value: impl Into<Option<HotelAvailableLanguage<'a>>>,
+        value: impl Into<Option<HotelAvailableLanguage<S>>>,
     ) -> Self {
         self._fields.12 = value.into();
         self
@@ -5851,7 +7193,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `availableLanguage` field to an Option value (optional)
     pub fn maybe_available_language(
         mut self,
-        value: Option<HotelAvailableLanguage<'a>>,
+        value: Option<HotelAvailableLanguage<S>>,
     ) -> Self {
         self._fields.12 = value;
         self
@@ -5860,12 +7202,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `award` field (optional)
-    pub fn award(mut self, value: impl Into<Option<HotelAward<'a>>>) -> Self {
+    pub fn award(mut self, value: impl Into<Option<HotelAward<S>>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
-    pub fn maybe_award(mut self, value: Option<HotelAward<'a>>) -> Self {
+    pub fn maybe_award(mut self, value: Option<HotelAward<S>>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -5873,12 +7215,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `awards` field (optional)
-    pub fn awards(mut self, value: impl Into<Option<HotelAwards<'a>>>) -> Self {
+    pub fn awards(mut self, value: impl Into<Option<HotelAwards<S>>>) -> Self {
         self._fields.14 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
-    pub fn maybe_awards(mut self, value: Option<HotelAwards<'a>>) -> Self {
+    pub fn maybe_awards(mut self, value: Option<HotelAwards<S>>) -> Self {
         self._fields.14 = value;
         self
     }
@@ -5886,12 +7228,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `branchCode` field (optional)
-    pub fn branch_code(mut self, value: impl Into<Option<HotelBranchCode<'a>>>) -> Self {
+    pub fn branch_code(mut self, value: impl Into<Option<HotelBranchCode<S>>>) -> Self {
         self._fields.15 = value.into();
         self
     }
     /// Set the `branchCode` field to an Option value (optional)
-    pub fn maybe_branch_code(mut self, value: Option<HotelBranchCode<'a>>) -> Self {
+    pub fn maybe_branch_code(mut self, value: Option<HotelBranchCode<S>>) -> Self {
         self._fields.15 = value;
         self
     }
@@ -5899,12 +7241,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `branchOf` field (optional)
-    pub fn branch_of(mut self, value: impl Into<Option<HotelBranchOf<'a>>>) -> Self {
+    pub fn branch_of(mut self, value: impl Into<Option<HotelBranchOf<S>>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `branchOf` field to an Option value (optional)
-    pub fn maybe_branch_of(mut self, value: Option<HotelBranchOf<'a>>) -> Self {
+    pub fn maybe_branch_of(mut self, value: Option<HotelBranchOf<S>>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -5912,12 +7254,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `brand` field (optional)
-    pub fn brand(mut self, value: impl Into<Option<HotelBrand<'a>>>) -> Self {
+    pub fn brand(mut self, value: impl Into<Option<HotelBrand<S>>>) -> Self {
         self._fields.17 = value.into();
         self
     }
     /// Set the `brand` field to an Option value (optional)
-    pub fn maybe_brand(mut self, value: Option<HotelBrand<'a>>) -> Self {
+    pub fn maybe_brand(mut self, value: Option<HotelBrand<S>>) -> Self {
         self._fields.17 = value;
         self
     }
@@ -5927,13 +7269,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `checkinTime` field (optional)
     pub fn checkin_time(
         mut self,
-        value: impl Into<Option<HotelCheckinTime<'a>>>,
+        value: impl Into<Option<HotelCheckinTime<S>>>,
     ) -> Self {
         self._fields.18 = value.into();
         self
     }
     /// Set the `checkinTime` field to an Option value (optional)
-    pub fn maybe_checkin_time(mut self, value: Option<HotelCheckinTime<'a>>) -> Self {
+    pub fn maybe_checkin_time(mut self, value: Option<HotelCheckinTime<S>>) -> Self {
         self._fields.18 = value;
         self
     }
@@ -5943,13 +7285,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `checkoutTime` field (optional)
     pub fn checkout_time(
         mut self,
-        value: impl Into<Option<HotelCheckoutTime<'a>>>,
+        value: impl Into<Option<HotelCheckoutTime<S>>>,
     ) -> Self {
         self._fields.19 = value.into();
         self
     }
     /// Set the `checkoutTime` field to an Option value (optional)
-    pub fn maybe_checkout_time(mut self, value: Option<HotelCheckoutTime<'a>>) -> Self {
+    pub fn maybe_checkout_time(mut self, value: Option<HotelCheckoutTime<S>>) -> Self {
         self._fields.19 = value;
         self
     }
@@ -5959,7 +7301,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `companyRegistration` field (optional)
     pub fn company_registration(
         mut self,
-        value: impl Into<Option<HotelCompanyRegistration<'a>>>,
+        value: impl Into<Option<HotelCompanyRegistration<S>>>,
     ) -> Self {
         self._fields.20 = value.into();
         self
@@ -5967,7 +7309,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `companyRegistration` field to an Option value (optional)
     pub fn maybe_company_registration(
         mut self,
-        value: Option<HotelCompanyRegistration<'a>>,
+        value: Option<HotelCompanyRegistration<S>>,
     ) -> Self {
         self._fields.20 = value;
         self
@@ -5978,13 +7320,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `contactPoint` field (optional)
     pub fn contact_point(
         mut self,
-        value: impl Into<Option<HotelContactPoint<'a>>>,
+        value: impl Into<Option<HotelContactPoint<S>>>,
     ) -> Self {
         self._fields.21 = value.into();
         self
     }
     /// Set the `contactPoint` field to an Option value (optional)
-    pub fn maybe_contact_point(mut self, value: Option<HotelContactPoint<'a>>) -> Self {
+    pub fn maybe_contact_point(mut self, value: Option<HotelContactPoint<S>>) -> Self {
         self._fields.21 = value;
         self
     }
@@ -5994,16 +7336,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `contactPoints` field (optional)
     pub fn contact_points(
         mut self,
-        value: impl Into<Option<HotelContactPoints<'a>>>,
+        value: impl Into<Option<HotelContactPoints<S>>>,
     ) -> Self {
         self._fields.22 = value.into();
         self
     }
     /// Set the `contactPoints` field to an Option value (optional)
-    pub fn maybe_contact_points(
-        mut self,
-        value: Option<HotelContactPoints<'a>>,
-    ) -> Self {
+    pub fn maybe_contact_points(mut self, value: Option<HotelContactPoints<S>>) -> Self {
         self._fields.22 = value;
         self
     }
@@ -6013,13 +7352,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `containedIn` field (optional)
     pub fn contained_in(
         mut self,
-        value: impl Into<Option<HotelContainedIn<'a>>>,
+        value: impl Into<Option<HotelContainedIn<S>>>,
     ) -> Self {
         self._fields.23 = value.into();
         self
     }
     /// Set the `containedIn` field to an Option value (optional)
-    pub fn maybe_contained_in(mut self, value: Option<HotelContainedIn<'a>>) -> Self {
+    pub fn maybe_contained_in(mut self, value: Option<HotelContainedIn<S>>) -> Self {
         self._fields.23 = value;
         self
     }
@@ -6029,7 +7368,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `containedInPlace` field (optional)
     pub fn contained_in_place(
         mut self,
-        value: impl Into<Option<HotelContainedInPlace<'a>>>,
+        value: impl Into<Option<HotelContainedInPlace<S>>>,
     ) -> Self {
         self._fields.24 = value.into();
         self
@@ -6037,7 +7376,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `containedInPlace` field to an Option value (optional)
     pub fn maybe_contained_in_place(
         mut self,
-        value: Option<HotelContainedInPlace<'a>>,
+        value: Option<HotelContainedInPlace<S>>,
     ) -> Self {
         self._fields.24 = value;
         self
@@ -6048,16 +7387,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `containsPlace` field (optional)
     pub fn contains_place(
         mut self,
-        value: impl Into<Option<HotelContainsPlace<'a>>>,
+        value: impl Into<Option<HotelContainsPlace<S>>>,
     ) -> Self {
         self._fields.25 = value.into();
         self
     }
     /// Set the `containsPlace` field to an Option value (optional)
-    pub fn maybe_contains_place(
-        mut self,
-        value: Option<HotelContainsPlace<'a>>,
-    ) -> Self {
+    pub fn maybe_contains_place(mut self, value: Option<HotelContainsPlace<S>>) -> Self {
         self._fields.25 = value;
         self
     }
@@ -6067,7 +7403,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `correctionsPolicy` field (optional)
     pub fn corrections_policy(
         mut self,
-        value: impl Into<Option<HotelCorrectionsPolicy<'a>>>,
+        value: impl Into<Option<HotelCorrectionsPolicy<S>>>,
     ) -> Self {
         self._fields.26 = value.into();
         self
@@ -6075,7 +7411,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `correctionsPolicy` field to an Option value (optional)
     pub fn maybe_corrections_policy(
         mut self,
-        value: Option<HotelCorrectionsPolicy<'a>>,
+        value: Option<HotelCorrectionsPolicy<S>>,
     ) -> Self {
         self._fields.26 = value;
         self
@@ -6086,7 +7422,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `currenciesAccepted` field (optional)
     pub fn currencies_accepted(
         mut self,
-        value: impl Into<Option<HotelCurrenciesAccepted<'a>>>,
+        value: impl Into<Option<HotelCurrenciesAccepted<S>>>,
     ) -> Self {
         self._fields.27 = value.into();
         self
@@ -6094,7 +7430,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `currenciesAccepted` field to an Option value (optional)
     pub fn maybe_currencies_accepted(
         mut self,
-        value: Option<HotelCurrenciesAccepted<'a>>,
+        value: Option<HotelCurrenciesAccepted<S>>,
     ) -> Self {
         self._fields.27 = value;
         self
@@ -6103,12 +7439,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `department` field (optional)
-    pub fn department(mut self, value: impl Into<Option<HotelDepartment<'a>>>) -> Self {
+    pub fn department(mut self, value: impl Into<Option<HotelDepartment<S>>>) -> Self {
         self._fields.28 = value.into();
         self
     }
     /// Set the `department` field to an Option value (optional)
-    pub fn maybe_department(mut self, value: Option<HotelDepartment<'a>>) -> Self {
+    pub fn maybe_department(mut self, value: Option<HotelDepartment<S>>) -> Self {
         self._fields.28 = value;
         self
     }
@@ -6116,15 +7452,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<HotelDescription<'a>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<HotelDescription<S>>>) -> Self {
         self._fields.29 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<HotelDescription<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<HotelDescription<S>>) -> Self {
         self._fields.29 = value;
         self
     }
@@ -6134,7 +7467,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
-        value: impl Into<Option<HotelDisambiguatingDescription<'a>>>,
+        value: impl Into<Option<HotelDisambiguatingDescription<S>>>,
     ) -> Self {
         self._fields.30 = value.into();
         self
@@ -6142,7 +7475,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field to an Option value (optional)
     pub fn maybe_disambiguating_description(
         mut self,
-        value: Option<HotelDisambiguatingDescription<'a>>,
+        value: Option<HotelDisambiguatingDescription<S>>,
     ) -> Self {
         self._fields.30 = value;
         self
@@ -6153,7 +7486,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `dissolutionDate` field (optional)
     pub fn dissolution_date(
         mut self,
-        value: impl Into<Option<HotelDissolutionDate<'a>>>,
+        value: impl Into<Option<HotelDissolutionDate<S>>>,
     ) -> Self {
         self._fields.31 = value.into();
         self
@@ -6161,7 +7494,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `dissolutionDate` field to an Option value (optional)
     pub fn maybe_dissolution_date(
         mut self,
-        value: Option<HotelDissolutionDate<'a>>,
+        value: Option<HotelDissolutionDate<S>>,
     ) -> Self {
         self._fields.31 = value;
         self
@@ -6172,7 +7505,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `diversityPolicy` field (optional)
     pub fn diversity_policy(
         mut self,
-        value: impl Into<Option<HotelDiversityPolicy<'a>>>,
+        value: impl Into<Option<HotelDiversityPolicy<S>>>,
     ) -> Self {
         self._fields.32 = value.into();
         self
@@ -6180,7 +7513,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `diversityPolicy` field to an Option value (optional)
     pub fn maybe_diversity_policy(
         mut self,
-        value: Option<HotelDiversityPolicy<'a>>,
+        value: Option<HotelDiversityPolicy<S>>,
     ) -> Self {
         self._fields.32 = value;
         self
@@ -6191,7 +7524,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `diversityStaffingReport` field (optional)
     pub fn diversity_staffing_report(
         mut self,
-        value: impl Into<Option<HotelDiversityStaffingReport<'a>>>,
+        value: impl Into<Option<HotelDiversityStaffingReport<S>>>,
     ) -> Self {
         self._fields.33 = value.into();
         self
@@ -6199,7 +7532,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `diversityStaffingReport` field to an Option value (optional)
     pub fn maybe_diversity_staffing_report(
         mut self,
-        value: Option<HotelDiversityStaffingReport<'a>>,
+        value: Option<HotelDiversityStaffingReport<S>>,
     ) -> Self {
         self._fields.33 = value;
         self
@@ -6208,12 +7541,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `duns` field (optional)
-    pub fn duns(mut self, value: impl Into<Option<HotelDuns<'a>>>) -> Self {
+    pub fn duns(mut self, value: impl Into<Option<HotelDuns<S>>>) -> Self {
         self._fields.34 = value.into();
         self
     }
     /// Set the `duns` field to an Option value (optional)
-    pub fn maybe_duns(mut self, value: Option<HotelDuns<'a>>) -> Self {
+    pub fn maybe_duns(mut self, value: Option<HotelDuns<S>>) -> Self {
         self._fields.34 = value;
         self
     }
@@ -6221,12 +7554,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `email` field (optional)
-    pub fn email(mut self, value: impl Into<Option<HotelEmail<'a>>>) -> Self {
+    pub fn email(mut self, value: impl Into<Option<HotelEmail<S>>>) -> Self {
         self._fields.35 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
-    pub fn maybe_email(mut self, value: Option<HotelEmail<'a>>) -> Self {
+    pub fn maybe_email(mut self, value: Option<HotelEmail<S>>) -> Self {
         self._fields.35 = value;
         self
     }
@@ -6234,12 +7567,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `employee` field (optional)
-    pub fn employee(mut self, value: impl Into<Option<HotelEmployee<'a>>>) -> Self {
+    pub fn employee(mut self, value: impl Into<Option<HotelEmployee<S>>>) -> Self {
         self._fields.36 = value.into();
         self
     }
     /// Set the `employee` field to an Option value (optional)
-    pub fn maybe_employee(mut self, value: Option<HotelEmployee<'a>>) -> Self {
+    pub fn maybe_employee(mut self, value: Option<HotelEmployee<S>>) -> Self {
         self._fields.36 = value;
         self
     }
@@ -6247,12 +7580,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `employees` field (optional)
-    pub fn employees(mut self, value: impl Into<Option<HotelEmployees<'a>>>) -> Self {
+    pub fn employees(mut self, value: impl Into<Option<HotelEmployees<S>>>) -> Self {
         self._fields.37 = value.into();
         self
     }
     /// Set the `employees` field to an Option value (optional)
-    pub fn maybe_employees(mut self, value: Option<HotelEmployees<'a>>) -> Self {
+    pub fn maybe_employees(mut self, value: Option<HotelEmployees<S>>) -> Self {
         self._fields.37 = value;
         self
     }
@@ -6262,13 +7595,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `ethicsPolicy` field (optional)
     pub fn ethics_policy(
         mut self,
-        value: impl Into<Option<HotelEthicsPolicy<'a>>>,
+        value: impl Into<Option<HotelEthicsPolicy<S>>>,
     ) -> Self {
         self._fields.38 = value.into();
         self
     }
     /// Set the `ethicsPolicy` field to an Option value (optional)
-    pub fn maybe_ethics_policy(mut self, value: Option<HotelEthicsPolicy<'a>>) -> Self {
+    pub fn maybe_ethics_policy(mut self, value: Option<HotelEthicsPolicy<S>>) -> Self {
         self._fields.38 = value;
         self
     }
@@ -6276,12 +7609,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `event` field (optional)
-    pub fn event(mut self, value: impl Into<Option<HotelEvent<'a>>>) -> Self {
+    pub fn event(mut self, value: impl Into<Option<HotelEvent<S>>>) -> Self {
         self._fields.39 = value.into();
         self
     }
     /// Set the `event` field to an Option value (optional)
-    pub fn maybe_event(mut self, value: Option<HotelEvent<'a>>) -> Self {
+    pub fn maybe_event(mut self, value: Option<HotelEvent<S>>) -> Self {
         self._fields.39 = value;
         self
     }
@@ -6289,12 +7622,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `events` field (optional)
-    pub fn events(mut self, value: impl Into<Option<HotelEvents<'a>>>) -> Self {
+    pub fn events(mut self, value: impl Into<Option<HotelEvents<S>>>) -> Self {
         self._fields.40 = value.into();
         self
     }
     /// Set the `events` field to an Option value (optional)
-    pub fn maybe_events(mut self, value: Option<HotelEvents<'a>>) -> Self {
+    pub fn maybe_events(mut self, value: Option<HotelEvents<S>>) -> Self {
         self._fields.40 = value;
         self
     }
@@ -6302,12 +7635,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `faxNumber` field (optional)
-    pub fn fax_number(mut self, value: impl Into<Option<HotelFaxNumber<'a>>>) -> Self {
+    pub fn fax_number(mut self, value: impl Into<Option<HotelFaxNumber<S>>>) -> Self {
         self._fields.41 = value.into();
         self
     }
     /// Set the `faxNumber` field to an Option value (optional)
-    pub fn maybe_fax_number(mut self, value: Option<HotelFaxNumber<'a>>) -> Self {
+    pub fn maybe_fax_number(mut self, value: Option<HotelFaxNumber<S>>) -> Self {
         self._fields.41 = value;
         self
     }
@@ -6315,12 +7648,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `founder` field (optional)
-    pub fn founder(mut self, value: impl Into<Option<HotelFounder<'a>>>) -> Self {
+    pub fn founder(mut self, value: impl Into<Option<HotelFounder<S>>>) -> Self {
         self._fields.42 = value.into();
         self
     }
     /// Set the `founder` field to an Option value (optional)
-    pub fn maybe_founder(mut self, value: Option<HotelFounder<'a>>) -> Self {
+    pub fn maybe_founder(mut self, value: Option<HotelFounder<S>>) -> Self {
         self._fields.42 = value;
         self
     }
@@ -6328,12 +7661,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `founders` field (optional)
-    pub fn founders(mut self, value: impl Into<Option<HotelFounders<'a>>>) -> Self {
+    pub fn founders(mut self, value: impl Into<Option<HotelFounders<S>>>) -> Self {
         self._fields.43 = value.into();
         self
     }
     /// Set the `founders` field to an Option value (optional)
-    pub fn maybe_founders(mut self, value: Option<HotelFounders<'a>>) -> Self {
+    pub fn maybe_founders(mut self, value: Option<HotelFounders<S>>) -> Self {
         self._fields.43 = value;
         self
     }
@@ -6343,13 +7676,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `foundingDate` field (optional)
     pub fn founding_date(
         mut self,
-        value: impl Into<Option<HotelFoundingDate<'a>>>,
+        value: impl Into<Option<HotelFoundingDate<S>>>,
     ) -> Self {
         self._fields.44 = value.into();
         self
     }
     /// Set the `foundingDate` field to an Option value (optional)
-    pub fn maybe_founding_date(mut self, value: Option<HotelFoundingDate<'a>>) -> Self {
+    pub fn maybe_founding_date(mut self, value: Option<HotelFoundingDate<S>>) -> Self {
         self._fields.44 = value;
         self
     }
@@ -6359,7 +7692,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `foundingLocation` field (optional)
     pub fn founding_location(
         mut self,
-        value: impl Into<Option<HotelFoundingLocation<'a>>>,
+        value: impl Into<Option<HotelFoundingLocation<S>>>,
     ) -> Self {
         self._fields.45 = value.into();
         self
@@ -6367,7 +7700,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `foundingLocation` field to an Option value (optional)
     pub fn maybe_founding_location(
         mut self,
-        value: Option<HotelFoundingLocation<'a>>,
+        value: Option<HotelFoundingLocation<S>>,
     ) -> Self {
         self._fields.45 = value;
         self
@@ -6376,12 +7709,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `funder` field (optional)
-    pub fn funder(mut self, value: impl Into<Option<HotelFunder<'a>>>) -> Self {
+    pub fn funder(mut self, value: impl Into<Option<HotelFunder<S>>>) -> Self {
         self._fields.46 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
-    pub fn maybe_funder(mut self, value: Option<HotelFunder<'a>>) -> Self {
+    pub fn maybe_funder(mut self, value: Option<HotelFunder<S>>) -> Self {
         self._fields.46 = value;
         self
     }
@@ -6389,12 +7722,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `funding` field (optional)
-    pub fn funding(mut self, value: impl Into<Option<HotelFunding<'a>>>) -> Self {
+    pub fn funding(mut self, value: impl Into<Option<HotelFunding<S>>>) -> Self {
         self._fields.47 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
-    pub fn maybe_funding(mut self, value: Option<HotelFunding<'a>>) -> Self {
+    pub fn maybe_funding(mut self, value: Option<HotelFunding<S>>) -> Self {
         self._fields.47 = value;
         self
     }
@@ -6402,12 +7735,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geo` field (optional)
-    pub fn geo(mut self, value: impl Into<Option<HotelGeo<'a>>>) -> Self {
+    pub fn geo(mut self, value: impl Into<Option<HotelGeo<S>>>) -> Self {
         self._fields.48 = value.into();
         self
     }
     /// Set the `geo` field to an Option value (optional)
-    pub fn maybe_geo(mut self, value: Option<HotelGeo<'a>>) -> Self {
+    pub fn maybe_geo(mut self, value: Option<HotelGeo<S>>) -> Self {
         self._fields.48 = value;
         self
     }
@@ -6417,13 +7750,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoContains` field (optional)
     pub fn geo_contains(
         mut self,
-        value: impl Into<Option<HotelGeoContains<'a>>>,
+        value: impl Into<Option<HotelGeoContains<S>>>,
     ) -> Self {
         self._fields.49 = value.into();
         self
     }
     /// Set the `geoContains` field to an Option value (optional)
-    pub fn maybe_geo_contains(mut self, value: Option<HotelGeoContains<'a>>) -> Self {
+    pub fn maybe_geo_contains(mut self, value: Option<HotelGeoContains<S>>) -> Self {
         self._fields.49 = value;
         self
     }
@@ -6433,13 +7766,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoCoveredBy` field (optional)
     pub fn geo_covered_by(
         mut self,
-        value: impl Into<Option<HotelGeoCoveredBy<'a>>>,
+        value: impl Into<Option<HotelGeoCoveredBy<S>>>,
     ) -> Self {
         self._fields.50 = value.into();
         self
     }
     /// Set the `geoCoveredBy` field to an Option value (optional)
-    pub fn maybe_geo_covered_by(mut self, value: Option<HotelGeoCoveredBy<'a>>) -> Self {
+    pub fn maybe_geo_covered_by(mut self, value: Option<HotelGeoCoveredBy<S>>) -> Self {
         self._fields.50 = value;
         self
     }
@@ -6447,12 +7780,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoCovers` field (optional)
-    pub fn geo_covers(mut self, value: impl Into<Option<HotelGeoCovers<'a>>>) -> Self {
+    pub fn geo_covers(mut self, value: impl Into<Option<HotelGeoCovers<S>>>) -> Self {
         self._fields.51 = value.into();
         self
     }
     /// Set the `geoCovers` field to an Option value (optional)
-    pub fn maybe_geo_covers(mut self, value: Option<HotelGeoCovers<'a>>) -> Self {
+    pub fn maybe_geo_covers(mut self, value: Option<HotelGeoCovers<S>>) -> Self {
         self._fields.51 = value;
         self
     }
@@ -6460,12 +7793,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoCrosses` field (optional)
-    pub fn geo_crosses(mut self, value: impl Into<Option<HotelGeoCrosses<'a>>>) -> Self {
+    pub fn geo_crosses(mut self, value: impl Into<Option<HotelGeoCrosses<S>>>) -> Self {
         self._fields.52 = value.into();
         self
     }
     /// Set the `geoCrosses` field to an Option value (optional)
-    pub fn maybe_geo_crosses(mut self, value: Option<HotelGeoCrosses<'a>>) -> Self {
+    pub fn maybe_geo_crosses(mut self, value: Option<HotelGeoCrosses<S>>) -> Self {
         self._fields.52 = value;
         self
     }
@@ -6475,13 +7808,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoDisjoint` field (optional)
     pub fn geo_disjoint(
         mut self,
-        value: impl Into<Option<HotelGeoDisjoint<'a>>>,
+        value: impl Into<Option<HotelGeoDisjoint<S>>>,
     ) -> Self {
         self._fields.53 = value.into();
         self
     }
     /// Set the `geoDisjoint` field to an Option value (optional)
-    pub fn maybe_geo_disjoint(mut self, value: Option<HotelGeoDisjoint<'a>>) -> Self {
+    pub fn maybe_geo_disjoint(mut self, value: Option<HotelGeoDisjoint<S>>) -> Self {
         self._fields.53 = value;
         self
     }
@@ -6489,12 +7822,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoEquals` field (optional)
-    pub fn geo_equals(mut self, value: impl Into<Option<HotelGeoEquals<'a>>>) -> Self {
+    pub fn geo_equals(mut self, value: impl Into<Option<HotelGeoEquals<S>>>) -> Self {
         self._fields.54 = value.into();
         self
     }
     /// Set the `geoEquals` field to an Option value (optional)
-    pub fn maybe_geo_equals(mut self, value: Option<HotelGeoEquals<'a>>) -> Self {
+    pub fn maybe_geo_equals(mut self, value: Option<HotelGeoEquals<S>>) -> Self {
         self._fields.54 = value;
         self
     }
@@ -6504,16 +7837,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoIntersects` field (optional)
     pub fn geo_intersects(
         mut self,
-        value: impl Into<Option<HotelGeoIntersects<'a>>>,
+        value: impl Into<Option<HotelGeoIntersects<S>>>,
     ) -> Self {
         self._fields.55 = value.into();
         self
     }
     /// Set the `geoIntersects` field to an Option value (optional)
-    pub fn maybe_geo_intersects(
-        mut self,
-        value: Option<HotelGeoIntersects<'a>>,
-    ) -> Self {
+    pub fn maybe_geo_intersects(mut self, value: Option<HotelGeoIntersects<S>>) -> Self {
         self._fields.55 = value;
         self
     }
@@ -6523,13 +7853,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoOverlaps` field (optional)
     pub fn geo_overlaps(
         mut self,
-        value: impl Into<Option<HotelGeoOverlaps<'a>>>,
+        value: impl Into<Option<HotelGeoOverlaps<S>>>,
     ) -> Self {
         self._fields.56 = value.into();
         self
     }
     /// Set the `geoOverlaps` field to an Option value (optional)
-    pub fn maybe_geo_overlaps(mut self, value: Option<HotelGeoOverlaps<'a>>) -> Self {
+    pub fn maybe_geo_overlaps(mut self, value: Option<HotelGeoOverlaps<S>>) -> Self {
         self._fields.56 = value;
         self
     }
@@ -6537,12 +7867,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoTouches` field (optional)
-    pub fn geo_touches(mut self, value: impl Into<Option<HotelGeoTouches<'a>>>) -> Self {
+    pub fn geo_touches(mut self, value: impl Into<Option<HotelGeoTouches<S>>>) -> Self {
         self._fields.57 = value.into();
         self
     }
     /// Set the `geoTouches` field to an Option value (optional)
-    pub fn maybe_geo_touches(mut self, value: Option<HotelGeoTouches<'a>>) -> Self {
+    pub fn maybe_geo_touches(mut self, value: Option<HotelGeoTouches<S>>) -> Self {
         self._fields.57 = value;
         self
     }
@@ -6550,12 +7880,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoWithin` field (optional)
-    pub fn geo_within(mut self, value: impl Into<Option<HotelGeoWithin<'a>>>) -> Self {
+    pub fn geo_within(mut self, value: impl Into<Option<HotelGeoWithin<S>>>) -> Self {
         self._fields.58 = value.into();
         self
     }
     /// Set the `geoWithin` field to an Option value (optional)
-    pub fn maybe_geo_within(mut self, value: Option<HotelGeoWithin<'a>>) -> Self {
+    pub fn maybe_geo_within(mut self, value: Option<HotelGeoWithin<S>>) -> Self {
         self._fields.58 = value;
         self
     }
@@ -6565,7 +7895,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `globalLocationNumber` field (optional)
     pub fn global_location_number(
         mut self,
-        value: impl Into<Option<HotelGlobalLocationNumber<'a>>>,
+        value: impl Into<Option<HotelGlobalLocationNumber<S>>>,
     ) -> Self {
         self._fields.59 = value.into();
         self
@@ -6573,7 +7903,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `globalLocationNumber` field to an Option value (optional)
     pub fn maybe_global_location_number(
         mut self,
-        value: Option<HotelGlobalLocationNumber<'a>>,
+        value: Option<HotelGlobalLocationNumber<S>>,
     ) -> Self {
         self._fields.59 = value;
         self
@@ -6584,7 +7914,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasCertification` field (optional)
     pub fn has_certification(
         mut self,
-        value: impl Into<Option<HotelHasCertification<'a>>>,
+        value: impl Into<Option<HotelHasCertification<S>>>,
     ) -> Self {
         self._fields.60 = value.into();
         self
@@ -6592,7 +7922,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasCertification` field to an Option value (optional)
     pub fn maybe_has_certification(
         mut self,
-        value: Option<HotelHasCertification<'a>>,
+        value: Option<HotelHasCertification<S>>,
     ) -> Self {
         self._fields.60 = value;
         self
@@ -6603,16 +7933,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasCredential` field (optional)
     pub fn has_credential(
         mut self,
-        value: impl Into<Option<HotelHasCredential<'a>>>,
+        value: impl Into<Option<HotelHasCredential<S>>>,
     ) -> Self {
         self._fields.61 = value.into();
         self
     }
     /// Set the `hasCredential` field to an Option value (optional)
-    pub fn maybe_has_credential(
-        mut self,
-        value: Option<HotelHasCredential<'a>>,
-    ) -> Self {
+    pub fn maybe_has_credential(mut self, value: Option<HotelHasCredential<S>>) -> Self {
         self._fields.61 = value;
         self
     }
@@ -6622,7 +7949,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasDriveThroughService` field (optional)
     pub fn has_drive_through_service(
         mut self,
-        value: impl Into<Option<HotelHasDriveThroughService<'a>>>,
+        value: impl Into<Option<HotelHasDriveThroughService<S>>>,
     ) -> Self {
         self._fields.62 = value.into();
         self
@@ -6630,7 +7957,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasDriveThroughService` field to an Option value (optional)
     pub fn maybe_has_drive_through_service(
         mut self,
-        value: Option<HotelHasDriveThroughService<'a>>,
+        value: Option<HotelHasDriveThroughService<S>>,
     ) -> Self {
         self._fields.62 = value;
         self
@@ -6641,7 +7968,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasGS1DigitalLink` field (optional)
     pub fn has_gs1_digital_link(
         mut self,
-        value: impl Into<Option<HotelHasGs1DigitalLink<'a>>>,
+        value: impl Into<Option<HotelHasGs1DigitalLink<S>>>,
     ) -> Self {
         self._fields.63 = value.into();
         self
@@ -6649,7 +7976,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasGS1DigitalLink` field to an Option value (optional)
     pub fn maybe_has_gs1_digital_link(
         mut self,
-        value: Option<HotelHasGs1DigitalLink<'a>>,
+        value: Option<HotelHasGs1DigitalLink<S>>,
     ) -> Self {
         self._fields.63 = value;
         self
@@ -6658,12 +7985,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasMap` field (optional)
-    pub fn has_map(mut self, value: impl Into<Option<HotelHasMap<'a>>>) -> Self {
+    pub fn has_map(mut self, value: impl Into<Option<HotelHasMap<S>>>) -> Self {
         self._fields.64 = value.into();
         self
     }
     /// Set the `hasMap` field to an Option value (optional)
-    pub fn maybe_has_map(mut self, value: Option<HotelHasMap<'a>>) -> Self {
+    pub fn maybe_has_map(mut self, value: Option<HotelHasMap<S>>) -> Self {
         self._fields.64 = value;
         self
     }
@@ -6673,7 +8000,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasMemberProgram` field (optional)
     pub fn has_member_program(
         mut self,
-        value: impl Into<Option<HotelHasMemberProgram<'a>>>,
+        value: impl Into<Option<HotelHasMemberProgram<S>>>,
     ) -> Self {
         self._fields.65 = value.into();
         self
@@ -6681,7 +8008,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasMemberProgram` field to an Option value (optional)
     pub fn maybe_has_member_program(
         mut self,
-        value: Option<HotelHasMemberProgram<'a>>,
+        value: Option<HotelHasMemberProgram<S>>,
     ) -> Self {
         self._fields.65 = value;
         self
@@ -6692,7 +8019,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasMerchantReturnPolicy` field (optional)
     pub fn has_merchant_return_policy(
         mut self,
-        value: impl Into<Option<HotelHasMerchantReturnPolicy<'a>>>,
+        value: impl Into<Option<HotelHasMerchantReturnPolicy<S>>>,
     ) -> Self {
         self._fields.66 = value.into();
         self
@@ -6700,7 +8027,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasMerchantReturnPolicy` field to an Option value (optional)
     pub fn maybe_has_merchant_return_policy(
         mut self,
-        value: Option<HotelHasMerchantReturnPolicy<'a>>,
+        value: Option<HotelHasMerchantReturnPolicy<S>>,
     ) -> Self {
         self._fields.66 = value;
         self
@@ -6711,7 +8038,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasOfferCatalog` field (optional)
     pub fn has_offer_catalog(
         mut self,
-        value: impl Into<Option<HotelHasOfferCatalog<'a>>>,
+        value: impl Into<Option<HotelHasOfferCatalog<S>>>,
     ) -> Self {
         self._fields.67 = value.into();
         self
@@ -6719,7 +8046,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasOfferCatalog` field to an Option value (optional)
     pub fn maybe_has_offer_catalog(
         mut self,
-        value: Option<HotelHasOfferCatalog<'a>>,
+        value: Option<HotelHasOfferCatalog<S>>,
     ) -> Self {
         self._fields.67 = value;
         self
@@ -6728,12 +8055,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasPOS` field (optional)
-    pub fn has_pos(mut self, value: impl Into<Option<HotelHasPos<'a>>>) -> Self {
+    pub fn has_pos(mut self, value: impl Into<Option<HotelHasPos<S>>>) -> Self {
         self._fields.68 = value.into();
         self
     }
     /// Set the `hasPOS` field to an Option value (optional)
-    pub fn maybe_has_pos(mut self, value: Option<HotelHasPos<'a>>) -> Self {
+    pub fn maybe_has_pos(mut self, value: Option<HotelHasPos<S>>) -> Self {
         self._fields.68 = value;
         self
     }
@@ -6743,7 +8070,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasProductReturnPolicy` field (optional)
     pub fn has_product_return_policy(
         mut self,
-        value: impl Into<Option<HotelHasProductReturnPolicy<'a>>>,
+        value: impl Into<Option<HotelHasProductReturnPolicy<S>>>,
     ) -> Self {
         self._fields.69 = value.into();
         self
@@ -6751,7 +8078,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasProductReturnPolicy` field to an Option value (optional)
     pub fn maybe_has_product_return_policy(
         mut self,
-        value: Option<HotelHasProductReturnPolicy<'a>>,
+        value: Option<HotelHasProductReturnPolicy<S>>,
     ) -> Self {
         self._fields.69 = value;
         self
@@ -6762,7 +8089,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasShippingService` field (optional)
     pub fn has_shipping_service(
         mut self,
-        value: impl Into<Option<HotelHasShippingService<'a>>>,
+        value: impl Into<Option<HotelHasShippingService<S>>>,
     ) -> Self {
         self._fields.70 = value.into();
         self
@@ -6770,7 +8097,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasShippingService` field to an Option value (optional)
     pub fn maybe_has_shipping_service(
         mut self,
-        value: Option<HotelHasShippingService<'a>>,
+        value: Option<HotelHasShippingService<S>>,
     ) -> Self {
         self._fields.70 = value;
         self
@@ -6779,12 +8106,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(mut self, value: impl Into<Option<HotelIdentifier<'a>>>) -> Self {
+    pub fn identifier(mut self, value: impl Into<Option<HotelIdentifier<S>>>) -> Self {
         self._fields.71 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
-    pub fn maybe_identifier(mut self, value: Option<HotelIdentifier<'a>>) -> Self {
+    pub fn maybe_identifier(mut self, value: Option<HotelIdentifier<S>>) -> Self {
         self._fields.71 = value;
         self
     }
@@ -6792,12 +8119,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<HotelImage<'a>>>) -> Self {
+    pub fn image(mut self, value: impl Into<Option<HotelImage<S>>>) -> Self {
         self._fields.72 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<HotelImage<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<HotelImage<S>>) -> Self {
         self._fields.72 = value;
         self
     }
@@ -6807,7 +8134,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `interactionStatistic` field (optional)
     pub fn interaction_statistic(
         mut self,
-        value: impl Into<Option<HotelInteractionStatistic<'a>>>,
+        value: impl Into<Option<HotelInteractionStatistic<S>>>,
     ) -> Self {
         self._fields.73 = value.into();
         self
@@ -6815,7 +8142,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `interactionStatistic` field to an Option value (optional)
     pub fn maybe_interaction_statistic(
         mut self,
-        value: Option<HotelInteractionStatistic<'a>>,
+        value: Option<HotelInteractionStatistic<S>>,
     ) -> Self {
         self._fields.73 = value;
         self
@@ -6826,7 +8153,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `isAccessibleForFree` field (optional)
     pub fn is_accessible_for_free(
         mut self,
-        value: impl Into<Option<HotelIsAccessibleForFree<'a>>>,
+        value: impl Into<Option<HotelIsAccessibleForFree<S>>>,
     ) -> Self {
         self._fields.74 = value.into();
         self
@@ -6834,7 +8161,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `isAccessibleForFree` field to an Option value (optional)
     pub fn maybe_is_accessible_for_free(
         mut self,
-        value: Option<HotelIsAccessibleForFree<'a>>,
+        value: Option<HotelIsAccessibleForFree<S>>,
     ) -> Self {
         self._fields.74 = value;
         self
@@ -6843,12 +8170,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `isicV4` field (optional)
-    pub fn isic_v4(mut self, value: impl Into<Option<HotelIsicV4<'a>>>) -> Self {
+    pub fn isic_v4(mut self, value: impl Into<Option<HotelIsicV4<S>>>) -> Self {
         self._fields.75 = value.into();
         self
     }
     /// Set the `isicV4` field to an Option value (optional)
-    pub fn maybe_isic_v4(mut self, value: Option<HotelIsicV4<'a>>) -> Self {
+    pub fn maybe_isic_v4(mut self, value: Option<HotelIsicV4<S>>) -> Self {
         self._fields.75 = value;
         self
     }
@@ -6858,13 +8185,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `iso6523Code` field (optional)
     pub fn iso6523_code(
         mut self,
-        value: impl Into<Option<HotelIso6523Code<'a>>>,
+        value: impl Into<Option<HotelIso6523Code<S>>>,
     ) -> Self {
         self._fields.76 = value.into();
         self
     }
     /// Set the `iso6523Code` field to an Option value (optional)
-    pub fn maybe_iso6523_code(mut self, value: Option<HotelIso6523Code<'a>>) -> Self {
+    pub fn maybe_iso6523_code(mut self, value: Option<HotelIso6523Code<S>>) -> Self {
         self._fields.76 = value;
         self
     }
@@ -6872,12 +8199,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(mut self, value: impl Into<Option<HotelKeywords<'a>>>) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<HotelKeywords<S>>>) -> Self {
         self._fields.77 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(mut self, value: Option<HotelKeywords<'a>>) -> Self {
+    pub fn maybe_keywords(mut self, value: Option<HotelKeywords<S>>) -> Self {
         self._fields.77 = value;
         self
     }
@@ -6885,12 +8212,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `knowsAbout` field (optional)
-    pub fn knows_about(mut self, value: impl Into<Option<HotelKnowsAbout<'a>>>) -> Self {
+    pub fn knows_about(mut self, value: impl Into<Option<HotelKnowsAbout<S>>>) -> Self {
         self._fields.78 = value.into();
         self
     }
     /// Set the `knowsAbout` field to an Option value (optional)
-    pub fn maybe_knows_about(mut self, value: Option<HotelKnowsAbout<'a>>) -> Self {
+    pub fn maybe_knows_about(mut self, value: Option<HotelKnowsAbout<S>>) -> Self {
         self._fields.78 = value;
         self
     }
@@ -6900,16 +8227,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `knowsLanguage` field (optional)
     pub fn knows_language(
         mut self,
-        value: impl Into<Option<HotelKnowsLanguage<'a>>>,
+        value: impl Into<Option<HotelKnowsLanguage<S>>>,
     ) -> Self {
         self._fields.79 = value.into();
         self
     }
     /// Set the `knowsLanguage` field to an Option value (optional)
-    pub fn maybe_knows_language(
-        mut self,
-        value: Option<HotelKnowsLanguage<'a>>,
-    ) -> Self {
+    pub fn maybe_knows_language(mut self, value: Option<HotelKnowsLanguage<S>>) -> Self {
         self._fields.79 = value;
         self
     }
@@ -6917,12 +8241,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `latitude` field (optional)
-    pub fn latitude(mut self, value: impl Into<Option<HotelLatitude<'a>>>) -> Self {
+    pub fn latitude(mut self, value: impl Into<Option<HotelLatitude<S>>>) -> Self {
         self._fields.80 = value.into();
         self
     }
     /// Set the `latitude` field to an Option value (optional)
-    pub fn maybe_latitude(mut self, value: Option<HotelLatitude<'a>>) -> Self {
+    pub fn maybe_latitude(mut self, value: Option<HotelLatitude<S>>) -> Self {
         self._fields.80 = value;
         self
     }
@@ -6932,13 +8256,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `legalAddress` field (optional)
     pub fn legal_address(
         mut self,
-        value: impl Into<Option<HotelLegalAddress<'a>>>,
+        value: impl Into<Option<HotelLegalAddress<S>>>,
     ) -> Self {
         self._fields.81 = value.into();
         self
     }
     /// Set the `legalAddress` field to an Option value (optional)
-    pub fn maybe_legal_address(mut self, value: Option<HotelLegalAddress<'a>>) -> Self {
+    pub fn maybe_legal_address(mut self, value: Option<HotelLegalAddress<S>>) -> Self {
         self._fields.81 = value;
         self
     }
@@ -6946,12 +8270,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `legalName` field (optional)
-    pub fn legal_name(mut self, value: impl Into<Option<HotelLegalName<'a>>>) -> Self {
+    pub fn legal_name(mut self, value: impl Into<Option<HotelLegalName<S>>>) -> Self {
         self._fields.82 = value.into();
         self
     }
     /// Set the `legalName` field to an Option value (optional)
-    pub fn maybe_legal_name(mut self, value: Option<HotelLegalName<'a>>) -> Self {
+    pub fn maybe_legal_name(mut self, value: Option<HotelLegalName<S>>) -> Self {
         self._fields.82 = value;
         self
     }
@@ -6961,7 +8285,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `legalRepresentative` field (optional)
     pub fn legal_representative(
         mut self,
-        value: impl Into<Option<HotelLegalRepresentative<'a>>>,
+        value: impl Into<Option<HotelLegalRepresentative<S>>>,
     ) -> Self {
         self._fields.83 = value.into();
         self
@@ -6969,7 +8293,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `legalRepresentative` field to an Option value (optional)
     pub fn maybe_legal_representative(
         mut self,
-        value: Option<HotelLegalRepresentative<'a>>,
+        value: Option<HotelLegalRepresentative<S>>,
     ) -> Self {
         self._fields.83 = value;
         self
@@ -6978,12 +8302,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `leiCode` field (optional)
-    pub fn lei_code(mut self, value: impl Into<Option<HotelLeiCode<'a>>>) -> Self {
+    pub fn lei_code(mut self, value: impl Into<Option<HotelLeiCode<S>>>) -> Self {
         self._fields.84 = value.into();
         self
     }
     /// Set the `leiCode` field to an Option value (optional)
-    pub fn maybe_lei_code(mut self, value: Option<HotelLeiCode<'a>>) -> Self {
+    pub fn maybe_lei_code(mut self, value: Option<HotelLeiCode<S>>) -> Self {
         self._fields.84 = value;
         self
     }
@@ -6991,12 +8315,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `location` field (optional)
-    pub fn location(mut self, value: impl Into<Option<HotelLocation<'a>>>) -> Self {
+    pub fn location(mut self, value: impl Into<Option<HotelLocation<S>>>) -> Self {
         self._fields.85 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
-    pub fn maybe_location(mut self, value: Option<HotelLocation<'a>>) -> Self {
+    pub fn maybe_location(mut self, value: Option<HotelLocation<S>>) -> Self {
         self._fields.85 = value;
         self
     }
@@ -7004,12 +8328,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `logo` field (optional)
-    pub fn logo(mut self, value: impl Into<Option<HotelLogo<'a>>>) -> Self {
+    pub fn logo(mut self, value: impl Into<Option<HotelLogo<S>>>) -> Self {
         self._fields.86 = value.into();
         self
     }
     /// Set the `logo` field to an Option value (optional)
-    pub fn maybe_logo(mut self, value: Option<HotelLogo<'a>>) -> Self {
+    pub fn maybe_logo(mut self, value: Option<HotelLogo<S>>) -> Self {
         self._fields.86 = value;
         self
     }
@@ -7017,12 +8341,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `longitude` field (optional)
-    pub fn longitude(mut self, value: impl Into<Option<HotelLongitude<'a>>>) -> Self {
+    pub fn longitude(mut self, value: impl Into<Option<HotelLongitude<S>>>) -> Self {
         self._fields.87 = value.into();
         self
     }
     /// Set the `longitude` field to an Option value (optional)
-    pub fn maybe_longitude(mut self, value: Option<HotelLongitude<'a>>) -> Self {
+    pub fn maybe_longitude(mut self, value: Option<HotelLongitude<S>>) -> Self {
         self._fields.87 = value;
         self
     }
@@ -7032,7 +8356,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
-        value: impl Into<Option<HotelMainEntityOfPage<'a>>>,
+        value: impl Into<Option<HotelMainEntityOfPage<S>>>,
     ) -> Self {
         self._fields.88 = value.into();
         self
@@ -7040,7 +8364,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field to an Option value (optional)
     pub fn maybe_main_entity_of_page(
         mut self,
-        value: Option<HotelMainEntityOfPage<'a>>,
+        value: Option<HotelMainEntityOfPage<S>>,
     ) -> Self {
         self._fields.88 = value;
         self
@@ -7049,12 +8373,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `makesOffer` field (optional)
-    pub fn makes_offer(mut self, value: impl Into<Option<HotelMakesOffer<'a>>>) -> Self {
+    pub fn makes_offer(mut self, value: impl Into<Option<HotelMakesOffer<S>>>) -> Self {
         self._fields.89 = value.into();
         self
     }
     /// Set the `makesOffer` field to an Option value (optional)
-    pub fn maybe_makes_offer(mut self, value: Option<HotelMakesOffer<'a>>) -> Self {
+    pub fn maybe_makes_offer(mut self, value: Option<HotelMakesOffer<S>>) -> Self {
         self._fields.89 = value;
         self
     }
@@ -7062,12 +8386,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `map` field (optional)
-    pub fn map(mut self, value: impl Into<Option<HotelMap<'a>>>) -> Self {
+    pub fn map(mut self, value: impl Into<Option<HotelMap<S>>>) -> Self {
         self._fields.90 = value.into();
         self
     }
     /// Set the `map` field to an Option value (optional)
-    pub fn maybe_map(mut self, value: Option<HotelMap<'a>>) -> Self {
+    pub fn maybe_map(mut self, value: Option<HotelMap<S>>) -> Self {
         self._fields.90 = value;
         self
     }
@@ -7075,12 +8399,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `maps` field (optional)
-    pub fn maps(mut self, value: impl Into<Option<HotelMaps<'a>>>) -> Self {
+    pub fn maps(mut self, value: impl Into<Option<HotelMaps<S>>>) -> Self {
         self._fields.91 = value.into();
         self
     }
     /// Set the `maps` field to an Option value (optional)
-    pub fn maybe_maps(mut self, value: Option<HotelMaps<'a>>) -> Self {
+    pub fn maybe_maps(mut self, value: Option<HotelMaps<S>>) -> Self {
         self._fields.91 = value;
         self
     }
@@ -7090,7 +8414,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `maximumAttendeeCapacity` field (optional)
     pub fn maximum_attendee_capacity(
         mut self,
-        value: impl Into<Option<HotelMaximumAttendeeCapacity<'a>>>,
+        value: impl Into<Option<HotelMaximumAttendeeCapacity<S>>>,
     ) -> Self {
         self._fields.92 = value.into();
         self
@@ -7098,7 +8422,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `maximumAttendeeCapacity` field to an Option value (optional)
     pub fn maybe_maximum_attendee_capacity(
         mut self,
-        value: Option<HotelMaximumAttendeeCapacity<'a>>,
+        value: Option<HotelMaximumAttendeeCapacity<S>>,
     ) -> Self {
         self._fields.92 = value;
         self
@@ -7107,12 +8431,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `member` field (optional)
-    pub fn member(mut self, value: impl Into<Option<HotelMember<'a>>>) -> Self {
+    pub fn member(mut self, value: impl Into<Option<HotelMember<S>>>) -> Self {
         self._fields.93 = value.into();
         self
     }
     /// Set the `member` field to an Option value (optional)
-    pub fn maybe_member(mut self, value: Option<HotelMember<'a>>) -> Self {
+    pub fn maybe_member(mut self, value: Option<HotelMember<S>>) -> Self {
         self._fields.93 = value;
         self
     }
@@ -7120,12 +8444,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `memberOf` field (optional)
-    pub fn member_of(mut self, value: impl Into<Option<HotelMemberOf<'a>>>) -> Self {
+    pub fn member_of(mut self, value: impl Into<Option<HotelMemberOf<S>>>) -> Self {
         self._fields.94 = value.into();
         self
     }
     /// Set the `memberOf` field to an Option value (optional)
-    pub fn maybe_member_of(mut self, value: Option<HotelMemberOf<'a>>) -> Self {
+    pub fn maybe_member_of(mut self, value: Option<HotelMemberOf<S>>) -> Self {
         self._fields.94 = value;
         self
     }
@@ -7133,12 +8457,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `members` field (optional)
-    pub fn members(mut self, value: impl Into<Option<HotelMembers<'a>>>) -> Self {
+    pub fn members(mut self, value: impl Into<Option<HotelMembers<S>>>) -> Self {
         self._fields.95 = value.into();
         self
     }
     /// Set the `members` field to an Option value (optional)
-    pub fn maybe_members(mut self, value: Option<HotelMembers<'a>>) -> Self {
+    pub fn maybe_members(mut self, value: Option<HotelMembers<S>>) -> Self {
         self._fields.95 = value;
         self
     }
@@ -7146,12 +8470,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `naics` field (optional)
-    pub fn naics(mut self, value: impl Into<Option<HotelNaics<'a>>>) -> Self {
+    pub fn naics(mut self, value: impl Into<Option<HotelNaics<S>>>) -> Self {
         self._fields.96 = value.into();
         self
     }
     /// Set the `naics` field to an Option value (optional)
-    pub fn maybe_naics(mut self, value: Option<HotelNaics<'a>>) -> Self {
+    pub fn maybe_naics(mut self, value: Option<HotelNaics<S>>) -> Self {
         self._fields.96 = value;
         self
     }
@@ -7159,12 +8483,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<HotelName<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<HotelName<S>>>) -> Self {
         self._fields.97 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<HotelName<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<HotelName<S>>) -> Self {
         self._fields.97 = value;
         self
     }
@@ -7174,7 +8498,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `nonprofitStatus` field (optional)
     pub fn nonprofit_status(
         mut self,
-        value: impl Into<Option<HotelNonprofitStatus<'a>>>,
+        value: impl Into<Option<HotelNonprofitStatus<S>>>,
     ) -> Self {
         self._fields.98 = value.into();
         self
@@ -7182,7 +8506,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `nonprofitStatus` field to an Option value (optional)
     pub fn maybe_nonprofit_status(
         mut self,
-        value: Option<HotelNonprofitStatus<'a>>,
+        value: Option<HotelNonprofitStatus<S>>,
     ) -> Self {
         self._fields.98 = value;
         self
@@ -7193,7 +8517,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `numberOfEmployees` field (optional)
     pub fn number_of_employees(
         mut self,
-        value: impl Into<Option<HotelNumberOfEmployees<'a>>>,
+        value: impl Into<Option<HotelNumberOfEmployees<S>>>,
     ) -> Self {
         self._fields.99 = value.into();
         self
@@ -7201,7 +8525,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `numberOfEmployees` field to an Option value (optional)
     pub fn maybe_number_of_employees(
         mut self,
-        value: Option<HotelNumberOfEmployees<'a>>,
+        value: Option<HotelNumberOfEmployees<S>>,
     ) -> Self {
         self._fields.99 = value;
         self
@@ -7212,7 +8536,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `numberOfRooms` field (optional)
     pub fn number_of_rooms(
         mut self,
-        value: impl Into<Option<HotelNumberOfRooms<'a>>>,
+        value: impl Into<Option<HotelNumberOfRooms<S>>>,
     ) -> Self {
         self._fields.100 = value.into();
         self
@@ -7220,7 +8544,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `numberOfRooms` field to an Option value (optional)
     pub fn maybe_number_of_rooms(
         mut self,
-        value: Option<HotelNumberOfRooms<'a>>,
+        value: Option<HotelNumberOfRooms<S>>,
     ) -> Self {
         self._fields.100 = value;
         self
@@ -7231,13 +8555,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `openingHours` field (optional)
     pub fn opening_hours(
         mut self,
-        value: impl Into<Option<HotelOpeningHours<'a>>>,
+        value: impl Into<Option<HotelOpeningHours<S>>>,
     ) -> Self {
         self._fields.101 = value.into();
         self
     }
     /// Set the `openingHours` field to an Option value (optional)
-    pub fn maybe_opening_hours(mut self, value: Option<HotelOpeningHours<'a>>) -> Self {
+    pub fn maybe_opening_hours(mut self, value: Option<HotelOpeningHours<S>>) -> Self {
         self._fields.101 = value;
         self
     }
@@ -7247,7 +8571,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `openingHoursSpecification` field (optional)
     pub fn opening_hours_specification(
         mut self,
-        value: impl Into<Option<HotelOpeningHoursSpecification<'a>>>,
+        value: impl Into<Option<HotelOpeningHoursSpecification<S>>>,
     ) -> Self {
         self._fields.102 = value.into();
         self
@@ -7255,7 +8579,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `openingHoursSpecification` field to an Option value (optional)
     pub fn maybe_opening_hours_specification(
         mut self,
-        value: Option<HotelOpeningHoursSpecification<'a>>,
+        value: Option<HotelOpeningHoursSpecification<S>>,
     ) -> Self {
         self._fields.102 = value;
         self
@@ -7266,7 +8590,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `ownershipFundingInfo` field (optional)
     pub fn ownership_funding_info(
         mut self,
-        value: impl Into<Option<HotelOwnershipFundingInfo<'a>>>,
+        value: impl Into<Option<HotelOwnershipFundingInfo<S>>>,
     ) -> Self {
         self._fields.103 = value.into();
         self
@@ -7274,7 +8598,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `ownershipFundingInfo` field to an Option value (optional)
     pub fn maybe_ownership_funding_info(
         mut self,
-        value: Option<HotelOwnershipFundingInfo<'a>>,
+        value: Option<HotelOwnershipFundingInfo<S>>,
     ) -> Self {
         self._fields.103 = value;
         self
@@ -7283,12 +8607,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `owns` field (optional)
-    pub fn owns(mut self, value: impl Into<Option<HotelOwns<'a>>>) -> Self {
+    pub fn owns(mut self, value: impl Into<Option<HotelOwns<S>>>) -> Self {
         self._fields.104 = value.into();
         self
     }
     /// Set the `owns` field to an Option value (optional)
-    pub fn maybe_owns(mut self, value: Option<HotelOwns<'a>>) -> Self {
+    pub fn maybe_owns(mut self, value: Option<HotelOwns<S>>) -> Self {
         self._fields.104 = value;
         self
     }
@@ -7298,7 +8622,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `parentOrganization` field (optional)
     pub fn parent_organization(
         mut self,
-        value: impl Into<Option<HotelParentOrganization<'a>>>,
+        value: impl Into<Option<HotelParentOrganization<S>>>,
     ) -> Self {
         self._fields.105 = value.into();
         self
@@ -7306,7 +8630,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `parentOrganization` field to an Option value (optional)
     pub fn maybe_parent_organization(
         mut self,
-        value: Option<HotelParentOrganization<'a>>,
+        value: Option<HotelParentOrganization<S>>,
     ) -> Self {
         self._fields.105 = value;
         self
@@ -7317,7 +8641,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `paymentAccepted` field (optional)
     pub fn payment_accepted(
         mut self,
-        value: impl Into<Option<HotelPaymentAccepted<'a>>>,
+        value: impl Into<Option<HotelPaymentAccepted<S>>>,
     ) -> Self {
         self._fields.106 = value.into();
         self
@@ -7325,7 +8649,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `paymentAccepted` field to an Option value (optional)
     pub fn maybe_payment_accepted(
         mut self,
-        value: Option<HotelPaymentAccepted<'a>>,
+        value: Option<HotelPaymentAccepted<S>>,
     ) -> Self {
         self._fields.106 = value;
         self
@@ -7336,13 +8660,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `petsAllowed` field (optional)
     pub fn pets_allowed(
         mut self,
-        value: impl Into<Option<HotelPetsAllowed<'a>>>,
+        value: impl Into<Option<HotelPetsAllowed<S>>>,
     ) -> Self {
         self._fields.107 = value.into();
         self
     }
     /// Set the `petsAllowed` field to an Option value (optional)
-    pub fn maybe_pets_allowed(mut self, value: Option<HotelPetsAllowed<'a>>) -> Self {
+    pub fn maybe_pets_allowed(mut self, value: Option<HotelPetsAllowed<S>>) -> Self {
         self._fields.107 = value;
         self
     }
@@ -7350,12 +8674,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `photo` field (optional)
-    pub fn photo(mut self, value: impl Into<Option<HotelPhoto<'a>>>) -> Self {
+    pub fn photo(mut self, value: impl Into<Option<HotelPhoto<S>>>) -> Self {
         self._fields.108 = value.into();
         self
     }
     /// Set the `photo` field to an Option value (optional)
-    pub fn maybe_photo(mut self, value: Option<HotelPhoto<'a>>) -> Self {
+    pub fn maybe_photo(mut self, value: Option<HotelPhoto<S>>) -> Self {
         self._fields.108 = value;
         self
     }
@@ -7363,12 +8687,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `photos` field (optional)
-    pub fn photos(mut self, value: impl Into<Option<HotelPhotos<'a>>>) -> Self {
+    pub fn photos(mut self, value: impl Into<Option<HotelPhotos<S>>>) -> Self {
         self._fields.109 = value.into();
         self
     }
     /// Set the `photos` field to an Option value (optional)
-    pub fn maybe_photos(mut self, value: Option<HotelPhotos<'a>>) -> Self {
+    pub fn maybe_photos(mut self, value: Option<HotelPhotos<S>>) -> Self {
         self._fields.109 = value;
         self
     }
@@ -7378,7 +8702,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `potentialAction` field (optional)
     pub fn potential_action(
         mut self,
-        value: impl Into<Option<HotelPotentialAction<'a>>>,
+        value: impl Into<Option<HotelPotentialAction<S>>>,
     ) -> Self {
         self._fields.110 = value.into();
         self
@@ -7386,7 +8710,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `potentialAction` field to an Option value (optional)
     pub fn maybe_potential_action(
         mut self,
-        value: Option<HotelPotentialAction<'a>>,
+        value: Option<HotelPotentialAction<S>>,
     ) -> Self {
         self._fields.110 = value;
         self
@@ -7395,12 +8719,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `priceRange` field (optional)
-    pub fn price_range(mut self, value: impl Into<Option<HotelPriceRange<'a>>>) -> Self {
+    pub fn price_range(mut self, value: impl Into<Option<HotelPriceRange<S>>>) -> Self {
         self._fields.111 = value.into();
         self
     }
     /// Set the `priceRange` field to an Option value (optional)
-    pub fn maybe_price_range(mut self, value: Option<HotelPriceRange<'a>>) -> Self {
+    pub fn maybe_price_range(mut self, value: Option<HotelPriceRange<S>>) -> Self {
         self._fields.111 = value;
         self
     }
@@ -7410,13 +8734,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `publicAccess` field (optional)
     pub fn public_access(
         mut self,
-        value: impl Into<Option<HotelPublicAccess<'a>>>,
+        value: impl Into<Option<HotelPublicAccess<S>>>,
     ) -> Self {
         self._fields.112 = value.into();
         self
     }
     /// Set the `publicAccess` field to an Option value (optional)
-    pub fn maybe_public_access(mut self, value: Option<HotelPublicAccess<'a>>) -> Self {
+    pub fn maybe_public_access(mut self, value: Option<HotelPublicAccess<S>>) -> Self {
         self._fields.112 = value;
         self
     }
@@ -7426,7 +8750,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `publishingPrinciples` field (optional)
     pub fn publishing_principles(
         mut self,
-        value: impl Into<Option<HotelPublishingPrinciples<'a>>>,
+        value: impl Into<Option<HotelPublishingPrinciples<S>>>,
     ) -> Self {
         self._fields.113 = value.into();
         self
@@ -7434,7 +8758,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `publishingPrinciples` field to an Option value (optional)
     pub fn maybe_publishing_principles(
         mut self,
-        value: Option<HotelPublishingPrinciples<'a>>,
+        value: Option<HotelPublishingPrinciples<S>>,
     ) -> Self {
         self._fields.113 = value;
         self
@@ -7443,12 +8767,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `review` field (optional)
-    pub fn review(mut self, value: impl Into<Option<HotelReview<'a>>>) -> Self {
+    pub fn review(mut self, value: impl Into<Option<HotelReview<S>>>) -> Self {
         self._fields.114 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
-    pub fn maybe_review(mut self, value: Option<HotelReview<'a>>) -> Self {
+    pub fn maybe_review(mut self, value: Option<HotelReview<S>>) -> Self {
         self._fields.114 = value;
         self
     }
@@ -7456,12 +8780,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `reviews` field (optional)
-    pub fn reviews(mut self, value: impl Into<Option<HotelReviews<'a>>>) -> Self {
+    pub fn reviews(mut self, value: impl Into<Option<HotelReviews<S>>>) -> Self {
         self._fields.115 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
-    pub fn maybe_reviews(mut self, value: Option<HotelReviews<'a>>) -> Self {
+    pub fn maybe_reviews(mut self, value: Option<HotelReviews<S>>) -> Self {
         self._fields.115 = value;
         self
     }
@@ -7469,12 +8793,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
-    pub fn same_as(mut self, value: impl Into<Option<HotelSameAs<'a>>>) -> Self {
+    pub fn same_as(mut self, value: impl Into<Option<HotelSameAs<S>>>) -> Self {
         self._fields.116 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
-    pub fn maybe_same_as(mut self, value: Option<HotelSameAs<'a>>) -> Self {
+    pub fn maybe_same_as(mut self, value: Option<HotelSameAs<S>>) -> Self {
         self._fields.116 = value;
         self
     }
@@ -7482,12 +8806,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `seeks` field (optional)
-    pub fn seeks(mut self, value: impl Into<Option<HotelSeeks<'a>>>) -> Self {
+    pub fn seeks(mut self, value: impl Into<Option<HotelSeeks<S>>>) -> Self {
         self._fields.117 = value.into();
         self
     }
     /// Set the `seeks` field to an Option value (optional)
-    pub fn maybe_seeks(mut self, value: Option<HotelSeeks<'a>>) -> Self {
+    pub fn maybe_seeks(mut self, value: Option<HotelSeeks<S>>) -> Self {
         self._fields.117 = value;
         self
     }
@@ -7497,13 +8821,13 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `serviceArea` field (optional)
     pub fn service_area(
         mut self,
-        value: impl Into<Option<HotelServiceArea<'a>>>,
+        value: impl Into<Option<HotelServiceArea<S>>>,
     ) -> Self {
         self._fields.118 = value.into();
         self
     }
     /// Set the `serviceArea` field to an Option value (optional)
-    pub fn maybe_service_area(mut self, value: Option<HotelServiceArea<'a>>) -> Self {
+    pub fn maybe_service_area(mut self, value: Option<HotelServiceArea<S>>) -> Self {
         self._fields.118 = value;
         self
     }
@@ -7511,12 +8835,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `skills` field (optional)
-    pub fn skills(mut self, value: impl Into<Option<HotelSkills<'a>>>) -> Self {
+    pub fn skills(mut self, value: impl Into<Option<HotelSkills<S>>>) -> Self {
         self._fields.119 = value.into();
         self
     }
     /// Set the `skills` field to an Option value (optional)
-    pub fn maybe_skills(mut self, value: Option<HotelSkills<'a>>) -> Self {
+    pub fn maybe_skills(mut self, value: Option<HotelSkills<S>>) -> Self {
         self._fields.119 = value;
         self
     }
@@ -7524,12 +8848,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `slogan` field (optional)
-    pub fn slogan(mut self, value: impl Into<Option<HotelSlogan<'a>>>) -> Self {
+    pub fn slogan(mut self, value: impl Into<Option<HotelSlogan<S>>>) -> Self {
         self._fields.120 = value.into();
         self
     }
     /// Set the `slogan` field to an Option value (optional)
-    pub fn maybe_slogan(mut self, value: Option<HotelSlogan<'a>>) -> Self {
+    pub fn maybe_slogan(mut self, value: Option<HotelSlogan<S>>) -> Self {
         self._fields.120 = value;
         self
     }
@@ -7539,7 +8863,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `smokingAllowed` field (optional)
     pub fn smoking_allowed(
         mut self,
-        value: impl Into<Option<HotelSmokingAllowed<'a>>>,
+        value: impl Into<Option<HotelSmokingAllowed<S>>>,
     ) -> Self {
         self._fields.121 = value.into();
         self
@@ -7547,7 +8871,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `smokingAllowed` field to an Option value (optional)
     pub fn maybe_smoking_allowed(
         mut self,
-        value: Option<HotelSmokingAllowed<'a>>,
+        value: Option<HotelSmokingAllowed<S>>,
     ) -> Self {
         self._fields.121 = value;
         self
@@ -7558,7 +8882,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `specialOpeningHoursSpecification` field (optional)
     pub fn special_opening_hours_specification(
         mut self,
-        value: impl Into<Option<HotelSpecialOpeningHoursSpecification<'a>>>,
+        value: impl Into<Option<HotelSpecialOpeningHoursSpecification<S>>>,
     ) -> Self {
         self._fields.122 = value.into();
         self
@@ -7566,7 +8890,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `specialOpeningHoursSpecification` field to an Option value (optional)
     pub fn maybe_special_opening_hours_specification(
         mut self,
-        value: Option<HotelSpecialOpeningHoursSpecification<'a>>,
+        value: Option<HotelSpecialOpeningHoursSpecification<S>>,
     ) -> Self {
         self._fields.122 = value;
         self
@@ -7575,12 +8899,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
-    pub fn sponsor(mut self, value: impl Into<Option<HotelSponsor<'a>>>) -> Self {
+    pub fn sponsor(mut self, value: impl Into<Option<HotelSponsor<S>>>) -> Self {
         self._fields.123 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
-    pub fn maybe_sponsor(mut self, value: Option<HotelSponsor<'a>>) -> Self {
+    pub fn maybe_sponsor(mut self, value: Option<HotelSponsor<S>>) -> Self {
         self._fields.123 = value;
         self
     }
@@ -7588,12 +8912,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `starRating` field (optional)
-    pub fn star_rating(mut self, value: impl Into<Option<HotelStarRating<'a>>>) -> Self {
+    pub fn star_rating(mut self, value: impl Into<Option<HotelStarRating<S>>>) -> Self {
         self._fields.124 = value.into();
         self
     }
     /// Set the `starRating` field to an Option value (optional)
-    pub fn maybe_star_rating(mut self, value: Option<HotelStarRating<'a>>) -> Self {
+    pub fn maybe_star_rating(mut self, value: Option<HotelStarRating<S>>) -> Self {
         self._fields.124 = value;
         self
     }
@@ -7603,7 +8927,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `subOrganization` field (optional)
     pub fn sub_organization(
         mut self,
-        value: impl Into<Option<HotelSubOrganization<'a>>>,
+        value: impl Into<Option<HotelSubOrganization<S>>>,
     ) -> Self {
         self._fields.125 = value.into();
         self
@@ -7611,7 +8935,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `subOrganization` field to an Option value (optional)
     pub fn maybe_sub_organization(
         mut self,
-        value: Option<HotelSubOrganization<'a>>,
+        value: Option<HotelSubOrganization<S>>,
     ) -> Self {
         self._fields.125 = value;
         self
@@ -7620,12 +8944,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(mut self, value: impl Into<Option<HotelSubjectOf<'a>>>) -> Self {
+    pub fn subject_of(mut self, value: impl Into<Option<HotelSubjectOf<S>>>) -> Self {
         self._fields.126 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
-    pub fn maybe_subject_of(mut self, value: Option<HotelSubjectOf<'a>>) -> Self {
+    pub fn maybe_subject_of(mut self, value: Option<HotelSubjectOf<S>>) -> Self {
         self._fields.126 = value;
         self
     }
@@ -7633,12 +8957,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `taxID` field (optional)
-    pub fn tax_id(mut self, value: impl Into<Option<HotelTaxId<'a>>>) -> Self {
+    pub fn tax_id(mut self, value: impl Into<Option<HotelTaxId<S>>>) -> Self {
         self._fields.127 = value.into();
         self
     }
     /// Set the `taxID` field to an Option value (optional)
-    pub fn maybe_tax_id(mut self, value: Option<HotelTaxId<'a>>) -> Self {
+    pub fn maybe_tax_id(mut self, value: Option<HotelTaxId<S>>) -> Self {
         self._fields.127 = value;
         self
     }
@@ -7646,12 +8970,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `telephone` field (optional)
-    pub fn telephone(mut self, value: impl Into<Option<HotelTelephone<'a>>>) -> Self {
+    pub fn telephone(mut self, value: impl Into<Option<HotelTelephone<S>>>) -> Self {
         self._fields.128 = value.into();
         self
     }
     /// Set the `telephone` field to an Option value (optional)
-    pub fn maybe_telephone(mut self, value: Option<HotelTelephone<'a>>) -> Self {
+    pub fn maybe_telephone(mut self, value: Option<HotelTelephone<S>>) -> Self {
         self._fields.128 = value;
         self
     }
@@ -7661,7 +8985,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `tourBookingPage` field (optional)
     pub fn tour_booking_page(
         mut self,
-        value: impl Into<Option<HotelTourBookingPage<'a>>>,
+        value: impl Into<Option<HotelTourBookingPage<S>>>,
     ) -> Self {
         self._fields.129 = value.into();
         self
@@ -7669,7 +8993,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `tourBookingPage` field to an Option value (optional)
     pub fn maybe_tour_booking_page(
         mut self,
-        value: Option<HotelTourBookingPage<'a>>,
+        value: Option<HotelTourBookingPage<S>>,
     ) -> Self {
         self._fields.129 = value;
         self
@@ -7680,7 +9004,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `unnamedSourcesPolicy` field (optional)
     pub fn unnamed_sources_policy(
         mut self,
-        value: impl Into<Option<HotelUnnamedSourcesPolicy<'a>>>,
+        value: impl Into<Option<HotelUnnamedSourcesPolicy<S>>>,
     ) -> Self {
         self._fields.130 = value.into();
         self
@@ -7688,7 +9012,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `unnamedSourcesPolicy` field to an Option value (optional)
     pub fn maybe_unnamed_sources_policy(
         mut self,
-        value: Option<HotelUnnamedSourcesPolicy<'a>>,
+        value: Option<HotelUnnamedSourcesPolicy<S>>,
     ) -> Self {
         self._fields.130 = value;
         self
@@ -7697,12 +9021,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<HotelUrl<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<HotelUrl<S>>>) -> Self {
         self._fields.131 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<HotelUrl<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<HotelUrl<S>>) -> Self {
         self._fields.131 = value;
         self
     }
@@ -7710,12 +9034,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `vatID` field (optional)
-    pub fn vat_id(mut self, value: impl Into<Option<HotelVatId<'a>>>) -> Self {
+    pub fn vat_id(mut self, value: impl Into<Option<HotelVatId<S>>>) -> Self {
         self._fields.132 = value.into();
         self
     }
     /// Set the `vatID` field to an Option value (optional)
-    pub fn maybe_vat_id(mut self, value: Option<HotelVatId<'a>>) -> Self {
+    pub fn maybe_vat_id(mut self, value: Option<HotelVatId<S>>) -> Self {
         self._fields.132 = value;
         self
     }
@@ -7865,10 +9189,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Hotel<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Hotel<'a> {
         Hotel {
             accepted_payment_method: self._fields.0,
             actionable_feedback_policy: self._fields.1,

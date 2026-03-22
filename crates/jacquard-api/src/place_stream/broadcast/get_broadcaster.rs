@@ -10,29 +10,38 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBroadcaster;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetBroadcasterOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetBroadcasterOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of DIDs authorized as admins
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub admins: Option<Vec<Did<'a>>>,
+    pub admins: Option<Vec<Did<S>>>,
     ///DID of the Streamplace broadcaster to which this server belongs
-    #[serde(borrow)]
-    pub broadcaster: Did<'a>,
+    pub broadcaster: Did<S>,
     ///DID of this particular Streamplace server
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub server: Option<Did<'a>>,
+    pub server: Option<Did<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for place.stream.broadcast.getBroadcaster
@@ -40,8 +49,8 @@ pub struct GetBroadcasterResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBroadcasterResponse {
     const NSID: &'static str = "place.stream.broadcast.getBroadcaster";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetBroadcasterOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetBroadcasterOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetBroadcaster {
@@ -55,6 +64,6 @@ pub struct GetBroadcasterRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBroadcasterRequest {
     const PATH: &'static str = "/xrpc/place.stream.broadcast.getBroadcaster";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBroadcaster;
+    type Request<S: Bos<str> + AsRef<str>> = GetBroadcaster;
     type Response = GetBroadcasterResponse;
 }

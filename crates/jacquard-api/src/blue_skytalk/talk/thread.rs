@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,47 +30,53 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A thread in a channel
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blue.skytalk.talk.thread", tag = "$type")]
-pub struct Thread<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "blue.skytalk.talk.thread",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Thread<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional attached media (image or audio)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub blobs: Option<Vec<BlobRef<'a>>>,
+    pub blobs: Option<Vec<BlobRef<S>>>,
     ///The channel this thread belongs to
-    #[serde(borrow)]
-    pub channel_id: CowStr<'a>,
+    pub channel_id: S,
     ///Timestamp of thread creation
     pub created_at: Datetime,
     ///The text content of the thread
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<CowStr<'a>>,
+    pub text: Option<S>,
     ///The title of the thread
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ThreadGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Thread<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Thread<S>,
 }
 
-impl<'a> Thread<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ThreadRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Thread<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ThreadRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -79,18 +87,17 @@ pub struct ThreadRecord;
 impl XrpcResp for ThreadRecord {
     const NSID: &'static str = "blue.skytalk.talk.thread";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ThreadGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ThreadGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ThreadGetRecordOutput<'_>> for Thread<'_> {
-    fn from(output: ThreadGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ThreadGetRecordOutput<S>> for Thread<S> {
+    fn from(output: ThreadGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Thread<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Thread<S> {
     const NSID: &'static str = "blue.skytalk.talk.thread";
     type Record = ThreadRecord;
 }
@@ -100,7 +107,7 @@ impl Collection for ThreadRecord {
     type Record = ThreadRecord;
 }
 
-impl<'a> LexiconSchema for Thread<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Thread<S> {
     fn nsid() -> &'static str {
         "blue.skytalk.talk.thread"
     }
@@ -181,51 +188,51 @@ pub mod thread_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type ChannelId;
         type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type ChannelId = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type ChannelId = S::ChannelId;
-        type Title = S::Title;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `channel_id` field to Set
     pub struct SetChannelId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChannelId<S> {}
     impl<S: State> State for SetChannelId<S> {
-        type CreatedAt = S::CreatedAt;
         type ChannelId = Set<members::channel_id>;
         type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
         type ChannelId = S::ChannelId;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ChannelId = S::ChannelId;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `channel_id` field
         pub struct channel_id(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -233,11 +240,11 @@ pub mod thread_state {
 pub struct ThreadBuilder<'a, S: thread_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<BlobRef<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<BlobRef<S>>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -262,12 +269,12 @@ impl<'a> ThreadBuilder<'a, thread_state::Empty> {
 
 impl<'a, S: thread_state::State> ThreadBuilder<'a, S> {
     /// Set the `blobs` field (optional)
-    pub fn blobs(mut self, value: impl Into<Option<Vec<BlobRef<'a>>>>) -> Self {
+    pub fn blobs(mut self, value: impl Into<Option<Vec<BlobRef<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `blobs` field to an Option value (optional)
-    pub fn maybe_blobs(mut self, value: Option<Vec<BlobRef<'a>>>) -> Self {
+    pub fn maybe_blobs(mut self, value: Option<Vec<BlobRef<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -281,7 +288,7 @@ where
     /// Set the `channelId` field (required)
     pub fn channel_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ThreadBuilder<'a, thread_state::SetChannelId<S>> {
         self._fields.1 = Option::Some(value.into());
         ThreadBuilder {
@@ -313,12 +320,12 @@ where
 
 impl<'a, S: thread_state::State> ThreadBuilder<'a, S> {
     /// Set the `text` field (optional)
-    pub fn text(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn text(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
-    pub fn maybe_text(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_text(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -332,7 +339,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ThreadBuilder<'a, thread_state::SetTitle<S>> {
         self._fields.4 = Option::Some(value.into());
         ThreadBuilder {
@@ -346,9 +353,9 @@ where
 impl<'a, S> ThreadBuilder<'a, S>
 where
     S: thread_state::State,
-    S::CreatedAt: thread_state::IsSet,
     S::ChannelId: thread_state::IsSet,
     S::Title: thread_state::IsSet,
+    S::CreatedAt: thread_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Thread<'a> {
@@ -362,13 +369,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Thread<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Thread<'a> {
         Thread {
             blobs: self._fields.0,
             channel_id: self._fields.1.unwrap(),

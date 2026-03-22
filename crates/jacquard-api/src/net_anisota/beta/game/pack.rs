@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,10 +30,17 @@ use serde::{Serialize, Deserialize};
 use crate::net_anisota::beta::game::pack;
 /// Beta version: Record tracking daily pack openings and streak information
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "net.anisota.beta.game.pack", tag = "$type")]
-pub struct Pack<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "net.anisota.beta.game.pack",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Pack<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When the record was created
     pub created_at: Datetime,
     ///When the record was last modified
@@ -44,70 +53,83 @@ pub struct Pack<'a> {
     pub longest_streak: Option<i64>,
     ///History of the last few pack openings
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pack_history: Option<Vec<pack::PackHistoryEntry<'a>>>,
+    pub pack_history: Option<Vec<pack::PackHistoryEntry<S>>>,
     ///Current daily pack opening streak count
     pub streak: i64,
     ///Total number of times daily packs have been opened
     pub total_opens: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PackGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PackGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Pack<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Pack<S>,
 }
 
 /// A single pack opening entry in the history
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct PackHistoryEntry<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PackHistoryEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Items received from this pack
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub items_received: Option<Vec<pack::ReceivedItem<'a>>>,
+    pub items_received: Option<Vec<pack::ReceivedItem<S>>>,
     ///When this pack was opened
     #[serde(skip_serializing_if = "Option::is_none")]
     pub open_time: Option<Datetime>,
     ///Streak count at time of opening
     #[serde(skip_serializing_if = "Option::is_none")]
     pub streak_count: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// An item received from a pack opening
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ReceivedItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReceivedItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///ID of the item received
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub item_id: Option<CowStr<'a>>,
+    pub item_id: Option<S>,
     ///Quantity received
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quantity: Option<i64>,
     ///Rarity of the item
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rarity: Option<CowStr<'a>>,
+    pub rarity: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Pack<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PackRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Pack<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PackRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -118,18 +140,17 @@ pub struct PackRecord;
 impl XrpcResp for PackRecord {
     const NSID: &'static str = "net.anisota.beta.game.pack";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PackGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PackGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PackGetRecordOutput<'_>> for Pack<'_> {
-    fn from(output: PackGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PackGetRecordOutput<S>> for Pack<S> {
+    fn from(output: PackGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Pack<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Pack<S> {
     const NSID: &'static str = "net.anisota.beta.game.pack";
     type Record = PackRecord;
 }
@@ -139,7 +160,7 @@ impl Collection for PackRecord {
     type Record = PackRecord;
 }
 
-impl<'a> LexiconSchema for Pack<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Pack<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.pack"
     }
@@ -193,7 +214,7 @@ impl<'a> LexiconSchema for Pack<'a> {
     }
 }
 
-impl<'a> LexiconSchema for PackHistoryEntry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PackHistoryEntry<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.pack"
     }
@@ -208,7 +229,7 @@ impl<'a> LexiconSchema for PackHistoryEntry<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ReceivedItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReceivedItem<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.pack"
     }
@@ -233,8 +254,8 @@ pub mod pack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streak;
         type TotalOpens;
+        type Streak;
         type CreatedAt;
         type LastOpenTime;
     }
@@ -242,26 +263,26 @@ pub mod pack_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streak = Unset;
         type TotalOpens = Unset;
+        type Streak = Unset;
         type CreatedAt = Unset;
         type LastOpenTime = Unset;
-    }
-    ///State transition - sets the `streak` field to Set
-    pub struct SetStreak<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreak<S> {}
-    impl<S: State> State for SetStreak<S> {
-        type Streak = Set<members::streak>;
-        type TotalOpens = S::TotalOpens;
-        type CreatedAt = S::CreatedAt;
-        type LastOpenTime = S::LastOpenTime;
     }
     ///State transition - sets the `total_opens` field to Set
     pub struct SetTotalOpens<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalOpens<S> {}
     impl<S: State> State for SetTotalOpens<S> {
-        type Streak = S::Streak;
         type TotalOpens = Set<members::total_opens>;
+        type Streak = S::Streak;
+        type CreatedAt = S::CreatedAt;
+        type LastOpenTime = S::LastOpenTime;
+    }
+    ///State transition - sets the `streak` field to Set
+    pub struct SetStreak<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreak<S> {}
+    impl<S: State> State for SetStreak<S> {
+        type TotalOpens = S::TotalOpens;
+        type Streak = Set<members::streak>;
         type CreatedAt = S::CreatedAt;
         type LastOpenTime = S::LastOpenTime;
     }
@@ -269,8 +290,8 @@ pub mod pack_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Streak = S::Streak;
         type TotalOpens = S::TotalOpens;
+        type Streak = S::Streak;
         type CreatedAt = Set<members::created_at>;
         type LastOpenTime = S::LastOpenTime;
     }
@@ -278,18 +299,18 @@ pub mod pack_state {
     pub struct SetLastOpenTime<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLastOpenTime<S> {}
     impl<S: State> State for SetLastOpenTime<S> {
-        type Streak = S::Streak;
         type TotalOpens = S::TotalOpens;
+        type Streak = S::Streak;
         type CreatedAt = S::CreatedAt;
         type LastOpenTime = Set<members::last_open_time>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streak` field
-        pub struct streak(());
         ///Marker type for the `total_opens` field
         pub struct total_opens(());
+        ///Marker type for the `streak` field
+        pub struct streak(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `last_open_time` field
@@ -305,7 +326,7 @@ pub struct PackBuilder<'a, S: pack_state::State> {
         Option<Datetime>,
         Option<Datetime>,
         Option<i64>,
-        Option<Vec<pack::PackHistoryEntry<'a>>>,
+        Option<Vec<pack::PackHistoryEntry<S>>>,
         Option<i64>,
         Option<i64>,
     ),
@@ -398,7 +419,7 @@ impl<'a, S: pack_state::State> PackBuilder<'a, S> {
     /// Set the `packHistory` field (optional)
     pub fn pack_history(
         mut self,
-        value: impl Into<Option<Vec<pack::PackHistoryEntry<'a>>>>,
+        value: impl Into<Option<Vec<pack::PackHistoryEntry<S>>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
@@ -406,7 +427,7 @@ impl<'a, S: pack_state::State> PackBuilder<'a, S> {
     /// Set the `packHistory` field to an Option value (optional)
     pub fn maybe_pack_history(
         mut self,
-        value: Option<Vec<pack::PackHistoryEntry<'a>>>,
+        value: Option<Vec<pack::PackHistoryEntry<S>>>,
     ) -> Self {
         self._fields.4 = value;
         self
@@ -454,8 +475,8 @@ where
 impl<'a, S> PackBuilder<'a, S>
 where
     S: pack_state::State,
-    S::Streak: pack_state::IsSet,
     S::TotalOpens: pack_state::IsSet,
+    S::Streak: pack_state::IsSet,
     S::CreatedAt: pack_state::IsSet,
     S::LastOpenTime: pack_state::IsSet,
 {
@@ -473,13 +494,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Pack<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Pack<'a> {
         Pack {
             created_at: self._fields.0.unwrap(),
             last_modified: self._fields.1,

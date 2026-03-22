@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,10 +29,17 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A player's score record stored in their own PDS for personal backup
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.mathr.score", tag = "$type")]
-pub struct Score<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.mathr.score",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Score<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when the score was recorded
     pub created_at: Datetime,
     ///The highest level reached by the player
@@ -42,27 +51,30 @@ pub struct Score<'a> {
     pub total_challenges: i64,
     ///Total number of correct answers
     pub total_successes: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ScoreGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ScoreGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Score<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Score<S>,
 }
 
-impl<'a> Score<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ScoreRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Score<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ScoreRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -73,18 +85,17 @@ pub struct ScoreRecord;
 impl XrpcResp for ScoreRecord {
     const NSID: &'static str = "app.mathr.score";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ScoreGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ScoreGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ScoreGetRecordOutput<'_>> for Score<'_> {
-    fn from(output: ScoreGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ScoreGetRecordOutput<S>> for Score<S> {
+    fn from(output: ScoreGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Score<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Score<S> {
     const NSID: &'static str = "app.mathr.score";
     type Record = ScoreRecord;
 }
@@ -94,7 +105,7 @@ impl Collection for ScoreRecord {
     type Record = ScoreRecord;
 }
 
-impl<'a> LexiconSchema for Score<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Score<S> {
     fn nsid() -> &'static str {
         "app.mathr.score"
     }
@@ -167,67 +178,67 @@ pub mod score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
+        type TotalChallenges;
         type TotalSuccesses;
         type Level;
-        type TotalChallenges;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
+        type TotalChallenges = Unset;
         type TotalSuccesses = Unset;
         type Level = Unset;
-        type TotalChallenges = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type TotalSuccesses = S::TotalSuccesses;
-        type Level = S::Level;
-        type TotalChallenges = S::TotalChallenges;
-    }
-    ///State transition - sets the `total_successes` field to Set
-    pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
-    impl<S: State> State for SetTotalSuccesses<S> {
-        type CreatedAt = S::CreatedAt;
-        type TotalSuccesses = Set<members::total_successes>;
-        type Level = S::Level;
-        type TotalChallenges = S::TotalChallenges;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type CreatedAt = S::CreatedAt;
-        type TotalSuccesses = S::TotalSuccesses;
-        type Level = Set<members::level>;
-        type TotalChallenges = S::TotalChallenges;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `total_challenges` field to Set
     pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
     impl<S: State> State for SetTotalChallenges<S> {
-        type CreatedAt = S::CreatedAt;
+        type TotalChallenges = Set<members::total_challenges>;
         type TotalSuccesses = S::TotalSuccesses;
         type Level = S::Level;
-        type TotalChallenges = Set<members::total_challenges>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `total_successes` field to Set
+    pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
+    impl<S: State> State for SetTotalSuccesses<S> {
+        type TotalChallenges = S::TotalChallenges;
+        type TotalSuccesses = Set<members::total_successes>;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type TotalChallenges = S::TotalChallenges;
+        type TotalSuccesses = S::TotalSuccesses;
+        type Level = Set<members::level>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type TotalChallenges = S::TotalChallenges;
+        type TotalSuccesses = S::TotalSuccesses;
+        type Level = S::Level;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `total_challenges` field
+        pub struct total_challenges(());
         ///Marker type for the `total_successes` field
         pub struct total_successes(());
         ///Marker type for the `level` field
         pub struct level(());
-        ///Marker type for the `total_challenges` field
-        pub struct total_challenges(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -348,10 +359,10 @@ where
 impl<'a, S> ScoreBuilder<'a, S>
 where
     S: score_state::State,
-    S::CreatedAt: score_state::IsSet,
+    S::TotalChallenges: score_state::IsSet,
     S::TotalSuccesses: score_state::IsSet,
     S::Level: score_state::IsSet,
-    S::TotalChallenges: score_state::IsSet,
+    S::CreatedAt: score_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Score<'a> {
@@ -365,13 +376,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Score<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Score<'a> {
         Score {
             created_at: self._fields.0.unwrap(),
             level: self._fields.1.unwrap(),

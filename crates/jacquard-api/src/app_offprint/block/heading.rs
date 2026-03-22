@@ -10,12 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,26 +24,30 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Heading<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Heading<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Facets for text formatting
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Data<'a>>>,
+    pub facets: Option<Vec<Data<S>>>,
     ///Heading level (1-3)
     pub level: i64,
     ///The heading text content
-    #[serde(borrow)]
-    pub plaintext: CowStr<'a>,
+    pub plaintext: S,
     ///Text alignment
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text_align: Option<CowStr<'a>>,
+    pub text_align: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Heading<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Heading<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.heading"
     }
@@ -87,49 +92,44 @@ pub mod heading_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Plaintext;
         type Level;
+        type Plaintext;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Plaintext = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `plaintext` field to Set
-    pub struct SetPlaintext<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlaintext<S> {}
-    impl<S: State> State for SetPlaintext<S> {
-        type Plaintext = Set<members::plaintext>;
-        type Level = S::Level;
+        type Plaintext = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type Plaintext = S::Plaintext;
         type Level = Set<members::level>;
+        type Plaintext = S::Plaintext;
+    }
+    ///State transition - sets the `plaintext` field to Set
+    pub struct SetPlaintext<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlaintext<S> {}
+    impl<S: State> State for SetPlaintext<S> {
+        type Level = S::Level;
+        type Plaintext = Set<members::plaintext>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `plaintext` field
-        pub struct plaintext(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `plaintext` field
+        pub struct plaintext(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct HeadingBuilder<'a, S: heading_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Vec<Data<'a>>>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<Vec<Data<S>>>, Option<i64>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -153,12 +153,12 @@ impl<'a> HeadingBuilder<'a, heading_state::Empty> {
 
 impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
     /// Set the `facets` field (optional)
-    pub fn facets(mut self, value: impl Into<Option<Vec<Data<'a>>>>) -> Self {
+    pub fn facets(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
-    pub fn maybe_facets(mut self, value: Option<Vec<Data<'a>>>) -> Self {
+    pub fn maybe_facets(mut self, value: Option<Vec<Data<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -191,7 +191,7 @@ where
     /// Set the `plaintext` field (required)
     pub fn plaintext(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> HeadingBuilder<'a, heading_state::SetPlaintext<S>> {
         self._fields.2 = Option::Some(value.into());
         HeadingBuilder {
@@ -204,12 +204,12 @@ where
 
 impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
     /// Set the `textAlign` field (optional)
-    pub fn text_align(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn text_align(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `textAlign` field to an Option value (optional)
-    pub fn maybe_text_align(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_text_align(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -218,8 +218,8 @@ impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
 impl<'a, S> HeadingBuilder<'a, S>
 where
     S: heading_state::State,
-    S::Plaintext: heading_state::IsSet,
     S::Level: heading_state::IsSet,
+    S::Plaintext: heading_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Heading<'a> {
@@ -234,7 +234,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Heading<'a> {
         Heading {
             facets: self._fields.0,

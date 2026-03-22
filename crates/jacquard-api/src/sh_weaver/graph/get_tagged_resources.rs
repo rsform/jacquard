@@ -10,8 +10,10 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::graph::TagView;
 use crate::sh_weaver::notebook::EntryView;
@@ -19,10 +21,16 @@ use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTaggedResources<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTaggedResources<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     /// Defaults to `true`.
     #[serde(default = "_default_include_author_tags")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,40 +47,52 @@ pub struct GetTaggedResources<'a> {
     #[serde(default = "_default_resource_type")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub resource_type: Option<CowStr<'a>>,
+    pub resource_type: Option<S>,
     ///Defaults to `"recent"`.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort: Option<CowStr<'a>>,
+    pub sort: Option<S>,
     #[serde(borrow)]
-    pub tag: CowStr<'a>,
+    pub tag: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTaggedResourcesOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTaggedResourcesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub resources: Vec<GetTaggedResourcesOutputResourcesItem<'a>>,
+    pub cursor: Option<S>,
+    pub resources: Vec<GetTaggedResourcesOutputResourcesItem<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tag: Option<TagView<'a>>,
+    pub tag: Option<TagView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum GetTaggedResourcesOutputResourcesItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum GetTaggedResourcesOutputResourcesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "sh.weaver.notebook.defs#notebookView")]
-    NotebookView(Box<NotebookView<'a>>),
+    NotebookView(Box<NotebookView<S>>),
     #[serde(rename = "sh.weaver.notebook.defs#entryView")]
-    EntryView(Box<EntryView<'a>>),
+    EntryView(Box<EntryView<S>>),
 }
 
 /// Response type for sh.weaver.graph.getTaggedResources
@@ -80,11 +100,12 @@ pub struct GetTaggedResourcesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTaggedResourcesResponse {
     const NSID: &'static str = "sh.weaver.graph.getTaggedResources";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTaggedResourcesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetTaggedResourcesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTaggedResources<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetTaggedResources<S> {
     const NSID: &'static str = "sh.weaver.graph.getTaggedResources";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTaggedResourcesResponse;
@@ -95,7 +116,7 @@ pub struct GetTaggedResourcesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedResourcesRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getTaggedResources";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTaggedResources<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetTaggedResources<S>;
     type Response = GetTaggedResourcesResponse;
 }
 
@@ -155,13 +176,13 @@ pub mod get_tagged_resources_state {
 pub struct GetTaggedResourcesBuilder<'a, S: get_tagged_resources_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<bool>,
         Option<bool>,
         Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -186,12 +207,12 @@ impl<'a> GetTaggedResourcesBuilder<'a, get_tagged_resources_state::Empty> {
 
 impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -238,12 +259,12 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
 
 impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
     /// Set the `resourceType` field (optional)
-    pub fn resource_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn resource_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `resourceType` field to an Option value (optional)
-    pub fn maybe_resource_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_resource_type(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -251,12 +272,12 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
 
 impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -270,7 +291,7 @@ where
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetTaggedResourcesBuilder<'a, get_tagged_resources_state::SetTag<S>> {
         self._fields.6 = Option::Some(value.into());
         GetTaggedResourcesBuilder {

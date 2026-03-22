@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -28,10 +30,16 @@ use crate::sh_weaver::notebook::get_reading_history;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetReadingHistory<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetReadingHistory<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -40,34 +48,45 @@ pub struct GetReadingHistory<'a> {
     #[serde(default = "_default_status")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: Option<CowStr<'a>>,
+    pub status: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetReadingHistoryOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetReadingHistoryOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub history: Vec<get_reading_history::ReadingHistoryItem<'a>>,
+    pub cursor: Option<S>,
+    pub history: Vec<get_reading_history::ReadingHistoryItem<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReadingHistoryItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReadingHistoryItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The entry the user was last reading.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub current_entry: Option<EntryView<'a>>,
-    #[serde(borrow)]
-    pub notebook: NotebookView<'a>,
-    #[serde(borrow)]
-    pub progress: ReadingProgress<'a>,
+    pub current_entry: Option<EntryView<S>>,
+    pub notebook: NotebookView<S>,
+    pub progress: ReadingProgress<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.notebook.getReadingHistory
@@ -75,11 +94,12 @@ pub struct GetReadingHistoryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetReadingHistoryResponse {
     const NSID: &'static str = "sh.weaver.notebook.getReadingHistory";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetReadingHistoryOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetReadingHistoryOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetReadingHistory<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetReadingHistory<S> {
     const NSID: &'static str = "sh.weaver.notebook.getReadingHistory";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetReadingHistoryResponse;
@@ -90,11 +110,11 @@ pub struct GetReadingHistoryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetReadingHistoryRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getReadingHistory";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetReadingHistory<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetReadingHistory<S>;
     type Response = GetReadingHistoryResponse;
 }
 
-impl<'a> LexiconSchema for ReadingHistoryItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReadingHistoryItem<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getReadingHistory"
     }
@@ -139,7 +159,7 @@ pub mod get_reading_history_state {
 /// Builder for constructing an instance of this type
 pub struct GetReadingHistoryBuilder<'a, S: get_reading_history_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -163,12 +183,12 @@ impl<'a> GetReadingHistoryBuilder<'a, get_reading_history_state::Empty> {
 
 impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -189,12 +209,12 @@ impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
 
 impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -261,11 +281,7 @@ pub mod reading_history_item_state {
 /// Builder for constructing an instance of this type
 pub struct ReadingHistoryItemBuilder<'a, S: reading_history_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<EntryView<'a>>,
-        Option<NotebookView<'a>>,
-        Option<ReadingProgress<'a>>,
-    ),
+    _fields: (Option<EntryView<S>>, Option<NotebookView<S>>, Option<ReadingProgress<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -289,12 +305,12 @@ impl<'a> ReadingHistoryItemBuilder<'a, reading_history_item_state::Empty> {
 
 impl<'a, S: reading_history_item_state::State> ReadingHistoryItemBuilder<'a, S> {
     /// Set the `currentEntry` field (optional)
-    pub fn current_entry(mut self, value: impl Into<Option<EntryView<'a>>>) -> Self {
+    pub fn current_entry(mut self, value: impl Into<Option<EntryView<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `currentEntry` field to an Option value (optional)
-    pub fn maybe_current_entry(mut self, value: Option<EntryView<'a>>) -> Self {
+    pub fn maybe_current_entry(mut self, value: Option<EntryView<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -308,7 +324,7 @@ where
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
-        value: impl Into<NotebookView<'a>>,
+        value: impl Into<NotebookView<S>>,
     ) -> ReadingHistoryItemBuilder<'a, reading_history_item_state::SetNotebook<S>> {
         self._fields.1 = Option::Some(value.into());
         ReadingHistoryItemBuilder {
@@ -327,7 +343,7 @@ where
     /// Set the `progress` field (required)
     pub fn progress(
         mut self,
-        value: impl Into<ReadingProgress<'a>>,
+        value: impl Into<ReadingProgress<S>>,
     ) -> ReadingHistoryItemBuilder<'a, reading_history_item_state::SetProgress<S>> {
         self._fields.2 = Option::Some(value.into());
         ReadingHistoryItemBuilder {
@@ -356,10 +372,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ReadingHistoryItem<'a> {
         ReadingHistoryItem {
             current_entry: self._fields.0,

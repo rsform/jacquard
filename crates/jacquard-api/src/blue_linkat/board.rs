@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,58 +29,71 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::blue_linkat::board;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Card<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Card<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Emoji of the card
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub emoji: Option<CowStr<'a>>,
+    pub emoji: Option<S>,
     ///Text of the card
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<CowStr<'a>>,
+    pub text: Option<S>,
     ///URL of the card
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<CowStr<'a>>,
+    pub url: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Record containing a cards of your profile.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blue.linkat.board", tag = "$type")]
-pub struct Board<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "blue.linkat.board",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Board<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of cards in the board.
-    #[serde(borrow)]
-    pub cards: Vec<board::Card<'a>>,
+    pub cards: Vec<board::Card<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BoardGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BoardGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Board<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Board<S>,
 }
 
-impl<'a> Board<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, BoardRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Board<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, BoardRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Card<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Card<S> {
     fn nsid() -> &'static str {
         "blue.linkat.board"
     }
@@ -100,18 +115,17 @@ pub struct BoardRecord;
 impl XrpcResp for BoardRecord {
     const NSID: &'static str = "blue.linkat.board";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BoardGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BoardGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<BoardGetRecordOutput<'_>> for Board<'_> {
-    fn from(output: BoardGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<BoardGetRecordOutput<S>> for Board<S> {
+    fn from(output: BoardGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Board<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Board<S> {
     const NSID: &'static str = "blue.linkat.board";
     type Record = BoardRecord;
 }
@@ -121,7 +135,7 @@ impl Collection for BoardRecord {
     type Record = BoardRecord;
 }
 
-impl<'a> LexiconSchema for Board<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Board<S> {
     fn nsid() -> &'static str {
         "blue.linkat.board"
     }
@@ -251,7 +265,7 @@ pub mod board_state {
 /// Builder for constructing an instance of this type
 pub struct BoardBuilder<'a, S: board_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<board::Card<'a>>>,),
+    _fields: (Option<Vec<board::Card<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -281,7 +295,7 @@ where
     /// Set the `cards` field (required)
     pub fn cards(
         mut self,
-        value: impl Into<Vec<board::Card<'a>>>,
+        value: impl Into<Vec<board::Card<S>>>,
     ) -> BoardBuilder<'a, board_state::SetCards<S>> {
         self._fields.0 = Option::Some(value.into());
         BoardBuilder {
@@ -305,13 +319,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Board<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Board<'a> {
         Board {
             cards: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

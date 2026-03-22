@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,29 +29,34 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::ai_syui::at::link;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct LinkItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LinkItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Service identifier.
-    #[serde(borrow)]
-    pub service: LinkItemService<'a>,
+    pub service: LinkItemService<S>,
     ///Username or ID on the service.
-    #[serde(borrow)]
-    pub username: CowStr<'a>,
+    pub username: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Service identifier.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LinkItemService<'a> {
+pub enum LinkItemService<S: Bos<str> + AsRef<str> = DefaultStr> {
     Github,
     Youtube,
     X,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> LinkItemService<'a> {
+impl<S: Bos<str> + AsRef<str>> LinkItemService<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Github => "github",
@@ -58,72 +65,57 @@ impl<'a> LinkItemService<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for LinkItemService<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "github" => Self::Github,
             "youtube" => Self::Youtube,
             "x" => Self::X,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for LinkItemService<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "github" => Self::Github,
-            "youtube" => Self::Youtube,
-            "x" => Self::X,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for LinkItemService<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for LinkItemService<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for LinkItemService<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for LinkItemService<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for LinkItemService<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for LinkItemService<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for LinkItemService<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for LinkItemService<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for LinkItemService<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for LinkItemService<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for LinkItemService<'_> {
-    type Output = LinkItemService<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for LinkItemService<S> {
+    type Output = LinkItemService<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             LinkItemService::Github => LinkItemService::Github,
@@ -136,43 +128,52 @@ impl jacquard_common::IntoStatic for LinkItemService<'_> {
 
 /// Record containing links to external service profiles.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "ai.syui.at.link", tag = "$type")]
-pub struct Link<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "ai.syui.at.link",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Link<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Client-declared timestamp when this record was created.
     pub created_at: Datetime,
     ///Array of external service links.
-    #[serde(borrow)]
-    pub links: Vec<link::LinkItem<'a>>,
+    pub links: Vec<link::LinkItem<S>>,
     ///Client-declared timestamp when this record was last updated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LinkGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LinkGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Link<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Link<S>,
 }
 
-impl<'a> Link<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LinkRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Link<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LinkRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for LinkItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LinkItem<S> {
     fn nsid() -> &'static str {
         "ai.syui.at.link"
     }
@@ -205,18 +206,17 @@ pub struct LinkRecord;
 impl XrpcResp for LinkRecord {
     const NSID: &'static str = "ai.syui.at.link";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LinkGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LinkGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LinkGetRecordOutput<'_>> for Link<'_> {
-    fn from(output: LinkGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LinkGetRecordOutput<S>> for Link<S> {
+    fn from(output: LinkGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Link<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Link<S> {
     const NSID: &'static str = "ai.syui.at.link";
     type Record = LinkRecord;
 }
@@ -226,7 +226,7 @@ impl Collection for LinkRecord {
     type Record = LinkRecord;
 }
 
-impl<'a> LexiconSchema for Link<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Link<S> {
     fn nsid() -> &'static str {
         "ai.syui.at.link"
     }
@@ -366,44 +366,44 @@ pub mod link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Links;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Links = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Links = S::Links;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `links` field to Set
     pub struct SetLinks<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLinks<S> {}
     impl<S: State> State for SetLinks<S> {
-        type CreatedAt = S::CreatedAt;
         type Links = Set<members::links>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Links = S::Links;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `links` field
         pub struct links(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LinkBuilder<'a, S: link_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Vec<link::LinkItem<'a>>>, Option<Datetime>),
+    _fields: (Option<Datetime>, Option<Vec<link::LinkItem<S>>>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -452,7 +452,7 @@ where
     /// Set the `links` field (required)
     pub fn links(
         mut self,
-        value: impl Into<Vec<link::LinkItem<'a>>>,
+        value: impl Into<Vec<link::LinkItem<S>>>,
     ) -> LinkBuilder<'a, link_state::SetLinks<S>> {
         self._fields.1 = Option::Some(value.into());
         LinkBuilder {
@@ -479,8 +479,8 @@ impl<'a, S: link_state::State> LinkBuilder<'a, S> {
 impl<'a, S> LinkBuilder<'a, S>
 where
     S: link_state::State,
-    S::CreatedAt: link_state::IsSet,
     S::Links: link_state::IsSet,
+    S::CreatedAt: link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Link<'a> {
@@ -492,13 +492,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Link<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Link<'a> {
         Link {
             created_at: self._fields.0.unwrap(),
             links: self._fields.1.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,36 +30,45 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Record declaring a 'explode' of a piece of subject content.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "net.wafrn.feed.explode", tag = "$type")]
-pub struct Explode<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "net.wafrn.feed.explode",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Explode<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject: Option<StrongRef<'a>>,
+    pub subject: Option<StrongRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ExplodeGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExplodeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Explode<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Explode<S>,
 }
 
-impl<'a> Explode<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ExplodeRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Explode<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ExplodeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -68,18 +79,17 @@ pub struct ExplodeRecord;
 impl XrpcResp for ExplodeRecord {
     const NSID: &'static str = "net.wafrn.feed.explode";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ExplodeGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ExplodeGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ExplodeGetRecordOutput<'_>> for Explode<'_> {
-    fn from(output: ExplodeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ExplodeGetRecordOutput<S>> for Explode<S> {
+    fn from(output: ExplodeGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Explode<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Explode<S> {
     const NSID: &'static str = "net.wafrn.feed.explode";
     type Record = ExplodeRecord;
 }
@@ -89,7 +99,7 @@ impl Collection for ExplodeRecord {
     type Record = ExplodeRecord;
 }
 
-impl<'a> LexiconSchema for Explode<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Explode<S> {
     fn nsid() -> &'static str {
         "net.wafrn.feed.explode"
     }
@@ -126,7 +136,7 @@ pub mod explode_state {
 /// Builder for constructing an instance of this type
 pub struct ExplodeBuilder<'a, S: explode_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<StrongRef<'a>>),
+    _fields: (Option<Datetime>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -163,12 +173,12 @@ impl<'a, S: explode_state::State> ExplodeBuilder<'a, S> {
 
 impl<'a, S: explode_state::State> ExplodeBuilder<'a, S> {
     /// Set the `subject` field (optional)
-    pub fn subject(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn subject(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
-    pub fn maybe_subject(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_subject(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -189,10 +199,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Explode<'a> {
         Explode {
             created_at: self._fields.0,

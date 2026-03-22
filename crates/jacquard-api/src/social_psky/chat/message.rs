@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,43 +31,49 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::social_psky::richtext::facet::Facet;
 /// A Picosky message containing at most 2048 graphemes.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.psky.chat.message", tag = "$type")]
-pub struct Message<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.psky.chat.message",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Message<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Text content.
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
+    pub content: S,
     ///Annotations of text (mentions, URLs, hashtags, etc)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Facet<'a>>>,
+    pub facets: Option<Vec<Facet<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reply: Option<StrongRef<'a>>,
-    #[serde(borrow)]
-    pub room: AtUri<'a>,
+    pub reply: Option<StrongRef<S>>,
+    pub room: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MessageGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MessageGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Message<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Message<S>,
 }
 
-impl<'a> Message<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, MessageRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Message<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, MessageRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -76,18 +84,17 @@ pub struct MessageRecord;
 impl XrpcResp for MessageRecord {
     const NSID: &'static str = "social.psky.chat.message";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MessageGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MessageGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<MessageGetRecordOutput<'_>> for Message<'_> {
-    fn from(output: MessageGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<MessageGetRecordOutput<S>> for Message<S> {
+    fn from(output: MessageGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Message<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Message<S> {
     const NSID: &'static str = "social.psky.chat.message";
     type Record = MessageRecord;
 }
@@ -97,7 +104,7 @@ impl Collection for MessageRecord {
     type Record = MessageRecord;
 }
 
-impl<'a> LexiconSchema for Message<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Message<S> {
     fn nsid() -> &'static str {
         "social.psky.chat.message"
     }
@@ -183,12 +190,7 @@ pub mod message_state {
 /// Builder for constructing an instance of this type
 pub struct MessageBuilder<'a, S: message_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<StrongRef<'a>>,
-        Option<AtUri<'a>>,
-    ),
+    _fields: (Option<S>, Option<Vec<Facet<S>>>, Option<StrongRef<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -218,7 +220,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MessageBuilder<'a, message_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         MessageBuilder {
@@ -231,12 +233,12 @@ where
 
 impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     /// Set the `facets` field (optional)
-    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
+    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
-    pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -244,12 +246,12 @@ impl<'a, S: message_state::State> MessageBuilder<'a, S> {
 
 impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     /// Set the `reply` field (optional)
-    pub fn reply(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn reply(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `reply` field to an Option value (optional)
-    pub fn maybe_reply(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_reply(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -263,7 +265,7 @@ where
     /// Set the `room` field (required)
     pub fn room(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> MessageBuilder<'a, message_state::SetRoom<S>> {
         self._fields.3 = Option::Some(value.into());
         MessageBuilder {
@@ -293,10 +295,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Message<'a> {
         Message {
             content: self._fields.0.unwrap(),

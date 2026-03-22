@@ -10,39 +10,54 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::chat_bsky::convo::ConvoView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListConvos<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListConvos<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub read_state: Option<CowStr<'a>>,
+    pub read_state: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub status: Option<CowStr<'a>>,
+    pub status: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListConvosOutput<'a> {
-    #[serde(borrow)]
-    pub convos: Vec<ConvoView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListConvosOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub convos: Vec<ConvoView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for chat.bsky.convo.listConvos
@@ -50,11 +65,12 @@ pub struct ListConvosResponse;
 impl jacquard_common::xrpc::XrpcResp for ListConvosResponse {
     const NSID: &'static str = "chat.bsky.convo.listConvos";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListConvosOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListConvosOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListConvos<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListConvos<S> {
     const NSID: &'static str = "chat.bsky.convo.listConvos";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListConvosResponse;
@@ -65,7 +81,7 @@ pub struct ListConvosRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListConvosRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.listConvos";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListConvos<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListConvos<S>;
     type Response = ListConvosResponse;
 }
 
@@ -95,7 +111,7 @@ pub mod list_convos_state {
 /// Builder for constructing an instance of this type
 pub struct ListConvosBuilder<'a, S: list_convos_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -119,12 +135,12 @@ impl<'a> ListConvosBuilder<'a, list_convos_state::Empty> {
 
 impl<'a, S: list_convos_state::State> ListConvosBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -145,12 +161,12 @@ impl<'a, S: list_convos_state::State> ListConvosBuilder<'a, S> {
 
 impl<'a, S: list_convos_state::State> ListConvosBuilder<'a, S> {
     /// Set the `readState` field (optional)
-    pub fn read_state(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn read_state(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `readState` field to an Option value (optional)
-    pub fn maybe_read_state(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_read_state(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -158,12 +174,12 @@ impl<'a, S: list_convos_state::State> ListConvosBuilder<'a, S> {
 
 impl<'a, S: list_convos_state::State> ListConvosBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }

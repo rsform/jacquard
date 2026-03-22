@@ -15,13 +15,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle, AtUri, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -32,75 +33,83 @@ use crate::tools_ozone::moderation::RepoViewDetail;
 use crate::tools_ozone::moderation::RepoViewNotFound;
 /// Verification data for the associated subject.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct VerificationView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct VerificationView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when the verification was created.
     pub created_at: Datetime,
     ///Display name of the subject the verification applies to at the moment of verifying, which might not be the same at the time of viewing. The verification is only valid if the current displayName matches the one at the time of verifying.
-    #[serde(borrow)]
-    pub display_name: CowStr<'a>,
+    pub display_name: S,
     ///Handle of the subject the verification applies to at the moment of verifying, which might not be the same at the time of viewing. The verification is only valid if the current handle matches the one at the time of verifying.
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub handle: Handle<S>,
     ///The user who issued this verification.
-    #[serde(borrow)]
-    pub issuer: Did<'a>,
+    pub issuer: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub issuer_profile: Option<Data<'a>>,
+    pub issuer_profile: Option<Data<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub issuer_repo: Option<VerificationViewIssuerRepo<'a>>,
+    pub issuer_repo: Option<VerificationViewIssuerRepo<S>>,
     ///Describes the reason for revocation, also indicating that the verification is no longer valid.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub revoke_reason: Option<CowStr<'a>>,
+    pub revoke_reason: Option<S>,
     ///Timestamp when the verification was revoked.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub revoked_at: Option<Datetime>,
     ///The user who revoked this verification.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub revoked_by: Option<Did<'a>>,
+    pub revoked_by: Option<Did<S>>,
     ///The subject of the verification.
-    #[serde(borrow)]
-    pub subject: Did<'a>,
+    pub subject: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_profile: Option<Data<'a>>,
+    pub subject_profile: Option<Data<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_repo: Option<VerificationViewSubjectRepo<'a>>,
+    pub subject_repo: Option<VerificationViewSubjectRepo<S>>,
     ///The AT-URI of the verification record.
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum VerificationViewIssuerRepo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum VerificationViewIssuerRepo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "tools.ozone.moderation.defs#repoViewDetail")]
-    RepoViewDetail(Box<RepoViewDetail<'a>>),
+    RepoViewDetail(Box<RepoViewDetail<S>>),
     #[serde(rename = "tools.ozone.moderation.defs#repoViewNotFound")]
-    RepoViewNotFound(Box<RepoViewNotFound<'a>>),
+    RepoViewNotFound(Box<RepoViewNotFound<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum VerificationViewSubjectRepo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum VerificationViewSubjectRepo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "tools.ozone.moderation.defs#repoViewDetail")]
-    RepoViewDetail(Box<RepoViewDetail<'a>>),
+    RepoViewDetail(Box<RepoViewDetail<S>>),
     #[serde(rename = "tools.ozone.moderation.defs#repoViewNotFound")]
-    RepoViewNotFound(Box<RepoViewNotFound<'a>>),
+    RepoViewNotFound(Box<RepoViewNotFound<S>>),
 }
 
-impl<'a> LexiconSchema for VerificationView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for VerificationView<S> {
     fn nsid() -> &'static str {
         "tools.ozone.verification.defs"
     }
@@ -127,10 +136,10 @@ pub mod verification_view_state {
     pub trait State: sealed::Sealed {
         type Issuer;
         type Subject;
-        type Handle;
-        type CreatedAt;
-        type Uri;
         type DisplayName;
+        type Uri;
+        type CreatedAt;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -138,10 +147,10 @@ pub mod verification_view_state {
     impl State for Empty {
         type Issuer = Unset;
         type Subject = Unset;
-        type Handle = Unset;
-        type CreatedAt = Unset;
-        type Uri = Unset;
         type DisplayName = Unset;
+        type Uri = Unset;
+        type CreatedAt = Unset;
+        type Handle = Unset;
     }
     ///State transition - sets the `issuer` field to Set
     pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
@@ -149,10 +158,10 @@ pub mod verification_view_state {
     impl<S: State> State for SetIssuer<S> {
         type Issuer = Set<members::issuer>;
         type Subject = S::Subject;
-        type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
         type DisplayName = S::DisplayName;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Handle = S::Handle;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
@@ -160,43 +169,10 @@ pub mod verification_view_state {
     impl<S: State> State for SetSubject<S> {
         type Issuer = S::Issuer;
         type Subject = Set<members::subject>;
-        type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
+        type DisplayName = S::DisplayName;
         type Uri = S::Uri;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Issuer = S::Issuer;
-        type Subject = S::Subject;
-        type Handle = Set<members::handle>;
         type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Issuer = S::Issuer;
-        type Subject = S::Subject;
         type Handle = S::Handle;
-        type CreatedAt = Set<members::created_at>;
-        type Uri = S::Uri;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Issuer = S::Issuer;
-        type Subject = S::Subject;
-        type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
-        type Uri = Set<members::uri>;
-        type DisplayName = S::DisplayName;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
@@ -204,10 +180,43 @@ pub mod verification_view_state {
     impl<S: State> State for SetDisplayName<S> {
         type Issuer = S::Issuer;
         type Subject = S::Subject;
-        type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
         type DisplayName = Set<members::display_name>;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Issuer = S::Issuer;
+        type Subject = S::Subject;
+        type DisplayName = S::DisplayName;
+        type Uri = Set<members::uri>;
+        type CreatedAt = S::CreatedAt;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Issuer = S::Issuer;
+        type Subject = S::Subject;
+        type DisplayName = S::DisplayName;
+        type Uri = S::Uri;
+        type CreatedAt = Set<members::created_at>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Issuer = S::Issuer;
+        type Subject = S::Subject;
+        type DisplayName = S::DisplayName;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -216,14 +225,14 @@ pub mod verification_view_state {
         pub struct issuer(());
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `handle` field
-        pub struct handle(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -232,18 +241,18 @@ pub struct VerificationViewBuilder<'a, S: verification_view_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Handle<'a>>,
-        Option<Did<'a>>,
-        Option<Data<'a>>,
-        Option<VerificationViewIssuerRepo<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<Handle<S>>,
+        Option<Did<S>>,
+        Option<Data<S>>,
+        Option<VerificationViewIssuerRepo<S>>,
+        Option<S>,
         Option<Datetime>,
-        Option<Did<'a>>,
-        Option<Did<'a>>,
-        Option<Data<'a>>,
-        Option<VerificationViewSubjectRepo<'a>>,
-        Option<AtUri<'a>>,
+        Option<Did<S>>,
+        Option<Did<S>>,
+        Option<Data<S>>,
+        Option<VerificationViewSubjectRepo<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -307,7 +316,7 @@ where
     /// Set the `displayName` field (required)
     pub fn display_name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetDisplayName<S>> {
         self._fields.1 = Option::Some(value.into());
         VerificationViewBuilder {
@@ -326,7 +335,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<Handle<'a>>,
+        value: impl Into<Handle<S>>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetHandle<S>> {
         self._fields.2 = Option::Some(value.into());
         VerificationViewBuilder {
@@ -345,7 +354,7 @@ where
     /// Set the `issuer` field (required)
     pub fn issuer(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetIssuer<S>> {
         self._fields.3 = Option::Some(value.into());
         VerificationViewBuilder {
@@ -358,12 +367,12 @@ where
 
 impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
     /// Set the `issuerProfile` field (optional)
-    pub fn issuer_profile(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn issuer_profile(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `issuerProfile` field to an Option value (optional)
-    pub fn maybe_issuer_profile(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_issuer_profile(mut self, value: Option<Data<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -373,7 +382,7 @@ impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
     /// Set the `issuerRepo` field (optional)
     pub fn issuer_repo(
         mut self,
-        value: impl Into<Option<VerificationViewIssuerRepo<'a>>>,
+        value: impl Into<Option<VerificationViewIssuerRepo<S>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
@@ -381,7 +390,7 @@ impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
     /// Set the `issuerRepo` field to an Option value (optional)
     pub fn maybe_issuer_repo(
         mut self,
-        value: Option<VerificationViewIssuerRepo<'a>>,
+        value: Option<VerificationViewIssuerRepo<S>>,
     ) -> Self {
         self._fields.5 = value;
         self
@@ -390,12 +399,12 @@ impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
 
 impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
     /// Set the `revokeReason` field (optional)
-    pub fn revoke_reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn revoke_reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `revokeReason` field to an Option value (optional)
-    pub fn maybe_revoke_reason(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_revoke_reason(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -416,12 +425,12 @@ impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
 
 impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
     /// Set the `revokedBy` field (optional)
-    pub fn revoked_by(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn revoked_by(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `revokedBy` field to an Option value (optional)
-    pub fn maybe_revoked_by(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_revoked_by(mut self, value: Option<Did<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -435,7 +444,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetSubject<S>> {
         self._fields.9 = Option::Some(value.into());
         VerificationViewBuilder {
@@ -448,12 +457,12 @@ where
 
 impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
     /// Set the `subjectProfile` field (optional)
-    pub fn subject_profile(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn subject_profile(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `subjectProfile` field to an Option value (optional)
-    pub fn maybe_subject_profile(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_subject_profile(mut self, value: Option<Data<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -463,7 +472,7 @@ impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
     /// Set the `subjectRepo` field (optional)
     pub fn subject_repo(
         mut self,
-        value: impl Into<Option<VerificationViewSubjectRepo<'a>>>,
+        value: impl Into<Option<VerificationViewSubjectRepo<S>>>,
     ) -> Self {
         self._fields.11 = value.into();
         self
@@ -471,7 +480,7 @@ impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
     /// Set the `subjectRepo` field to an Option value (optional)
     pub fn maybe_subject_repo(
         mut self,
-        value: Option<VerificationViewSubjectRepo<'a>>,
+        value: Option<VerificationViewSubjectRepo<S>>,
     ) -> Self {
         self._fields.11 = value;
         self
@@ -486,7 +495,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetUri<S>> {
         self._fields.12 = Option::Some(value.into());
         VerificationViewBuilder {
@@ -502,10 +511,10 @@ where
     S: verification_view_state::State,
     S::Issuer: verification_view_state::IsSet,
     S::Subject: verification_view_state::IsSet,
-    S::Handle: verification_view_state::IsSet,
-    S::CreatedAt: verification_view_state::IsSet,
-    S::Uri: verification_view_state::IsSet,
     S::DisplayName: verification_view_state::IsSet,
+    S::Uri: verification_view_state::IsSet,
+    S::CreatedAt: verification_view_state::IsSet,
+    S::Handle: verification_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationView<'a> {
@@ -529,7 +538,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> VerificationView<'a> {
         VerificationView {
             created_at: self._fields.0.unwrap(),

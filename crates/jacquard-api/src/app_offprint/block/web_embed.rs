@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,50 +26,49 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct WebEmbed<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct WebEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Horizontal alignment
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alignment: Option<CowStr<'a>>,
+    pub alignment: Option<S>,
     ///Page description/excerpt
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Native embed height in pixels
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed_height: Option<i64>,
     ///oEmbed URL for iframe embedding
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub embed_url: Option<UriValue<'a>>,
+    pub embed_url: Option<UriValue<S>>,
     ///Native embed width in pixels
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed_width: Option<i64>,
     ///The URL of the embedded page
-    #[serde(borrow)]
-    pub href: UriValue<'a>,
+    pub href: UriValue<S>,
     ///Screenshot of the embedded content (1280×720px)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub preview: Option<BlobRef<'a>>,
+    pub preview: Option<BlobRef<S>>,
     ///Name of the website
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub site_name: Option<CowStr<'a>>,
+    pub site_name: Option<S>,
     ///Page title
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     ///CSS width value (e.g., "100%", "75%". "50%" minimum)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub width: Option<CowStr<'a>>,
+    pub width: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for WebEmbed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for WebEmbed<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.webEmbed"
     }
@@ -210,16 +211,16 @@ pub mod web_embed_state {
 pub struct WebEmbedBuilder<'a, S: web_embed_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
         Option<i64>,
-        Option<UriValue<'a>>,
+        Option<UriValue<S>>,
         Option<i64>,
-        Option<UriValue<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<UriValue<S>>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -244,12 +245,12 @@ impl<'a> WebEmbedBuilder<'a, web_embed_state::Empty> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `alignment` field (optional)
-    pub fn alignment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn alignment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alignment` field to an Option value (optional)
-    pub fn maybe_alignment(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_alignment(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -257,12 +258,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -283,12 +284,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `embedUrl` field (optional)
-    pub fn embed_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn embed_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `embedUrl` field to an Option value (optional)
-    pub fn maybe_embed_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_embed_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -315,7 +316,7 @@ where
     /// Set the `href` field (required)
     pub fn href(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> WebEmbedBuilder<'a, web_embed_state::SetHref<S>> {
         self._fields.5 = Option::Some(value.into());
         WebEmbedBuilder {
@@ -328,12 +329,12 @@ where
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `preview` field (optional)
-    pub fn preview(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn preview(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `preview` field to an Option value (optional)
-    pub fn maybe_preview(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_preview(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -341,12 +342,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `siteName` field (optional)
-    pub fn site_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn site_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `siteName` field to an Option value (optional)
-    pub fn maybe_site_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_site_name(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -354,12 +355,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -367,12 +368,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `width` field (optional)
-    pub fn width(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn width(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `width` field to an Option value (optional)
-    pub fn maybe_width(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_width(mut self, value: Option<S>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -402,10 +403,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> WebEmbed<'a> {
         WebEmbed {
             alignment: self._fields.0,

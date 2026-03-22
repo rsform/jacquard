@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -33,84 +35,88 @@ use crate::sh_weaver::notebook::Tags;
 use crate::sh_weaver::notebook::Title;
 /// A notebook entry
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.weaver.notebook.entry", tag = "$type")]
-pub struct Entry<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.weaver.notebook.entry",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub authors: Option<Vec<Author<'a>>>,
+    pub authors: Option<Vec<Author<S>>>,
     ///The content of the notebook entry. This should be some flavor of Markdown.
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
+    pub content: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_warnings: Option<ContentWarnings<'a>>,
+    pub content_warnings: Option<ContentWarnings<S>>,
     ///Client-declared timestamp when this was originally created.
     pub created_at: Datetime,
     ///The set of images and records, if any, embedded in the notebook entry.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub embeds: Option<EntryEmbeds<'a>>,
-    #[serde(borrow)]
-    pub path: Path<'a>,
+    pub embeds: Option<EntryEmbeds<S>>,
+    pub path: Path<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rating: Option<ContentRating<'a>>,
+    pub rating: Option<ContentRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Tags<'a>>,
-    #[serde(borrow)]
-    pub title: Title<'a>,
+    pub tags: Option<Tags<S>>,
+    pub title: Title<S>,
     ///Client-declared timestamp of last modification. Used for canonicality tiebreaking in multi-author scenarios.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The set of images and records, if any, embedded in the notebook entry.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct EntryEmbeds<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EntryEmbeds<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub externals: Option<crate::sh_weaver::embed::external::External<'a>>,
+    pub externals: Option<crate::sh_weaver::embed::external::External<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub images: Option<crate::sh_weaver::embed::images::Images<'a>>,
+    pub images: Option<crate::sh_weaver::embed::images::Images<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub records: Option<crate::sh_weaver::embed::records::Records<'a>>,
+    pub records: Option<crate::sh_weaver::embed::records::Records<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub records_with_media: Option<
-        Vec<crate::sh_weaver::embed::record_with_media::RecordWithMedia<'a>>,
+        Vec<crate::sh_weaver::embed::record_with_media::RecordWithMedia<S>>,
     >,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub videos: Option<crate::sh_weaver::embed::video::VideoRecord<'a>>,
+    pub videos: Option<crate::sh_weaver::embed::video::VideoRecord<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct EntryGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct EntryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Entry<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Entry<S>,
 }
 
-impl<'a> Entry<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, EntryRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Entry<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, EntryRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -121,18 +127,17 @@ pub struct EntryRecord;
 impl XrpcResp for EntryRecord {
     const NSID: &'static str = "sh.weaver.notebook.entry";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = EntryGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = EntryGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<EntryGetRecordOutput<'_>> for Entry<'_> {
-    fn from(output: EntryGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<EntryGetRecordOutput<S>> for Entry<S> {
+    fn from(output: EntryGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Entry<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Entry<S> {
     const NSID: &'static str = "sh.weaver.notebook.entry";
     type Record = EntryRecord;
 }
@@ -142,7 +147,7 @@ impl Collection for EntryRecord {
     type Record = EntryRecord;
 }
 
-impl<'a> LexiconSchema for Entry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entry<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.entry"
     }
@@ -157,7 +162,7 @@ impl<'a> LexiconSchema for Entry<'a> {
     }
 }
 
-impl<'a> LexiconSchema for EntryEmbeds<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for EntryEmbeds<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.entry"
     }
@@ -361,67 +366,67 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type CreatedAt;
-        type Content;
         type Path;
+        type Content;
+        type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type CreatedAt = Unset;
-        type Content = Unset;
         type Path = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
-        type Path = S::Path;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
-        type Path = S::Path;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Content = Set<members::content>;
-        type Path = S::Path;
+        type Content = Unset;
+        type CreatedAt = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `path` field to Set
     pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPath<S> {}
     impl<S: State> State for SetPath<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
         type Path = Set<members::path>;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Path = S::Path;
+        type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Path = S::Path;
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Path = S::Path;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `path` field
         pub struct path(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -429,15 +434,15 @@ pub mod entry_state {
 pub struct EntryBuilder<'a, S: entry_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<Author<'a>>>,
-        Option<CowStr<'a>>,
-        Option<ContentWarnings<'a>>,
+        Option<Vec<Author<S>>>,
+        Option<S>,
+        Option<ContentWarnings<S>>,
         Option<Datetime>,
-        Option<EntryEmbeds<'a>>,
-        Option<Path<'a>>,
-        Option<ContentRating<'a>>,
-        Option<Tags<'a>>,
-        Option<Title<'a>>,
+        Option<EntryEmbeds<S>>,
+        Option<Path<S>>,
+        Option<ContentRating<S>>,
+        Option<Tags<S>>,
+        Option<Title<S>>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -463,12 +468,12 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `authors` field (optional)
-    pub fn authors(mut self, value: impl Into<Option<Vec<Author<'a>>>>) -> Self {
+    pub fn authors(mut self, value: impl Into<Option<Vec<Author<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `authors` field to an Option value (optional)
-    pub fn maybe_authors(mut self, value: Option<Vec<Author<'a>>>) -> Self {
+    pub fn maybe_authors(mut self, value: Option<Vec<Author<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -482,7 +487,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EntryBuilder<'a, entry_state::SetContent<S>> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
@@ -497,13 +502,13 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `contentWarnings` field (optional)
     pub fn content_warnings(
         mut self,
-        value: impl Into<Option<ContentWarnings<'a>>>,
+        value: impl Into<Option<ContentWarnings<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `contentWarnings` field to an Option value (optional)
-    pub fn maybe_content_warnings(mut self, value: Option<ContentWarnings<'a>>) -> Self {
+    pub fn maybe_content_warnings(mut self, value: Option<ContentWarnings<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -530,12 +535,12 @@ where
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `embeds` field (optional)
-    pub fn embeds(mut self, value: impl Into<Option<EntryEmbeds<'a>>>) -> Self {
+    pub fn embeds(mut self, value: impl Into<Option<EntryEmbeds<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `embeds` field to an Option value (optional)
-    pub fn maybe_embeds(mut self, value: Option<EntryEmbeds<'a>>) -> Self {
+    pub fn maybe_embeds(mut self, value: Option<EntryEmbeds<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -549,7 +554,7 @@ where
     /// Set the `path` field (required)
     pub fn path(
         mut self,
-        value: impl Into<Path<'a>>,
+        value: impl Into<Path<S>>,
     ) -> EntryBuilder<'a, entry_state::SetPath<S>> {
         self._fields.5 = Option::Some(value.into());
         EntryBuilder {
@@ -562,12 +567,12 @@ where
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `rating` field (optional)
-    pub fn rating(mut self, value: impl Into<Option<ContentRating<'a>>>) -> Self {
+    pub fn rating(mut self, value: impl Into<Option<ContentRating<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `rating` field to an Option value (optional)
-    pub fn maybe_rating(mut self, value: Option<ContentRating<'a>>) -> Self {
+    pub fn maybe_rating(mut self, value: Option<ContentRating<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -575,12 +580,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Tags<'a>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Tags<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Tags<'a>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Tags<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -594,7 +599,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<Title<'a>>,
+        value: impl Into<Title<S>>,
     ) -> EntryBuilder<'a, entry_state::SetTitle<S>> {
         self._fields.8 = Option::Some(value.into());
         EntryBuilder {
@@ -621,10 +626,10 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::Title: entry_state::IsSet,
-    S::CreatedAt: entry_state::IsSet,
-    S::Content: entry_state::IsSet,
     S::Path: entry_state::IsSet,
+    S::Content: entry_state::IsSet,
+    S::CreatedAt: entry_state::IsSet,
+    S::Title: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
@@ -643,13 +648,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Entry<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Entry<'a> {
         Entry {
             authors: self._fields.0,
             content: self._fields.1.unwrap(),

@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -36,2610 +37,4033 @@ use crate::social_flockfeeds::lexical::r#type::product;
 use crate::social_flockfeeds::lexical::r#type::tv_series;
 /// A TV episode which can be part of a series or season.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Embedded<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub about: Option<EmbeddedAbout<'a>>,
+    pub about: Option<EmbeddedAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#abstract: Option<EmbeddedAbstract<'a>>,
+    pub r#abstract: Option<EmbeddedAbstract<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode: Option<EmbeddedAccessMode<'a>>,
+    pub access_mode: Option<EmbeddedAccessMode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode_sufficient: Option<EmbeddedAccessModeSufficient<'a>>,
+    pub access_mode_sufficient: Option<EmbeddedAccessModeSufficient<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_api: Option<EmbeddedAccessibilityApi<'a>>,
+    pub accessibility_api: Option<EmbeddedAccessibilityApi<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_control: Option<EmbeddedAccessibilityControl<'a>>,
+    pub accessibility_control: Option<EmbeddedAccessibilityControl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_feature: Option<EmbeddedAccessibilityFeature<'a>>,
+    pub accessibility_feature: Option<EmbeddedAccessibilityFeature<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_hazard: Option<EmbeddedAccessibilityHazard<'a>>,
+    pub accessibility_hazard: Option<EmbeddedAccessibilityHazard<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_summary: Option<EmbeddedAccessibilitySummary<'a>>,
+    pub accessibility_summary: Option<EmbeddedAccessibilitySummary<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accountable_person: Option<EmbeddedAccountablePerson<'a>>,
+    pub accountable_person: Option<EmbeddedAccountablePerson<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub acquire_license_page: Option<EmbeddedAcquireLicensePage<'a>>,
+    pub acquire_license_page: Option<EmbeddedAcquireLicensePage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub actor: Option<EmbeddedActor<'a>>,
+    pub actor: Option<EmbeddedActor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub actors: Option<EmbeddedActors<'a>>,
+    pub actors: Option<EmbeddedActors<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<EmbeddedAdditionalType<'a>>,
+    pub additional_type: Option<EmbeddedAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<EmbeddedAggregateRating<'a>>,
+    pub aggregate_rating: Option<EmbeddedAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<EmbeddedAlternateName<'a>>,
+    pub alternate_name: Option<EmbeddedAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternative_headline: Option<EmbeddedAlternativeHeadline<'a>>,
+    pub alternative_headline: Option<EmbeddedAlternativeHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub archived_at: Option<EmbeddedArchivedAt<'a>>,
+    pub archived_at: Option<EmbeddedArchivedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub assesses: Option<EmbeddedAssesses<'a>>,
+    pub assesses: Option<EmbeddedAssesses<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_media: Option<EmbeddedAssociatedMedia<'a>>,
+    pub associated_media: Option<EmbeddedAssociatedMedia<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audience: Option<EmbeddedAudience<'a>>,
+    pub audience: Option<EmbeddedAudience<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audio: Option<EmbeddedAudio<'a>>,
+    pub audio: Option<EmbeddedAudio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<EmbeddedAuthor<'a>>,
+    pub author: Option<EmbeddedAuthor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<EmbeddedAward<'a>>,
+    pub award: Option<EmbeddedAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<EmbeddedAwards<'a>>,
+    pub awards: Option<EmbeddedAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub character: Option<EmbeddedCharacter<'a>>,
+    pub character: Option<EmbeddedCharacter<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub citation: Option<EmbeddedCitation<'a>>,
+    pub citation: Option<EmbeddedCitation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<EmbeddedComment<'a>>,
+    pub comment: Option<EmbeddedComment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment_count: Option<EmbeddedCommentCount<'a>>,
+    pub comment_count: Option<EmbeddedCommentCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub conditions_of_access: Option<EmbeddedConditionsOfAccess<'a>>,
+    pub conditions_of_access: Option<EmbeddedConditionsOfAccess<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_location: Option<EmbeddedContentLocation<'a>>,
+    pub content_location: Option<EmbeddedContentLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_rating: Option<EmbeddedContentRating<'a>>,
+    pub content_rating: Option<EmbeddedContentRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_reference_time: Option<EmbeddedContentReferenceTime<'a>>,
+    pub content_reference_time: Option<EmbeddedContentReferenceTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contributor: Option<EmbeddedContributor<'a>>,
+    pub contributor: Option<EmbeddedContributor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_holder: Option<EmbeddedCopyrightHolder<'a>>,
+    pub copyright_holder: Option<EmbeddedCopyrightHolder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_notice: Option<EmbeddedCopyrightNotice<'a>>,
+    pub copyright_notice: Option<EmbeddedCopyrightNotice<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_year: Option<EmbeddedCopyrightYear<'a>>,
+    pub copyright_year: Option<EmbeddedCopyrightYear<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub correction: Option<EmbeddedCorrection<'a>>,
+    pub correction: Option<EmbeddedCorrection<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_origin: Option<EmbeddedCountryOfOrigin<'a>>,
+    pub country_of_origin: Option<EmbeddedCountryOfOrigin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creative_work_status: Option<EmbeddedCreativeWorkStatus<'a>>,
+    pub creative_work_status: Option<EmbeddedCreativeWorkStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creator: Option<EmbeddedCreator<'a>>,
+    pub creator: Option<EmbeddedCreator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub credit_text: Option<EmbeddedCreditText<'a>>,
+    pub credit_text: Option<EmbeddedCreditText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_created: Option<EmbeddedDateCreated<'a>>,
+    pub date_created: Option<EmbeddedDateCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_modified: Option<EmbeddedDateModified<'a>>,
+    pub date_modified: Option<EmbeddedDateModified<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_published: Option<EmbeddedDatePublished<'a>>,
+    pub date_published: Option<EmbeddedDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<EmbeddedDescription<'a>>,
+    pub description: Option<EmbeddedDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub digital_source_type: Option<EmbeddedDigitalSourceType<'a>>,
+    pub digital_source_type: Option<EmbeddedDigitalSourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub director: Option<EmbeddedDirector<'a>>,
+    pub director: Option<EmbeddedDirector<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub directors: Option<EmbeddedDirectors<'a>>,
+    pub directors: Option<EmbeddedDirectors<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<EmbeddedDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub discussion_url: Option<EmbeddedDiscussionUrl<'a>>,
+    pub discussion_url: Option<EmbeddedDiscussionUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub duration: Option<EmbeddedDuration<'a>>,
+    pub duration: Option<EmbeddedDuration<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub edit_eidr: Option<EmbeddedEditEidr<'a>>,
+    pub edit_eidr: Option<EmbeddedEditEidr<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub editor: Option<EmbeddedEditor<'a>>,
+    pub editor: Option<EmbeddedEditor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_alignment: Option<EmbeddedEducationalAlignment<'a>>,
+    pub educational_alignment: Option<EmbeddedEducationalAlignment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_level: Option<EmbeddedEducationalLevel<'a>>,
+    pub educational_level: Option<EmbeddedEducationalLevel<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_use: Option<EmbeddedEducationalUse<'a>>,
+    pub educational_use: Option<EmbeddedEducationalUse<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding: Option<EmbeddedEncoding<'a>>,
+    pub encoding: Option<EmbeddedEncoding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding_format: Option<EmbeddedEncodingFormat<'a>>,
+    pub encoding_format: Option<EmbeddedEncodingFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encodings: Option<EmbeddedEncodings<'a>>,
+    pub encodings: Option<EmbeddedEncodings<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub episode_number: Option<EmbeddedEpisodeNumber<'a>>,
+    pub episode_number: Option<EmbeddedEpisodeNumber<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub example_of_work: Option<EmbeddedExampleOfWork<'a>>,
+    pub example_of_work: Option<EmbeddedExampleOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub expires: Option<EmbeddedExpires<'a>>,
+    pub expires: Option<EmbeddedExpires<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub file_format: Option<EmbeddedFileFormat<'a>>,
+    pub file_format: Option<EmbeddedFileFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funder: Option<EmbeddedFunder<'a>>,
+    pub funder: Option<EmbeddedFunder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<EmbeddedFunding<'a>>,
+    pub funding: Option<EmbeddedFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genre: Option<EmbeddedGenre<'a>>,
+    pub genre: Option<EmbeddedGenre<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_part: Option<EmbeddedHasPart<'a>>,
+    pub has_part: Option<EmbeddedHasPart<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub headline: Option<EmbeddedHeadline<'a>>,
+    pub headline: Option<EmbeddedHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<EmbeddedIdentifier<'a>>,
+    pub identifier: Option<EmbeddedIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<EmbeddedImage<'a>>,
+    pub image: Option<EmbeddedImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub in_language: Option<EmbeddedInLanguage<'a>>,
+    pub in_language: Option<EmbeddedInLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interaction_statistic: Option<EmbeddedInteractionStatistic<'a>>,
+    pub interaction_statistic: Option<EmbeddedInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interactivity_type: Option<EmbeddedInteractivityType<'a>>,
+    pub interactivity_type: Option<EmbeddedInteractivityType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interpreted_as_claim: Option<EmbeddedInterpretedAsClaim<'a>>,
+    pub interpreted_as_claim: Option<EmbeddedInterpretedAsClaim<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_accessible_for_free: Option<EmbeddedIsAccessibleForFree<'a>>,
+    pub is_accessible_for_free: Option<EmbeddedIsAccessibleForFree<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on: Option<EmbeddedIsBasedOn<'a>>,
+    pub is_based_on: Option<EmbeddedIsBasedOn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on_url: Option<EmbeddedIsBasedOnUrl<'a>>,
+    pub is_based_on_url: Option<EmbeddedIsBasedOnUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_family_friendly: Option<EmbeddedIsFamilyFriendly<'a>>,
+    pub is_family_friendly: Option<EmbeddedIsFamilyFriendly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_part_of: Option<EmbeddedIsPartOf<'a>>,
+    pub is_part_of: Option<EmbeddedIsPartOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<EmbeddedKeywords<'a>>,
+    pub keywords: Option<EmbeddedKeywords<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub learning_resource_type: Option<EmbeddedLearningResourceType<'a>>,
+    pub learning_resource_type: Option<EmbeddedLearningResourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub license: Option<EmbeddedLicense<'a>>,
+    pub license: Option<EmbeddedLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location_created: Option<EmbeddedLocationCreated<'a>>,
+    pub location_created: Option<EmbeddedLocationCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity: Option<EmbeddedMainEntity<'a>>,
+    pub main_entity: Option<EmbeddedMainEntity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<EmbeddedMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub maintainer: Option<EmbeddedMaintainer<'a>>,
+    pub maintainer: Option<EmbeddedMaintainer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material: Option<EmbeddedMaterial<'a>>,
+    pub material: Option<EmbeddedMaterial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material_extent: Option<EmbeddedMaterialExtent<'a>>,
+    pub material_extent: Option<EmbeddedMaterialExtent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mentions: Option<EmbeddedMentions<'a>>,
+    pub mentions: Option<EmbeddedMentions<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub music_by: Option<EmbeddedMusicBy<'a>>,
+    pub music_by: Option<EmbeddedMusicBy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<EmbeddedName<'a>>,
+    pub name: Option<EmbeddedName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub offers: Option<EmbeddedOffers<'a>>,
+    pub offers: Option<EmbeddedOffers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub part_of_season: Option<EmbeddedPartOfSeason<'a>>,
+    pub part_of_season: Option<EmbeddedPartOfSeason<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub part_of_series: Option<EmbeddedPartOfSeries<'a>>,
+    pub part_of_series: Option<EmbeddedPartOfSeries<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub part_of_tv_series: Option<EmbeddedPartOfTvSeries<'a>>,
+    pub part_of_tv_series: Option<EmbeddedPartOfTvSeries<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pattern: Option<EmbeddedPattern<'a>>,
+    pub pattern: Option<EmbeddedPattern<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub position: Option<EmbeddedPosition<'a>>,
+    pub position: Option<EmbeddedPosition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<EmbeddedPotentialAction<'a>>,
+    pub potential_action: Option<EmbeddedPotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub producer: Option<EmbeddedProducer<'a>>,
+    pub producer: Option<EmbeddedProducer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub production_company: Option<EmbeddedProductionCompany<'a>>,
+    pub production_company: Option<EmbeddedProductionCompany<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub provider: Option<EmbeddedProvider<'a>>,
+    pub provider: Option<EmbeddedProvider<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publication: Option<EmbeddedPublication<'a>>,
+    pub publication: Option<EmbeddedPublication<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher: Option<EmbeddedPublisher<'a>>,
+    pub publisher: Option<EmbeddedPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher_imprint: Option<EmbeddedPublisherImprint<'a>>,
+    pub publisher_imprint: Option<EmbeddedPublisherImprint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publishing_principles: Option<EmbeddedPublishingPrinciples<'a>>,
+    pub publishing_principles: Option<EmbeddedPublishingPrinciples<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recorded_at: Option<EmbeddedRecordedAt<'a>>,
+    pub recorded_at: Option<EmbeddedRecordedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub released_event: Option<EmbeddedReleasedEvent<'a>>,
+    pub released_event: Option<EmbeddedReleasedEvent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<EmbeddedReview<'a>>,
+    pub review: Option<EmbeddedReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<EmbeddedReviews<'a>>,
+    pub reviews: Option<EmbeddedReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<EmbeddedSameAs<'a>>,
+    pub same_as: Option<EmbeddedSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub schema_version: Option<EmbeddedSchemaVersion<'a>>,
+    pub schema_version: Option<EmbeddedSchemaVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_date_published: Option<EmbeddedSdDatePublished<'a>>,
+    pub sd_date_published: Option<EmbeddedSdDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_license: Option<EmbeddedSdLicense<'a>>,
+    pub sd_license: Option<EmbeddedSdLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_publisher: Option<EmbeddedSdPublisher<'a>>,
+    pub sd_publisher: Option<EmbeddedSdPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub size: Option<EmbeddedSize<'a>>,
+    pub size: Option<EmbeddedSize<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_organization: Option<EmbeddedSourceOrganization<'a>>,
+    pub source_organization: Option<EmbeddedSourceOrganization<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial: Option<EmbeddedSpatial<'a>>,
+    pub spatial: Option<EmbeddedSpatial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial_coverage: Option<EmbeddedSpatialCoverage<'a>>,
+    pub spatial_coverage: Option<EmbeddedSpatialCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sponsor: Option<EmbeddedSponsor<'a>>,
+    pub sponsor: Option<EmbeddedSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<EmbeddedSubjectOf<'a>>,
+    pub subject_of: Option<EmbeddedSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subtitle_language: Option<EmbeddedSubtitleLanguage<'a>>,
+    pub subtitle_language: Option<EmbeddedSubtitleLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub teaches: Option<EmbeddedTeaches<'a>>,
+    pub teaches: Option<EmbeddedTeaches<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal: Option<EmbeddedTemporal<'a>>,
+    pub temporal: Option<EmbeddedTemporal<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal_coverage: Option<EmbeddedTemporalCoverage<'a>>,
+    pub temporal_coverage: Option<EmbeddedTemporalCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<EmbeddedText<'a>>,
+    pub text: Option<EmbeddedText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail: Option<EmbeddedThumbnail<'a>>,
+    pub thumbnail: Option<EmbeddedThumbnail<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail_url: Option<EmbeddedThumbnailUrl<'a>>,
+    pub thumbnail_url: Option<EmbeddedThumbnailUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub time_required: Option<EmbeddedTimeRequired<'a>>,
+    pub time_required: Option<EmbeddedTimeRequired<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title_eidr: Option<EmbeddedTitleEidr<'a>>,
+    pub title_eidr: Option<EmbeddedTitleEidr<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub trailer: Option<EmbeddedTrailer<'a>>,
+    pub trailer: Option<EmbeddedTrailer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translation_of_work: Option<EmbeddedTranslationOfWork<'a>>,
+    pub translation_of_work: Option<EmbeddedTranslationOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translator: Option<EmbeddedTranslator<'a>>,
+    pub translator: Option<EmbeddedTranslator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub typical_age_range: Option<EmbeddedTypicalAgeRange<'a>>,
+    pub typical_age_range: Option<EmbeddedTypicalAgeRange<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<EmbeddedUrl<'a>>,
+    pub url: Option<EmbeddedUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub usage_info: Option<EmbeddedUsageInfo<'a>>,
+    pub usage_info: Option<EmbeddedUsageInfo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub version: Option<EmbeddedVersion<'a>>,
+    pub version: Option<EmbeddedVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub video: Option<EmbeddedVideo<'a>>,
+    pub video: Option<EmbeddedVideo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub word_count: Option<EmbeddedWordCount<'a>>,
+    pub word_count: Option<EmbeddedWordCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_example: Option<EmbeddedWorkExample<'a>>,
+    pub work_example: Option<EmbeddedWorkExample<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_translation: Option<EmbeddedWorkTranslation<'a>>,
+    pub work_translation: Option<EmbeddedWorkTranslation<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAbout<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAbstract<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAbstract<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessMode<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessMode<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessModeSufficient<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessModeSufficient<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityApi<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityApi<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityControl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityControl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityFeature<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityFeature<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilityHazard<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilityHazard<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccessibilitySummary<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccessibilitySummary<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAccountablePerson<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAccountablePerson<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAcquireLicensePage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAcquireLicensePage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedActor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedActor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedActors<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedActors<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAlternativeHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAlternativeHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedArchivedAt<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedArchivedAt<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAssesses<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAssesses<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAssociatedMedia<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAssociatedMedia<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAudience<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAudio<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAudio<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAuthor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAuthor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCharacter<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCharacter<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCitation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCitation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedComment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedComment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCommentCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCommentCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedConditionsOfAccess<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedConditionsOfAccess<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContentReferenceTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContentReferenceTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedContributor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedContributor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCopyrightHolder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCopyrightHolder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCopyrightNotice<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCopyrightNotice<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCopyrightYear<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCopyrightYear<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCorrection<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCorrection<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCountryOfOrigin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCreativeWorkStatus<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCreativeWorkStatus<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCreator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCreator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedCreditText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedCreditText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDateCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDateCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDateModified<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDateModified<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDigitalSourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDigitalSourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDirector<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDirector<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDirectors<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDirectors<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDiscussionUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDiscussionUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedDuration<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedDuration<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEditEidr<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEditEidr<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEditor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEditor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEducationalAlignment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEducationalAlignment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEducationalLevel<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEducationalLevel<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEducationalUse<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEducationalUse<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEncoding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEncoding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEncodingFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEncodingFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEncodings<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEncodings<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedEpisodeNumber<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedEpisodeNumber<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedExampleOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedExampleOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedExpires<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedExpires<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFileFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFileFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFunder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedGenre<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedGenre<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHasPart<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHasPart<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInteractivityType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInteractivityType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedInterpretedAsClaim<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedInterpretedAsClaim<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsAccessibleForFree<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsAccessibleForFree<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsBasedOn<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsBasedOn<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsBasedOnUrl<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsBasedOnUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsFamilyFriendly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedIsPartOf<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedIsPartOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedKeywords<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLearningResourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLearningResourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedLocationCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedLocationCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMainEntity<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMainEntity<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaintainer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaintainer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaterial<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMaterialExtent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMaterialExtent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMentions<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMentions<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedMusicBy<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedMusicBy<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.MusicGroup#embedded")]
-    MusicGroupEmbedded(Box<music_group::Embedded<'a>>),
+    MusicGroupEmbedded(Box<music_group::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedOffers<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPartOfSeason<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPartOfSeason<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPartOfSeries<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPartOfSeries<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPartOfTvSeries<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPartOfTvSeries<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.TVSeries#embedded")]
-    TvSeriesEmbedded(Box<tv_series::Embedded<'a>>),
+    TvSeriesEmbedded(Box<tv_series::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPattern<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPosition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPosition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedProducer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedProducer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedProductionCompany<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedProductionCompany<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedProvider<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedProvider<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublication<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublication<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublisherImprint<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublisherImprint<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedPublishingPrinciples<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedPublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedRecordedAt<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedRecordedAt<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReleasedEvent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReleasedEvent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSchemaVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSchemaVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSdDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSdDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSdLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSdLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSdPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSdPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSize<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSourceOrganization<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSourceOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSpatial<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSpatial<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSpatialCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSpatialCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSponsor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedSubtitleLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedSubtitleLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTeaches<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTeaches<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTemporal<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTemporal<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTemporalCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTemporalCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedThumbnail<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedThumbnail<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedThumbnailUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedThumbnailUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTimeRequired<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTimeRequired<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTitleEidr<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTitleEidr<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTrailer<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTrailer<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTranslationOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTranslationOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTranslator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTranslator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedTypicalAgeRange<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedTypicalAgeRange<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedUsageInfo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedUsageInfo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedVideo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedVideo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWordCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWordCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWorkExample<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWorkExample<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EmbeddedWorkTranslation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EmbeddedWorkTranslation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "social.flockfeeds.lexical.type.TVEpisode",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct TvEpisode<'a> {
+pub struct TvEpisode<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub about: Option<TvEpisodeAbout<'a>>,
+    pub about: Option<TvEpisodeAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#abstract: Option<TvEpisodeAbstract<'a>>,
+    pub r#abstract: Option<TvEpisodeAbstract<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode: Option<TvEpisodeAccessMode<'a>>,
+    pub access_mode: Option<TvEpisodeAccessMode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub access_mode_sufficient: Option<TvEpisodeAccessModeSufficient<'a>>,
+    pub access_mode_sufficient: Option<TvEpisodeAccessModeSufficient<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_api: Option<TvEpisodeAccessibilityApi<'a>>,
+    pub accessibility_api: Option<TvEpisodeAccessibilityApi<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_control: Option<TvEpisodeAccessibilityControl<'a>>,
+    pub accessibility_control: Option<TvEpisodeAccessibilityControl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_feature: Option<TvEpisodeAccessibilityFeature<'a>>,
+    pub accessibility_feature: Option<TvEpisodeAccessibilityFeature<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_hazard: Option<TvEpisodeAccessibilityHazard<'a>>,
+    pub accessibility_hazard: Option<TvEpisodeAccessibilityHazard<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accessibility_summary: Option<TvEpisodeAccessibilitySummary<'a>>,
+    pub accessibility_summary: Option<TvEpisodeAccessibilitySummary<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub accountable_person: Option<TvEpisodeAccountablePerson<'a>>,
+    pub accountable_person: Option<TvEpisodeAccountablePerson<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub acquire_license_page: Option<TvEpisodeAcquireLicensePage<'a>>,
+    pub acquire_license_page: Option<TvEpisodeAcquireLicensePage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub actor: Option<TvEpisodeActor<'a>>,
+    pub actor: Option<TvEpisodeActor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub actors: Option<TvEpisodeActors<'a>>,
+    pub actors: Option<TvEpisodeActors<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub additional_type: Option<TvEpisodeAdditionalType<'a>>,
+    pub additional_type: Option<TvEpisodeAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aggregate_rating: Option<TvEpisodeAggregateRating<'a>>,
+    pub aggregate_rating: Option<TvEpisodeAggregateRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternate_name: Option<TvEpisodeAlternateName<'a>>,
+    pub alternate_name: Option<TvEpisodeAlternateName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alternative_headline: Option<TvEpisodeAlternativeHeadline<'a>>,
+    pub alternative_headline: Option<TvEpisodeAlternativeHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub archived_at: Option<TvEpisodeArchivedAt<'a>>,
+    pub archived_at: Option<TvEpisodeArchivedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub assesses: Option<TvEpisodeAssesses<'a>>,
+    pub assesses: Option<TvEpisodeAssesses<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub associated_media: Option<TvEpisodeAssociatedMedia<'a>>,
+    pub associated_media: Option<TvEpisodeAssociatedMedia<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audience: Option<TvEpisodeAudience<'a>>,
+    pub audience: Option<TvEpisodeAudience<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub audio: Option<TvEpisodeAudio<'a>>,
+    pub audio: Option<TvEpisodeAudio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<TvEpisodeAuthor<'a>>,
+    pub author: Option<TvEpisodeAuthor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub award: Option<TvEpisodeAward<'a>>,
+    pub award: Option<TvEpisodeAward<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub awards: Option<TvEpisodeAwards<'a>>,
+    pub awards: Option<TvEpisodeAwards<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub character: Option<TvEpisodeCharacter<'a>>,
+    pub character: Option<TvEpisodeCharacter<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub citation: Option<TvEpisodeCitation<'a>>,
+    pub citation: Option<TvEpisodeCitation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<TvEpisodeComment<'a>>,
+    pub comment: Option<TvEpisodeComment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment_count: Option<TvEpisodeCommentCount<'a>>,
+    pub comment_count: Option<TvEpisodeCommentCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub conditions_of_access: Option<TvEpisodeConditionsOfAccess<'a>>,
+    pub conditions_of_access: Option<TvEpisodeConditionsOfAccess<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_location: Option<TvEpisodeContentLocation<'a>>,
+    pub content_location: Option<TvEpisodeContentLocation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_rating: Option<TvEpisodeContentRating<'a>>,
+    pub content_rating: Option<TvEpisodeContentRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_reference_time: Option<TvEpisodeContentReferenceTime<'a>>,
+    pub content_reference_time: Option<TvEpisodeContentReferenceTime<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contributor: Option<TvEpisodeContributor<'a>>,
+    pub contributor: Option<TvEpisodeContributor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_holder: Option<TvEpisodeCopyrightHolder<'a>>,
+    pub copyright_holder: Option<TvEpisodeCopyrightHolder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_notice: Option<TvEpisodeCopyrightNotice<'a>>,
+    pub copyright_notice: Option<TvEpisodeCopyrightNotice<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub copyright_year: Option<TvEpisodeCopyrightYear<'a>>,
+    pub copyright_year: Option<TvEpisodeCopyrightYear<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub correction: Option<TvEpisodeCorrection<'a>>,
+    pub correction: Option<TvEpisodeCorrection<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub country_of_origin: Option<TvEpisodeCountryOfOrigin<'a>>,
+    pub country_of_origin: Option<TvEpisodeCountryOfOrigin<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creative_work_status: Option<TvEpisodeCreativeWorkStatus<'a>>,
+    pub creative_work_status: Option<TvEpisodeCreativeWorkStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub creator: Option<TvEpisodeCreator<'a>>,
+    pub creator: Option<TvEpisodeCreator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub credit_text: Option<TvEpisodeCreditText<'a>>,
+    pub credit_text: Option<TvEpisodeCreditText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_created: Option<TvEpisodeDateCreated<'a>>,
+    pub date_created: Option<TvEpisodeDateCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_modified: Option<TvEpisodeDateModified<'a>>,
+    pub date_modified: Option<TvEpisodeDateModified<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub date_published: Option<TvEpisodeDatePublished<'a>>,
+    pub date_published: Option<TvEpisodeDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<TvEpisodeDescription<'a>>,
+    pub description: Option<TvEpisodeDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub digital_source_type: Option<TvEpisodeDigitalSourceType<'a>>,
+    pub digital_source_type: Option<TvEpisodeDigitalSourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub director: Option<TvEpisodeDirector<'a>>,
+    pub director: Option<TvEpisodeDirector<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub directors: Option<TvEpisodeDirectors<'a>>,
+    pub directors: Option<TvEpisodeDirectors<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub disambiguating_description: Option<TvEpisodeDisambiguatingDescription<'a>>,
+    pub disambiguating_description: Option<TvEpisodeDisambiguatingDescription<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub discussion_url: Option<TvEpisodeDiscussionUrl<'a>>,
+    pub discussion_url: Option<TvEpisodeDiscussionUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub duration: Option<TvEpisodeDuration<'a>>,
+    pub duration: Option<TvEpisodeDuration<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub edit_eidr: Option<TvEpisodeEditEidr<'a>>,
+    pub edit_eidr: Option<TvEpisodeEditEidr<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub editor: Option<TvEpisodeEditor<'a>>,
+    pub editor: Option<TvEpisodeEditor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_alignment: Option<TvEpisodeEducationalAlignment<'a>>,
+    pub educational_alignment: Option<TvEpisodeEducationalAlignment<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_level: Option<TvEpisodeEducationalLevel<'a>>,
+    pub educational_level: Option<TvEpisodeEducationalLevel<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub educational_use: Option<TvEpisodeEducationalUse<'a>>,
+    pub educational_use: Option<TvEpisodeEducationalUse<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding: Option<TvEpisodeEncoding<'a>>,
+    pub encoding: Option<TvEpisodeEncoding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding_format: Option<TvEpisodeEncodingFormat<'a>>,
+    pub encoding_format: Option<TvEpisodeEncodingFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encodings: Option<TvEpisodeEncodings<'a>>,
+    pub encodings: Option<TvEpisodeEncodings<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub episode_number: Option<TvEpisodeEpisodeNumber<'a>>,
+    pub episode_number: Option<TvEpisodeEpisodeNumber<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub example_of_work: Option<TvEpisodeExampleOfWork<'a>>,
+    pub example_of_work: Option<TvEpisodeExampleOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub expires: Option<TvEpisodeExpires<'a>>,
+    pub expires: Option<TvEpisodeExpires<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub file_format: Option<TvEpisodeFileFormat<'a>>,
+    pub file_format: Option<TvEpisodeFileFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funder: Option<TvEpisodeFunder<'a>>,
+    pub funder: Option<TvEpisodeFunder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub funding: Option<TvEpisodeFunding<'a>>,
+    pub funding: Option<TvEpisodeFunding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genre: Option<TvEpisodeGenre<'a>>,
+    pub genre: Option<TvEpisodeGenre<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub has_part: Option<TvEpisodeHasPart<'a>>,
+    pub has_part: Option<TvEpisodeHasPart<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub headline: Option<TvEpisodeHeadline<'a>>,
+    pub headline: Option<TvEpisodeHeadline<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub identifier: Option<TvEpisodeIdentifier<'a>>,
+    pub identifier: Option<TvEpisodeIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<TvEpisodeImage<'a>>,
+    pub image: Option<TvEpisodeImage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub in_language: Option<TvEpisodeInLanguage<'a>>,
+    pub in_language: Option<TvEpisodeInLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interaction_statistic: Option<TvEpisodeInteractionStatistic<'a>>,
+    pub interaction_statistic: Option<TvEpisodeInteractionStatistic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interactivity_type: Option<TvEpisodeInteractivityType<'a>>,
+    pub interactivity_type: Option<TvEpisodeInteractivityType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub interpreted_as_claim: Option<TvEpisodeInterpretedAsClaim<'a>>,
+    pub interpreted_as_claim: Option<TvEpisodeInterpretedAsClaim<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_accessible_for_free: Option<TvEpisodeIsAccessibleForFree<'a>>,
+    pub is_accessible_for_free: Option<TvEpisodeIsAccessibleForFree<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on: Option<TvEpisodeIsBasedOn<'a>>,
+    pub is_based_on: Option<TvEpisodeIsBasedOn<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_based_on_url: Option<TvEpisodeIsBasedOnUrl<'a>>,
+    pub is_based_on_url: Option<TvEpisodeIsBasedOnUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_family_friendly: Option<TvEpisodeIsFamilyFriendly<'a>>,
+    pub is_family_friendly: Option<TvEpisodeIsFamilyFriendly<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub is_part_of: Option<TvEpisodeIsPartOf<'a>>,
+    pub is_part_of: Option<TvEpisodeIsPartOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<TvEpisodeKeywords<'a>>,
+    pub keywords: Option<TvEpisodeKeywords<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub learning_resource_type: Option<TvEpisodeLearningResourceType<'a>>,
+    pub learning_resource_type: Option<TvEpisodeLearningResourceType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub license: Option<TvEpisodeLicense<'a>>,
+    pub license: Option<TvEpisodeLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location_created: Option<TvEpisodeLocationCreated<'a>>,
+    pub location_created: Option<TvEpisodeLocationCreated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity: Option<TvEpisodeMainEntity<'a>>,
+    pub main_entity: Option<TvEpisodeMainEntity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub main_entity_of_page: Option<TvEpisodeMainEntityOfPage<'a>>,
+    pub main_entity_of_page: Option<TvEpisodeMainEntityOfPage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub maintainer: Option<TvEpisodeMaintainer<'a>>,
+    pub maintainer: Option<TvEpisodeMaintainer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material: Option<TvEpisodeMaterial<'a>>,
+    pub material: Option<TvEpisodeMaterial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub material_extent: Option<TvEpisodeMaterialExtent<'a>>,
+    pub material_extent: Option<TvEpisodeMaterialExtent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mentions: Option<TvEpisodeMentions<'a>>,
+    pub mentions: Option<TvEpisodeMentions<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub music_by: Option<TvEpisodeMusicBy<'a>>,
+    pub music_by: Option<TvEpisodeMusicBy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<TvEpisodeName<'a>>,
+    pub name: Option<TvEpisodeName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub offers: Option<TvEpisodeOffers<'a>>,
+    pub offers: Option<TvEpisodeOffers<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub part_of_season: Option<TvEpisodePartOfSeason<'a>>,
+    pub part_of_season: Option<TvEpisodePartOfSeason<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub part_of_series: Option<TvEpisodePartOfSeries<'a>>,
+    pub part_of_series: Option<TvEpisodePartOfSeries<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub part_of_tv_series: Option<TvEpisodePartOfTvSeries<'a>>,
+    pub part_of_tv_series: Option<TvEpisodePartOfTvSeries<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pattern: Option<TvEpisodePattern<'a>>,
+    pub pattern: Option<TvEpisodePattern<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub position: Option<TvEpisodePosition<'a>>,
+    pub position: Option<TvEpisodePosition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub potential_action: Option<TvEpisodePotentialAction<'a>>,
+    pub potential_action: Option<TvEpisodePotentialAction<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub producer: Option<TvEpisodeProducer<'a>>,
+    pub producer: Option<TvEpisodeProducer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub production_company: Option<TvEpisodeProductionCompany<'a>>,
+    pub production_company: Option<TvEpisodeProductionCompany<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub provider: Option<TvEpisodeProvider<'a>>,
+    pub provider: Option<TvEpisodeProvider<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publication: Option<TvEpisodePublication<'a>>,
+    pub publication: Option<TvEpisodePublication<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher: Option<TvEpisodePublisher<'a>>,
+    pub publisher: Option<TvEpisodePublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publisher_imprint: Option<TvEpisodePublisherImprint<'a>>,
+    pub publisher_imprint: Option<TvEpisodePublisherImprint<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub publishing_principles: Option<TvEpisodePublishingPrinciples<'a>>,
+    pub publishing_principles: Option<TvEpisodePublishingPrinciples<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub recorded_at: Option<TvEpisodeRecordedAt<'a>>,
+    pub recorded_at: Option<TvEpisodeRecordedAt<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub released_event: Option<TvEpisodeReleasedEvent<'a>>,
+    pub released_event: Option<TvEpisodeReleasedEvent<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub review: Option<TvEpisodeReview<'a>>,
+    pub review: Option<TvEpisodeReview<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reviews: Option<TvEpisodeReviews<'a>>,
+    pub reviews: Option<TvEpisodeReviews<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub same_as: Option<TvEpisodeSameAs<'a>>,
+    pub same_as: Option<TvEpisodeSameAs<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub schema_version: Option<TvEpisodeSchemaVersion<'a>>,
+    pub schema_version: Option<TvEpisodeSchemaVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_date_published: Option<TvEpisodeSdDatePublished<'a>>,
+    pub sd_date_published: Option<TvEpisodeSdDatePublished<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_license: Option<TvEpisodeSdLicense<'a>>,
+    pub sd_license: Option<TvEpisodeSdLicense<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sd_publisher: Option<TvEpisodeSdPublisher<'a>>,
+    pub sd_publisher: Option<TvEpisodeSdPublisher<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub size: Option<TvEpisodeSize<'a>>,
+    pub size: Option<TvEpisodeSize<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_organization: Option<TvEpisodeSourceOrganization<'a>>,
+    pub source_organization: Option<TvEpisodeSourceOrganization<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial: Option<TvEpisodeSpatial<'a>>,
+    pub spatial: Option<TvEpisodeSpatial<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub spatial_coverage: Option<TvEpisodeSpatialCoverage<'a>>,
+    pub spatial_coverage: Option<TvEpisodeSpatialCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sponsor: Option<TvEpisodeSponsor<'a>>,
+    pub sponsor: Option<TvEpisodeSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subject_of: Option<TvEpisodeSubjectOf<'a>>,
+    pub subject_of: Option<TvEpisodeSubjectOf<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub subtitle_language: Option<TvEpisodeSubtitleLanguage<'a>>,
+    pub subtitle_language: Option<TvEpisodeSubtitleLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub teaches: Option<TvEpisodeTeaches<'a>>,
+    pub teaches: Option<TvEpisodeTeaches<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal: Option<TvEpisodeTemporal<'a>>,
+    pub temporal: Option<TvEpisodeTemporal<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub temporal_coverage: Option<TvEpisodeTemporalCoverage<'a>>,
+    pub temporal_coverage: Option<TvEpisodeTemporalCoverage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<TvEpisodeText<'a>>,
+    pub text: Option<TvEpisodeText<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail: Option<TvEpisodeThumbnail<'a>>,
+    pub thumbnail: Option<TvEpisodeThumbnail<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail_url: Option<TvEpisodeThumbnailUrl<'a>>,
+    pub thumbnail_url: Option<TvEpisodeThumbnailUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub time_required: Option<TvEpisodeTimeRequired<'a>>,
+    pub time_required: Option<TvEpisodeTimeRequired<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title_eidr: Option<TvEpisodeTitleEidr<'a>>,
+    pub title_eidr: Option<TvEpisodeTitleEidr<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub trailer: Option<TvEpisodeTrailer<'a>>,
+    pub trailer: Option<TvEpisodeTrailer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translation_of_work: Option<TvEpisodeTranslationOfWork<'a>>,
+    pub translation_of_work: Option<TvEpisodeTranslationOfWork<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub translator: Option<TvEpisodeTranslator<'a>>,
+    pub translator: Option<TvEpisodeTranslator<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub typical_age_range: Option<TvEpisodeTypicalAgeRange<'a>>,
+    pub typical_age_range: Option<TvEpisodeTypicalAgeRange<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<TvEpisodeUrl<'a>>,
+    pub url: Option<TvEpisodeUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub usage_info: Option<TvEpisodeUsageInfo<'a>>,
+    pub usage_info: Option<TvEpisodeUsageInfo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub version: Option<TvEpisodeVersion<'a>>,
+    pub version: Option<TvEpisodeVersion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub video: Option<TvEpisodeVideo<'a>>,
+    pub video: Option<TvEpisodeVideo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub word_count: Option<TvEpisodeWordCount<'a>>,
+    pub word_count: Option<TvEpisodeWordCount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_example: Option<TvEpisodeWorkExample<'a>>,
+    pub work_example: Option<TvEpisodeWorkExample<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub work_translation: Option<TvEpisodeWorkTranslation<'a>>,
+    pub work_translation: Option<TvEpisodeWorkTranslation<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAbout<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAbstract<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAbstract<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAccessMode<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAccessMode<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAccessModeSufficient<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAccessModeSufficient<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAccessibilityApi<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAccessibilityApi<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAccessibilityControl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAccessibilityControl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAccessibilityFeature<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAccessibilityFeature<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAccessibilityHazard<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAccessibilityHazard<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAccessibilitySummary<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAccessibilitySummary<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAccountablePerson<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAccountablePerson<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAcquireLicensePage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAcquireLicensePage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeActor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeActor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeActors<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeActors<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAdditionalType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAggregateRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAlternateName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAlternativeHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAlternativeHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeArchivedAt<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeArchivedAt<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAssesses<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAssesses<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAssociatedMedia<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAssociatedMedia<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAudience<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAudio<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAudio<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAuthor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAuthor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAward<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeAwards<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeCharacter<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeCharacter<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeCitation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeCitation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeComment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeComment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeCommentCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeCommentCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeConditionsOfAccess<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeConditionsOfAccess<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeContentLocation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeContentLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeContentRating<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeContentRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeContentReferenceTime<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeContentReferenceTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeContributor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeContributor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeCopyrightHolder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeCopyrightHolder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeCopyrightNotice<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeCopyrightNotice<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeCopyrightYear<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeCopyrightYear<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeCorrection<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeCorrection<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeCountryOfOrigin<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeCreativeWorkStatus<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeCreativeWorkStatus<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeCreator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeCreator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeCreditText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeCreditText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeDateCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeDateCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeDateModified<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeDateModified<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeDigitalSourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeDigitalSourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeDirector<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeDirector<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeDirectors<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeDirectors<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeDisambiguatingDescription<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeDiscussionUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeDiscussionUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeDuration<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeDuration<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeEditEidr<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeEditEidr<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeEditor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeEditor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeEducationalAlignment<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeEducationalAlignment<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeEducationalLevel<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeEducationalLevel<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeEducationalUse<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeEducationalUse<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeEncoding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeEncoding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeEncodingFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeEncodingFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeEncodings<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeEncodings<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeEpisodeNumber<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeEpisodeNumber<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeExampleOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeExampleOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeExpires<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeExpires<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeFileFormat<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeFileFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeFunder<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeFunding<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeGenre<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeGenre<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeHasPart<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeHasPart<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeHeadline<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeIdentifier<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeInLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeInLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeInteractionStatistic<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeInteractivityType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeInteractivityType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeInterpretedAsClaim<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeInterpretedAsClaim<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeIsAccessibleForFree<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeIsAccessibleForFree<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeIsBasedOn<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeIsBasedOn<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeIsBasedOnUrl<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeIsBasedOnUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeIsFamilyFriendly<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeIsPartOf<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeIsPartOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeKeywords<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeLearningResourceType<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeLearningResourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeLocationCreated<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeLocationCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeMainEntity<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeMainEntity<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeMainEntityOfPage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeMaintainer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeMaintainer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeMaterial<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
-    ProductEmbedded(Box<product::Embedded<'a>>),
+    ProductEmbedded(Box<product::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeMaterialExtent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeMaterialExtent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeMentions<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeMentions<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeMusicBy<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeMusicBy<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.MusicGroup#embedded")]
-    MusicGroupEmbedded(Box<music_group::Embedded<'a>>),
+    MusicGroupEmbedded(Box<music_group::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeName<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeName<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeOffers<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
-    OfferEmbedded(Box<offer::Embedded<'a>>),
+    OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodePartOfSeason<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodePartOfSeason<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodePartOfSeries<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodePartOfSeries<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodePartOfTvSeries<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodePartOfTvSeries<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.TVSeries#embedded")]
-    TvSeriesEmbedded(Box<tv_series::Embedded<'a>>),
+    TvSeriesEmbedded(Box<tv_series::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodePattern<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodePattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodePosition<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodePosition<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodePotentialAction<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodePotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeProducer<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeProducer<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeProductionCompany<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeProductionCompany<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeProvider<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeProvider<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodePublication<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodePublication<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodePublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodePublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodePublisherImprint<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodePublisherImprint<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodePublishingPrinciples<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodePublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeRecordedAt<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeRecordedAt<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeReleasedEvent<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeReleasedEvent<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeReview<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeReviews<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeSameAs<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeSchemaVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeSchemaVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeSdDatePublished<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeSdDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeSdLicense<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeSdLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeSdPublisher<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeSdPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeSize<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeSourceOrganization<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeSourceOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeSpatial<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeSpatial<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeSpatialCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeSpatialCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeSponsor<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeSubjectOf<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
-    EventEmbedded(Box<event::Embedded<'a>>),
+    EventEmbedded(Box<event::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeSubtitleLanguage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeSubtitleLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeTeaches<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeTeaches<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeTemporal<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeTemporal<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeTemporalCoverage<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeTemporalCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeText<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeText<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeThumbnail<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeThumbnail<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
-    ImageObjectEmbedded(Box<image_object::Embedded<'a>>),
+    ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeThumbnailUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeThumbnailUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeTimeRequired<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeTimeRequired<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeTitleEidr<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeTitleEidr<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeTrailer<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeTrailer<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeTranslationOfWork<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeTranslationOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeTranslator<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeTranslator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
-    OrganizationEmbedded(Box<organization::Embedded<'a>>),
+    OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
-    PersonEmbedded(Box<person::Embedded<'a>>),
+    PersonEmbedded(Box<person::Embedded<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeTypicalAgeRange<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeTypicalAgeRange<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeUrl<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeUsageInfo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeUsageInfo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeVersion<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeVideo<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeVideo<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeWordCount<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeWordCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeWorkExample<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeWorkExample<S: Bos<str> + AsRef<str> = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TvEpisodeWorkTranslation<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TvEpisodeWorkTranslation<S: Bos<str> + AsRef<str> = DefaultStr> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TvEpisodeGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TvEpisodeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: TvEpisode<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: TvEpisode<S>,
 }
 
-impl<'a> TvEpisode<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TvEpisodeRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> TvEpisode<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TvEpisodeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Embedded<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Embedded<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.TVEpisode"
     }
@@ -2661,18 +4085,17 @@ pub struct TvEpisodeRecord;
 impl XrpcResp for TvEpisodeRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.TVEpisode";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TvEpisodeGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TvEpisodeGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TvEpisodeGetRecordOutput<'_>> for TvEpisode<'_> {
-    fn from(output: TvEpisodeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TvEpisodeGetRecordOutput<S>> for TvEpisode<S> {
+    fn from(output: TvEpisodeGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for TvEpisode<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for TvEpisode<S> {
     const NSID: &'static str = "social.flockfeeds.lexical.type.TVEpisode";
     type Record = TvEpisodeRecord;
 }
@@ -2682,7 +4105,7 @@ impl Collection for TvEpisodeRecord {
     type Record = TvEpisodeRecord;
 }
 
-impl<'a> LexiconSchema for TvEpisode<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TvEpisode<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.TVEpisode"
     }
@@ -5700,147 +7123,147 @@ pub mod tv_episode_state {
 pub struct TvEpisodeBuilder<'a, S: tv_episode_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<TvEpisodeAbout<'a>>,
-        Option<TvEpisodeAbstract<'a>>,
-        Option<TvEpisodeAccessMode<'a>>,
-        Option<TvEpisodeAccessModeSufficient<'a>>,
-        Option<TvEpisodeAccessibilityApi<'a>>,
-        Option<TvEpisodeAccessibilityControl<'a>>,
-        Option<TvEpisodeAccessibilityFeature<'a>>,
-        Option<TvEpisodeAccessibilityHazard<'a>>,
-        Option<TvEpisodeAccessibilitySummary<'a>>,
-        Option<TvEpisodeAccountablePerson<'a>>,
-        Option<TvEpisodeAcquireLicensePage<'a>>,
-        Option<TvEpisodeActor<'a>>,
-        Option<TvEpisodeActors<'a>>,
-        Option<TvEpisodeAdditionalType<'a>>,
-        Option<TvEpisodeAggregateRating<'a>>,
-        Option<TvEpisodeAlternateName<'a>>,
-        Option<TvEpisodeAlternativeHeadline<'a>>,
-        Option<TvEpisodeArchivedAt<'a>>,
-        Option<TvEpisodeAssesses<'a>>,
-        Option<TvEpisodeAssociatedMedia<'a>>,
-        Option<TvEpisodeAudience<'a>>,
-        Option<TvEpisodeAudio<'a>>,
-        Option<TvEpisodeAuthor<'a>>,
-        Option<TvEpisodeAward<'a>>,
-        Option<TvEpisodeAwards<'a>>,
-        Option<TvEpisodeCharacter<'a>>,
-        Option<TvEpisodeCitation<'a>>,
-        Option<TvEpisodeComment<'a>>,
-        Option<TvEpisodeCommentCount<'a>>,
-        Option<TvEpisodeConditionsOfAccess<'a>>,
-        Option<TvEpisodeContentLocation<'a>>,
-        Option<TvEpisodeContentRating<'a>>,
-        Option<TvEpisodeContentReferenceTime<'a>>,
-        Option<TvEpisodeContributor<'a>>,
-        Option<TvEpisodeCopyrightHolder<'a>>,
-        Option<TvEpisodeCopyrightNotice<'a>>,
-        Option<TvEpisodeCopyrightYear<'a>>,
-        Option<TvEpisodeCorrection<'a>>,
-        Option<TvEpisodeCountryOfOrigin<'a>>,
-        Option<TvEpisodeCreativeWorkStatus<'a>>,
-        Option<TvEpisodeCreator<'a>>,
-        Option<TvEpisodeCreditText<'a>>,
-        Option<TvEpisodeDateCreated<'a>>,
-        Option<TvEpisodeDateModified<'a>>,
-        Option<TvEpisodeDatePublished<'a>>,
-        Option<TvEpisodeDescription<'a>>,
-        Option<TvEpisodeDigitalSourceType<'a>>,
-        Option<TvEpisodeDirector<'a>>,
-        Option<TvEpisodeDirectors<'a>>,
-        Option<TvEpisodeDisambiguatingDescription<'a>>,
-        Option<TvEpisodeDiscussionUrl<'a>>,
-        Option<TvEpisodeDuration<'a>>,
-        Option<TvEpisodeEditEidr<'a>>,
-        Option<TvEpisodeEditor<'a>>,
-        Option<TvEpisodeEducationalAlignment<'a>>,
-        Option<TvEpisodeEducationalLevel<'a>>,
-        Option<TvEpisodeEducationalUse<'a>>,
-        Option<TvEpisodeEncoding<'a>>,
-        Option<TvEpisodeEncodingFormat<'a>>,
-        Option<TvEpisodeEncodings<'a>>,
-        Option<TvEpisodeEpisodeNumber<'a>>,
-        Option<TvEpisodeExampleOfWork<'a>>,
-        Option<TvEpisodeExpires<'a>>,
-        Option<TvEpisodeFileFormat<'a>>,
-        Option<TvEpisodeFunder<'a>>,
-        Option<TvEpisodeFunding<'a>>,
-        Option<TvEpisodeGenre<'a>>,
-        Option<TvEpisodeHasPart<'a>>,
-        Option<TvEpisodeHeadline<'a>>,
-        Option<TvEpisodeIdentifier<'a>>,
-        Option<TvEpisodeImage<'a>>,
-        Option<TvEpisodeInLanguage<'a>>,
-        Option<TvEpisodeInteractionStatistic<'a>>,
-        Option<TvEpisodeInteractivityType<'a>>,
-        Option<TvEpisodeInterpretedAsClaim<'a>>,
-        Option<TvEpisodeIsAccessibleForFree<'a>>,
-        Option<TvEpisodeIsBasedOn<'a>>,
-        Option<TvEpisodeIsBasedOnUrl<'a>>,
-        Option<TvEpisodeIsFamilyFriendly<'a>>,
-        Option<TvEpisodeIsPartOf<'a>>,
-        Option<TvEpisodeKeywords<'a>>,
-        Option<TvEpisodeLearningResourceType<'a>>,
-        Option<TvEpisodeLicense<'a>>,
-        Option<TvEpisodeLocationCreated<'a>>,
-        Option<TvEpisodeMainEntity<'a>>,
-        Option<TvEpisodeMainEntityOfPage<'a>>,
-        Option<TvEpisodeMaintainer<'a>>,
-        Option<TvEpisodeMaterial<'a>>,
-        Option<TvEpisodeMaterialExtent<'a>>,
-        Option<TvEpisodeMentions<'a>>,
-        Option<TvEpisodeMusicBy<'a>>,
-        Option<TvEpisodeName<'a>>,
-        Option<TvEpisodeOffers<'a>>,
-        Option<TvEpisodePartOfSeason<'a>>,
-        Option<TvEpisodePartOfSeries<'a>>,
-        Option<TvEpisodePartOfTvSeries<'a>>,
-        Option<TvEpisodePattern<'a>>,
-        Option<TvEpisodePosition<'a>>,
-        Option<TvEpisodePotentialAction<'a>>,
-        Option<TvEpisodeProducer<'a>>,
-        Option<TvEpisodeProductionCompany<'a>>,
-        Option<TvEpisodeProvider<'a>>,
-        Option<TvEpisodePublication<'a>>,
-        Option<TvEpisodePublisher<'a>>,
-        Option<TvEpisodePublisherImprint<'a>>,
-        Option<TvEpisodePublishingPrinciples<'a>>,
-        Option<TvEpisodeRecordedAt<'a>>,
-        Option<TvEpisodeReleasedEvent<'a>>,
-        Option<TvEpisodeReview<'a>>,
-        Option<TvEpisodeReviews<'a>>,
-        Option<TvEpisodeSameAs<'a>>,
-        Option<TvEpisodeSchemaVersion<'a>>,
-        Option<TvEpisodeSdDatePublished<'a>>,
-        Option<TvEpisodeSdLicense<'a>>,
-        Option<TvEpisodeSdPublisher<'a>>,
-        Option<TvEpisodeSize<'a>>,
-        Option<TvEpisodeSourceOrganization<'a>>,
-        Option<TvEpisodeSpatial<'a>>,
-        Option<TvEpisodeSpatialCoverage<'a>>,
-        Option<TvEpisodeSponsor<'a>>,
-        Option<TvEpisodeSubjectOf<'a>>,
-        Option<TvEpisodeSubtitleLanguage<'a>>,
-        Option<TvEpisodeTeaches<'a>>,
-        Option<TvEpisodeTemporal<'a>>,
-        Option<TvEpisodeTemporalCoverage<'a>>,
-        Option<TvEpisodeText<'a>>,
-        Option<TvEpisodeThumbnail<'a>>,
-        Option<TvEpisodeThumbnailUrl<'a>>,
-        Option<TvEpisodeTimeRequired<'a>>,
-        Option<TvEpisodeTitleEidr<'a>>,
-        Option<TvEpisodeTrailer<'a>>,
-        Option<TvEpisodeTranslationOfWork<'a>>,
-        Option<TvEpisodeTranslator<'a>>,
-        Option<TvEpisodeTypicalAgeRange<'a>>,
-        Option<TvEpisodeUrl<'a>>,
-        Option<TvEpisodeUsageInfo<'a>>,
-        Option<TvEpisodeVersion<'a>>,
-        Option<TvEpisodeVideo<'a>>,
-        Option<TvEpisodeWordCount<'a>>,
-        Option<TvEpisodeWorkExample<'a>>,
-        Option<TvEpisodeWorkTranslation<'a>>,
+        Option<TvEpisodeAbout<S>>,
+        Option<TvEpisodeAbstract<S>>,
+        Option<TvEpisodeAccessMode<S>>,
+        Option<TvEpisodeAccessModeSufficient<S>>,
+        Option<TvEpisodeAccessibilityApi<S>>,
+        Option<TvEpisodeAccessibilityControl<S>>,
+        Option<TvEpisodeAccessibilityFeature<S>>,
+        Option<TvEpisodeAccessibilityHazard<S>>,
+        Option<TvEpisodeAccessibilitySummary<S>>,
+        Option<TvEpisodeAccountablePerson<S>>,
+        Option<TvEpisodeAcquireLicensePage<S>>,
+        Option<TvEpisodeActor<S>>,
+        Option<TvEpisodeActors<S>>,
+        Option<TvEpisodeAdditionalType<S>>,
+        Option<TvEpisodeAggregateRating<S>>,
+        Option<TvEpisodeAlternateName<S>>,
+        Option<TvEpisodeAlternativeHeadline<S>>,
+        Option<TvEpisodeArchivedAt<S>>,
+        Option<TvEpisodeAssesses<S>>,
+        Option<TvEpisodeAssociatedMedia<S>>,
+        Option<TvEpisodeAudience<S>>,
+        Option<TvEpisodeAudio<S>>,
+        Option<TvEpisodeAuthor<S>>,
+        Option<TvEpisodeAward<S>>,
+        Option<TvEpisodeAwards<S>>,
+        Option<TvEpisodeCharacter<S>>,
+        Option<TvEpisodeCitation<S>>,
+        Option<TvEpisodeComment<S>>,
+        Option<TvEpisodeCommentCount<S>>,
+        Option<TvEpisodeConditionsOfAccess<S>>,
+        Option<TvEpisodeContentLocation<S>>,
+        Option<TvEpisodeContentRating<S>>,
+        Option<TvEpisodeContentReferenceTime<S>>,
+        Option<TvEpisodeContributor<S>>,
+        Option<TvEpisodeCopyrightHolder<S>>,
+        Option<TvEpisodeCopyrightNotice<S>>,
+        Option<TvEpisodeCopyrightYear<S>>,
+        Option<TvEpisodeCorrection<S>>,
+        Option<TvEpisodeCountryOfOrigin<S>>,
+        Option<TvEpisodeCreativeWorkStatus<S>>,
+        Option<TvEpisodeCreator<S>>,
+        Option<TvEpisodeCreditText<S>>,
+        Option<TvEpisodeDateCreated<S>>,
+        Option<TvEpisodeDateModified<S>>,
+        Option<TvEpisodeDatePublished<S>>,
+        Option<TvEpisodeDescription<S>>,
+        Option<TvEpisodeDigitalSourceType<S>>,
+        Option<TvEpisodeDirector<S>>,
+        Option<TvEpisodeDirectors<S>>,
+        Option<TvEpisodeDisambiguatingDescription<S>>,
+        Option<TvEpisodeDiscussionUrl<S>>,
+        Option<TvEpisodeDuration<S>>,
+        Option<TvEpisodeEditEidr<S>>,
+        Option<TvEpisodeEditor<S>>,
+        Option<TvEpisodeEducationalAlignment<S>>,
+        Option<TvEpisodeEducationalLevel<S>>,
+        Option<TvEpisodeEducationalUse<S>>,
+        Option<TvEpisodeEncoding<S>>,
+        Option<TvEpisodeEncodingFormat<S>>,
+        Option<TvEpisodeEncodings<S>>,
+        Option<TvEpisodeEpisodeNumber<S>>,
+        Option<TvEpisodeExampleOfWork<S>>,
+        Option<TvEpisodeExpires<S>>,
+        Option<TvEpisodeFileFormat<S>>,
+        Option<TvEpisodeFunder<S>>,
+        Option<TvEpisodeFunding<S>>,
+        Option<TvEpisodeGenre<S>>,
+        Option<TvEpisodeHasPart<S>>,
+        Option<TvEpisodeHeadline<S>>,
+        Option<TvEpisodeIdentifier<S>>,
+        Option<TvEpisodeImage<S>>,
+        Option<TvEpisodeInLanguage<S>>,
+        Option<TvEpisodeInteractionStatistic<S>>,
+        Option<TvEpisodeInteractivityType<S>>,
+        Option<TvEpisodeInterpretedAsClaim<S>>,
+        Option<TvEpisodeIsAccessibleForFree<S>>,
+        Option<TvEpisodeIsBasedOn<S>>,
+        Option<TvEpisodeIsBasedOnUrl<S>>,
+        Option<TvEpisodeIsFamilyFriendly<S>>,
+        Option<TvEpisodeIsPartOf<S>>,
+        Option<TvEpisodeKeywords<S>>,
+        Option<TvEpisodeLearningResourceType<S>>,
+        Option<TvEpisodeLicense<S>>,
+        Option<TvEpisodeLocationCreated<S>>,
+        Option<TvEpisodeMainEntity<S>>,
+        Option<TvEpisodeMainEntityOfPage<S>>,
+        Option<TvEpisodeMaintainer<S>>,
+        Option<TvEpisodeMaterial<S>>,
+        Option<TvEpisodeMaterialExtent<S>>,
+        Option<TvEpisodeMentions<S>>,
+        Option<TvEpisodeMusicBy<S>>,
+        Option<TvEpisodeName<S>>,
+        Option<TvEpisodeOffers<S>>,
+        Option<TvEpisodePartOfSeason<S>>,
+        Option<TvEpisodePartOfSeries<S>>,
+        Option<TvEpisodePartOfTvSeries<S>>,
+        Option<TvEpisodePattern<S>>,
+        Option<TvEpisodePosition<S>>,
+        Option<TvEpisodePotentialAction<S>>,
+        Option<TvEpisodeProducer<S>>,
+        Option<TvEpisodeProductionCompany<S>>,
+        Option<TvEpisodeProvider<S>>,
+        Option<TvEpisodePublication<S>>,
+        Option<TvEpisodePublisher<S>>,
+        Option<TvEpisodePublisherImprint<S>>,
+        Option<TvEpisodePublishingPrinciples<S>>,
+        Option<TvEpisodeRecordedAt<S>>,
+        Option<TvEpisodeReleasedEvent<S>>,
+        Option<TvEpisodeReview<S>>,
+        Option<TvEpisodeReviews<S>>,
+        Option<TvEpisodeSameAs<S>>,
+        Option<TvEpisodeSchemaVersion<S>>,
+        Option<TvEpisodeSdDatePublished<S>>,
+        Option<TvEpisodeSdLicense<S>>,
+        Option<TvEpisodeSdPublisher<S>>,
+        Option<TvEpisodeSize<S>>,
+        Option<TvEpisodeSourceOrganization<S>>,
+        Option<TvEpisodeSpatial<S>>,
+        Option<TvEpisodeSpatialCoverage<S>>,
+        Option<TvEpisodeSponsor<S>>,
+        Option<TvEpisodeSubjectOf<S>>,
+        Option<TvEpisodeSubtitleLanguage<S>>,
+        Option<TvEpisodeTeaches<S>>,
+        Option<TvEpisodeTemporal<S>>,
+        Option<TvEpisodeTemporalCoverage<S>>,
+        Option<TvEpisodeText<S>>,
+        Option<TvEpisodeThumbnail<S>>,
+        Option<TvEpisodeThumbnailUrl<S>>,
+        Option<TvEpisodeTimeRequired<S>>,
+        Option<TvEpisodeTitleEidr<S>>,
+        Option<TvEpisodeTrailer<S>>,
+        Option<TvEpisodeTranslationOfWork<S>>,
+        Option<TvEpisodeTranslator<S>>,
+        Option<TvEpisodeTypicalAgeRange<S>>,
+        Option<TvEpisodeUrl<S>>,
+        Option<TvEpisodeUsageInfo<S>>,
+        Option<TvEpisodeVersion<S>>,
+        Option<TvEpisodeVideo<S>>,
+        Option<TvEpisodeWordCount<S>>,
+        Option<TvEpisodeWorkExample<S>>,
+        Option<TvEpisodeWorkTranslation<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -6007,12 +7430,12 @@ impl<'a> TvEpisodeBuilder<'a, tv_episode_state::Empty> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `about` field (optional)
-    pub fn about(mut self, value: impl Into<Option<TvEpisodeAbout<'a>>>) -> Self {
+    pub fn about(mut self, value: impl Into<Option<TvEpisodeAbout<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `about` field to an Option value (optional)
-    pub fn maybe_about(mut self, value: Option<TvEpisodeAbout<'a>>) -> Self {
+    pub fn maybe_about(mut self, value: Option<TvEpisodeAbout<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -6020,15 +7443,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `abstract` field (optional)
-    pub fn r#abstract(
-        mut self,
-        value: impl Into<Option<TvEpisodeAbstract<'a>>>,
-    ) -> Self {
+    pub fn r#abstract(mut self, value: impl Into<Option<TvEpisodeAbstract<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `abstract` field to an Option value (optional)
-    pub fn maybe_abstract(mut self, value: Option<TvEpisodeAbstract<'a>>) -> Self {
+    pub fn maybe_abstract(mut self, value: Option<TvEpisodeAbstract<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -6038,13 +7458,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accessMode` field (optional)
     pub fn access_mode(
         mut self,
-        value: impl Into<Option<TvEpisodeAccessMode<'a>>>,
+        value: impl Into<Option<TvEpisodeAccessMode<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `accessMode` field to an Option value (optional)
-    pub fn maybe_access_mode(mut self, value: Option<TvEpisodeAccessMode<'a>>) -> Self {
+    pub fn maybe_access_mode(mut self, value: Option<TvEpisodeAccessMode<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -6054,7 +7474,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accessModeSufficient` field (optional)
     pub fn access_mode_sufficient(
         mut self,
-        value: impl Into<Option<TvEpisodeAccessModeSufficient<'a>>>,
+        value: impl Into<Option<TvEpisodeAccessModeSufficient<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -6062,7 +7482,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accessModeSufficient` field to an Option value (optional)
     pub fn maybe_access_mode_sufficient(
         mut self,
-        value: Option<TvEpisodeAccessModeSufficient<'a>>,
+        value: Option<TvEpisodeAccessModeSufficient<S>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -6073,7 +7493,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accessibilityAPI` field (optional)
     pub fn accessibility_api(
         mut self,
-        value: impl Into<Option<TvEpisodeAccessibilityApi<'a>>>,
+        value: impl Into<Option<TvEpisodeAccessibilityApi<S>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
@@ -6081,7 +7501,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accessibilityAPI` field to an Option value (optional)
     pub fn maybe_accessibility_api(
         mut self,
-        value: Option<TvEpisodeAccessibilityApi<'a>>,
+        value: Option<TvEpisodeAccessibilityApi<S>>,
     ) -> Self {
         self._fields.4 = value;
         self
@@ -6092,7 +7512,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accessibilityControl` field (optional)
     pub fn accessibility_control(
         mut self,
-        value: impl Into<Option<TvEpisodeAccessibilityControl<'a>>>,
+        value: impl Into<Option<TvEpisodeAccessibilityControl<S>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
@@ -6100,7 +7520,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accessibilityControl` field to an Option value (optional)
     pub fn maybe_accessibility_control(
         mut self,
-        value: Option<TvEpisodeAccessibilityControl<'a>>,
+        value: Option<TvEpisodeAccessibilityControl<S>>,
     ) -> Self {
         self._fields.5 = value;
         self
@@ -6111,7 +7531,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accessibilityFeature` field (optional)
     pub fn accessibility_feature(
         mut self,
-        value: impl Into<Option<TvEpisodeAccessibilityFeature<'a>>>,
+        value: impl Into<Option<TvEpisodeAccessibilityFeature<S>>>,
     ) -> Self {
         self._fields.6 = value.into();
         self
@@ -6119,7 +7539,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accessibilityFeature` field to an Option value (optional)
     pub fn maybe_accessibility_feature(
         mut self,
-        value: Option<TvEpisodeAccessibilityFeature<'a>>,
+        value: Option<TvEpisodeAccessibilityFeature<S>>,
     ) -> Self {
         self._fields.6 = value;
         self
@@ -6130,7 +7550,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accessibilityHazard` field (optional)
     pub fn accessibility_hazard(
         mut self,
-        value: impl Into<Option<TvEpisodeAccessibilityHazard<'a>>>,
+        value: impl Into<Option<TvEpisodeAccessibilityHazard<S>>>,
     ) -> Self {
         self._fields.7 = value.into();
         self
@@ -6138,7 +7558,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accessibilityHazard` field to an Option value (optional)
     pub fn maybe_accessibility_hazard(
         mut self,
-        value: Option<TvEpisodeAccessibilityHazard<'a>>,
+        value: Option<TvEpisodeAccessibilityHazard<S>>,
     ) -> Self {
         self._fields.7 = value;
         self
@@ -6149,7 +7569,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accessibilitySummary` field (optional)
     pub fn accessibility_summary(
         mut self,
-        value: impl Into<Option<TvEpisodeAccessibilitySummary<'a>>>,
+        value: impl Into<Option<TvEpisodeAccessibilitySummary<S>>>,
     ) -> Self {
         self._fields.8 = value.into();
         self
@@ -6157,7 +7577,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accessibilitySummary` field to an Option value (optional)
     pub fn maybe_accessibility_summary(
         mut self,
-        value: Option<TvEpisodeAccessibilitySummary<'a>>,
+        value: Option<TvEpisodeAccessibilitySummary<S>>,
     ) -> Self {
         self._fields.8 = value;
         self
@@ -6168,7 +7588,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accountablePerson` field (optional)
     pub fn accountable_person(
         mut self,
-        value: impl Into<Option<TvEpisodeAccountablePerson<'a>>>,
+        value: impl Into<Option<TvEpisodeAccountablePerson<S>>>,
     ) -> Self {
         self._fields.9 = value.into();
         self
@@ -6176,7 +7596,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `accountablePerson` field to an Option value (optional)
     pub fn maybe_accountable_person(
         mut self,
-        value: Option<TvEpisodeAccountablePerson<'a>>,
+        value: Option<TvEpisodeAccountablePerson<S>>,
     ) -> Self {
         self._fields.9 = value;
         self
@@ -6187,7 +7607,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `acquireLicensePage` field (optional)
     pub fn acquire_license_page(
         mut self,
-        value: impl Into<Option<TvEpisodeAcquireLicensePage<'a>>>,
+        value: impl Into<Option<TvEpisodeAcquireLicensePage<S>>>,
     ) -> Self {
         self._fields.10 = value.into();
         self
@@ -6195,7 +7615,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `acquireLicensePage` field to an Option value (optional)
     pub fn maybe_acquire_license_page(
         mut self,
-        value: Option<TvEpisodeAcquireLicensePage<'a>>,
+        value: Option<TvEpisodeAcquireLicensePage<S>>,
     ) -> Self {
         self._fields.10 = value;
         self
@@ -6204,12 +7624,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `actor` field (optional)
-    pub fn actor(mut self, value: impl Into<Option<TvEpisodeActor<'a>>>) -> Self {
+    pub fn actor(mut self, value: impl Into<Option<TvEpisodeActor<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
-    pub fn maybe_actor(mut self, value: Option<TvEpisodeActor<'a>>) -> Self {
+    pub fn maybe_actor(mut self, value: Option<TvEpisodeActor<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -6217,12 +7637,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `actors` field (optional)
-    pub fn actors(mut self, value: impl Into<Option<TvEpisodeActors<'a>>>) -> Self {
+    pub fn actors(mut self, value: impl Into<Option<TvEpisodeActors<S>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `actors` field to an Option value (optional)
-    pub fn maybe_actors(mut self, value: Option<TvEpisodeActors<'a>>) -> Self {
+    pub fn maybe_actors(mut self, value: Option<TvEpisodeActors<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -6232,7 +7652,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `additionalType` field (optional)
     pub fn additional_type(
         mut self,
-        value: impl Into<Option<TvEpisodeAdditionalType<'a>>>,
+        value: impl Into<Option<TvEpisodeAdditionalType<S>>>,
     ) -> Self {
         self._fields.13 = value.into();
         self
@@ -6240,7 +7660,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `additionalType` field to an Option value (optional)
     pub fn maybe_additional_type(
         mut self,
-        value: Option<TvEpisodeAdditionalType<'a>>,
+        value: Option<TvEpisodeAdditionalType<S>>,
     ) -> Self {
         self._fields.13 = value;
         self
@@ -6251,7 +7671,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `aggregateRating` field (optional)
     pub fn aggregate_rating(
         mut self,
-        value: impl Into<Option<TvEpisodeAggregateRating<'a>>>,
+        value: impl Into<Option<TvEpisodeAggregateRating<S>>>,
     ) -> Self {
         self._fields.14 = value.into();
         self
@@ -6259,7 +7679,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `aggregateRating` field to an Option value (optional)
     pub fn maybe_aggregate_rating(
         mut self,
-        value: Option<TvEpisodeAggregateRating<'a>>,
+        value: Option<TvEpisodeAggregateRating<S>>,
     ) -> Self {
         self._fields.14 = value;
         self
@@ -6270,7 +7690,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `alternateName` field (optional)
     pub fn alternate_name(
         mut self,
-        value: impl Into<Option<TvEpisodeAlternateName<'a>>>,
+        value: impl Into<Option<TvEpisodeAlternateName<S>>>,
     ) -> Self {
         self._fields.15 = value.into();
         self
@@ -6278,7 +7698,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `alternateName` field to an Option value (optional)
     pub fn maybe_alternate_name(
         mut self,
-        value: Option<TvEpisodeAlternateName<'a>>,
+        value: Option<TvEpisodeAlternateName<S>>,
     ) -> Self {
         self._fields.15 = value;
         self
@@ -6289,7 +7709,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `alternativeHeadline` field (optional)
     pub fn alternative_headline(
         mut self,
-        value: impl Into<Option<TvEpisodeAlternativeHeadline<'a>>>,
+        value: impl Into<Option<TvEpisodeAlternativeHeadline<S>>>,
     ) -> Self {
         self._fields.16 = value.into();
         self
@@ -6297,7 +7717,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `alternativeHeadline` field to an Option value (optional)
     pub fn maybe_alternative_headline(
         mut self,
-        value: Option<TvEpisodeAlternativeHeadline<'a>>,
+        value: Option<TvEpisodeAlternativeHeadline<S>>,
     ) -> Self {
         self._fields.16 = value;
         self
@@ -6308,13 +7728,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `archivedAt` field (optional)
     pub fn archived_at(
         mut self,
-        value: impl Into<Option<TvEpisodeArchivedAt<'a>>>,
+        value: impl Into<Option<TvEpisodeArchivedAt<S>>>,
     ) -> Self {
         self._fields.17 = value.into();
         self
     }
     /// Set the `archivedAt` field to an Option value (optional)
-    pub fn maybe_archived_at(mut self, value: Option<TvEpisodeArchivedAt<'a>>) -> Self {
+    pub fn maybe_archived_at(mut self, value: Option<TvEpisodeArchivedAt<S>>) -> Self {
         self._fields.17 = value;
         self
     }
@@ -6322,12 +7742,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `assesses` field (optional)
-    pub fn assesses(mut self, value: impl Into<Option<TvEpisodeAssesses<'a>>>) -> Self {
+    pub fn assesses(mut self, value: impl Into<Option<TvEpisodeAssesses<S>>>) -> Self {
         self._fields.18 = value.into();
         self
     }
     /// Set the `assesses` field to an Option value (optional)
-    pub fn maybe_assesses(mut self, value: Option<TvEpisodeAssesses<'a>>) -> Self {
+    pub fn maybe_assesses(mut self, value: Option<TvEpisodeAssesses<S>>) -> Self {
         self._fields.18 = value;
         self
     }
@@ -6337,7 +7757,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `associatedMedia` field (optional)
     pub fn associated_media(
         mut self,
-        value: impl Into<Option<TvEpisodeAssociatedMedia<'a>>>,
+        value: impl Into<Option<TvEpisodeAssociatedMedia<S>>>,
     ) -> Self {
         self._fields.19 = value.into();
         self
@@ -6345,7 +7765,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `associatedMedia` field to an Option value (optional)
     pub fn maybe_associated_media(
         mut self,
-        value: Option<TvEpisodeAssociatedMedia<'a>>,
+        value: Option<TvEpisodeAssociatedMedia<S>>,
     ) -> Self {
         self._fields.19 = value;
         self
@@ -6354,12 +7774,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `audience` field (optional)
-    pub fn audience(mut self, value: impl Into<Option<TvEpisodeAudience<'a>>>) -> Self {
+    pub fn audience(mut self, value: impl Into<Option<TvEpisodeAudience<S>>>) -> Self {
         self._fields.20 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
-    pub fn maybe_audience(mut self, value: Option<TvEpisodeAudience<'a>>) -> Self {
+    pub fn maybe_audience(mut self, value: Option<TvEpisodeAudience<S>>) -> Self {
         self._fields.20 = value;
         self
     }
@@ -6367,12 +7787,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `audio` field (optional)
-    pub fn audio(mut self, value: impl Into<Option<TvEpisodeAudio<'a>>>) -> Self {
+    pub fn audio(mut self, value: impl Into<Option<TvEpisodeAudio<S>>>) -> Self {
         self._fields.21 = value.into();
         self
     }
     /// Set the `audio` field to an Option value (optional)
-    pub fn maybe_audio(mut self, value: Option<TvEpisodeAudio<'a>>) -> Self {
+    pub fn maybe_audio(mut self, value: Option<TvEpisodeAudio<S>>) -> Self {
         self._fields.21 = value;
         self
     }
@@ -6380,12 +7800,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `author` field (optional)
-    pub fn author(mut self, value: impl Into<Option<TvEpisodeAuthor<'a>>>) -> Self {
+    pub fn author(mut self, value: impl Into<Option<TvEpisodeAuthor<S>>>) -> Self {
         self._fields.22 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
-    pub fn maybe_author(mut self, value: Option<TvEpisodeAuthor<'a>>) -> Self {
+    pub fn maybe_author(mut self, value: Option<TvEpisodeAuthor<S>>) -> Self {
         self._fields.22 = value;
         self
     }
@@ -6393,12 +7813,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `award` field (optional)
-    pub fn award(mut self, value: impl Into<Option<TvEpisodeAward<'a>>>) -> Self {
+    pub fn award(mut self, value: impl Into<Option<TvEpisodeAward<S>>>) -> Self {
         self._fields.23 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
-    pub fn maybe_award(mut self, value: Option<TvEpisodeAward<'a>>) -> Self {
+    pub fn maybe_award(mut self, value: Option<TvEpisodeAward<S>>) -> Self {
         self._fields.23 = value;
         self
     }
@@ -6406,12 +7826,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `awards` field (optional)
-    pub fn awards(mut self, value: impl Into<Option<TvEpisodeAwards<'a>>>) -> Self {
+    pub fn awards(mut self, value: impl Into<Option<TvEpisodeAwards<S>>>) -> Self {
         self._fields.24 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
-    pub fn maybe_awards(mut self, value: Option<TvEpisodeAwards<'a>>) -> Self {
+    pub fn maybe_awards(mut self, value: Option<TvEpisodeAwards<S>>) -> Self {
         self._fields.24 = value;
         self
     }
@@ -6419,15 +7839,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `character` field (optional)
-    pub fn character(
-        mut self,
-        value: impl Into<Option<TvEpisodeCharacter<'a>>>,
-    ) -> Self {
+    pub fn character(mut self, value: impl Into<Option<TvEpisodeCharacter<S>>>) -> Self {
         self._fields.25 = value.into();
         self
     }
     /// Set the `character` field to an Option value (optional)
-    pub fn maybe_character(mut self, value: Option<TvEpisodeCharacter<'a>>) -> Self {
+    pub fn maybe_character(mut self, value: Option<TvEpisodeCharacter<S>>) -> Self {
         self._fields.25 = value;
         self
     }
@@ -6435,12 +7852,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `citation` field (optional)
-    pub fn citation(mut self, value: impl Into<Option<TvEpisodeCitation<'a>>>) -> Self {
+    pub fn citation(mut self, value: impl Into<Option<TvEpisodeCitation<S>>>) -> Self {
         self._fields.26 = value.into();
         self
     }
     /// Set the `citation` field to an Option value (optional)
-    pub fn maybe_citation(mut self, value: Option<TvEpisodeCitation<'a>>) -> Self {
+    pub fn maybe_citation(mut self, value: Option<TvEpisodeCitation<S>>) -> Self {
         self._fields.26 = value;
         self
     }
@@ -6448,12 +7865,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `comment` field (optional)
-    pub fn comment(mut self, value: impl Into<Option<TvEpisodeComment<'a>>>) -> Self {
+    pub fn comment(mut self, value: impl Into<Option<TvEpisodeComment<S>>>) -> Self {
         self._fields.27 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
-    pub fn maybe_comment(mut self, value: Option<TvEpisodeComment<'a>>) -> Self {
+    pub fn maybe_comment(mut self, value: Option<TvEpisodeComment<S>>) -> Self {
         self._fields.27 = value;
         self
     }
@@ -6463,7 +7880,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `commentCount` field (optional)
     pub fn comment_count(
         mut self,
-        value: impl Into<Option<TvEpisodeCommentCount<'a>>>,
+        value: impl Into<Option<TvEpisodeCommentCount<S>>>,
     ) -> Self {
         self._fields.28 = value.into();
         self
@@ -6471,7 +7888,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `commentCount` field to an Option value (optional)
     pub fn maybe_comment_count(
         mut self,
-        value: Option<TvEpisodeCommentCount<'a>>,
+        value: Option<TvEpisodeCommentCount<S>>,
     ) -> Self {
         self._fields.28 = value;
         self
@@ -6482,7 +7899,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `conditionsOfAccess` field (optional)
     pub fn conditions_of_access(
         mut self,
-        value: impl Into<Option<TvEpisodeConditionsOfAccess<'a>>>,
+        value: impl Into<Option<TvEpisodeConditionsOfAccess<S>>>,
     ) -> Self {
         self._fields.29 = value.into();
         self
@@ -6490,7 +7907,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `conditionsOfAccess` field to an Option value (optional)
     pub fn maybe_conditions_of_access(
         mut self,
-        value: Option<TvEpisodeConditionsOfAccess<'a>>,
+        value: Option<TvEpisodeConditionsOfAccess<S>>,
     ) -> Self {
         self._fields.29 = value;
         self
@@ -6501,7 +7918,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `contentLocation` field (optional)
     pub fn content_location(
         mut self,
-        value: impl Into<Option<TvEpisodeContentLocation<'a>>>,
+        value: impl Into<Option<TvEpisodeContentLocation<S>>>,
     ) -> Self {
         self._fields.30 = value.into();
         self
@@ -6509,7 +7926,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `contentLocation` field to an Option value (optional)
     pub fn maybe_content_location(
         mut self,
-        value: Option<TvEpisodeContentLocation<'a>>,
+        value: Option<TvEpisodeContentLocation<S>>,
     ) -> Self {
         self._fields.30 = value;
         self
@@ -6520,7 +7937,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `contentRating` field (optional)
     pub fn content_rating(
         mut self,
-        value: impl Into<Option<TvEpisodeContentRating<'a>>>,
+        value: impl Into<Option<TvEpisodeContentRating<S>>>,
     ) -> Self {
         self._fields.31 = value.into();
         self
@@ -6528,7 +7945,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `contentRating` field to an Option value (optional)
     pub fn maybe_content_rating(
         mut self,
-        value: Option<TvEpisodeContentRating<'a>>,
+        value: Option<TvEpisodeContentRating<S>>,
     ) -> Self {
         self._fields.31 = value;
         self
@@ -6539,7 +7956,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `contentReferenceTime` field (optional)
     pub fn content_reference_time(
         mut self,
-        value: impl Into<Option<TvEpisodeContentReferenceTime<'a>>>,
+        value: impl Into<Option<TvEpisodeContentReferenceTime<S>>>,
     ) -> Self {
         self._fields.32 = value.into();
         self
@@ -6547,7 +7964,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `contentReferenceTime` field to an Option value (optional)
     pub fn maybe_content_reference_time(
         mut self,
-        value: Option<TvEpisodeContentReferenceTime<'a>>,
+        value: Option<TvEpisodeContentReferenceTime<S>>,
     ) -> Self {
         self._fields.32 = value;
         self
@@ -6558,13 +7975,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `contributor` field (optional)
     pub fn contributor(
         mut self,
-        value: impl Into<Option<TvEpisodeContributor<'a>>>,
+        value: impl Into<Option<TvEpisodeContributor<S>>>,
     ) -> Self {
         self._fields.33 = value.into();
         self
     }
     /// Set the `contributor` field to an Option value (optional)
-    pub fn maybe_contributor(mut self, value: Option<TvEpisodeContributor<'a>>) -> Self {
+    pub fn maybe_contributor(mut self, value: Option<TvEpisodeContributor<S>>) -> Self {
         self._fields.33 = value;
         self
     }
@@ -6574,7 +7991,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `copyrightHolder` field (optional)
     pub fn copyright_holder(
         mut self,
-        value: impl Into<Option<TvEpisodeCopyrightHolder<'a>>>,
+        value: impl Into<Option<TvEpisodeCopyrightHolder<S>>>,
     ) -> Self {
         self._fields.34 = value.into();
         self
@@ -6582,7 +7999,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `copyrightHolder` field to an Option value (optional)
     pub fn maybe_copyright_holder(
         mut self,
-        value: Option<TvEpisodeCopyrightHolder<'a>>,
+        value: Option<TvEpisodeCopyrightHolder<S>>,
     ) -> Self {
         self._fields.34 = value;
         self
@@ -6593,7 +8010,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `copyrightNotice` field (optional)
     pub fn copyright_notice(
         mut self,
-        value: impl Into<Option<TvEpisodeCopyrightNotice<'a>>>,
+        value: impl Into<Option<TvEpisodeCopyrightNotice<S>>>,
     ) -> Self {
         self._fields.35 = value.into();
         self
@@ -6601,7 +8018,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `copyrightNotice` field to an Option value (optional)
     pub fn maybe_copyright_notice(
         mut self,
-        value: Option<TvEpisodeCopyrightNotice<'a>>,
+        value: Option<TvEpisodeCopyrightNotice<S>>,
     ) -> Self {
         self._fields.35 = value;
         self
@@ -6612,7 +8029,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `copyrightYear` field (optional)
     pub fn copyright_year(
         mut self,
-        value: impl Into<Option<TvEpisodeCopyrightYear<'a>>>,
+        value: impl Into<Option<TvEpisodeCopyrightYear<S>>>,
     ) -> Self {
         self._fields.36 = value.into();
         self
@@ -6620,7 +8037,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `copyrightYear` field to an Option value (optional)
     pub fn maybe_copyright_year(
         mut self,
-        value: Option<TvEpisodeCopyrightYear<'a>>,
+        value: Option<TvEpisodeCopyrightYear<S>>,
     ) -> Self {
         self._fields.36 = value;
         self
@@ -6631,13 +8048,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `correction` field (optional)
     pub fn correction(
         mut self,
-        value: impl Into<Option<TvEpisodeCorrection<'a>>>,
+        value: impl Into<Option<TvEpisodeCorrection<S>>>,
     ) -> Self {
         self._fields.37 = value.into();
         self
     }
     /// Set the `correction` field to an Option value (optional)
-    pub fn maybe_correction(mut self, value: Option<TvEpisodeCorrection<'a>>) -> Self {
+    pub fn maybe_correction(mut self, value: Option<TvEpisodeCorrection<S>>) -> Self {
         self._fields.37 = value;
         self
     }
@@ -6647,7 +8064,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `countryOfOrigin` field (optional)
     pub fn country_of_origin(
         mut self,
-        value: impl Into<Option<TvEpisodeCountryOfOrigin<'a>>>,
+        value: impl Into<Option<TvEpisodeCountryOfOrigin<S>>>,
     ) -> Self {
         self._fields.38 = value.into();
         self
@@ -6655,7 +8072,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `countryOfOrigin` field to an Option value (optional)
     pub fn maybe_country_of_origin(
         mut self,
-        value: Option<TvEpisodeCountryOfOrigin<'a>>,
+        value: Option<TvEpisodeCountryOfOrigin<S>>,
     ) -> Self {
         self._fields.38 = value;
         self
@@ -6666,7 +8083,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `creativeWorkStatus` field (optional)
     pub fn creative_work_status(
         mut self,
-        value: impl Into<Option<TvEpisodeCreativeWorkStatus<'a>>>,
+        value: impl Into<Option<TvEpisodeCreativeWorkStatus<S>>>,
     ) -> Self {
         self._fields.39 = value.into();
         self
@@ -6674,7 +8091,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `creativeWorkStatus` field to an Option value (optional)
     pub fn maybe_creative_work_status(
         mut self,
-        value: Option<TvEpisodeCreativeWorkStatus<'a>>,
+        value: Option<TvEpisodeCreativeWorkStatus<S>>,
     ) -> Self {
         self._fields.39 = value;
         self
@@ -6683,12 +8100,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `creator` field (optional)
-    pub fn creator(mut self, value: impl Into<Option<TvEpisodeCreator<'a>>>) -> Self {
+    pub fn creator(mut self, value: impl Into<Option<TvEpisodeCreator<S>>>) -> Self {
         self._fields.40 = value.into();
         self
     }
     /// Set the `creator` field to an Option value (optional)
-    pub fn maybe_creator(mut self, value: Option<TvEpisodeCreator<'a>>) -> Self {
+    pub fn maybe_creator(mut self, value: Option<TvEpisodeCreator<S>>) -> Self {
         self._fields.40 = value;
         self
     }
@@ -6698,13 +8115,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `creditText` field (optional)
     pub fn credit_text(
         mut self,
-        value: impl Into<Option<TvEpisodeCreditText<'a>>>,
+        value: impl Into<Option<TvEpisodeCreditText<S>>>,
     ) -> Self {
         self._fields.41 = value.into();
         self
     }
     /// Set the `creditText` field to an Option value (optional)
-    pub fn maybe_credit_text(mut self, value: Option<TvEpisodeCreditText<'a>>) -> Self {
+    pub fn maybe_credit_text(mut self, value: Option<TvEpisodeCreditText<S>>) -> Self {
         self._fields.41 = value;
         self
     }
@@ -6714,16 +8131,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `dateCreated` field (optional)
     pub fn date_created(
         mut self,
-        value: impl Into<Option<TvEpisodeDateCreated<'a>>>,
+        value: impl Into<Option<TvEpisodeDateCreated<S>>>,
     ) -> Self {
         self._fields.42 = value.into();
         self
     }
     /// Set the `dateCreated` field to an Option value (optional)
-    pub fn maybe_date_created(
-        mut self,
-        value: Option<TvEpisodeDateCreated<'a>>,
-    ) -> Self {
+    pub fn maybe_date_created(mut self, value: Option<TvEpisodeDateCreated<S>>) -> Self {
         self._fields.42 = value;
         self
     }
@@ -6733,7 +8147,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `dateModified` field (optional)
     pub fn date_modified(
         mut self,
-        value: impl Into<Option<TvEpisodeDateModified<'a>>>,
+        value: impl Into<Option<TvEpisodeDateModified<S>>>,
     ) -> Self {
         self._fields.43 = value.into();
         self
@@ -6741,7 +8155,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `dateModified` field to an Option value (optional)
     pub fn maybe_date_modified(
         mut self,
-        value: Option<TvEpisodeDateModified<'a>>,
+        value: Option<TvEpisodeDateModified<S>>,
     ) -> Self {
         self._fields.43 = value;
         self
@@ -6752,7 +8166,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `datePublished` field (optional)
     pub fn date_published(
         mut self,
-        value: impl Into<Option<TvEpisodeDatePublished<'a>>>,
+        value: impl Into<Option<TvEpisodeDatePublished<S>>>,
     ) -> Self {
         self._fields.44 = value.into();
         self
@@ -6760,7 +8174,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `datePublished` field to an Option value (optional)
     pub fn maybe_date_published(
         mut self,
-        value: Option<TvEpisodeDatePublished<'a>>,
+        value: Option<TvEpisodeDatePublished<S>>,
     ) -> Self {
         self._fields.44 = value;
         self
@@ -6771,13 +8185,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
-        value: impl Into<Option<TvEpisodeDescription<'a>>>,
+        value: impl Into<Option<TvEpisodeDescription<S>>>,
     ) -> Self {
         self._fields.45 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<TvEpisodeDescription<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<TvEpisodeDescription<S>>) -> Self {
         self._fields.45 = value;
         self
     }
@@ -6787,7 +8201,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `digitalSourceType` field (optional)
     pub fn digital_source_type(
         mut self,
-        value: impl Into<Option<TvEpisodeDigitalSourceType<'a>>>,
+        value: impl Into<Option<TvEpisodeDigitalSourceType<S>>>,
     ) -> Self {
         self._fields.46 = value.into();
         self
@@ -6795,7 +8209,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `digitalSourceType` field to an Option value (optional)
     pub fn maybe_digital_source_type(
         mut self,
-        value: Option<TvEpisodeDigitalSourceType<'a>>,
+        value: Option<TvEpisodeDigitalSourceType<S>>,
     ) -> Self {
         self._fields.46 = value;
         self
@@ -6804,12 +8218,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `director` field (optional)
-    pub fn director(mut self, value: impl Into<Option<TvEpisodeDirector<'a>>>) -> Self {
+    pub fn director(mut self, value: impl Into<Option<TvEpisodeDirector<S>>>) -> Self {
         self._fields.47 = value.into();
         self
     }
     /// Set the `director` field to an Option value (optional)
-    pub fn maybe_director(mut self, value: Option<TvEpisodeDirector<'a>>) -> Self {
+    pub fn maybe_director(mut self, value: Option<TvEpisodeDirector<S>>) -> Self {
         self._fields.47 = value;
         self
     }
@@ -6817,15 +8231,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `directors` field (optional)
-    pub fn directors(
-        mut self,
-        value: impl Into<Option<TvEpisodeDirectors<'a>>>,
-    ) -> Self {
+    pub fn directors(mut self, value: impl Into<Option<TvEpisodeDirectors<S>>>) -> Self {
         self._fields.48 = value.into();
         self
     }
     /// Set the `directors` field to an Option value (optional)
-    pub fn maybe_directors(mut self, value: Option<TvEpisodeDirectors<'a>>) -> Self {
+    pub fn maybe_directors(mut self, value: Option<TvEpisodeDirectors<S>>) -> Self {
         self._fields.48 = value;
         self
     }
@@ -6835,7 +8246,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
-        value: impl Into<Option<TvEpisodeDisambiguatingDescription<'a>>>,
+        value: impl Into<Option<TvEpisodeDisambiguatingDescription<S>>>,
     ) -> Self {
         self._fields.49 = value.into();
         self
@@ -6843,7 +8254,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `disambiguatingDescription` field to an Option value (optional)
     pub fn maybe_disambiguating_description(
         mut self,
-        value: Option<TvEpisodeDisambiguatingDescription<'a>>,
+        value: Option<TvEpisodeDisambiguatingDescription<S>>,
     ) -> Self {
         self._fields.49 = value;
         self
@@ -6854,7 +8265,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `discussionUrl` field (optional)
     pub fn discussion_url(
         mut self,
-        value: impl Into<Option<TvEpisodeDiscussionUrl<'a>>>,
+        value: impl Into<Option<TvEpisodeDiscussionUrl<S>>>,
     ) -> Self {
         self._fields.50 = value.into();
         self
@@ -6862,7 +8273,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `discussionUrl` field to an Option value (optional)
     pub fn maybe_discussion_url(
         mut self,
-        value: Option<TvEpisodeDiscussionUrl<'a>>,
+        value: Option<TvEpisodeDiscussionUrl<S>>,
     ) -> Self {
         self._fields.50 = value;
         self
@@ -6871,12 +8282,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `duration` field (optional)
-    pub fn duration(mut self, value: impl Into<Option<TvEpisodeDuration<'a>>>) -> Self {
+    pub fn duration(mut self, value: impl Into<Option<TvEpisodeDuration<S>>>) -> Self {
         self._fields.51 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
-    pub fn maybe_duration(mut self, value: Option<TvEpisodeDuration<'a>>) -> Self {
+    pub fn maybe_duration(mut self, value: Option<TvEpisodeDuration<S>>) -> Self {
         self._fields.51 = value;
         self
     }
@@ -6884,12 +8295,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `editEIDR` field (optional)
-    pub fn edit_eidr(mut self, value: impl Into<Option<TvEpisodeEditEidr<'a>>>) -> Self {
+    pub fn edit_eidr(mut self, value: impl Into<Option<TvEpisodeEditEidr<S>>>) -> Self {
         self._fields.52 = value.into();
         self
     }
     /// Set the `editEIDR` field to an Option value (optional)
-    pub fn maybe_edit_eidr(mut self, value: Option<TvEpisodeEditEidr<'a>>) -> Self {
+    pub fn maybe_edit_eidr(mut self, value: Option<TvEpisodeEditEidr<S>>) -> Self {
         self._fields.52 = value;
         self
     }
@@ -6897,12 +8308,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `editor` field (optional)
-    pub fn editor(mut self, value: impl Into<Option<TvEpisodeEditor<'a>>>) -> Self {
+    pub fn editor(mut self, value: impl Into<Option<TvEpisodeEditor<S>>>) -> Self {
         self._fields.53 = value.into();
         self
     }
     /// Set the `editor` field to an Option value (optional)
-    pub fn maybe_editor(mut self, value: Option<TvEpisodeEditor<'a>>) -> Self {
+    pub fn maybe_editor(mut self, value: Option<TvEpisodeEditor<S>>) -> Self {
         self._fields.53 = value;
         self
     }
@@ -6912,7 +8323,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `educationalAlignment` field (optional)
     pub fn educational_alignment(
         mut self,
-        value: impl Into<Option<TvEpisodeEducationalAlignment<'a>>>,
+        value: impl Into<Option<TvEpisodeEducationalAlignment<S>>>,
     ) -> Self {
         self._fields.54 = value.into();
         self
@@ -6920,7 +8331,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `educationalAlignment` field to an Option value (optional)
     pub fn maybe_educational_alignment(
         mut self,
-        value: Option<TvEpisodeEducationalAlignment<'a>>,
+        value: Option<TvEpisodeEducationalAlignment<S>>,
     ) -> Self {
         self._fields.54 = value;
         self
@@ -6931,7 +8342,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `educationalLevel` field (optional)
     pub fn educational_level(
         mut self,
-        value: impl Into<Option<TvEpisodeEducationalLevel<'a>>>,
+        value: impl Into<Option<TvEpisodeEducationalLevel<S>>>,
     ) -> Self {
         self._fields.55 = value.into();
         self
@@ -6939,7 +8350,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `educationalLevel` field to an Option value (optional)
     pub fn maybe_educational_level(
         mut self,
-        value: Option<TvEpisodeEducationalLevel<'a>>,
+        value: Option<TvEpisodeEducationalLevel<S>>,
     ) -> Self {
         self._fields.55 = value;
         self
@@ -6950,7 +8361,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `educationalUse` field (optional)
     pub fn educational_use(
         mut self,
-        value: impl Into<Option<TvEpisodeEducationalUse<'a>>>,
+        value: impl Into<Option<TvEpisodeEducationalUse<S>>>,
     ) -> Self {
         self._fields.56 = value.into();
         self
@@ -6958,7 +8369,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `educationalUse` field to an Option value (optional)
     pub fn maybe_educational_use(
         mut self,
-        value: Option<TvEpisodeEducationalUse<'a>>,
+        value: Option<TvEpisodeEducationalUse<S>>,
     ) -> Self {
         self._fields.56 = value;
         self
@@ -6967,12 +8378,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `encoding` field (optional)
-    pub fn encoding(mut self, value: impl Into<Option<TvEpisodeEncoding<'a>>>) -> Self {
+    pub fn encoding(mut self, value: impl Into<Option<TvEpisodeEncoding<S>>>) -> Self {
         self._fields.57 = value.into();
         self
     }
     /// Set the `encoding` field to an Option value (optional)
-    pub fn maybe_encoding(mut self, value: Option<TvEpisodeEncoding<'a>>) -> Self {
+    pub fn maybe_encoding(mut self, value: Option<TvEpisodeEncoding<S>>) -> Self {
         self._fields.57 = value;
         self
     }
@@ -6982,7 +8393,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `encodingFormat` field (optional)
     pub fn encoding_format(
         mut self,
-        value: impl Into<Option<TvEpisodeEncodingFormat<'a>>>,
+        value: impl Into<Option<TvEpisodeEncodingFormat<S>>>,
     ) -> Self {
         self._fields.58 = value.into();
         self
@@ -6990,7 +8401,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `encodingFormat` field to an Option value (optional)
     pub fn maybe_encoding_format(
         mut self,
-        value: Option<TvEpisodeEncodingFormat<'a>>,
+        value: Option<TvEpisodeEncodingFormat<S>>,
     ) -> Self {
         self._fields.58 = value;
         self
@@ -6999,15 +8410,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `encodings` field (optional)
-    pub fn encodings(
-        mut self,
-        value: impl Into<Option<TvEpisodeEncodings<'a>>>,
-    ) -> Self {
+    pub fn encodings(mut self, value: impl Into<Option<TvEpisodeEncodings<S>>>) -> Self {
         self._fields.59 = value.into();
         self
     }
     /// Set the `encodings` field to an Option value (optional)
-    pub fn maybe_encodings(mut self, value: Option<TvEpisodeEncodings<'a>>) -> Self {
+    pub fn maybe_encodings(mut self, value: Option<TvEpisodeEncodings<S>>) -> Self {
         self._fields.59 = value;
         self
     }
@@ -7017,7 +8425,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `episodeNumber` field (optional)
     pub fn episode_number(
         mut self,
-        value: impl Into<Option<TvEpisodeEpisodeNumber<'a>>>,
+        value: impl Into<Option<TvEpisodeEpisodeNumber<S>>>,
     ) -> Self {
         self._fields.60 = value.into();
         self
@@ -7025,7 +8433,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `episodeNumber` field to an Option value (optional)
     pub fn maybe_episode_number(
         mut self,
-        value: Option<TvEpisodeEpisodeNumber<'a>>,
+        value: Option<TvEpisodeEpisodeNumber<S>>,
     ) -> Self {
         self._fields.60 = value;
         self
@@ -7036,7 +8444,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `exampleOfWork` field (optional)
     pub fn example_of_work(
         mut self,
-        value: impl Into<Option<TvEpisodeExampleOfWork<'a>>>,
+        value: impl Into<Option<TvEpisodeExampleOfWork<S>>>,
     ) -> Self {
         self._fields.61 = value.into();
         self
@@ -7044,7 +8452,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `exampleOfWork` field to an Option value (optional)
     pub fn maybe_example_of_work(
         mut self,
-        value: Option<TvEpisodeExampleOfWork<'a>>,
+        value: Option<TvEpisodeExampleOfWork<S>>,
     ) -> Self {
         self._fields.61 = value;
         self
@@ -7053,12 +8461,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `expires` field (optional)
-    pub fn expires(mut self, value: impl Into<Option<TvEpisodeExpires<'a>>>) -> Self {
+    pub fn expires(mut self, value: impl Into<Option<TvEpisodeExpires<S>>>) -> Self {
         self._fields.62 = value.into();
         self
     }
     /// Set the `expires` field to an Option value (optional)
-    pub fn maybe_expires(mut self, value: Option<TvEpisodeExpires<'a>>) -> Self {
+    pub fn maybe_expires(mut self, value: Option<TvEpisodeExpires<S>>) -> Self {
         self._fields.62 = value;
         self
     }
@@ -7068,13 +8476,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `fileFormat` field (optional)
     pub fn file_format(
         mut self,
-        value: impl Into<Option<TvEpisodeFileFormat<'a>>>,
+        value: impl Into<Option<TvEpisodeFileFormat<S>>>,
     ) -> Self {
         self._fields.63 = value.into();
         self
     }
     /// Set the `fileFormat` field to an Option value (optional)
-    pub fn maybe_file_format(mut self, value: Option<TvEpisodeFileFormat<'a>>) -> Self {
+    pub fn maybe_file_format(mut self, value: Option<TvEpisodeFileFormat<S>>) -> Self {
         self._fields.63 = value;
         self
     }
@@ -7082,12 +8490,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `funder` field (optional)
-    pub fn funder(mut self, value: impl Into<Option<TvEpisodeFunder<'a>>>) -> Self {
+    pub fn funder(mut self, value: impl Into<Option<TvEpisodeFunder<S>>>) -> Self {
         self._fields.64 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
-    pub fn maybe_funder(mut self, value: Option<TvEpisodeFunder<'a>>) -> Self {
+    pub fn maybe_funder(mut self, value: Option<TvEpisodeFunder<S>>) -> Self {
         self._fields.64 = value;
         self
     }
@@ -7095,12 +8503,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `funding` field (optional)
-    pub fn funding(mut self, value: impl Into<Option<TvEpisodeFunding<'a>>>) -> Self {
+    pub fn funding(mut self, value: impl Into<Option<TvEpisodeFunding<S>>>) -> Self {
         self._fields.65 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
-    pub fn maybe_funding(mut self, value: Option<TvEpisodeFunding<'a>>) -> Self {
+    pub fn maybe_funding(mut self, value: Option<TvEpisodeFunding<S>>) -> Self {
         self._fields.65 = value;
         self
     }
@@ -7108,12 +8516,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `genre` field (optional)
-    pub fn genre(mut self, value: impl Into<Option<TvEpisodeGenre<'a>>>) -> Self {
+    pub fn genre(mut self, value: impl Into<Option<TvEpisodeGenre<S>>>) -> Self {
         self._fields.66 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
-    pub fn maybe_genre(mut self, value: Option<TvEpisodeGenre<'a>>) -> Self {
+    pub fn maybe_genre(mut self, value: Option<TvEpisodeGenre<S>>) -> Self {
         self._fields.66 = value;
         self
     }
@@ -7121,12 +8529,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `hasPart` field (optional)
-    pub fn has_part(mut self, value: impl Into<Option<TvEpisodeHasPart<'a>>>) -> Self {
+    pub fn has_part(mut self, value: impl Into<Option<TvEpisodeHasPart<S>>>) -> Self {
         self._fields.67 = value.into();
         self
     }
     /// Set the `hasPart` field to an Option value (optional)
-    pub fn maybe_has_part(mut self, value: Option<TvEpisodeHasPart<'a>>) -> Self {
+    pub fn maybe_has_part(mut self, value: Option<TvEpisodeHasPart<S>>) -> Self {
         self._fields.67 = value;
         self
     }
@@ -7134,12 +8542,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `headline` field (optional)
-    pub fn headline(mut self, value: impl Into<Option<TvEpisodeHeadline<'a>>>) -> Self {
+    pub fn headline(mut self, value: impl Into<Option<TvEpisodeHeadline<S>>>) -> Self {
         self._fields.68 = value.into();
         self
     }
     /// Set the `headline` field to an Option value (optional)
-    pub fn maybe_headline(mut self, value: Option<TvEpisodeHeadline<'a>>) -> Self {
+    pub fn maybe_headline(mut self, value: Option<TvEpisodeHeadline<S>>) -> Self {
         self._fields.68 = value;
         self
     }
@@ -7149,13 +8557,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `identifier` field (optional)
     pub fn identifier(
         mut self,
-        value: impl Into<Option<TvEpisodeIdentifier<'a>>>,
+        value: impl Into<Option<TvEpisodeIdentifier<S>>>,
     ) -> Self {
         self._fields.69 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
-    pub fn maybe_identifier(mut self, value: Option<TvEpisodeIdentifier<'a>>) -> Self {
+    pub fn maybe_identifier(mut self, value: Option<TvEpisodeIdentifier<S>>) -> Self {
         self._fields.69 = value;
         self
     }
@@ -7163,12 +8571,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<TvEpisodeImage<'a>>>) -> Self {
+    pub fn image(mut self, value: impl Into<Option<TvEpisodeImage<S>>>) -> Self {
         self._fields.70 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<TvEpisodeImage<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<TvEpisodeImage<S>>) -> Self {
         self._fields.70 = value;
         self
     }
@@ -7178,13 +8586,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `inLanguage` field (optional)
     pub fn in_language(
         mut self,
-        value: impl Into<Option<TvEpisodeInLanguage<'a>>>,
+        value: impl Into<Option<TvEpisodeInLanguage<S>>>,
     ) -> Self {
         self._fields.71 = value.into();
         self
     }
     /// Set the `inLanguage` field to an Option value (optional)
-    pub fn maybe_in_language(mut self, value: Option<TvEpisodeInLanguage<'a>>) -> Self {
+    pub fn maybe_in_language(mut self, value: Option<TvEpisodeInLanguage<S>>) -> Self {
         self._fields.71 = value;
         self
     }
@@ -7194,7 +8602,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `interactionStatistic` field (optional)
     pub fn interaction_statistic(
         mut self,
-        value: impl Into<Option<TvEpisodeInteractionStatistic<'a>>>,
+        value: impl Into<Option<TvEpisodeInteractionStatistic<S>>>,
     ) -> Self {
         self._fields.72 = value.into();
         self
@@ -7202,7 +8610,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `interactionStatistic` field to an Option value (optional)
     pub fn maybe_interaction_statistic(
         mut self,
-        value: Option<TvEpisodeInteractionStatistic<'a>>,
+        value: Option<TvEpisodeInteractionStatistic<S>>,
     ) -> Self {
         self._fields.72 = value;
         self
@@ -7213,7 +8621,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `interactivityType` field (optional)
     pub fn interactivity_type(
         mut self,
-        value: impl Into<Option<TvEpisodeInteractivityType<'a>>>,
+        value: impl Into<Option<TvEpisodeInteractivityType<S>>>,
     ) -> Self {
         self._fields.73 = value.into();
         self
@@ -7221,7 +8629,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `interactivityType` field to an Option value (optional)
     pub fn maybe_interactivity_type(
         mut self,
-        value: Option<TvEpisodeInteractivityType<'a>>,
+        value: Option<TvEpisodeInteractivityType<S>>,
     ) -> Self {
         self._fields.73 = value;
         self
@@ -7232,7 +8640,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `interpretedAsClaim` field (optional)
     pub fn interpreted_as_claim(
         mut self,
-        value: impl Into<Option<TvEpisodeInterpretedAsClaim<'a>>>,
+        value: impl Into<Option<TvEpisodeInterpretedAsClaim<S>>>,
     ) -> Self {
         self._fields.74 = value.into();
         self
@@ -7240,7 +8648,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `interpretedAsClaim` field to an Option value (optional)
     pub fn maybe_interpreted_as_claim(
         mut self,
-        value: Option<TvEpisodeInterpretedAsClaim<'a>>,
+        value: Option<TvEpisodeInterpretedAsClaim<S>>,
     ) -> Self {
         self._fields.74 = value;
         self
@@ -7251,7 +8659,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `isAccessibleForFree` field (optional)
     pub fn is_accessible_for_free(
         mut self,
-        value: impl Into<Option<TvEpisodeIsAccessibleForFree<'a>>>,
+        value: impl Into<Option<TvEpisodeIsAccessibleForFree<S>>>,
     ) -> Self {
         self._fields.75 = value.into();
         self
@@ -7259,7 +8667,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `isAccessibleForFree` field to an Option value (optional)
     pub fn maybe_is_accessible_for_free(
         mut self,
-        value: Option<TvEpisodeIsAccessibleForFree<'a>>,
+        value: Option<TvEpisodeIsAccessibleForFree<S>>,
     ) -> Self {
         self._fields.75 = value;
         self
@@ -7270,13 +8678,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `isBasedOn` field (optional)
     pub fn is_based_on(
         mut self,
-        value: impl Into<Option<TvEpisodeIsBasedOn<'a>>>,
+        value: impl Into<Option<TvEpisodeIsBasedOn<S>>>,
     ) -> Self {
         self._fields.76 = value.into();
         self
     }
     /// Set the `isBasedOn` field to an Option value (optional)
-    pub fn maybe_is_based_on(mut self, value: Option<TvEpisodeIsBasedOn<'a>>) -> Self {
+    pub fn maybe_is_based_on(mut self, value: Option<TvEpisodeIsBasedOn<S>>) -> Self {
         self._fields.76 = value;
         self
     }
@@ -7286,7 +8694,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `isBasedOnUrl` field (optional)
     pub fn is_based_on_url(
         mut self,
-        value: impl Into<Option<TvEpisodeIsBasedOnUrl<'a>>>,
+        value: impl Into<Option<TvEpisodeIsBasedOnUrl<S>>>,
     ) -> Self {
         self._fields.77 = value.into();
         self
@@ -7294,7 +8702,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `isBasedOnUrl` field to an Option value (optional)
     pub fn maybe_is_based_on_url(
         mut self,
-        value: Option<TvEpisodeIsBasedOnUrl<'a>>,
+        value: Option<TvEpisodeIsBasedOnUrl<S>>,
     ) -> Self {
         self._fields.77 = value;
         self
@@ -7305,7 +8713,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `isFamilyFriendly` field (optional)
     pub fn is_family_friendly(
         mut self,
-        value: impl Into<Option<TvEpisodeIsFamilyFriendly<'a>>>,
+        value: impl Into<Option<TvEpisodeIsFamilyFriendly<S>>>,
     ) -> Self {
         self._fields.78 = value.into();
         self
@@ -7313,7 +8721,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `isFamilyFriendly` field to an Option value (optional)
     pub fn maybe_is_family_friendly(
         mut self,
-        value: Option<TvEpisodeIsFamilyFriendly<'a>>,
+        value: Option<TvEpisodeIsFamilyFriendly<S>>,
     ) -> Self {
         self._fields.78 = value;
         self
@@ -7322,15 +8730,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `isPartOf` field (optional)
-    pub fn is_part_of(
-        mut self,
-        value: impl Into<Option<TvEpisodeIsPartOf<'a>>>,
-    ) -> Self {
+    pub fn is_part_of(mut self, value: impl Into<Option<TvEpisodeIsPartOf<S>>>) -> Self {
         self._fields.79 = value.into();
         self
     }
     /// Set the `isPartOf` field to an Option value (optional)
-    pub fn maybe_is_part_of(mut self, value: Option<TvEpisodeIsPartOf<'a>>) -> Self {
+    pub fn maybe_is_part_of(mut self, value: Option<TvEpisodeIsPartOf<S>>) -> Self {
         self._fields.79 = value;
         self
     }
@@ -7338,12 +8743,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(mut self, value: impl Into<Option<TvEpisodeKeywords<'a>>>) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<TvEpisodeKeywords<S>>>) -> Self {
         self._fields.80 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(mut self, value: Option<TvEpisodeKeywords<'a>>) -> Self {
+    pub fn maybe_keywords(mut self, value: Option<TvEpisodeKeywords<S>>) -> Self {
         self._fields.80 = value;
         self
     }
@@ -7353,7 +8758,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `learningResourceType` field (optional)
     pub fn learning_resource_type(
         mut self,
-        value: impl Into<Option<TvEpisodeLearningResourceType<'a>>>,
+        value: impl Into<Option<TvEpisodeLearningResourceType<S>>>,
     ) -> Self {
         self._fields.81 = value.into();
         self
@@ -7361,7 +8766,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `learningResourceType` field to an Option value (optional)
     pub fn maybe_learning_resource_type(
         mut self,
-        value: Option<TvEpisodeLearningResourceType<'a>>,
+        value: Option<TvEpisodeLearningResourceType<S>>,
     ) -> Self {
         self._fields.81 = value;
         self
@@ -7370,12 +8775,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `license` field (optional)
-    pub fn license(mut self, value: impl Into<Option<TvEpisodeLicense<'a>>>) -> Self {
+    pub fn license(mut self, value: impl Into<Option<TvEpisodeLicense<S>>>) -> Self {
         self._fields.82 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
-    pub fn maybe_license(mut self, value: Option<TvEpisodeLicense<'a>>) -> Self {
+    pub fn maybe_license(mut self, value: Option<TvEpisodeLicense<S>>) -> Self {
         self._fields.82 = value;
         self
     }
@@ -7385,7 +8790,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `locationCreated` field (optional)
     pub fn location_created(
         mut self,
-        value: impl Into<Option<TvEpisodeLocationCreated<'a>>>,
+        value: impl Into<Option<TvEpisodeLocationCreated<S>>>,
     ) -> Self {
         self._fields.83 = value.into();
         self
@@ -7393,7 +8798,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `locationCreated` field to an Option value (optional)
     pub fn maybe_location_created(
         mut self,
-        value: Option<TvEpisodeLocationCreated<'a>>,
+        value: Option<TvEpisodeLocationCreated<S>>,
     ) -> Self {
         self._fields.83 = value;
         self
@@ -7404,13 +8809,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `mainEntity` field (optional)
     pub fn main_entity(
         mut self,
-        value: impl Into<Option<TvEpisodeMainEntity<'a>>>,
+        value: impl Into<Option<TvEpisodeMainEntity<S>>>,
     ) -> Self {
         self._fields.84 = value.into();
         self
     }
     /// Set the `mainEntity` field to an Option value (optional)
-    pub fn maybe_main_entity(mut self, value: Option<TvEpisodeMainEntity<'a>>) -> Self {
+    pub fn maybe_main_entity(mut self, value: Option<TvEpisodeMainEntity<S>>) -> Self {
         self._fields.84 = value;
         self
     }
@@ -7420,7 +8825,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
-        value: impl Into<Option<TvEpisodeMainEntityOfPage<'a>>>,
+        value: impl Into<Option<TvEpisodeMainEntityOfPage<S>>>,
     ) -> Self {
         self._fields.85 = value.into();
         self
@@ -7428,7 +8833,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `mainEntityOfPage` field to an Option value (optional)
     pub fn maybe_main_entity_of_page(
         mut self,
-        value: Option<TvEpisodeMainEntityOfPage<'a>>,
+        value: Option<TvEpisodeMainEntityOfPage<S>>,
     ) -> Self {
         self._fields.85 = value;
         self
@@ -7439,13 +8844,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `maintainer` field (optional)
     pub fn maintainer(
         mut self,
-        value: impl Into<Option<TvEpisodeMaintainer<'a>>>,
+        value: impl Into<Option<TvEpisodeMaintainer<S>>>,
     ) -> Self {
         self._fields.86 = value.into();
         self
     }
     /// Set the `maintainer` field to an Option value (optional)
-    pub fn maybe_maintainer(mut self, value: Option<TvEpisodeMaintainer<'a>>) -> Self {
+    pub fn maybe_maintainer(mut self, value: Option<TvEpisodeMaintainer<S>>) -> Self {
         self._fields.86 = value;
         self
     }
@@ -7453,12 +8858,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `material` field (optional)
-    pub fn material(mut self, value: impl Into<Option<TvEpisodeMaterial<'a>>>) -> Self {
+    pub fn material(mut self, value: impl Into<Option<TvEpisodeMaterial<S>>>) -> Self {
         self._fields.87 = value.into();
         self
     }
     /// Set the `material` field to an Option value (optional)
-    pub fn maybe_material(mut self, value: Option<TvEpisodeMaterial<'a>>) -> Self {
+    pub fn maybe_material(mut self, value: Option<TvEpisodeMaterial<S>>) -> Self {
         self._fields.87 = value;
         self
     }
@@ -7468,7 +8873,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `materialExtent` field (optional)
     pub fn material_extent(
         mut self,
-        value: impl Into<Option<TvEpisodeMaterialExtent<'a>>>,
+        value: impl Into<Option<TvEpisodeMaterialExtent<S>>>,
     ) -> Self {
         self._fields.88 = value.into();
         self
@@ -7476,7 +8881,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `materialExtent` field to an Option value (optional)
     pub fn maybe_material_extent(
         mut self,
-        value: Option<TvEpisodeMaterialExtent<'a>>,
+        value: Option<TvEpisodeMaterialExtent<S>>,
     ) -> Self {
         self._fields.88 = value;
         self
@@ -7485,12 +8890,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `mentions` field (optional)
-    pub fn mentions(mut self, value: impl Into<Option<TvEpisodeMentions<'a>>>) -> Self {
+    pub fn mentions(mut self, value: impl Into<Option<TvEpisodeMentions<S>>>) -> Self {
         self._fields.89 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
-    pub fn maybe_mentions(mut self, value: Option<TvEpisodeMentions<'a>>) -> Self {
+    pub fn maybe_mentions(mut self, value: Option<TvEpisodeMentions<S>>) -> Self {
         self._fields.89 = value;
         self
     }
@@ -7498,12 +8903,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `musicBy` field (optional)
-    pub fn music_by(mut self, value: impl Into<Option<TvEpisodeMusicBy<'a>>>) -> Self {
+    pub fn music_by(mut self, value: impl Into<Option<TvEpisodeMusicBy<S>>>) -> Self {
         self._fields.90 = value.into();
         self
     }
     /// Set the `musicBy` field to an Option value (optional)
-    pub fn maybe_music_by(mut self, value: Option<TvEpisodeMusicBy<'a>>) -> Self {
+    pub fn maybe_music_by(mut self, value: Option<TvEpisodeMusicBy<S>>) -> Self {
         self._fields.90 = value;
         self
     }
@@ -7511,12 +8916,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<TvEpisodeName<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<TvEpisodeName<S>>>) -> Self {
         self._fields.91 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<TvEpisodeName<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<TvEpisodeName<S>>) -> Self {
         self._fields.91 = value;
         self
     }
@@ -7524,12 +8929,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `offers` field (optional)
-    pub fn offers(mut self, value: impl Into<Option<TvEpisodeOffers<'a>>>) -> Self {
+    pub fn offers(mut self, value: impl Into<Option<TvEpisodeOffers<S>>>) -> Self {
         self._fields.92 = value.into();
         self
     }
     /// Set the `offers` field to an Option value (optional)
-    pub fn maybe_offers(mut self, value: Option<TvEpisodeOffers<'a>>) -> Self {
+    pub fn maybe_offers(mut self, value: Option<TvEpisodeOffers<S>>) -> Self {
         self._fields.92 = value;
         self
     }
@@ -7539,7 +8944,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `partOfSeason` field (optional)
     pub fn part_of_season(
         mut self,
-        value: impl Into<Option<TvEpisodePartOfSeason<'a>>>,
+        value: impl Into<Option<TvEpisodePartOfSeason<S>>>,
     ) -> Self {
         self._fields.93 = value.into();
         self
@@ -7547,7 +8952,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `partOfSeason` field to an Option value (optional)
     pub fn maybe_part_of_season(
         mut self,
-        value: Option<TvEpisodePartOfSeason<'a>>,
+        value: Option<TvEpisodePartOfSeason<S>>,
     ) -> Self {
         self._fields.93 = value;
         self
@@ -7558,7 +8963,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `partOfSeries` field (optional)
     pub fn part_of_series(
         mut self,
-        value: impl Into<Option<TvEpisodePartOfSeries<'a>>>,
+        value: impl Into<Option<TvEpisodePartOfSeries<S>>>,
     ) -> Self {
         self._fields.94 = value.into();
         self
@@ -7566,7 +8971,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `partOfSeries` field to an Option value (optional)
     pub fn maybe_part_of_series(
         mut self,
-        value: Option<TvEpisodePartOfSeries<'a>>,
+        value: Option<TvEpisodePartOfSeries<S>>,
     ) -> Self {
         self._fields.94 = value;
         self
@@ -7577,7 +8982,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `partOfTVSeries` field (optional)
     pub fn part_of_tv_series(
         mut self,
-        value: impl Into<Option<TvEpisodePartOfTvSeries<'a>>>,
+        value: impl Into<Option<TvEpisodePartOfTvSeries<S>>>,
     ) -> Self {
         self._fields.95 = value.into();
         self
@@ -7585,7 +8990,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `partOfTVSeries` field to an Option value (optional)
     pub fn maybe_part_of_tv_series(
         mut self,
-        value: Option<TvEpisodePartOfTvSeries<'a>>,
+        value: Option<TvEpisodePartOfTvSeries<S>>,
     ) -> Self {
         self._fields.95 = value;
         self
@@ -7594,12 +8999,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `pattern` field (optional)
-    pub fn pattern(mut self, value: impl Into<Option<TvEpisodePattern<'a>>>) -> Self {
+    pub fn pattern(mut self, value: impl Into<Option<TvEpisodePattern<S>>>) -> Self {
         self._fields.96 = value.into();
         self
     }
     /// Set the `pattern` field to an Option value (optional)
-    pub fn maybe_pattern(mut self, value: Option<TvEpisodePattern<'a>>) -> Self {
+    pub fn maybe_pattern(mut self, value: Option<TvEpisodePattern<S>>) -> Self {
         self._fields.96 = value;
         self
     }
@@ -7607,12 +9012,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `position` field (optional)
-    pub fn position(mut self, value: impl Into<Option<TvEpisodePosition<'a>>>) -> Self {
+    pub fn position(mut self, value: impl Into<Option<TvEpisodePosition<S>>>) -> Self {
         self._fields.97 = value.into();
         self
     }
     /// Set the `position` field to an Option value (optional)
-    pub fn maybe_position(mut self, value: Option<TvEpisodePosition<'a>>) -> Self {
+    pub fn maybe_position(mut self, value: Option<TvEpisodePosition<S>>) -> Self {
         self._fields.97 = value;
         self
     }
@@ -7622,7 +9027,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `potentialAction` field (optional)
     pub fn potential_action(
         mut self,
-        value: impl Into<Option<TvEpisodePotentialAction<'a>>>,
+        value: impl Into<Option<TvEpisodePotentialAction<S>>>,
     ) -> Self {
         self._fields.98 = value.into();
         self
@@ -7630,7 +9035,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `potentialAction` field to an Option value (optional)
     pub fn maybe_potential_action(
         mut self,
-        value: Option<TvEpisodePotentialAction<'a>>,
+        value: Option<TvEpisodePotentialAction<S>>,
     ) -> Self {
         self._fields.98 = value;
         self
@@ -7639,12 +9044,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `producer` field (optional)
-    pub fn producer(mut self, value: impl Into<Option<TvEpisodeProducer<'a>>>) -> Self {
+    pub fn producer(mut self, value: impl Into<Option<TvEpisodeProducer<S>>>) -> Self {
         self._fields.99 = value.into();
         self
     }
     /// Set the `producer` field to an Option value (optional)
-    pub fn maybe_producer(mut self, value: Option<TvEpisodeProducer<'a>>) -> Self {
+    pub fn maybe_producer(mut self, value: Option<TvEpisodeProducer<S>>) -> Self {
         self._fields.99 = value;
         self
     }
@@ -7654,7 +9059,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `productionCompany` field (optional)
     pub fn production_company(
         mut self,
-        value: impl Into<Option<TvEpisodeProductionCompany<'a>>>,
+        value: impl Into<Option<TvEpisodeProductionCompany<S>>>,
     ) -> Self {
         self._fields.100 = value.into();
         self
@@ -7662,7 +9067,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `productionCompany` field to an Option value (optional)
     pub fn maybe_production_company(
         mut self,
-        value: Option<TvEpisodeProductionCompany<'a>>,
+        value: Option<TvEpisodeProductionCompany<S>>,
     ) -> Self {
         self._fields.100 = value;
         self
@@ -7671,12 +9076,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `provider` field (optional)
-    pub fn provider(mut self, value: impl Into<Option<TvEpisodeProvider<'a>>>) -> Self {
+    pub fn provider(mut self, value: impl Into<Option<TvEpisodeProvider<S>>>) -> Self {
         self._fields.101 = value.into();
         self
     }
     /// Set the `provider` field to an Option value (optional)
-    pub fn maybe_provider(mut self, value: Option<TvEpisodeProvider<'a>>) -> Self {
+    pub fn maybe_provider(mut self, value: Option<TvEpisodeProvider<S>>) -> Self {
         self._fields.101 = value;
         self
     }
@@ -7686,13 +9091,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `publication` field (optional)
     pub fn publication(
         mut self,
-        value: impl Into<Option<TvEpisodePublication<'a>>>,
+        value: impl Into<Option<TvEpisodePublication<S>>>,
     ) -> Self {
         self._fields.102 = value.into();
         self
     }
     /// Set the `publication` field to an Option value (optional)
-    pub fn maybe_publication(mut self, value: Option<TvEpisodePublication<'a>>) -> Self {
+    pub fn maybe_publication(mut self, value: Option<TvEpisodePublication<S>>) -> Self {
         self._fields.102 = value;
         self
     }
@@ -7700,15 +9105,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `publisher` field (optional)
-    pub fn publisher(
-        mut self,
-        value: impl Into<Option<TvEpisodePublisher<'a>>>,
-    ) -> Self {
+    pub fn publisher(mut self, value: impl Into<Option<TvEpisodePublisher<S>>>) -> Self {
         self._fields.103 = value.into();
         self
     }
     /// Set the `publisher` field to an Option value (optional)
-    pub fn maybe_publisher(mut self, value: Option<TvEpisodePublisher<'a>>) -> Self {
+    pub fn maybe_publisher(mut self, value: Option<TvEpisodePublisher<S>>) -> Self {
         self._fields.103 = value;
         self
     }
@@ -7718,7 +9120,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `publisherImprint` field (optional)
     pub fn publisher_imprint(
         mut self,
-        value: impl Into<Option<TvEpisodePublisherImprint<'a>>>,
+        value: impl Into<Option<TvEpisodePublisherImprint<S>>>,
     ) -> Self {
         self._fields.104 = value.into();
         self
@@ -7726,7 +9128,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `publisherImprint` field to an Option value (optional)
     pub fn maybe_publisher_imprint(
         mut self,
-        value: Option<TvEpisodePublisherImprint<'a>>,
+        value: Option<TvEpisodePublisherImprint<S>>,
     ) -> Self {
         self._fields.104 = value;
         self
@@ -7737,7 +9139,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `publishingPrinciples` field (optional)
     pub fn publishing_principles(
         mut self,
-        value: impl Into<Option<TvEpisodePublishingPrinciples<'a>>>,
+        value: impl Into<Option<TvEpisodePublishingPrinciples<S>>>,
     ) -> Self {
         self._fields.105 = value.into();
         self
@@ -7745,7 +9147,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `publishingPrinciples` field to an Option value (optional)
     pub fn maybe_publishing_principles(
         mut self,
-        value: Option<TvEpisodePublishingPrinciples<'a>>,
+        value: Option<TvEpisodePublishingPrinciples<S>>,
     ) -> Self {
         self._fields.105 = value;
         self
@@ -7756,13 +9158,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `recordedAt` field (optional)
     pub fn recorded_at(
         mut self,
-        value: impl Into<Option<TvEpisodeRecordedAt<'a>>>,
+        value: impl Into<Option<TvEpisodeRecordedAt<S>>>,
     ) -> Self {
         self._fields.106 = value.into();
         self
     }
     /// Set the `recordedAt` field to an Option value (optional)
-    pub fn maybe_recorded_at(mut self, value: Option<TvEpisodeRecordedAt<'a>>) -> Self {
+    pub fn maybe_recorded_at(mut self, value: Option<TvEpisodeRecordedAt<S>>) -> Self {
         self._fields.106 = value;
         self
     }
@@ -7772,7 +9174,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `releasedEvent` field (optional)
     pub fn released_event(
         mut self,
-        value: impl Into<Option<TvEpisodeReleasedEvent<'a>>>,
+        value: impl Into<Option<TvEpisodeReleasedEvent<S>>>,
     ) -> Self {
         self._fields.107 = value.into();
         self
@@ -7780,7 +9182,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `releasedEvent` field to an Option value (optional)
     pub fn maybe_released_event(
         mut self,
-        value: Option<TvEpisodeReleasedEvent<'a>>,
+        value: Option<TvEpisodeReleasedEvent<S>>,
     ) -> Self {
         self._fields.107 = value;
         self
@@ -7789,12 +9191,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `review` field (optional)
-    pub fn review(mut self, value: impl Into<Option<TvEpisodeReview<'a>>>) -> Self {
+    pub fn review(mut self, value: impl Into<Option<TvEpisodeReview<S>>>) -> Self {
         self._fields.108 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
-    pub fn maybe_review(mut self, value: Option<TvEpisodeReview<'a>>) -> Self {
+    pub fn maybe_review(mut self, value: Option<TvEpisodeReview<S>>) -> Self {
         self._fields.108 = value;
         self
     }
@@ -7802,12 +9204,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `reviews` field (optional)
-    pub fn reviews(mut self, value: impl Into<Option<TvEpisodeReviews<'a>>>) -> Self {
+    pub fn reviews(mut self, value: impl Into<Option<TvEpisodeReviews<S>>>) -> Self {
         self._fields.109 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
-    pub fn maybe_reviews(mut self, value: Option<TvEpisodeReviews<'a>>) -> Self {
+    pub fn maybe_reviews(mut self, value: Option<TvEpisodeReviews<S>>) -> Self {
         self._fields.109 = value;
         self
     }
@@ -7815,12 +9217,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
-    pub fn same_as(mut self, value: impl Into<Option<TvEpisodeSameAs<'a>>>) -> Self {
+    pub fn same_as(mut self, value: impl Into<Option<TvEpisodeSameAs<S>>>) -> Self {
         self._fields.110 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
-    pub fn maybe_same_as(mut self, value: Option<TvEpisodeSameAs<'a>>) -> Self {
+    pub fn maybe_same_as(mut self, value: Option<TvEpisodeSameAs<S>>) -> Self {
         self._fields.110 = value;
         self
     }
@@ -7830,7 +9232,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `schemaVersion` field (optional)
     pub fn schema_version(
         mut self,
-        value: impl Into<Option<TvEpisodeSchemaVersion<'a>>>,
+        value: impl Into<Option<TvEpisodeSchemaVersion<S>>>,
     ) -> Self {
         self._fields.111 = value.into();
         self
@@ -7838,7 +9240,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `schemaVersion` field to an Option value (optional)
     pub fn maybe_schema_version(
         mut self,
-        value: Option<TvEpisodeSchemaVersion<'a>>,
+        value: Option<TvEpisodeSchemaVersion<S>>,
     ) -> Self {
         self._fields.111 = value;
         self
@@ -7849,7 +9251,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `sdDatePublished` field (optional)
     pub fn sd_date_published(
         mut self,
-        value: impl Into<Option<TvEpisodeSdDatePublished<'a>>>,
+        value: impl Into<Option<TvEpisodeSdDatePublished<S>>>,
     ) -> Self {
         self._fields.112 = value.into();
         self
@@ -7857,7 +9259,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `sdDatePublished` field to an Option value (optional)
     pub fn maybe_sd_date_published(
         mut self,
-        value: Option<TvEpisodeSdDatePublished<'a>>,
+        value: Option<TvEpisodeSdDatePublished<S>>,
     ) -> Self {
         self._fields.112 = value;
         self
@@ -7868,13 +9270,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `sdLicense` field (optional)
     pub fn sd_license(
         mut self,
-        value: impl Into<Option<TvEpisodeSdLicense<'a>>>,
+        value: impl Into<Option<TvEpisodeSdLicense<S>>>,
     ) -> Self {
         self._fields.113 = value.into();
         self
     }
     /// Set the `sdLicense` field to an Option value (optional)
-    pub fn maybe_sd_license(mut self, value: Option<TvEpisodeSdLicense<'a>>) -> Self {
+    pub fn maybe_sd_license(mut self, value: Option<TvEpisodeSdLicense<S>>) -> Self {
         self._fields.113 = value;
         self
     }
@@ -7884,16 +9286,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `sdPublisher` field (optional)
     pub fn sd_publisher(
         mut self,
-        value: impl Into<Option<TvEpisodeSdPublisher<'a>>>,
+        value: impl Into<Option<TvEpisodeSdPublisher<S>>>,
     ) -> Self {
         self._fields.114 = value.into();
         self
     }
     /// Set the `sdPublisher` field to an Option value (optional)
-    pub fn maybe_sd_publisher(
-        mut self,
-        value: Option<TvEpisodeSdPublisher<'a>>,
-    ) -> Self {
+    pub fn maybe_sd_publisher(mut self, value: Option<TvEpisodeSdPublisher<S>>) -> Self {
         self._fields.114 = value;
         self
     }
@@ -7901,12 +9300,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `size` field (optional)
-    pub fn size(mut self, value: impl Into<Option<TvEpisodeSize<'a>>>) -> Self {
+    pub fn size(mut self, value: impl Into<Option<TvEpisodeSize<S>>>) -> Self {
         self._fields.115 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
-    pub fn maybe_size(mut self, value: Option<TvEpisodeSize<'a>>) -> Self {
+    pub fn maybe_size(mut self, value: Option<TvEpisodeSize<S>>) -> Self {
         self._fields.115 = value;
         self
     }
@@ -7916,7 +9315,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `sourceOrganization` field (optional)
     pub fn source_organization(
         mut self,
-        value: impl Into<Option<TvEpisodeSourceOrganization<'a>>>,
+        value: impl Into<Option<TvEpisodeSourceOrganization<S>>>,
     ) -> Self {
         self._fields.116 = value.into();
         self
@@ -7924,7 +9323,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `sourceOrganization` field to an Option value (optional)
     pub fn maybe_source_organization(
         mut self,
-        value: Option<TvEpisodeSourceOrganization<'a>>,
+        value: Option<TvEpisodeSourceOrganization<S>>,
     ) -> Self {
         self._fields.116 = value;
         self
@@ -7933,12 +9332,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `spatial` field (optional)
-    pub fn spatial(mut self, value: impl Into<Option<TvEpisodeSpatial<'a>>>) -> Self {
+    pub fn spatial(mut self, value: impl Into<Option<TvEpisodeSpatial<S>>>) -> Self {
         self._fields.117 = value.into();
         self
     }
     /// Set the `spatial` field to an Option value (optional)
-    pub fn maybe_spatial(mut self, value: Option<TvEpisodeSpatial<'a>>) -> Self {
+    pub fn maybe_spatial(mut self, value: Option<TvEpisodeSpatial<S>>) -> Self {
         self._fields.117 = value;
         self
     }
@@ -7948,7 +9347,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `spatialCoverage` field (optional)
     pub fn spatial_coverage(
         mut self,
-        value: impl Into<Option<TvEpisodeSpatialCoverage<'a>>>,
+        value: impl Into<Option<TvEpisodeSpatialCoverage<S>>>,
     ) -> Self {
         self._fields.118 = value.into();
         self
@@ -7956,7 +9355,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `spatialCoverage` field to an Option value (optional)
     pub fn maybe_spatial_coverage(
         mut self,
-        value: Option<TvEpisodeSpatialCoverage<'a>>,
+        value: Option<TvEpisodeSpatialCoverage<S>>,
     ) -> Self {
         self._fields.118 = value;
         self
@@ -7965,12 +9364,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
-    pub fn sponsor(mut self, value: impl Into<Option<TvEpisodeSponsor<'a>>>) -> Self {
+    pub fn sponsor(mut self, value: impl Into<Option<TvEpisodeSponsor<S>>>) -> Self {
         self._fields.119 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
-    pub fn maybe_sponsor(mut self, value: Option<TvEpisodeSponsor<'a>>) -> Self {
+    pub fn maybe_sponsor(mut self, value: Option<TvEpisodeSponsor<S>>) -> Self {
         self._fields.119 = value;
         self
     }
@@ -7980,13 +9379,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(
         mut self,
-        value: impl Into<Option<TvEpisodeSubjectOf<'a>>>,
+        value: impl Into<Option<TvEpisodeSubjectOf<S>>>,
     ) -> Self {
         self._fields.120 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
-    pub fn maybe_subject_of(mut self, value: Option<TvEpisodeSubjectOf<'a>>) -> Self {
+    pub fn maybe_subject_of(mut self, value: Option<TvEpisodeSubjectOf<S>>) -> Self {
         self._fields.120 = value;
         self
     }
@@ -7996,7 +9395,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `subtitleLanguage` field (optional)
     pub fn subtitle_language(
         mut self,
-        value: impl Into<Option<TvEpisodeSubtitleLanguage<'a>>>,
+        value: impl Into<Option<TvEpisodeSubtitleLanguage<S>>>,
     ) -> Self {
         self._fields.121 = value.into();
         self
@@ -8004,7 +9403,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `subtitleLanguage` field to an Option value (optional)
     pub fn maybe_subtitle_language(
         mut self,
-        value: Option<TvEpisodeSubtitleLanguage<'a>>,
+        value: Option<TvEpisodeSubtitleLanguage<S>>,
     ) -> Self {
         self._fields.121 = value;
         self
@@ -8013,12 +9412,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `teaches` field (optional)
-    pub fn teaches(mut self, value: impl Into<Option<TvEpisodeTeaches<'a>>>) -> Self {
+    pub fn teaches(mut self, value: impl Into<Option<TvEpisodeTeaches<S>>>) -> Self {
         self._fields.122 = value.into();
         self
     }
     /// Set the `teaches` field to an Option value (optional)
-    pub fn maybe_teaches(mut self, value: Option<TvEpisodeTeaches<'a>>) -> Self {
+    pub fn maybe_teaches(mut self, value: Option<TvEpisodeTeaches<S>>) -> Self {
         self._fields.122 = value;
         self
     }
@@ -8026,12 +9425,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `temporal` field (optional)
-    pub fn temporal(mut self, value: impl Into<Option<TvEpisodeTemporal<'a>>>) -> Self {
+    pub fn temporal(mut self, value: impl Into<Option<TvEpisodeTemporal<S>>>) -> Self {
         self._fields.123 = value.into();
         self
     }
     /// Set the `temporal` field to an Option value (optional)
-    pub fn maybe_temporal(mut self, value: Option<TvEpisodeTemporal<'a>>) -> Self {
+    pub fn maybe_temporal(mut self, value: Option<TvEpisodeTemporal<S>>) -> Self {
         self._fields.123 = value;
         self
     }
@@ -8041,7 +9440,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `temporalCoverage` field (optional)
     pub fn temporal_coverage(
         mut self,
-        value: impl Into<Option<TvEpisodeTemporalCoverage<'a>>>,
+        value: impl Into<Option<TvEpisodeTemporalCoverage<S>>>,
     ) -> Self {
         self._fields.124 = value.into();
         self
@@ -8049,7 +9448,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `temporalCoverage` field to an Option value (optional)
     pub fn maybe_temporal_coverage(
         mut self,
-        value: Option<TvEpisodeTemporalCoverage<'a>>,
+        value: Option<TvEpisodeTemporalCoverage<S>>,
     ) -> Self {
         self._fields.124 = value;
         self
@@ -8058,12 +9457,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `text` field (optional)
-    pub fn text(mut self, value: impl Into<Option<TvEpisodeText<'a>>>) -> Self {
+    pub fn text(mut self, value: impl Into<Option<TvEpisodeText<S>>>) -> Self {
         self._fields.125 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
-    pub fn maybe_text(mut self, value: Option<TvEpisodeText<'a>>) -> Self {
+    pub fn maybe_text(mut self, value: Option<TvEpisodeText<S>>) -> Self {
         self._fields.125 = value;
         self
     }
@@ -8071,15 +9470,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
-    pub fn thumbnail(
-        mut self,
-        value: impl Into<Option<TvEpisodeThumbnail<'a>>>,
-    ) -> Self {
+    pub fn thumbnail(mut self, value: impl Into<Option<TvEpisodeThumbnail<S>>>) -> Self {
         self._fields.126 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
-    pub fn maybe_thumbnail(mut self, value: Option<TvEpisodeThumbnail<'a>>) -> Self {
+    pub fn maybe_thumbnail(mut self, value: Option<TvEpisodeThumbnail<S>>) -> Self {
         self._fields.126 = value;
         self
     }
@@ -8089,7 +9485,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `thumbnailUrl` field (optional)
     pub fn thumbnail_url(
         mut self,
-        value: impl Into<Option<TvEpisodeThumbnailUrl<'a>>>,
+        value: impl Into<Option<TvEpisodeThumbnailUrl<S>>>,
     ) -> Self {
         self._fields.127 = value.into();
         self
@@ -8097,7 +9493,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `thumbnailUrl` field to an Option value (optional)
     pub fn maybe_thumbnail_url(
         mut self,
-        value: Option<TvEpisodeThumbnailUrl<'a>>,
+        value: Option<TvEpisodeThumbnailUrl<S>>,
     ) -> Self {
         self._fields.127 = value;
         self
@@ -8108,7 +9504,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `timeRequired` field (optional)
     pub fn time_required(
         mut self,
-        value: impl Into<Option<TvEpisodeTimeRequired<'a>>>,
+        value: impl Into<Option<TvEpisodeTimeRequired<S>>>,
     ) -> Self {
         self._fields.128 = value.into();
         self
@@ -8116,7 +9512,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `timeRequired` field to an Option value (optional)
     pub fn maybe_time_required(
         mut self,
-        value: Option<TvEpisodeTimeRequired<'a>>,
+        value: Option<TvEpisodeTimeRequired<S>>,
     ) -> Self {
         self._fields.128 = value;
         self
@@ -8127,13 +9523,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `titleEIDR` field (optional)
     pub fn title_eidr(
         mut self,
-        value: impl Into<Option<TvEpisodeTitleEidr<'a>>>,
+        value: impl Into<Option<TvEpisodeTitleEidr<S>>>,
     ) -> Self {
         self._fields.129 = value.into();
         self
     }
     /// Set the `titleEIDR` field to an Option value (optional)
-    pub fn maybe_title_eidr(mut self, value: Option<TvEpisodeTitleEidr<'a>>) -> Self {
+    pub fn maybe_title_eidr(mut self, value: Option<TvEpisodeTitleEidr<S>>) -> Self {
         self._fields.129 = value;
         self
     }
@@ -8141,12 +9537,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `trailer` field (optional)
-    pub fn trailer(mut self, value: impl Into<Option<TvEpisodeTrailer<'a>>>) -> Self {
+    pub fn trailer(mut self, value: impl Into<Option<TvEpisodeTrailer<S>>>) -> Self {
         self._fields.130 = value.into();
         self
     }
     /// Set the `trailer` field to an Option value (optional)
-    pub fn maybe_trailer(mut self, value: Option<TvEpisodeTrailer<'a>>) -> Self {
+    pub fn maybe_trailer(mut self, value: Option<TvEpisodeTrailer<S>>) -> Self {
         self._fields.130 = value;
         self
     }
@@ -8156,7 +9552,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `translationOfWork` field (optional)
     pub fn translation_of_work(
         mut self,
-        value: impl Into<Option<TvEpisodeTranslationOfWork<'a>>>,
+        value: impl Into<Option<TvEpisodeTranslationOfWork<S>>>,
     ) -> Self {
         self._fields.131 = value.into();
         self
@@ -8164,7 +9560,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `translationOfWork` field to an Option value (optional)
     pub fn maybe_translation_of_work(
         mut self,
-        value: Option<TvEpisodeTranslationOfWork<'a>>,
+        value: Option<TvEpisodeTranslationOfWork<S>>,
     ) -> Self {
         self._fields.131 = value;
         self
@@ -8175,13 +9571,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `translator` field (optional)
     pub fn translator(
         mut self,
-        value: impl Into<Option<TvEpisodeTranslator<'a>>>,
+        value: impl Into<Option<TvEpisodeTranslator<S>>>,
     ) -> Self {
         self._fields.132 = value.into();
         self
     }
     /// Set the `translator` field to an Option value (optional)
-    pub fn maybe_translator(mut self, value: Option<TvEpisodeTranslator<'a>>) -> Self {
+    pub fn maybe_translator(mut self, value: Option<TvEpisodeTranslator<S>>) -> Self {
         self._fields.132 = value;
         self
     }
@@ -8191,7 +9587,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `typicalAgeRange` field (optional)
     pub fn typical_age_range(
         mut self,
-        value: impl Into<Option<TvEpisodeTypicalAgeRange<'a>>>,
+        value: impl Into<Option<TvEpisodeTypicalAgeRange<S>>>,
     ) -> Self {
         self._fields.133 = value.into();
         self
@@ -8199,7 +9595,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `typicalAgeRange` field to an Option value (optional)
     pub fn maybe_typical_age_range(
         mut self,
-        value: Option<TvEpisodeTypicalAgeRange<'a>>,
+        value: Option<TvEpisodeTypicalAgeRange<S>>,
     ) -> Self {
         self._fields.133 = value;
         self
@@ -8208,12 +9604,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<TvEpisodeUrl<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<TvEpisodeUrl<S>>>) -> Self {
         self._fields.134 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<TvEpisodeUrl<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<TvEpisodeUrl<S>>) -> Self {
         self._fields.134 = value;
         self
     }
@@ -8223,13 +9619,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `usageInfo` field (optional)
     pub fn usage_info(
         mut self,
-        value: impl Into<Option<TvEpisodeUsageInfo<'a>>>,
+        value: impl Into<Option<TvEpisodeUsageInfo<S>>>,
     ) -> Self {
         self._fields.135 = value.into();
         self
     }
     /// Set the `usageInfo` field to an Option value (optional)
-    pub fn maybe_usage_info(mut self, value: Option<TvEpisodeUsageInfo<'a>>) -> Self {
+    pub fn maybe_usage_info(mut self, value: Option<TvEpisodeUsageInfo<S>>) -> Self {
         self._fields.135 = value;
         self
     }
@@ -8237,12 +9633,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `version` field (optional)
-    pub fn version(mut self, value: impl Into<Option<TvEpisodeVersion<'a>>>) -> Self {
+    pub fn version(mut self, value: impl Into<Option<TvEpisodeVersion<S>>>) -> Self {
         self._fields.136 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
-    pub fn maybe_version(mut self, value: Option<TvEpisodeVersion<'a>>) -> Self {
+    pub fn maybe_version(mut self, value: Option<TvEpisodeVersion<S>>) -> Self {
         self._fields.136 = value;
         self
     }
@@ -8250,12 +9646,12 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
 
 impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `video` field (optional)
-    pub fn video(mut self, value: impl Into<Option<TvEpisodeVideo<'a>>>) -> Self {
+    pub fn video(mut self, value: impl Into<Option<TvEpisodeVideo<S>>>) -> Self {
         self._fields.137 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
-    pub fn maybe_video(mut self, value: Option<TvEpisodeVideo<'a>>) -> Self {
+    pub fn maybe_video(mut self, value: Option<TvEpisodeVideo<S>>) -> Self {
         self._fields.137 = value;
         self
     }
@@ -8265,13 +9661,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `wordCount` field (optional)
     pub fn word_count(
         mut self,
-        value: impl Into<Option<TvEpisodeWordCount<'a>>>,
+        value: impl Into<Option<TvEpisodeWordCount<S>>>,
     ) -> Self {
         self._fields.138 = value.into();
         self
     }
     /// Set the `wordCount` field to an Option value (optional)
-    pub fn maybe_word_count(mut self, value: Option<TvEpisodeWordCount<'a>>) -> Self {
+    pub fn maybe_word_count(mut self, value: Option<TvEpisodeWordCount<S>>) -> Self {
         self._fields.138 = value;
         self
     }
@@ -8281,16 +9677,13 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `workExample` field (optional)
     pub fn work_example(
         mut self,
-        value: impl Into<Option<TvEpisodeWorkExample<'a>>>,
+        value: impl Into<Option<TvEpisodeWorkExample<S>>>,
     ) -> Self {
         self._fields.139 = value.into();
         self
     }
     /// Set the `workExample` field to an Option value (optional)
-    pub fn maybe_work_example(
-        mut self,
-        value: Option<TvEpisodeWorkExample<'a>>,
-    ) -> Self {
+    pub fn maybe_work_example(mut self, value: Option<TvEpisodeWorkExample<S>>) -> Self {
         self._fields.139 = value;
         self
     }
@@ -8300,7 +9693,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `workTranslation` field (optional)
     pub fn work_translation(
         mut self,
-        value: impl Into<Option<TvEpisodeWorkTranslation<'a>>>,
+        value: impl Into<Option<TvEpisodeWorkTranslation<S>>>,
     ) -> Self {
         self._fields.140 = value.into();
         self
@@ -8308,7 +9701,7 @@ impl<'a, S: tv_episode_state::State> TvEpisodeBuilder<'a, S> {
     /// Set the `workTranslation` field to an Option value (optional)
     pub fn maybe_work_translation(
         mut self,
-        value: Option<TvEpisodeWorkTranslation<'a>>,
+        value: Option<TvEpisodeWorkTranslation<S>>,
     ) -> Self {
         self._fields.140 = value;
         self
@@ -8469,7 +9862,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TvEpisode<'a> {
         TvEpisode {
             about: self._fields.0,

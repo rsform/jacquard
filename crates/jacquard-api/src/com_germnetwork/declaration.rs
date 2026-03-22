@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,10 +31,17 @@ use serde::{Serialize, Deserialize};
 use crate::com_germnetwork::declaration;
 /// A declaration of a Germ Network account
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "com.germnetwork.declaration", tag = "$type")]
-pub struct Declaration<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "com.germnetwork.declaration",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Declaration<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Array of opaque values to allow for key rolling
     #[serde(skip_serializing_if = "Option::is_none")]
     pub continuity_proofs: Option<Vec<Bytes>>,
@@ -45,51 +54,59 @@ pub struct Declaration<'a> {
     pub key_package: Option<Bytes>,
     ///Controls who can message this account
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message_me: Option<declaration::MessageMe<'a>>,
+    pub message_me: Option<declaration::MessageMe<S>>,
     ///Semver version number, without pre-release or build information, for the format of opaque content
-    #[serde(borrow)]
-    pub version: CowStr<'a>,
+    pub version: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DeclarationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeclarationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Declaration<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Declaration<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MessageMe<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MessageMe<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///A URL to present to an account that does not have its own com.germnetwork.declaration record, must have an empty fragment component, where the app should fill in the fragment component with the DIDs of the two accounts who wish to message each other
-    #[serde(borrow)]
-    pub message_me_url: UriValue<'a>,
+    pub message_me_url: UriValue<S>,
     ///The policy of who can message the account, this value is included in the keyPackage, but is duplicated here to allow applications to decide if they should show a 'Message on Germ' button to the viewer.
-    #[serde(borrow)]
-    pub show_button_to: MessageMeShowButtonTo<'a>,
+    pub show_button_to: MessageMeShowButtonTo<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The policy of who can message the account, this value is included in the keyPackage, but is duplicated here to allow applications to decide if they should show a 'Message on Germ' button to the viewer.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MessageMeShowButtonTo<'a> {
+pub enum MessageMeShowButtonTo<S: Bos<str> + AsRef<str> = DefaultStr> {
     None,
     UsersIFollow,
     Everyone,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> MessageMeShowButtonTo<'a> {
+impl<S: Bos<str> + AsRef<str>> MessageMeShowButtonTo<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -98,72 +115,57 @@ impl<'a> MessageMeShowButtonTo<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for MessageMeShowButtonTo<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "none" => Self::None,
             "usersIFollow" => Self::UsersIFollow,
             "everyone" => Self::Everyone,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for MessageMeShowButtonTo<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "usersIFollow" => Self::UsersIFollow,
-            "everyone" => Self::Everyone,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for MessageMeShowButtonTo<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for MessageMeShowButtonTo<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for MessageMeShowButtonTo<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for MessageMeShowButtonTo<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for MessageMeShowButtonTo<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for MessageMeShowButtonTo<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for MessageMeShowButtonTo<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for MessageMeShowButtonTo<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for MessageMeShowButtonTo<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for MessageMeShowButtonTo<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for MessageMeShowButtonTo<'_> {
-    type Output = MessageMeShowButtonTo<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for MessageMeShowButtonTo<S> {
+    type Output = MessageMeShowButtonTo<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             MessageMeShowButtonTo::None => MessageMeShowButtonTo::None,
@@ -176,11 +178,9 @@ impl jacquard_common::IntoStatic for MessageMeShowButtonTo<'_> {
     }
 }
 
-impl<'a> Declaration<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DeclarationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Declaration<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DeclarationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -191,18 +191,17 @@ pub struct DeclarationRecord;
 impl XrpcResp for DeclarationRecord {
     const NSID: &'static str = "com.germnetwork.declaration";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DeclarationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DeclarationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DeclarationGetRecordOutput<'_>> for Declaration<'_> {
-    fn from(output: DeclarationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DeclarationGetRecordOutput<S>> for Declaration<S> {
+    fn from(output: DeclarationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Declaration<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Declaration<S> {
     const NSID: &'static str = "com.germnetwork.declaration";
     type Record = DeclarationRecord;
 }
@@ -212,7 +211,7 @@ impl Collection for DeclarationRecord {
     type Record = DeclarationRecord;
 }
 
-impl<'a> LexiconSchema for Declaration<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Declaration<S> {
     fn nsid() -> &'static str {
         "com.germnetwork.declaration"
     }
@@ -259,7 +258,7 @@ impl<'a> LexiconSchema for Declaration<'a> {
     }
 }
 
-impl<'a> LexiconSchema for MessageMe<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for MessageMe<S> {
     fn nsid() -> &'static str {
         "com.germnetwork.declaration"
     }
@@ -328,37 +327,37 @@ pub mod declaration_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Version;
         type CurrentKey;
+        type Version;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Version = Unset;
         type CurrentKey = Unset;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type Version = Set<members::version>;
-        type CurrentKey = S::CurrentKey;
+        type Version = Unset;
     }
     ///State transition - sets the `current_key` field to Set
     pub struct SetCurrentKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCurrentKey<S> {}
     impl<S: State> State for SetCurrentKey<S> {
-        type Version = S::Version;
         type CurrentKey = Set<members::current_key>;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type CurrentKey = S::CurrentKey;
+        type Version = Set<members::version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `version` field
-        pub struct version(());
         ///Marker type for the `current_key` field
         pub struct current_key(());
+        ///Marker type for the `version` field
+        pub struct version(());
     }
 }
 
@@ -369,8 +368,8 @@ pub struct DeclarationBuilder<'a, S: declaration_state::State> {
         Option<Vec<Bytes>>,
         Option<Bytes>,
         Option<Bytes>,
-        Option<declaration::MessageMe<'a>>,
-        Option<CowStr<'a>>,
+        Option<declaration::MessageMe<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -442,16 +441,13 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `messageMe` field (optional)
     pub fn message_me(
         mut self,
-        value: impl Into<Option<declaration::MessageMe<'a>>>,
+        value: impl Into<Option<declaration::MessageMe<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `messageMe` field to an Option value (optional)
-    pub fn maybe_message_me(
-        mut self,
-        value: Option<declaration::MessageMe<'a>>,
-    ) -> Self {
+    pub fn maybe_message_me(mut self, value: Option<declaration::MessageMe<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -465,7 +461,7 @@ where
     /// Set the `version` field (required)
     pub fn version(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DeclarationBuilder<'a, declaration_state::SetVersion<S>> {
         self._fields.4 = Option::Some(value.into());
         DeclarationBuilder {
@@ -479,8 +475,8 @@ where
 impl<'a, S> DeclarationBuilder<'a, S>
 where
     S: declaration_state::State,
-    S::Version: declaration_state::IsSet,
     S::CurrentKey: declaration_state::IsSet,
+    S::Version: declaration_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Declaration<'a> {
@@ -496,10 +492,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Declaration<'a> {
         Declaration {
             continuity_proofs: self._fields.0,
@@ -686,7 +679,7 @@ pub mod message_me_state {
 /// Builder for constructing an instance of this type
 pub struct MessageMeBuilder<'a, S: message_me_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<UriValue<'a>>, Option<MessageMeShowButtonTo<'a>>),
+    _fields: (Option<UriValue<S>>, Option<MessageMeShowButtonTo<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -716,7 +709,7 @@ where
     /// Set the `messageMeUrl` field (required)
     pub fn message_me_url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> MessageMeBuilder<'a, message_me_state::SetMessageMeUrl<S>> {
         self._fields.0 = Option::Some(value.into());
         MessageMeBuilder {
@@ -735,7 +728,7 @@ where
     /// Set the `showButtonTo` field (required)
     pub fn show_button_to(
         mut self,
-        value: impl Into<MessageMeShowButtonTo<'a>>,
+        value: impl Into<MessageMeShowButtonTo<S>>,
     ) -> MessageMeBuilder<'a, message_me_state::SetShowButtonTo<S>> {
         self._fields.1 = Option::Some(value.into());
         MessageMeBuilder {
@@ -763,10 +756,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> MessageMe<'a> {
         MessageMe {
             message_me_url: self._fields.0.unwrap(),

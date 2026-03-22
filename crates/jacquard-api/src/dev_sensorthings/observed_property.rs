@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,44 +29,47 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// The phenomenon being observed (e.g. air temperature, PM2.5 concentration).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "dev.sensorthings.observedProperty",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct ObservedProperty<'a> {
+pub struct ObservedProperty<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///URI identifying the property from a controlled vocabulary (CF Standard Names, QUDT quantity kinds, etc.)
-    #[serde(borrow)]
-    pub definition: UriValue<'a>,
+    pub definition: UriValue<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub description: Option<S>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ObservedPropertyGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ObservedPropertyGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: ObservedProperty<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: ObservedProperty<S>,
 }
 
-impl<'a> ObservedProperty<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ObservedPropertyRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> ObservedProperty<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ObservedPropertyRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -75,18 +80,18 @@ pub struct ObservedPropertyRecord;
 impl XrpcResp for ObservedPropertyRecord {
     const NSID: &'static str = "dev.sensorthings.observedProperty";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ObservedPropertyGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ObservedPropertyGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ObservedPropertyGetRecordOutput<'_>> for ObservedProperty<'_> {
-    fn from(output: ObservedPropertyGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ObservedPropertyGetRecordOutput<S>>
+for ObservedProperty<S> {
+    fn from(output: ObservedPropertyGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for ObservedProperty<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for ObservedProperty<S> {
     const NSID: &'static str = "dev.sensorthings.observedProperty";
     type Record = ObservedPropertyRecord;
 }
@@ -96,7 +101,7 @@ impl Collection for ObservedPropertyRecord {
     type Record = ObservedPropertyRecord;
 }
 
-impl<'a> LexiconSchema for ObservedProperty<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ObservedProperty<S> {
     fn nsid() -> &'static str {
         "dev.sensorthings.observedProperty"
     }
@@ -142,63 +147,58 @@ pub mod observed_property_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Definition;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Definition = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Definition = S::Definition;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `definition` field to Set
     pub struct SetDefinition<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDefinition<S> {}
     impl<S: State> State for SetDefinition<S> {
-        type Name = S::Name;
         type Definition = Set<members::definition>;
         type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Definition = S::Definition;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Definition = S::Definition;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `definition` field
         pub struct definition(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ObservedPropertyBuilder<'a, S: observed_property_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<UriValue<S>>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -247,7 +247,7 @@ where
     /// Set the `definition` field (required)
     pub fn definition(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ObservedPropertyBuilder<'a, observed_property_state::SetDefinition<S>> {
         self._fields.1 = Option::Some(value.into());
         ObservedPropertyBuilder {
@@ -260,12 +260,12 @@ where
 
 impl<'a, S: observed_property_state::State> ObservedPropertyBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -279,7 +279,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ObservedPropertyBuilder<'a, observed_property_state::SetName<S>> {
         self._fields.3 = Option::Some(value.into());
         ObservedPropertyBuilder {
@@ -293,9 +293,9 @@ where
 impl<'a, S> ObservedPropertyBuilder<'a, S>
 where
     S: observed_property_state::State,
-    S::Name: observed_property_state::IsSet,
     S::Definition: observed_property_state::IsSet,
     S::CreatedAt: observed_property_state::IsSet,
+    S::Name: observed_property_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ObservedProperty<'a> {
@@ -310,10 +310,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ObservedProperty<'a> {
         ObservedProperty {
             created_at: self._fields.0.unwrap(),

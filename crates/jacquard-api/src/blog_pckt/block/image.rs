@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,58 +27,72 @@ use serde::{Serialize, Deserialize};
 use crate::blog_pckt::block::image;
 /// Image aspect ratio represented as width and height dimensions
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AspectRatio<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Height component of aspect ratio
     pub height: i64,
     ///Width component of aspect ratio
     pub width: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Image attributes
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageAttrs<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImageAttrs<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Horizontal alignment of the image within its container
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub align: Option<CowStr<'a>>,
+    pub align: Option<S>,
     ///Alternative text description for accessibility and screen readers
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alt: Option<CowStr<'a>>,
+    pub alt: Option<S>,
     ///Image aspect ratio for proper layout before loading
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub aspect_ratio: Option<image::AspectRatio<'a>>,
+    pub aspect_ratio: Option<image::AspectRatio<S>>,
     ///AT Protocol blob reference (10MB max). Used when image is uploaded to PDS.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub blob: Option<BlobRef<'a>>,
+    pub blob: Option<BlobRef<S>>,
     ///Image source URL or blob reference (blob:CID format for AT Protocol blobs)
-    #[serde(borrow)]
-    pub src: CowStr<'a>,
+    pub src: S,
     ///Optional image title displayed on hover
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Image<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Image attributes
-    #[serde(borrow)]
-    pub attrs: image::ImageAttrs<'a>,
+    pub attrs: image::ImageAttrs<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for AspectRatio<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AspectRatio<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.image"
     }
@@ -111,7 +127,7 @@ impl<'a> LexiconSchema for AspectRatio<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ImageAttrs<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageAttrs<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.image"
     }
@@ -219,7 +235,7 @@ impl<'a> LexiconSchema for ImageAttrs<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Image<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Image<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.image"
     }
@@ -358,10 +374,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> AspectRatio<'a> {
         AspectRatio {
             height: self._fields.0.unwrap(),
@@ -547,7 +560,7 @@ pub mod image_state {
 /// Builder for constructing an instance of this type
 pub struct ImageBuilder<'a, S: image_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<image::ImageAttrs<'a>>,),
+    _fields: (Option<image::ImageAttrs<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -577,7 +590,7 @@ where
     /// Set the `attrs` field (required)
     pub fn attrs(
         mut self,
-        value: impl Into<image::ImageAttrs<'a>>,
+        value: impl Into<image::ImageAttrs<S>>,
     ) -> ImageBuilder<'a, image_state::SetAttrs<S>> {
         self._fields.0 = Option::Some(value.into());
         ImageBuilder {
@@ -601,13 +614,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Image<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Image<'a> {
         Image {
             attrs: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

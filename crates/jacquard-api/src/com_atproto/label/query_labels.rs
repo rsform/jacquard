@@ -10,39 +10,54 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::label::Label;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct QueryLabels<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct QueryLabels<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 250.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sources: Option<Vec<Did<'a>>>,
+    pub sources: Option<Vec<Did<S>>>,
     #[serde(borrow)]
-    pub uri_patterns: Vec<CowStr<'a>>,
+    pub uri_patterns: Vec<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct QueryLabelsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct QueryLabelsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub labels: Vec<Label<'a>>,
+    pub cursor: Option<S>,
+    pub labels: Vec<Label<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.atproto.label.queryLabels
@@ -50,11 +65,12 @@ pub struct QueryLabelsResponse;
 impl jacquard_common::xrpc::XrpcResp for QueryLabelsResponse {
     const NSID: &'static str = "com.atproto.label.queryLabels";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = QueryLabelsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = QueryLabelsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for QueryLabels<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for QueryLabels<S> {
     const NSID: &'static str = "com.atproto.label.queryLabels";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = QueryLabelsResponse;
@@ -65,7 +81,7 @@ pub struct QueryLabelsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryLabelsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.label.queryLabels";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = QueryLabels<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = QueryLabels<S>;
     type Response = QueryLabelsResponse;
 }
 
@@ -108,12 +124,7 @@ pub mod query_labels_state {
 /// Builder for constructing an instance of this type
 pub struct QueryLabelsBuilder<'a, S: query_labels_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<Vec<Did<'a>>>,
-        Option<Vec<CowStr<'a>>>,
-    ),
+    _fields: (Option<S>, Option<i64>, Option<Vec<Did<S>>>, Option<Vec<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -137,12 +148,12 @@ impl<'a> QueryLabelsBuilder<'a, query_labels_state::Empty> {
 
 impl<'a, S: query_labels_state::State> QueryLabelsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -163,12 +174,12 @@ impl<'a, S: query_labels_state::State> QueryLabelsBuilder<'a, S> {
 
 impl<'a, S: query_labels_state::State> QueryLabelsBuilder<'a, S> {
     /// Set the `sources` field (optional)
-    pub fn sources(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
+    pub fn sources(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `sources` field to an Option value (optional)
-    pub fn maybe_sources(mut self, value: Option<Vec<Did<'a>>>) -> Self {
+    pub fn maybe_sources(mut self, value: Option<Vec<Did<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -182,7 +193,7 @@ where
     /// Set the `uriPatterns` field (required)
     pub fn uri_patterns(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> QueryLabelsBuilder<'a, query_labels_state::SetUriPatterns<S>> {
         self._fields.3 = Option::Some(value.into());
         QueryLabelsBuilder {

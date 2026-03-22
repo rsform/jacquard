@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,45 +30,48 @@ use serde::{Serialize, Deserialize};
 use crate::net_asadaame5121::at_circle::RingRef;
 /// Block/Kick a member from the circle
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "net.asadaame5121.at-circle.block",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Block<'a> {
+pub struct Block<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///Reason for blocking
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub reason: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub ring: RingRef<'a>,
+    pub reason: Option<S>,
+    pub ring: RingRef<S>,
     ///DID of the member to block
-    #[serde(borrow)]
-    pub subject: Did<'a>,
+    pub subject: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BlockGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BlockGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Block<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Block<S>,
 }
 
-impl<'a> Block<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, BlockRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Block<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, BlockRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -77,18 +82,17 @@ pub struct BlockRecord;
 impl XrpcResp for BlockRecord {
     const NSID: &'static str = "net.asadaame5121.at-circle.block";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BlockGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BlockGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<BlockGetRecordOutput<'_>> for Block<'_> {
-    fn from(output: BlockGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<BlockGetRecordOutput<S>> for Block<S> {
+    fn from(output: BlockGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Block<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Block<S> {
     const NSID: &'static str = "net.asadaame5121.at-circle.block";
     type Record = BlockRecord;
 }
@@ -98,7 +102,7 @@ impl Collection for BlockRecord {
     type Record = BlockRecord;
 }
 
-impl<'a> LexiconSchema for Block<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Block<S> {
     fn nsid() -> &'static str {
         "net.asadaame5121.at-circle.block"
     }
@@ -156,63 +160,58 @@ pub mod block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ring;
         type CreatedAt;
         type Subject;
+        type Ring;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ring = Unset;
         type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `ring` field to Set
-    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRing<S> {}
-    impl<S: State> State for SetRing<S> {
-        type Ring = Set<members::ring>;
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
+        type Ring = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Ring = S::Ring;
         type CreatedAt = Set<members::created_at>;
         type Subject = S::Subject;
+        type Ring = S::Ring;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Ring = S::Ring;
         type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
+        type Ring = S::Ring;
+    }
+    ///State transition - sets the `ring` field to Set
+    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRing<S> {}
+    impl<S: State> State for SetRing<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subject = S::Subject;
+        type Ring = Set<members::ring>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ring` field
-        pub struct ring(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `ring` field
+        pub struct ring(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BlockBuilder<'a, S: block_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<RingRef<'a>>,
-        Option<Did<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<RingRef<S>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -255,12 +254,12 @@ where
 
 impl<'a, S: block_state::State> BlockBuilder<'a, S> {
     /// Set the `reason` field (optional)
-    pub fn reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `reason` field to an Option value (optional)
-    pub fn maybe_reason(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_reason(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -274,7 +273,7 @@ where
     /// Set the `ring` field (required)
     pub fn ring(
         mut self,
-        value: impl Into<RingRef<'a>>,
+        value: impl Into<RingRef<S>>,
     ) -> BlockBuilder<'a, block_state::SetRing<S>> {
         self._fields.2 = Option::Some(value.into());
         BlockBuilder {
@@ -293,7 +292,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> BlockBuilder<'a, block_state::SetSubject<S>> {
         self._fields.3 = Option::Some(value.into());
         BlockBuilder {
@@ -307,9 +306,9 @@ where
 impl<'a, S> BlockBuilder<'a, S>
 where
     S: block_state::State,
-    S::Ring: block_state::IsSet,
     S::CreatedAt: block_state::IsSet,
     S::Subject: block_state::IsSet,
+    S::Ring: block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Block<'a> {
@@ -322,13 +321,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Block<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Block<'a> {
         Block {
             created_at: self._fields.0.unwrap(),
             reason: self._fields.1,

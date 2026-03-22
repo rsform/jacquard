@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,118 +31,136 @@ use crate::com_atproto::label::SelfLabels;
 use crate::at_margin::annotation;
 /// Annotation body - the content of the annotation
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Body<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Body<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///MIME type of the body content  Defaults to `"text/plain"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_body_format")]
-    #[serde(borrow)]
-    pub format: Option<CowStr<'a>>,
+    pub format: Option<S>,
     ///BCP47 language tag
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub language: Option<CowStr<'a>>,
+    pub language: Option<S>,
     ///Reference to external body content
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<UriValue<'a>>,
+    pub uri: Option<UriValue<S>>,
     ///Text content of the annotation
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub value: Option<CowStr<'a>>,
+    pub value: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// W3C CssSelector - select DOM elements by CSS selector
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CssSelector<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CssSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<CowStr<'a>>,
+    pub r#type: Option<S>,
     ///CSS selector string
-    #[serde(borrow)]
-    pub value: CowStr<'a>,
+    pub value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// W3C FragmentSelector - select by URI fragment
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct FragmentSelector<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FragmentSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Specification the fragment conforms to
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub conforms_to: Option<UriValue<'a>>,
+    pub conforms_to: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<CowStr<'a>>,
+    pub r#type: Option<S>,
     ///Fragment identifier value
-    #[serde(borrow)]
-    pub value: CowStr<'a>,
+    pub value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The client/agent that created this record
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Generator<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Generator<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub homepage: Option<UriValue<'a>>,
+    pub homepage: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<UriValue<'a>>,
+    pub id: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A W3C-compliant web annotation stored on the AT Protocol
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "at.margin.annotation", tag = "$type")]
-pub struct Annotation<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "at.margin.annotation",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Annotation<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The annotation content (text or reference)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub body: Option<annotation::Body<'a>>,
+    pub body: Option<annotation::Body<S>>,
     pub created_at: Datetime,
     ///The client/agent that created this record
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub generator: Option<annotation::Generator<'a>>,
+    pub generator: Option<annotation::Generator<S>>,
     ///Self-applied content labels for this annotation
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<SelfLabels<'a>>,
+    pub labels: Option<SelfLabels<S>>,
     ///W3C motivation for the annotation
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub motivation: Option<AnnotationMotivation<'a>>,
+    pub motivation: Option<AnnotationMotivation<S>>,
     ///License URI (e.g., https://creativecommons.org/licenses/by/4.0/)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rights: Option<UriValue<'a>>,
+    pub rights: Option<UriValue<S>>,
     ///Tags for categorization
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///The resource being annotated with optional selector
-    #[serde(borrow)]
-    pub target: annotation::Target<'a>,
+    pub target: annotation::Target<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// W3C motivation for the annotation
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AnnotationMotivation<'a> {
+pub enum AnnotationMotivation<S: Bos<str> + AsRef<str> = DefaultStr> {
     Commenting,
     Highlighting,
     Bookmarking,
@@ -151,10 +171,10 @@ pub enum AnnotationMotivation<'a> {
     Editing,
     Questioning,
     Assessing,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> AnnotationMotivation<'a> {
+impl<S: Bos<str> + AsRef<str>> AnnotationMotivation<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Commenting => "commenting",
@@ -170,11 +190,9 @@ impl<'a> AnnotationMotivation<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for AnnotationMotivation<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "commenting" => Self::Commenting,
             "highlighting" => Self::Highlighting,
             "bookmarking" => Self::Bookmarking,
@@ -185,71 +203,51 @@ impl<'a> From<&'a str> for AnnotationMotivation<'a> {
             "editing" => Self::Editing,
             "questioning" => Self::Questioning,
             "assessing" => Self::Assessing,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for AnnotationMotivation<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "commenting" => Self::Commenting,
-            "highlighting" => Self::Highlighting,
-            "bookmarking" => Self::Bookmarking,
-            "tagging" => Self::Tagging,
-            "describing" => Self::Describing,
-            "linking" => Self::Linking,
-            "replying" => Self::Replying,
-            "editing" => Self::Editing,
-            "questioning" => Self::Questioning,
-            "assessing" => Self::Assessing,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for AnnotationMotivation<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for AnnotationMotivation<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for AnnotationMotivation<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for AnnotationMotivation<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for AnnotationMotivation<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for AnnotationMotivation<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for AnnotationMotivation<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for AnnotationMotivation<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for AnnotationMotivation<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for AnnotationMotivation<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for AnnotationMotivation<'_> {
-    type Output = AnnotationMotivation<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for AnnotationMotivation<S> {
+    type Output = AnnotationMotivation<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             AnnotationMotivation::Commenting => AnnotationMotivation::Commenting,
@@ -272,185 +270,230 @@ impl jacquard_common::IntoStatic for AnnotationMotivation<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AnnotationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AnnotationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Annotation<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Annotation<S>,
 }
 
 /// W3C RangeSelector - select range between two selectors
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RangeSelector<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RangeSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Selector for range end
-    #[serde(borrow)]
-    pub end_selector: RangeSelectorEndSelector<'a>,
+    pub end_selector: RangeSelectorEndSelector<S>,
     ///Selector for range start
-    #[serde(borrow)]
-    pub start_selector: RangeSelectorStartSelector<'a>,
+    pub start_selector: RangeSelectorStartSelector<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<CowStr<'a>>,
+    pub r#type: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RangeSelectorEndSelector<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RangeSelectorEndSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
-    TextQuoteSelector(Box<annotation::TextQuoteSelector<'a>>),
+    TextQuoteSelector(Box<annotation::TextQuoteSelector<S>>),
     #[serde(rename = "at.margin.annotation#textPositionSelector")]
-    TextPositionSelector(Box<annotation::TextPositionSelector<'a>>),
+    TextPositionSelector(Box<annotation::TextPositionSelector<S>>),
     #[serde(rename = "at.margin.annotation#cssSelector")]
-    CssSelector(Box<annotation::CssSelector<'a>>),
+    CssSelector(Box<annotation::CssSelector<S>>),
     #[serde(rename = "at.margin.annotation#xpathSelector")]
-    XpathSelector(Box<annotation::XpathSelector<'a>>),
+    XpathSelector(Box<annotation::XpathSelector<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum RangeSelectorStartSelector<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum RangeSelectorStartSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
-    TextQuoteSelector(Box<annotation::TextQuoteSelector<'a>>),
+    TextQuoteSelector(Box<annotation::TextQuoteSelector<S>>),
     #[serde(rename = "at.margin.annotation#textPositionSelector")]
-    TextPositionSelector(Box<annotation::TextPositionSelector<'a>>),
+    TextPositionSelector(Box<annotation::TextPositionSelector<S>>),
     #[serde(rename = "at.margin.annotation#cssSelector")]
-    CssSelector(Box<annotation::CssSelector<'a>>),
+    CssSelector(Box<annotation::CssSelector<S>>),
     #[serde(rename = "at.margin.annotation#xpathSelector")]
-    XpathSelector(Box<annotation::XpathSelector<'a>>),
+    XpathSelector(Box<annotation::XpathSelector<S>>),
 }
 
 /// W3C SpecificResource - the target with optional selector
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Target<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Target<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Selector to identify the specific segment
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub selector: Option<TargetSelector<'a>>,
+    pub selector: Option<TargetSelector<S>>,
     ///The URL being annotated
-    #[serde(borrow)]
-    pub source: UriValue<'a>,
+    pub source: UriValue<S>,
     ///SHA256 hash of normalized URL for indexing
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source_hash: Option<CowStr<'a>>,
+    pub source_hash: Option<S>,
     ///State of the resource at annotation time
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub state: Option<annotation::TimeState<'a>>,
+    pub state: Option<annotation::TimeState<S>>,
     ///Page title at time of annotation
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TargetSelector<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TargetSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
-    TextQuoteSelector(Box<annotation::TextQuoteSelector<'a>>),
+    TextQuoteSelector(Box<annotation::TextQuoteSelector<S>>),
     #[serde(rename = "at.margin.annotation#textPositionSelector")]
-    TextPositionSelector(Box<annotation::TextPositionSelector<'a>>),
+    TextPositionSelector(Box<annotation::TextPositionSelector<S>>),
     #[serde(rename = "at.margin.annotation#cssSelector")]
-    CssSelector(Box<annotation::CssSelector<'a>>),
+    CssSelector(Box<annotation::CssSelector<S>>),
     #[serde(rename = "at.margin.annotation#xpathSelector")]
-    XpathSelector(Box<annotation::XpathSelector<'a>>),
+    XpathSelector(Box<annotation::XpathSelector<S>>),
     #[serde(rename = "at.margin.annotation#fragmentSelector")]
-    FragmentSelector(Box<annotation::FragmentSelector<'a>>),
+    FragmentSelector(Box<annotation::FragmentSelector<S>>),
     #[serde(rename = "at.margin.annotation#rangeSelector")]
-    RangeSelector(Box<annotation::RangeSelector<'a>>),
+    RangeSelector(Box<annotation::RangeSelector<S>>),
 }
 
 /// W3C TextPositionSelector - select by character offsets
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TextPositionSelector<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TextPositionSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Ending character position (exclusive)
     pub end: i64,
     ///Starting character position (0-indexed, inclusive)
     pub start: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<CowStr<'a>>,
+    pub r#type: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// W3C TextQuoteSelector - select text by quoting it with context
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct TextQuoteSelector<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TextQuoteSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The exact text to match
-    #[serde(borrow)]
-    pub exact: CowStr<'a>,
+    pub exact: S,
     ///Text immediately before the selection
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub prefix: Option<CowStr<'a>>,
+    pub prefix: Option<S>,
     ///Text immediately after the selection
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub suffix: Option<CowStr<'a>>,
+    pub suffix: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<CowStr<'a>>,
+    pub r#type: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// W3C TimeState - record when content was captured
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct TimeState<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TimeState<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///URL to cached/archived version
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cached: Option<UriValue<'a>>,
+    pub cached: Option<UriValue<S>>,
     ///When the source was accessed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_date: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// W3C XPathSelector - select by XPath expression
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct XpathSelector<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct XpathSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#type: Option<CowStr<'a>>,
+    pub r#type: Option<S>,
     ///XPath expression
-    #[serde(borrow)]
-    pub value: CowStr<'a>,
+    pub value: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Annotation<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AnnotationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Annotation<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AnnotationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Body<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Body<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -487,7 +530,7 @@ impl<'a> LexiconSchema for Body<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CssSelector<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CssSelector<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -513,7 +556,7 @@ impl<'a> LexiconSchema for CssSelector<'a> {
     }
 }
 
-impl<'a> LexiconSchema for FragmentSelector<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FragmentSelector<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -539,7 +582,7 @@ impl<'a> LexiconSchema for FragmentSelector<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Generator<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Generator<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -561,18 +604,17 @@ pub struct AnnotationRecord;
 impl XrpcResp for AnnotationRecord {
     const NSID: &'static str = "at.margin.annotation";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AnnotationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AnnotationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AnnotationGetRecordOutput<'_>> for Annotation<'_> {
-    fn from(output: AnnotationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AnnotationGetRecordOutput<S>> for Annotation<S> {
+    fn from(output: AnnotationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Annotation<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Annotation<S> {
     const NSID: &'static str = "at.margin.annotation";
     type Record = AnnotationRecord;
 }
@@ -582,7 +624,7 @@ impl Collection for AnnotationRecord {
     type Record = AnnotationRecord;
 }
 
-impl<'a> LexiconSchema for Annotation<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Annotation<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -607,7 +649,7 @@ impl<'a> LexiconSchema for Annotation<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RangeSelector<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RangeSelector<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -622,7 +664,7 @@ impl<'a> LexiconSchema for RangeSelector<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Target<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Target<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -647,7 +689,7 @@ impl<'a> LexiconSchema for Target<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TextPositionSelector<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TextPositionSelector<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -682,7 +724,7 @@ impl<'a> LexiconSchema for TextPositionSelector<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TextQuoteSelector<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TextQuoteSelector<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -765,7 +807,7 @@ impl<'a> LexiconSchema for TextQuoteSelector<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TimeState<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TimeState<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -780,7 +822,7 @@ impl<'a> LexiconSchema for TimeState<'a> {
     }
 }
 
-impl<'a> LexiconSchema for XpathSelector<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for XpathSelector<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -806,14 +848,14 @@ impl<'a> LexiconSchema for XpathSelector<'a> {
     }
 }
 
-fn _default_body_format() -> Option<CowStr<'static>> {
-    Some(CowStr::from("text/plain"))
+fn _default_body_format<S: From<&'static str>>() -> ::core::option::Option<S> {
+    Some(S::from("text/plain"))
 }
 
-impl Default for Body<'_> {
+impl Default for Body {
     fn default() -> Self {
         Self {
-            format: Some(CowStr::from("text/plain")),
+            format: Some(SmolStr::from("text/plain")),
             language: None,
             uri: None,
             value: None,
@@ -1390,37 +1432,37 @@ pub mod annotation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Target;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Target = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Target = S::Target;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTarget<S> {}
     impl<S: State> State for SetTarget<S> {
-        type CreatedAt = S::CreatedAt;
         type Target = Set<members::target>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Target = S::Target;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `target` field
         pub struct target(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1428,14 +1470,14 @@ pub mod annotation_state {
 pub struct AnnotationBuilder<'a, S: annotation_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<annotation::Body<'a>>,
+        Option<annotation::Body<S>>,
         Option<Datetime>,
-        Option<annotation::Generator<'a>>,
-        Option<SelfLabels<'a>>,
-        Option<AnnotationMotivation<'a>>,
-        Option<UriValue<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<annotation::Target<'a>>,
+        Option<annotation::Generator<S>>,
+        Option<SelfLabels<S>>,
+        Option<AnnotationMotivation<S>>,
+        Option<UriValue<S>>,
+        Option<Vec<S>>,
+        Option<annotation::Target<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1460,12 +1502,12 @@ impl<'a> AnnotationBuilder<'a, annotation_state::Empty> {
 
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `body` field (optional)
-    pub fn body(mut self, value: impl Into<Option<annotation::Body<'a>>>) -> Self {
+    pub fn body(mut self, value: impl Into<Option<annotation::Body<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `body` field to an Option value (optional)
-    pub fn maybe_body(mut self, value: Option<annotation::Body<'a>>) -> Self {
+    pub fn maybe_body(mut self, value: Option<annotation::Body<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1494,13 +1536,13 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `generator` field (optional)
     pub fn generator(
         mut self,
-        value: impl Into<Option<annotation::Generator<'a>>>,
+        value: impl Into<Option<annotation::Generator<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `generator` field to an Option value (optional)
-    pub fn maybe_generator(mut self, value: Option<annotation::Generator<'a>>) -> Self {
+    pub fn maybe_generator(mut self, value: Option<annotation::Generator<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1508,12 +1550,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
 
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1523,13 +1565,13 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `motivation` field (optional)
     pub fn motivation(
         mut self,
-        value: impl Into<Option<AnnotationMotivation<'a>>>,
+        value: impl Into<Option<AnnotationMotivation<S>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `motivation` field to an Option value (optional)
-    pub fn maybe_motivation(mut self, value: Option<AnnotationMotivation<'a>>) -> Self {
+    pub fn maybe_motivation(mut self, value: Option<AnnotationMotivation<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1537,12 +1579,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
 
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `rights` field (optional)
-    pub fn rights(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn rights(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `rights` field to an Option value (optional)
-    pub fn maybe_rights(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_rights(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -1550,12 +1592,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
 
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -1569,7 +1611,7 @@ where
     /// Set the `target` field (required)
     pub fn target(
         mut self,
-        value: impl Into<annotation::Target<'a>>,
+        value: impl Into<annotation::Target<S>>,
     ) -> AnnotationBuilder<'a, annotation_state::SetTarget<S>> {
         self._fields.7 = Option::Some(value.into());
         AnnotationBuilder {
@@ -1583,8 +1625,8 @@ where
 impl<'a, S> AnnotationBuilder<'a, S>
 where
     S: annotation_state::State,
-    S::CreatedAt: annotation_state::IsSet,
     S::Target: annotation_state::IsSet,
+    S::CreatedAt: annotation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Annotation<'a> {
@@ -1603,10 +1645,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Annotation<'a> {
         Annotation {
             body: self._fields.0,
@@ -1670,9 +1709,9 @@ pub mod range_selector_state {
 pub struct RangeSelectorBuilder<'a, S: range_selector_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<RangeSelectorEndSelector<'a>>,
-        Option<RangeSelectorStartSelector<'a>>,
-        Option<CowStr<'a>>,
+        Option<RangeSelectorEndSelector<S>>,
+        Option<RangeSelectorStartSelector<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1703,7 +1742,7 @@ where
     /// Set the `endSelector` field (required)
     pub fn end_selector(
         mut self,
-        value: impl Into<RangeSelectorEndSelector<'a>>,
+        value: impl Into<RangeSelectorEndSelector<S>>,
     ) -> RangeSelectorBuilder<'a, range_selector_state::SetEndSelector<S>> {
         self._fields.0 = Option::Some(value.into());
         RangeSelectorBuilder {
@@ -1722,7 +1761,7 @@ where
     /// Set the `startSelector` field (required)
     pub fn start_selector(
         mut self,
-        value: impl Into<RangeSelectorStartSelector<'a>>,
+        value: impl Into<RangeSelectorStartSelector<S>>,
     ) -> RangeSelectorBuilder<'a, range_selector_state::SetStartSelector<S>> {
         self._fields.1 = Option::Some(value.into());
         RangeSelectorBuilder {
@@ -1735,12 +1774,12 @@ where
 
 impl<'a, S: range_selector_state::State> RangeSelectorBuilder<'a, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
-    pub fn maybe_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_type(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1764,10 +1803,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RangeSelector<'a> {
         RangeSelector {
             end_selector: self._fields.0.unwrap(),
@@ -1814,11 +1850,11 @@ pub mod target_state {
 pub struct TargetBuilder<'a, S: target_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<TargetSelector<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-        Option<annotation::TimeState<'a>>,
-        Option<CowStr<'a>>,
+        Option<TargetSelector<S>>,
+        Option<UriValue<S>>,
+        Option<S>,
+        Option<annotation::TimeState<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1843,12 +1879,12 @@ impl<'a> TargetBuilder<'a, target_state::Empty> {
 
 impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     /// Set the `selector` field (optional)
-    pub fn selector(mut self, value: impl Into<Option<TargetSelector<'a>>>) -> Self {
+    pub fn selector(mut self, value: impl Into<Option<TargetSelector<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `selector` field to an Option value (optional)
-    pub fn maybe_selector(mut self, value: Option<TargetSelector<'a>>) -> Self {
+    pub fn maybe_selector(mut self, value: Option<TargetSelector<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1862,7 +1898,7 @@ where
     /// Set the `source` field (required)
     pub fn source(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> TargetBuilder<'a, target_state::SetSource<S>> {
         self._fields.1 = Option::Some(value.into());
         TargetBuilder {
@@ -1875,12 +1911,12 @@ where
 
 impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     /// Set the `sourceHash` field (optional)
-    pub fn source_hash(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn source_hash(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `sourceHash` field to an Option value (optional)
-    pub fn maybe_source_hash(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_source_hash(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1888,12 +1924,12 @@ impl<'a, S: target_state::State> TargetBuilder<'a, S> {
 
 impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     /// Set the `state` field (optional)
-    pub fn state(mut self, value: impl Into<Option<annotation::TimeState<'a>>>) -> Self {
+    pub fn state(mut self, value: impl Into<Option<annotation::TimeState<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `state` field to an Option value (optional)
-    pub fn maybe_state(mut self, value: Option<annotation::TimeState<'a>>) -> Self {
+    pub fn maybe_state(mut self, value: Option<annotation::TimeState<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1901,12 +1937,12 @@ impl<'a, S: target_state::State> TargetBuilder<'a, S> {
 
 impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1929,13 +1965,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Target<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Target<'a> {
         Target {
             selector: self._fields.0,
             source: self._fields.1.unwrap(),
@@ -1994,7 +2024,7 @@ pub mod text_position_selector_state {
 /// Builder for constructing an instance of this type
 pub struct TextPositionSelectorBuilder<'a, S: text_position_selector_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<i64>, Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -2059,12 +2089,12 @@ where
 
 impl<'a, S: text_position_selector_state::State> TextPositionSelectorBuilder<'a, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
-    pub fn maybe_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_type(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -2088,10 +2118,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TextPositionSelector<'a> {
         TextPositionSelector {
             end: self._fields.0.unwrap(),

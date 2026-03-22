@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,150 +32,189 @@ use crate::network_slices::tools::richtext::facet::Facet;
 use crate::network_slices::tools::document;
 /// A fenced code block
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CodeBlock<'a> {
-    #[serde(borrow)]
-    pub code: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CodeBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub code: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lang: Option<CowStr<'a>>,
+    pub lang: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A heading block (h1-h3) with optional inline formatting
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Heading<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Heading<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Facet<'a>>>,
+    pub facets: Option<Vec<Facet<S>>>,
     pub level: i64,
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// An embedded image with alt text
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageEmbed<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImageEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alt: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub image: BlobRef<'a>,
+    pub alt: Option<S>,
+    pub image: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "network.slices.tools.document",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Document<'a> {
+pub struct Document<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Document content as array of blocks
-    #[serde(borrow)]
-    pub blocks: Vec<DocumentBlocksItem<'a>>,
+    pub blocks: Vec<DocumentBlocksItem<S>>,
     pub created_at: Datetime,
     ///URL-friendly identifier, unique per author
-    #[serde(borrow)]
-    pub slug: CowStr<'a>,
+    pub slug: S,
     ///Document title
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum DocumentBlocksItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum DocumentBlocksItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "network.slices.tools.document#paragraph")]
-    Paragraph(Box<document::Paragraph<'a>>),
+    Paragraph(Box<document::Paragraph<S>>),
     #[serde(rename = "network.slices.tools.document#heading")]
-    Heading(Box<document::Heading<'a>>),
+    Heading(Box<document::Heading<S>>),
     #[serde(rename = "network.slices.tools.document#codeBlock")]
-    CodeBlock(Box<document::CodeBlock<'a>>),
+    CodeBlock(Box<document::CodeBlock<S>>),
     #[serde(rename = "network.slices.tools.document#quote")]
-    Quote(Box<document::Quote<'a>>),
+    Quote(Box<document::Quote<S>>),
     #[serde(rename = "network.slices.tools.document#tangledEmbed")]
-    TangledEmbed(Box<document::TangledEmbed<'a>>),
+    TangledEmbed(Box<document::TangledEmbed<S>>),
     #[serde(rename = "network.slices.tools.document#imageEmbed")]
-    ImageEmbed(Box<document::ImageEmbed<'a>>),
+    ImageEmbed(Box<document::ImageEmbed<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DocumentGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DocumentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Document<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Document<S>,
 }
 
 /// A paragraph block with optional inline formatting
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Paragraph<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Paragraph<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Facet<'a>>>,
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub facets: Option<Vec<Facet<S>>>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A blockquote with optional inline formatting
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Quote<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Quote<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Facet<'a>>>,
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub facets: Option<Vec<Facet<S>>>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// An embedded Tangled repo card
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct TangledEmbed<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TangledEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The repo owner's handle
-    #[serde(borrow)]
-    pub handle: CowStr<'a>,
+    pub handle: S,
     ///The repository name
-    #[serde(borrow)]
-    pub repo: CowStr<'a>,
+    pub repo: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Document<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DocumentRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Document<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DocumentRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for CodeBlock<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeBlock<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -209,7 +250,7 @@ impl<'a> LexiconSchema for CodeBlock<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Heading<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Heading<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -255,7 +296,7 @@ impl<'a> LexiconSchema for Heading<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ImageEmbed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageEmbed<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -327,18 +368,17 @@ pub struct DocumentRecord;
 impl XrpcResp for DocumentRecord {
     const NSID: &'static str = "network.slices.tools.document";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DocumentGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DocumentGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DocumentGetRecordOutput<'_>> for Document<'_> {
-    fn from(output: DocumentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DocumentGetRecordOutput<S>> for Document<S> {
+    fn from(output: DocumentGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Document<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Document<S> {
     const NSID: &'static str = "network.slices.tools.document";
     type Record = DocumentRecord;
 }
@@ -348,7 +388,7 @@ impl Collection for DocumentRecord {
     type Record = DocumentRecord;
 }
 
-impl<'a> LexiconSchema for Document<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Document<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -385,7 +425,7 @@ impl<'a> LexiconSchema for Document<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Paragraph<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Paragraph<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -411,7 +451,7 @@ impl<'a> LexiconSchema for Paragraph<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Quote<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Quote<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -437,7 +477,7 @@ impl<'a> LexiconSchema for Quote<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TangledEmbed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TangledEmbed<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -787,44 +827,44 @@ pub mod heading_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
         type Level;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type Level = S::Level;
+        type Text = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type Text = S::Text;
         type Level = Set<members::level>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Level = S::Level;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct HeadingBuilder<'a, S: heading_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<Facet<'a>>>, Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<Vec<Facet<S>>>, Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -848,12 +888,12 @@ impl<'a> HeadingBuilder<'a, heading_state::Empty> {
 
 impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
     /// Set the `facets` field (optional)
-    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
+    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
-    pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -886,7 +926,7 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> HeadingBuilder<'a, heading_state::SetText<S>> {
         self._fields.2 = Option::Some(value.into());
         HeadingBuilder {
@@ -900,8 +940,8 @@ where
 impl<'a, S> HeadingBuilder<'a, S>
 where
     S: heading_state::State,
-    S::Text: heading_state::IsSet,
     S::Level: heading_state::IsSet,
+    S::Text: heading_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Heading<'a> {
@@ -915,10 +955,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Heading<'a> {
         Heading {
             facets: self._fields.0,
@@ -964,7 +1001,7 @@ pub mod image_embed_state {
 /// Builder for constructing an instance of this type
 pub struct ImageEmbedBuilder<'a, S: image_embed_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<BlobRef<'a>>),
+    _fields: (Option<S>, Option<BlobRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -988,12 +1025,12 @@ impl<'a> ImageEmbedBuilder<'a, image_embed_state::Empty> {
 
 impl<'a, S: image_embed_state::State> ImageEmbedBuilder<'a, S> {
     /// Set the `alt` field (optional)
-    pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
-    pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_alt(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1007,7 +1044,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> ImageEmbedBuilder<'a, image_embed_state::SetImage<S>> {
         self._fields.1 = Option::Some(value.into());
         ImageEmbedBuilder {
@@ -1034,10 +1071,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ImageEmbed<'a> {
         ImageEmbed {
             alt: self._fields.0,
@@ -1057,67 +1091,67 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blocks;
         type Slug;
-        type CreatedAt;
         type Title;
+        type Blocks;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blocks = Unset;
         type Slug = Unset;
-        type CreatedAt = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocks<S> {}
-    impl<S: State> State for SetBlocks<S> {
-        type Blocks = Set<members::blocks>;
-        type Slug = S::Slug;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
+        type Blocks = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Blocks = S::Blocks;
         type Slug = Set<members::slug>;
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Blocks = S::Blocks;
-        type Slug = S::Slug;
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Blocks = S::Blocks;
         type Slug = S::Slug;
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
+        type Blocks = S::Blocks;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type Slug = S::Slug;
+        type Title = S::Title;
+        type Blocks = Set<members::blocks>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Slug = S::Slug;
+        type Title = S::Title;
+        type Blocks = S::Blocks;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
         ///Marker type for the `slug` field
         pub struct slug(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1125,10 +1159,10 @@ pub mod document_state {
 pub struct DocumentBuilder<'a, S: document_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<DocumentBlocksItem<'a>>>,
+        Option<Vec<DocumentBlocksItem<S>>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -1160,7 +1194,7 @@ where
     /// Set the `blocks` field (required)
     pub fn blocks(
         mut self,
-        value: impl Into<Vec<DocumentBlocksItem<'a>>>,
+        value: impl Into<Vec<DocumentBlocksItem<S>>>,
     ) -> DocumentBuilder<'a, document_state::SetBlocks<S>> {
         self._fields.0 = Option::Some(value.into());
         DocumentBuilder {
@@ -1198,7 +1232,7 @@ where
     /// Set the `slug` field (required)
     pub fn slug(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DocumentBuilder<'a, document_state::SetSlug<S>> {
         self._fields.2 = Option::Some(value.into());
         DocumentBuilder {
@@ -1217,7 +1251,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DocumentBuilder<'a, document_state::SetTitle<S>> {
         self._fields.3 = Option::Some(value.into());
         DocumentBuilder {
@@ -1244,10 +1278,10 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
-    S::Blocks: document_state::IsSet,
     S::Slug: document_state::IsSet,
-    S::CreatedAt: document_state::IsSet,
     S::Title: document_state::IsSet,
+    S::Blocks: document_state::IsSet,
+    S::CreatedAt: document_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Document<'a> {
@@ -1263,10 +1297,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Document<'a> {
         Document {
             blocks: self._fields.0.unwrap(),

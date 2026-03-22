@@ -21,12 +21,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -34,21 +36,25 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct IdentityInfo<'a> {
-    #[serde(borrow)]
-    pub did: Did<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct IdentityInfo<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub did: Did<S>,
     ///The complete DID document for the identity.
-    #[serde(borrow)]
-    pub did_doc: Data<'a>,
+    pub did_doc: Data<S>,
     ///The validated handle of the account; or 'handle.invalid' if the handle did not bi-directionally match the DID document.
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub handle: Handle<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for IdentityInfo<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for IdentityInfo<S> {
     fn nsid() -> &'static str {
         "com.atproto.identity.defs"
     }
@@ -73,58 +79,58 @@ pub mod identity_info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type DidDoc;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type DidDoc = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type DidDoc = S::DidDoc;
-        type Did = S::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `did_doc` field to Set
     pub struct SetDidDoc<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDidDoc<S> {}
     impl<S: State> State for SetDidDoc<S> {
-        type Handle = S::Handle;
         type DidDoc = Set<members::did_doc>;
         type Did = S::Did;
+        type Handle = S::Handle;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
         type DidDoc = S::DidDoc;
         type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type DidDoc = S::DidDoc;
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did_doc` field
         pub struct did_doc(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct IdentityInfoBuilder<'a, S: identity_info_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<Data<'a>>, Option<Handle<'a>>),
+    _fields: (Option<Did<S>>, Option<Data<S>>, Option<Handle<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -154,7 +160,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> IdentityInfoBuilder<'a, identity_info_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         IdentityInfoBuilder {
@@ -173,7 +179,7 @@ where
     /// Set the `didDoc` field (required)
     pub fn did_doc(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> IdentityInfoBuilder<'a, identity_info_state::SetDidDoc<S>> {
         self._fields.1 = Option::Some(value.into());
         IdentityInfoBuilder {
@@ -192,7 +198,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<Handle<'a>>,
+        value: impl Into<Handle<S>>,
     ) -> IdentityInfoBuilder<'a, identity_info_state::SetHandle<S>> {
         self._fields.2 = Option::Some(value.into());
         IdentityInfoBuilder {
@@ -206,9 +212,9 @@ where
 impl<'a, S> IdentityInfoBuilder<'a, S>
 where
     S: identity_info_state::State,
-    S::Handle: identity_info_state::IsSet,
     S::DidDoc: identity_info_state::IsSet,
     S::Did: identity_info_state::IsSet,
+    S::Handle: identity_info_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IdentityInfo<'a> {
@@ -222,7 +228,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> IdentityInfo<'a> {
         IdentityInfo {
             did: self._fields.0.unwrap(),

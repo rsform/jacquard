@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,36 +28,45 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "uk.ewancroft.now", tag = "$type")]
-pub struct Now<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "uk.ewancroft.now",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Now<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The ISO 8601 date and time when the status was created.
     pub created_at: Datetime,
     ///The status text formatted as plain text.
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct NowGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct NowGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Now<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Now<S>,
 }
 
-impl<'a> Now<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, NowRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Now<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, NowRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -66,18 +77,17 @@ pub struct NowRecord;
 impl XrpcResp for NowRecord {
     const NSID: &'static str = "uk.ewancroft.now";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = NowGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = NowGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<NowGetRecordOutput<'_>> for Now<'_> {
-    fn from(output: NowGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<NowGetRecordOutput<S>> for Now<S> {
+    fn from(output: NowGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Now<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Now<S> {
     const NSID: &'static str = "uk.ewancroft.now";
     type Record = NowRecord;
 }
@@ -87,7 +97,7 @@ impl Collection for NowRecord {
     type Record = NowRecord;
 }
 
-impl<'a> LexiconSchema for Now<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Now<S> {
     fn nsid() -> &'static str {
         "uk.ewancroft.now"
     }
@@ -171,7 +181,7 @@ pub mod now_state {
 /// Builder for constructing an instance of this type
 pub struct NowBuilder<'a, S: now_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<CowStr<'a>>),
+    _fields: (Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -218,10 +228,7 @@ where
     S::Text: now_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(
-        mut self,
-        value: impl Into<CowStr<'a>>,
-    ) -> NowBuilder<'a, now_state::SetText<S>> {
+    pub fn text(mut self, value: impl Into<S>) -> NowBuilder<'a, now_state::SetText<S>> {
         self._fields.1 = Option::Some(value.into());
         NowBuilder {
             _state: PhantomData,
@@ -246,13 +253,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Now<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Now<'a> {
         Now {
             created_at: self._fields.0.unwrap(),
             text: self._fields.1.unwrap(),

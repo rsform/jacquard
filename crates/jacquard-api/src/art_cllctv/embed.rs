@@ -9,11 +9,16 @@ pub mod external;
 pub mod external_video;
 pub mod images;
 
-use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -22,73 +27,90 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::art_cllctv::embed;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Tombstone<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Tombstone<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub camera: Option<embed::TombstoneCamera<'a>>,
+    pub camera: Option<embed::TombstoneCamera<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub dimensions: Option<embed::TombstoneDimensions<'a>>,
+    pub dimensions: Option<embed::TombstoneDimensions<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub lens: Option<embed::TombstoneLens<'a>>,
+    pub lens: Option<embed::TombstoneLens<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub materials: Option<Vec<CowStr<'a>>>,
+    pub materials: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct TombstoneCamera<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TombstoneCamera<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub make: Option<CowStr<'a>>,
+    pub make: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub model: Option<CowStr<'a>>,
+    pub model: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct TombstoneDimensions<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TombstoneDimensions<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub depth: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub unit: Option<CowStr<'a>>,
+    pub unit: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct TombstoneLens<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TombstoneLens<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub exposure_time: Option<CowStr<'a>>,
+    pub exposure_time: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub fnumber: Option<CowStr<'a>>,
+    pub fnumber: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub focal_length: Option<CowStr<'a>>,
+    pub focal_length: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub iso: Option<CowStr<'a>>,
+    pub iso: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Tombstone<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tombstone<S> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.defs"
     }
@@ -103,7 +125,7 @@ impl<'a> LexiconSchema for Tombstone<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TombstoneCamera<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TombstoneCamera<S> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.defs"
     }
@@ -118,7 +140,7 @@ impl<'a> LexiconSchema for TombstoneCamera<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TombstoneDimensions<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TombstoneDimensions<S> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.defs"
     }
@@ -133,7 +155,7 @@ impl<'a> LexiconSchema for TombstoneDimensions<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TombstoneLens<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TombstoneLens<S> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.defs"
     }

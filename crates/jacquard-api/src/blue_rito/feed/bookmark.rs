@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,75 +29,83 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::blue_rito::feed::bookmark;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Locale<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Locale<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///URI's comment. It can use GitHub Flavored Markdown.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub comment: Option<CowStr<'a>>,
+    pub comment: Option<S>,
     ///Comments Language
-    #[serde(borrow)]
-    pub lang: CowStr<'a>,
+    pub lang: S,
     ///URI's title
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Records a bookmark.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blue.rito.feed.bookmark", tag = "$type")]
-pub struct Bookmark<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "blue.rito.feed.bookmark",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Bookmark<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Title and comment in different languages.
-    #[serde(borrow)]
-    pub comments: Vec<bookmark::Locale<'a>>,
+    pub comments: Vec<bookmark::Locale<S>>,
     pub created_at: Datetime,
     ///OGP Description
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ogp_description: Option<CowStr<'a>>,
+    pub ogp_description: Option<S>,
     ///OGP Image Uri
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ogp_image: Option<UriValue<'a>>,
+    pub ogp_image: Option<UriValue<S>>,
     ///OGP Title
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ogp_title: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub subject: UriValue<'a>,
+    pub ogp_title: Option<S>,
+    pub subject: UriValue<S>,
     ///Tags describing the uri's description (max 10 tags, 25 charactors)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BookmarkGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BookmarkGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Bookmark<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Bookmark<S>,
 }
 
-impl<'a> Bookmark<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, BookmarkRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Bookmark<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, BookmarkRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Locale<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Locale<S> {
     fn nsid() -> &'static str {
         "blue.rito.feed.bookmark"
     }
@@ -174,18 +184,17 @@ pub struct BookmarkRecord;
 impl XrpcResp for BookmarkRecord {
     const NSID: &'static str = "blue.rito.feed.bookmark";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = BookmarkGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = BookmarkGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<BookmarkGetRecordOutput<'_>> for Bookmark<'_> {
-    fn from(output: BookmarkGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<BookmarkGetRecordOutput<S>> for Bookmark<S> {
+    fn from(output: BookmarkGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Bookmark<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Bookmark<S> {
     const NSID: &'static str = "blue.rito.feed.bookmark";
     type Record = BookmarkRecord;
 }
@@ -195,7 +204,7 @@ impl Collection for BookmarkRecord {
     type Record = BookmarkRecord;
 }
 
-impl<'a> LexiconSchema for Bookmark<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bookmark<S> {
     fn nsid() -> &'static str {
         "blue.rito.feed.bookmark"
     }
@@ -395,51 +404,51 @@ pub mod bookmark_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Comments;
         type Subject;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Comments = Unset;
         type Subject = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `comments` field to Set
-    pub struct SetComments<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComments<S> {}
-    impl<S: State> State for SetComments<S> {
-        type Comments = Set<members::comments>;
-        type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Comments = S::Comments;
-        type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Comments = S::Comments;
         type Subject = S::Subject;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `comments` field to Set
+    pub struct SetComments<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetComments<S> {}
+    impl<S: State> State for SetComments<S> {
+        type CreatedAt = S::CreatedAt;
+        type Comments = Set<members::comments>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type Comments = S::Comments;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `comments` field
         pub struct comments(());
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -447,13 +456,13 @@ pub mod bookmark_state {
 pub struct BookmarkBuilder<'a, S: bookmark_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<bookmark::Locale<'a>>>,
+        Option<Vec<bookmark::Locale<S>>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<Vec<CowStr<'a>>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<Vec<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -484,7 +493,7 @@ where
     /// Set the `comments` field (required)
     pub fn comments(
         mut self,
-        value: impl Into<Vec<bookmark::Locale<'a>>>,
+        value: impl Into<Vec<bookmark::Locale<S>>>,
     ) -> BookmarkBuilder<'a, bookmark_state::SetComments<S>> {
         self._fields.0 = Option::Some(value.into());
         BookmarkBuilder {
@@ -516,12 +525,12 @@ where
 
 impl<'a, S: bookmark_state::State> BookmarkBuilder<'a, S> {
     /// Set the `ogpDescription` field (optional)
-    pub fn ogp_description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn ogp_description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `ogpDescription` field to an Option value (optional)
-    pub fn maybe_ogp_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_ogp_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -529,12 +538,12 @@ impl<'a, S: bookmark_state::State> BookmarkBuilder<'a, S> {
 
 impl<'a, S: bookmark_state::State> BookmarkBuilder<'a, S> {
     /// Set the `ogpImage` field (optional)
-    pub fn ogp_image(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn ogp_image(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `ogpImage` field to an Option value (optional)
-    pub fn maybe_ogp_image(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_ogp_image(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -542,12 +551,12 @@ impl<'a, S: bookmark_state::State> BookmarkBuilder<'a, S> {
 
 impl<'a, S: bookmark_state::State> BookmarkBuilder<'a, S> {
     /// Set the `ogpTitle` field (optional)
-    pub fn ogp_title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn ogp_title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `ogpTitle` field to an Option value (optional)
-    pub fn maybe_ogp_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_ogp_title(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -561,7 +570,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> BookmarkBuilder<'a, bookmark_state::SetSubject<S>> {
         self._fields.5 = Option::Some(value.into());
         BookmarkBuilder {
@@ -574,12 +583,12 @@ where
 
 impl<'a, S: bookmark_state::State> BookmarkBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -588,9 +597,9 @@ impl<'a, S: bookmark_state::State> BookmarkBuilder<'a, S> {
 impl<'a, S> BookmarkBuilder<'a, S>
 where
     S: bookmark_state::State,
+    S::CreatedAt: bookmark_state::IsSet,
     S::Comments: bookmark_state::IsSet,
     S::Subject: bookmark_state::IsSet,
-    S::CreatedAt: bookmark_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Bookmark<'a> {
@@ -608,10 +617,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Bookmark<'a> {
         Bookmark {
             comments: self._fields.0.unwrap(),

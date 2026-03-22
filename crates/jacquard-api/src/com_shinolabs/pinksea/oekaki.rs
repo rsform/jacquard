@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,79 +31,93 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::com_shinolabs::pinksea::oekaki;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Image<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The actual atproto image blob.
-    #[serde(borrow)]
-    pub blob: BlobRef<'a>,
-    #[serde(borrow)]
-    pub image_link: oekaki::ImageLink<'a>,
+    pub blob: BlobRef<S>,
+    pub image_link: oekaki::ImageLink<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A link to the image, it can be either directly to the PDS or to a CDN.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ImageLink<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ImageLink<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alt: Option<CowStr<'a>>,
+    pub alt: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// An oekaki post.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "com.shinolabs.pinksea.oekaki",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Oekaki<'a> {
+pub struct Oekaki<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The timestamp of creation.
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub image: oekaki::Image<'a>,
+    pub image: oekaki::Image<S>,
     ///What this oekaki post is a response to.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub in_response_to: Option<StrongRef<'a>>,
+    pub in_response_to: Option<StrongRef<S>>,
     ///Is this oekaki NSFW?
     #[serde(skip_serializing_if = "Option::is_none")]
     pub nsfw: Option<bool>,
     ///An array of tags this image had.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct OekakiGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct OekakiGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Oekaki<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Oekaki<S>,
 }
 
-impl<'a> Oekaki<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, OekakiRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Oekaki<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, OekakiRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Image<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Image<S> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.oekaki"
     }
@@ -156,7 +172,7 @@ impl<'a> LexiconSchema for Image<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ImageLink<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageLink<S> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.oekaki"
     }
@@ -178,18 +194,17 @@ pub struct OekakiRecord;
 impl XrpcResp for OekakiRecord {
     const NSID: &'static str = "com.shinolabs.pinksea.oekaki";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = OekakiGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = OekakiGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<OekakiGetRecordOutput<'_>> for Oekaki<'_> {
-    fn from(output: OekakiGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<OekakiGetRecordOutput<S>> for Oekaki<S> {
+    fn from(output: OekakiGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Oekaki<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Oekaki<S> {
     const NSID: &'static str = "com.shinolabs.pinksea.oekaki";
     type Record = OekakiRecord;
 }
@@ -199,7 +214,7 @@ impl Collection for OekakiRecord {
     type Record = OekakiRecord;
 }
 
-impl<'a> LexiconSchema for Oekaki<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Oekaki<S> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.oekaki"
     }
@@ -234,44 +249,44 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blob;
         type ImageLink;
+        type Blob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blob = Unset;
         type ImageLink = Unset;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
-        type Blob = Set<members::blob>;
-        type ImageLink = S::ImageLink;
+        type Blob = Unset;
     }
     ///State transition - sets the `image_link` field to Set
     pub struct SetImageLink<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImageLink<S> {}
     impl<S: State> State for SetImageLink<S> {
-        type Blob = S::Blob;
         type ImageLink = Set<members::image_link>;
+        type Blob = S::Blob;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type ImageLink = S::ImageLink;
+        type Blob = Set<members::blob>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blob` field
-        pub struct blob(());
         ///Marker type for the `image_link` field
         pub struct image_link(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ImageBuilder<'a, S: image_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>, Option<oekaki::ImageLink<'a>>),
+    _fields: (Option<BlobRef<S>>, Option<oekaki::ImageLink<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -301,7 +316,7 @@ where
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> ImageBuilder<'a, image_state::SetBlob<S>> {
         self._fields.0 = Option::Some(value.into());
         ImageBuilder {
@@ -320,7 +335,7 @@ where
     /// Set the `imageLink` field (required)
     pub fn image_link(
         mut self,
-        value: impl Into<oekaki::ImageLink<'a>>,
+        value: impl Into<oekaki::ImageLink<S>>,
     ) -> ImageBuilder<'a, image_state::SetImageLink<S>> {
         self._fields.1 = Option::Some(value.into());
         ImageBuilder {
@@ -334,8 +349,8 @@ where
 impl<'a, S> ImageBuilder<'a, S>
 where
     S: image_state::State,
-    S::Blob: image_state::IsSet,
     S::ImageLink: image_state::IsSet,
+    S::Blob: image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Image<'a> {
@@ -346,13 +361,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Image<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Image<'a> {
         Image {
             blob: self._fields.0.unwrap(),
             image_link: self._fields.1.unwrap(),
@@ -546,10 +555,10 @@ pub struct OekakiBuilder<'a, S: oekaki_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<oekaki::Image<'a>>,
-        Option<StrongRef<'a>>,
+        Option<oekaki::Image<S>>,
+        Option<StrongRef<S>>,
         Option<bool>,
-        Option<Vec<CowStr<'a>>>,
+        Option<Vec<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -599,7 +608,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<oekaki::Image<'a>>,
+        value: impl Into<oekaki::Image<S>>,
     ) -> OekakiBuilder<'a, oekaki_state::SetImage<S>> {
         self._fields.1 = Option::Some(value.into());
         OekakiBuilder {
@@ -612,12 +621,12 @@ where
 
 impl<'a, S: oekaki_state::State> OekakiBuilder<'a, S> {
     /// Set the `inResponseTo` field (optional)
-    pub fn in_response_to(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn in_response_to(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `inResponseTo` field to an Option value (optional)
-    pub fn maybe_in_response_to(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_in_response_to(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -638,12 +647,12 @@ impl<'a, S: oekaki_state::State> OekakiBuilder<'a, S> {
 
 impl<'a, S: oekaki_state::State> OekakiBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -667,13 +676,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Oekaki<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Oekaki<'a> {
         Oekaki {
             created_at: self._fields.0.unwrap(),
             image: self._fields.1.unwrap(),

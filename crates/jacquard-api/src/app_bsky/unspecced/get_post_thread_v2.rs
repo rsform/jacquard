@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -31,13 +33,19 @@ use crate::app_bsky::unspecced::get_post_thread_v2;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPostThreadV2<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPostThreadV2<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// Defaults to `true`.
     #[serde(default = "_default_above")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub above: Option<bool>,
     #[serde(borrow)]
-    pub anchor: AtUri<'a>,
+    pub anchor: AtUri<S>,
     ///Defaults to `6`. Min: 0. Max: 20.
     #[serde(default = "_default_below")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,50 +58,68 @@ pub struct GetPostThreadV2<'a> {
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sort: Option<CowStr<'a>>,
+    pub sort: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetPostThreadV2Output<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetPostThreadV2Output<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether this thread has additional replies. If true, a call can be made to the `getPostThreadOtherV2` endpoint to retrieve them.
     pub has_other_replies: bool,
     ///A flat list of thread items. The depth of each item is indicated by the depth property inside the item.
-    #[serde(borrow)]
-    pub thread: Vec<get_post_thread_v2::ThreadItem<'a>>,
+    pub thread: Vec<get_post_thread_v2::ThreadItem<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub threadgate: Option<ThreadgateView<'a>>,
+    pub threadgate: Option<ThreadgateView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ThreadItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ThreadItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
     pub depth: i64,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: ThreadItemValue<'a>,
+    pub uri: AtUri<S>,
+    pub value: ThreadItemValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ThreadItemValue<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ThreadItemValue<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.unspecced.defs#threadItemPost")]
-    ThreadItemPost(Box<ThreadItemPost<'a>>),
+    ThreadItemPost(Box<ThreadItemPost<S>>),
     #[serde(rename = "app.bsky.unspecced.defs#threadItemNoUnauthenticated")]
-    ThreadItemNoUnauthenticated(Box<ThreadItemNoUnauthenticated<'a>>),
+    ThreadItemNoUnauthenticated(Box<ThreadItemNoUnauthenticated<S>>),
     #[serde(rename = "app.bsky.unspecced.defs#threadItemNotFound")]
-    ThreadItemNotFound(Box<ThreadItemNotFound<'a>>),
+    ThreadItemNotFound(Box<ThreadItemNotFound<S>>),
     #[serde(rename = "app.bsky.unspecced.defs#threadItemBlocked")]
-    ThreadItemBlocked(Box<ThreadItemBlocked<'a>>),
+    ThreadItemBlocked(Box<ThreadItemBlocked<S>>),
 }
 
 /// Response type for app.bsky.unspecced.getPostThreadV2
@@ -101,11 +127,12 @@ pub struct GetPostThreadV2Response;
 impl jacquard_common::xrpc::XrpcResp for GetPostThreadV2Response {
     const NSID: &'static str = "app.bsky.unspecced.getPostThreadV2";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetPostThreadV2Output<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetPostThreadV2Output<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetPostThreadV2<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetPostThreadV2<S> {
     const NSID: &'static str = "app.bsky.unspecced.getPostThreadV2";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPostThreadV2Response;
@@ -116,11 +143,11 @@ pub struct GetPostThreadV2Request;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadV2Request {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getPostThreadV2";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetPostThreadV2<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetPostThreadV2<S>;
     type Response = GetPostThreadV2Response;
 }
 
-impl<'a> LexiconSchema for ThreadItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ThreadItem<S> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.getPostThreadV2"
     }
@@ -186,13 +213,7 @@ pub mod get_post_thread_v2_state {
 /// Builder for constructing an instance of this type
 pub struct GetPostThreadV2Builder<'a, S: get_post_thread_v2_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<bool>,
-        Option<AtUri<'a>>,
-        Option<i64>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<bool>, Option<AtUri<S>>, Option<i64>, Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -235,7 +256,7 @@ where
     /// Set the `anchor` field (required)
     pub fn anchor(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetPostThreadV2Builder<'a, get_post_thread_v2_state::SetAnchor<S>> {
         self._fields.1 = Option::Some(value.into());
         GetPostThreadV2Builder {
@@ -274,12 +295,12 @@ impl<'a, S: get_post_thread_v2_state::State> GetPostThreadV2Builder<'a, S> {
 
 impl<'a, S: get_post_thread_v2_state::State> GetPostThreadV2Builder<'a, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -312,58 +333,58 @@ pub mod thread_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
-        type Depth;
         type Uri;
+        type Depth;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
-        type Depth = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Depth = S::Depth;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `depth` field to Set
-    pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDepth<S> {}
-    impl<S: State> State for SetDepth<S> {
-        type Value = S::Value;
-        type Depth = Set<members::depth>;
-        type Uri = S::Uri;
+        type Depth = Unset;
+        type Value = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Value = S::Value;
-        type Depth = S::Depth;
         type Uri = Set<members::uri>;
+        type Depth = S::Depth;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `depth` field to Set
+    pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDepth<S> {}
+    impl<S: State> State for SetDepth<S> {
+        type Uri = S::Uri;
+        type Depth = Set<members::depth>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Uri = S::Uri;
+        type Depth = S::Depth;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
-        ///Marker type for the `depth` field
-        pub struct depth(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `depth` field
+        pub struct depth(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ThreadItemBuilder<'a, S: thread_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<AtUri<'a>>, Option<ThreadItemValue<'a>>),
+    _fields: (Option<i64>, Option<AtUri<S>>, Option<ThreadItemValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -412,7 +433,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ThreadItemBuilder<'a, thread_item_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         ThreadItemBuilder {
@@ -431,7 +452,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<ThreadItemValue<'a>>,
+        value: impl Into<ThreadItemValue<S>>,
     ) -> ThreadItemBuilder<'a, thread_item_state::SetValue<S>> {
         self._fields.2 = Option::Some(value.into());
         ThreadItemBuilder {
@@ -445,9 +466,9 @@ where
 impl<'a, S> ThreadItemBuilder<'a, S>
 where
     S: thread_item_state::State,
-    S::Value: thread_item_state::IsSet,
-    S::Depth: thread_item_state::IsSet,
     S::Uri: thread_item_state::IsSet,
+    S::Depth: thread_item_state::IsSet,
+    S::Value: thread_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ThreadItem<'a> {
@@ -461,10 +482,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ThreadItem<'a> {
         ThreadItem {
             depth: self._fields.0.unwrap(),

@@ -10,21 +10,29 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notebook::ChapterEntryView;
 use crate::sh_weaver::notebook::ChapterView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetChapter<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetChapter<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub chapter: AtUri<'a>,
+    pub chapter: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub entry_cursor: Option<CowStr<'a>>,
+    pub entry_cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_entry_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -32,21 +40,26 @@ pub struct GetChapter<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetChapterOutput<'a> {
-    #[serde(borrow)]
-    pub chapter: ChapterView<'a>,
-    #[serde(borrow)]
-    pub entries: Vec<ChapterEntryView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetChapterOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub chapter: ChapterView<S>,
+    pub entries: Vec<ChapterEntryView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub entry_cursor: Option<CowStr<'a>>,
+    pub entry_cursor: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -55,18 +68,19 @@ pub struct GetChapterOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetChapterError<'a> {
+pub enum GetChapterError {
     #[serde(rename = "ChapterNotFound")]
-    ChapterNotFound(Option<CowStr<'a>>),
+    ChapterNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetChapterError<'_> {
+impl core::fmt::Display for GetChapterError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::ChapterNotFound(msg) => {
@@ -76,7 +90,13 @@ impl core::fmt::Display for GetChapterError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -86,11 +106,12 @@ pub struct GetChapterResponse;
 impl jacquard_common::xrpc::XrpcResp for GetChapterResponse {
     const NSID: &'static str = "sh.weaver.notebook.getChapter";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetChapterOutput<'de>;
-    type Err<'de> = GetChapterError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetChapterOutput<S>;
+    type Err = GetChapterError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetChapter<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetChapter<S> {
     const NSID: &'static str = "sh.weaver.notebook.getChapter";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetChapterResponse;
@@ -101,7 +122,7 @@ pub struct GetChapterRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetChapterRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getChapter";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetChapter<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetChapter<S>;
     type Response = GetChapterResponse;
 }
 
@@ -144,7 +165,7 @@ pub mod get_chapter_state {
 /// Builder for constructing an instance of this type
 pub struct GetChapterBuilder<'a, S: get_chapter_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<AtUri<S>>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -174,7 +195,7 @@ where
     /// Set the `chapter` field (required)
     pub fn chapter(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetChapterBuilder<'a, get_chapter_state::SetChapter<S>> {
         self._fields.0 = Option::Some(value.into());
         GetChapterBuilder {
@@ -187,12 +208,12 @@ where
 
 impl<'a, S: get_chapter_state::State> GetChapterBuilder<'a, S> {
     /// Set the `entryCursor` field (optional)
-    pub fn entry_cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn entry_cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `entryCursor` field to an Option value (optional)
-    pub fn maybe_entry_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_entry_cursor(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }

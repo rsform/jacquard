@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,62 +29,79 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::diy_razorgirl::winter::job;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct IntervalSchedule<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct IntervalSchedule<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub seconds: i64,
-    #[serde(borrow)]
-    pub r#type: CowStr<'a>,
+    pub r#type: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "diy.razorgirl.winter.job", tag = "$type")]
-pub struct Job<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "diy.razorgirl.winter.job",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Job<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     /// Defaults to `0`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_job_failure_count")]
     pub failure_count: Option<i64>,
-    #[serde(borrow)]
-    pub instructions: CowStr<'a>,
+    pub instructions: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_run: Option<Datetime>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub next_run: Option<Datetime>,
-    #[serde(borrow)]
-    pub schedule: JobSchedule<'a>,
+    pub schedule: JobSchedule<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<JobStatus<'a>>,
+    pub status: Option<JobStatus<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum JobSchedule<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum JobSchedule<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "diy.razorgirl.winter.job#onceSchedule")]
-    OnceSchedule(Box<job::OnceSchedule<'a>>),
+    OnceSchedule(Box<job::OnceSchedule<S>>),
     #[serde(rename = "diy.razorgirl.winter.job#intervalSchedule")]
-    IntervalSchedule(Box<job::IntervalSchedule<'a>>),
+    IntervalSchedule(Box<job::IntervalSchedule<S>>),
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum JobStatus<'a> {
+pub enum JobStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Pending,
     Running,
     Completed,
     Failed,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> JobStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> JobStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Pending => "pending",
@@ -92,74 +111,58 @@ impl<'a> JobStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for JobStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "pending" => Self::Pending,
             "running" => Self::Running,
             "completed" => Self::Completed,
             "failed" => Self::Failed,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for JobStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "pending" => Self::Pending,
-            "running" => Self::Running,
-            "completed" => Self::Completed,
-            "failed" => Self::Failed,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for JobStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for JobStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for JobStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for JobStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for JobStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for JobStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for JobStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for JobStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for JobStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for JobStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for JobStatus<'_> {
-    type Output = JobStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for JobStatus<S> {
+    type Output = JobStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             JobStatus::Pending => JobStatus::Pending,
@@ -174,36 +177,43 @@ impl jacquard_common::IntoStatic for JobStatus<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct JobGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct JobGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Job<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Job<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct OnceSchedule<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct OnceSchedule<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub run_at: Datetime,
-    #[serde(borrow)]
-    pub r#type: CowStr<'a>,
+    pub r#type: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Job<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, JobRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Job<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, JobRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for IntervalSchedule<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for IntervalSchedule<S> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.job"
     }
@@ -225,18 +235,17 @@ pub struct JobRecord;
 impl XrpcResp for JobRecord {
     const NSID: &'static str = "diy.razorgirl.winter.job";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = JobGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = JobGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<JobGetRecordOutput<'_>> for Job<'_> {
-    fn from(output: JobGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<JobGetRecordOutput<S>> for Job<S> {
+    fn from(output: JobGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Job<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Job<S> {
     const NSID: &'static str = "diy.razorgirl.winter.job";
     type Record = JobRecord;
 }
@@ -246,7 +255,7 @@ impl Collection for JobRecord {
     type Record = JobRecord;
 }
 
-impl<'a> LexiconSchema for Job<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Job<S> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.job"
     }
@@ -283,7 +292,7 @@ impl<'a> LexiconSchema for Job<'a> {
     }
 }
 
-impl<'a> LexiconSchema for OnceSchedule<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for OnceSchedule<S> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.job"
     }
@@ -345,7 +354,7 @@ pub mod interval_schedule_state {
 /// Builder for constructing an instance of this type
 pub struct IntervalScheduleBuilder<'a, S: interval_schedule_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -394,7 +403,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> IntervalScheduleBuilder<'a, interval_schedule_state::SetType<S>> {
         self._fields.1 = Option::Some(value.into());
         IntervalScheduleBuilder {
@@ -422,10 +431,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> IntervalSchedule<'a> {
         IntervalSchedule {
             seconds: self._fields.0.unwrap(),
@@ -594,67 +600,67 @@ pub mod job_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Instructions;
-        type CreatedAt;
         type Schedule;
         type Name;
+        type CreatedAt;
+        type Instructions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Instructions = Unset;
-        type CreatedAt = Unset;
         type Schedule = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `instructions` field to Set
-    pub struct SetInstructions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInstructions<S> {}
-    impl<S: State> State for SetInstructions<S> {
-        type Instructions = Set<members::instructions>;
-        type CreatedAt = S::CreatedAt;
-        type Schedule = S::Schedule;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Instructions = S::Instructions;
-        type CreatedAt = Set<members::created_at>;
-        type Schedule = S::Schedule;
-        type Name = S::Name;
+        type CreatedAt = Unset;
+        type Instructions = Unset;
     }
     ///State transition - sets the `schedule` field to Set
     pub struct SetSchedule<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchedule<S> {}
     impl<S: State> State for SetSchedule<S> {
-        type Instructions = S::Instructions;
-        type CreatedAt = S::CreatedAt;
         type Schedule = Set<members::schedule>;
         type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Instructions = S::Instructions;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Instructions = S::Instructions;
-        type CreatedAt = S::CreatedAt;
         type Schedule = S::Schedule;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+        type Instructions = S::Instructions;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Schedule = S::Schedule;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
+        type Instructions = S::Instructions;
+    }
+    ///State transition - sets the `instructions` field to Set
+    pub struct SetInstructions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInstructions<S> {}
+    impl<S: State> State for SetInstructions<S> {
+        type Schedule = S::Schedule;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Instructions = Set<members::instructions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `instructions` field
-        pub struct instructions(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `schedule` field
         pub struct schedule(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `instructions` field
+        pub struct instructions(());
     }
 }
 
@@ -664,12 +670,12 @@ pub struct JobBuilder<'a, S: job_state::State> {
     _fields: (
         Option<Datetime>,
         Option<i64>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<JobSchedule<'a>>,
-        Option<JobStatus<'a>>,
+        Option<JobSchedule<S>>,
+        Option<JobStatus<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -732,7 +738,7 @@ where
     /// Set the `instructions` field (required)
     pub fn instructions(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> JobBuilder<'a, job_state::SetInstructions<S>> {
         self._fields.2 = Option::Some(value.into());
         JobBuilder {
@@ -762,10 +768,7 @@ where
     S::Name: job_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<CowStr<'a>>,
-    ) -> JobBuilder<'a, job_state::SetName<S>> {
+    pub fn name(mut self, value: impl Into<S>) -> JobBuilder<'a, job_state::SetName<S>> {
         self._fields.4 = Option::Some(value.into());
         JobBuilder {
             _state: PhantomData,
@@ -796,7 +799,7 @@ where
     /// Set the `schedule` field (required)
     pub fn schedule(
         mut self,
-        value: impl Into<JobSchedule<'a>>,
+        value: impl Into<JobSchedule<S>>,
     ) -> JobBuilder<'a, job_state::SetSchedule<S>> {
         self._fields.6 = Option::Some(value.into());
         JobBuilder {
@@ -809,12 +812,12 @@ where
 
 impl<'a, S: job_state::State> JobBuilder<'a, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<JobStatus<'a>>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<JobStatus<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<JobStatus<'a>>) -> Self {
+    pub fn maybe_status(mut self, value: Option<JobStatus<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -823,10 +826,10 @@ impl<'a, S: job_state::State> JobBuilder<'a, S> {
 impl<'a, S> JobBuilder<'a, S>
 where
     S: job_state::State,
-    S::Instructions: job_state::IsSet,
-    S::CreatedAt: job_state::IsSet,
     S::Schedule: job_state::IsSet,
     S::Name: job_state::IsSet,
+    S::CreatedAt: job_state::IsSet,
+    S::Instructions: job_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Job<'a> {
@@ -843,13 +846,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Job<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Job<'a> {
         Job {
             created_at: self._fields.0.unwrap(),
             failure_count: self._fields.1.or_else(|| Some(0i64)),
@@ -911,7 +908,7 @@ pub mod once_schedule_state {
 /// Builder for constructing an instance of this type
 pub struct OnceScheduleBuilder<'a, S: once_schedule_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<CowStr<'a>>),
+    _fields: (Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -960,7 +957,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> OnceScheduleBuilder<'a, once_schedule_state::SetType<S>> {
         self._fields.1 = Option::Some(value.into());
         OnceScheduleBuilder {
@@ -988,10 +985,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> OnceSchedule<'a> {
         OnceSchedule {
             run_at: self._fields.0.unwrap(),

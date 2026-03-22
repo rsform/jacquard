@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,49 +28,51 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.blebbit.authr.group.record",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Record<'a> {
+pub struct Record<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cuid: Option<CowStr<'a>>,
+    pub cuid: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display: Option<CowStr<'a>>,
+    pub display: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RecordGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Record<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Record<S>,
 }
 
-impl<'a> Record<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, RecordRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Record<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, RecordRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -79,18 +83,17 @@ pub struct RecordRecord;
 impl XrpcResp for RecordRecord {
     const NSID: &'static str = "app.blebbit.authr.group.record";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RecordGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RecordGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<RecordGetRecordOutput<'_>> for Record<'_> {
-    fn from(output: RecordGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<RecordGetRecordOutput<S>> for Record<S> {
+    fn from(output: RecordGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Record<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Record<S> {
     const NSID: &'static str = "app.blebbit.authr.group.record";
     type Record = RecordRecord;
 }
@@ -100,7 +103,7 @@ impl Collection for RecordRecord {
     type Record = RecordRecord;
 }
 
-impl<'a> LexiconSchema for Record<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Record<S> {
     fn nsid() -> &'static str {
         "app.blebbit.authr.group.record"
     }
@@ -137,13 +140,7 @@ pub mod record_state {
 /// Builder for constructing an instance of this type
 pub struct RecordBuilder<'a, S: record_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<bool>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<bool>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -167,12 +164,12 @@ impl<'a> RecordBuilder<'a, record_state::Empty> {
 
 impl<'a, S: record_state::State> RecordBuilder<'a, S> {
     /// Set the `cuid` field (optional)
-    pub fn cuid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cuid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cuid` field to an Option value (optional)
-    pub fn maybe_cuid(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cuid(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -180,12 +177,12 @@ impl<'a, S: record_state::State> RecordBuilder<'a, S> {
 
 impl<'a, S: record_state::State> RecordBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -193,12 +190,12 @@ impl<'a, S: record_state::State> RecordBuilder<'a, S> {
 
 impl<'a, S: record_state::State> RecordBuilder<'a, S> {
     /// Set the `display` field (optional)
-    pub fn display(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `display` field to an Option value (optional)
-    pub fn maybe_display(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -206,12 +203,12 @@ impl<'a, S: record_state::State> RecordBuilder<'a, S> {
 
 impl<'a, S: record_state::State> RecordBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -246,13 +243,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Record<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Record<'a> {
         Record {
             cuid: self._fields.0,
             description: self._fields.1,

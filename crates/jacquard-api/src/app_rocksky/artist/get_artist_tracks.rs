@@ -10,14 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::song::SongViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetArtistTracks<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetArtistTracks<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///(min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -26,17 +35,25 @@ pub struct GetArtistTracks<'a> {
     pub offset: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetArtistTracksOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetArtistTracksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tracks: Option<Vec<SongViewBasic<'a>>>,
+    pub tracks: Option<Vec<SongViewBasic<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.artist.getArtistTracks
@@ -44,11 +61,12 @@ pub struct GetArtistTracksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetArtistTracksResponse {
     const NSID: &'static str = "app.rocksky.artist.getArtistTracks";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetArtistTracksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetArtistTracksOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetArtistTracks<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetArtistTracks<S> {
     const NSID: &'static str = "app.rocksky.artist.getArtistTracks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetArtistTracksResponse;
@@ -59,7 +77,7 @@ pub struct GetArtistTracksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetArtistTracksRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.artist.getArtistTracks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetArtistTracks<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetArtistTracks<S>;
     type Response = GetArtistTracksResponse;
 }
 
@@ -85,7 +103,7 @@ pub mod get_artist_tracks_state {
 /// Builder for constructing an instance of this type
 pub struct GetArtistTracksBuilder<'a, S: get_artist_tracks_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<i64>, Option<AtUri<'a>>),
+    _fields: (Option<i64>, Option<i64>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -135,12 +153,12 @@ impl<'a, S: get_artist_tracks_state::State> GetArtistTracksBuilder<'a, S> {
 
 impl<'a, S: get_artist_tracks_state::State> GetArtistTracksBuilder<'a, S> {
     /// Set the `uri` field (optional)
-    pub fn uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
-    pub fn maybe_uri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_uri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.2 = value;
         self
     }

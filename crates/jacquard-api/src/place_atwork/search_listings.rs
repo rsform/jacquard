@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,41 +28,58 @@ use crate::place_atwork::listing::Listing;
 use crate::place_atwork::search_listings;
 /// A job listing record with metadata for strong references
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ListingRecord<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListingRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///CID of the listing record
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
     ///AT-URI of the listing (at://did/place.atwork.listing/rkey)
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
     ///The full job listing record
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub value: Option<Listing<'a>>,
+    pub value: Option<Listing<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchListings<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchListings<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub query: CowStr<'a>,
+    pub query: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SearchListingsOutput<'a> {
-    #[serde(borrow)]
-    pub listings: Vec<search_listings::ListingRecord<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SearchListingsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub listings: Vec<search_listings::ListingRecord<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -69,19 +88,20 @@ pub struct SearchListingsOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SearchListingsError<'a> {
+pub enum SearchListingsError {
     /// Failed to search listings
     #[serde(rename = "SearchFailed")]
-    SearchFailed(Option<CowStr<'a>>),
+    SearchFailed(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for SearchListingsError<'_> {
+impl core::fmt::Display for SearchListingsError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::SearchFailed(msg) => {
@@ -91,12 +111,18 @@ impl core::fmt::Display for SearchListingsError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
-impl<'a> LexiconSchema for ListingRecord<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListingRecord<S> {
     fn nsid() -> &'static str {
         "place.atwork.searchListings"
     }
@@ -116,11 +142,12 @@ pub struct SearchListingsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchListingsResponse {
     const NSID: &'static str = "place.atwork.searchListings";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SearchListingsOutput<'de>;
-    type Err<'de> = SearchListingsError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SearchListingsOutput<S>;
+    type Err = SearchListingsError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SearchListings<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SearchListings<S> {
     const NSID: &'static str = "place.atwork.searchListings";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchListingsResponse;
@@ -131,7 +158,7 @@ pub struct SearchListingsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchListingsRequest {
     const PATH: &'static str = "/xrpc/place.atwork.searchListings";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = SearchListings<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SearchListings<S>;
     type Response = SearchListingsResponse;
 }
 
@@ -182,7 +209,7 @@ pub mod listing_record_state {
 /// Builder for constructing an instance of this type
 pub struct ListingRecordBuilder<'a, S: listing_record_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>, Option<Listing<'a>>),
+    _fields: (Option<Cid<S>>, Option<AtUri<S>>, Option<Listing<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -212,7 +239,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> ListingRecordBuilder<'a, listing_record_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         ListingRecordBuilder {
@@ -231,7 +258,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ListingRecordBuilder<'a, listing_record_state::SetUri<S>> {
         self._fields.1 = Option::Some(value.into());
         ListingRecordBuilder {
@@ -244,12 +271,12 @@ where
 
 impl<'a, S: listing_record_state::State> ListingRecordBuilder<'a, S> {
     /// Set the `value` field (optional)
-    pub fn value(mut self, value: impl Into<Option<Listing<'a>>>) -> Self {
+    pub fn value(mut self, value: impl Into<Option<Listing<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `value` field to an Option value (optional)
-    pub fn maybe_value(mut self, value: Option<Listing<'a>>) -> Self {
+    pub fn maybe_value(mut self, value: Option<Listing<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -273,10 +300,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ListingRecord<'a> {
         ListingRecord {
             cid: self._fields.0.unwrap(),
@@ -414,7 +438,7 @@ pub mod search_listings_state {
 /// Builder for constructing an instance of this type
 pub struct SearchListingsBuilder<'a, S: search_listings_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -444,7 +468,7 @@ where
     /// Set the `query` field (required)
     pub fn query(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SearchListingsBuilder<'a, search_listings_state::SetQuery<S>> {
         self._fields.0 = Option::Some(value.into());
         SearchListingsBuilder {

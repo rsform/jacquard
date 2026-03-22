@@ -10,25 +10,42 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::collab::SessionView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetResourceSessions<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetResourceSessions<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub resource: AtUri<'a>,
+    pub resource: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetResourceSessionsOutput<'a> {
-    #[serde(borrow)]
-    pub sessions: Vec<SessionView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetResourceSessionsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub sessions: Vec<SessionView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.collab.getResourceSessions
@@ -36,11 +53,12 @@ pub struct GetResourceSessionsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetResourceSessionsResponse {
     const NSID: &'static str = "sh.weaver.collab.getResourceSessions";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetResourceSessionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetResourceSessionsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetResourceSessions<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetResourceSessions<S> {
     const NSID: &'static str = "sh.weaver.collab.getResourceSessions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetResourceSessionsResponse;
@@ -51,7 +69,7 @@ pub struct GetResourceSessionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetResourceSessionsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.collab.getResourceSessions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetResourceSessions<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetResourceSessions<S>;
     type Response = GetResourceSessionsResponse;
 }
 
@@ -90,7 +108,7 @@ pub mod get_resource_sessions_state {
 /// Builder for constructing an instance of this type
 pub struct GetResourceSessionsBuilder<'a, S: get_resource_sessions_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -120,7 +138,7 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetResourceSessionsBuilder<'a, get_resource_sessions_state::SetResource<S>> {
         self._fields.0 = Option::Some(value.into());
         GetResourceSessionsBuilder {

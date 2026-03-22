@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,57 +31,69 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::pub_quizzy::team_score;
 /// A team's scored answers for a quiz
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "pub.quizzy.teamScore", tag = "$type")]
-pub struct TeamScore<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "pub.quizzy.teamScore",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TeamScore<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Scored answers for this team
-    #[serde(borrow)]
-    pub answers: Vec<team_score::ScoredAnswer<'a>>,
+    pub answers: Vec<team_score::ScoredAnswer<S>>,
     ///Reference to the quizBegin record
-    #[serde(borrow)]
-    pub quiz_begin: StrongRef<'a>,
+    pub quiz_begin: StrongRef<S>,
     ///Reference to the team
-    #[serde(borrow)]
-    pub team: StrongRef<'a>,
+    pub team: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TeamScoreGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TeamScoreGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: TeamScore<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: TeamScore<S>,
 }
 
 /// An answer with scores for each expected answer
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ScoredAnswer<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ScoredAnswer<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reference to the answer record
-    #[serde(borrow)]
-    pub answer: StrongRef<'a>,
+    pub answer: StrongRef<S>,
     ///Optional commentary from the quiz master
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub commentary: Option<CowStr<'a>>,
+    pub commentary: Option<S>,
     ///Points awarded for each expected answer in the question
     pub scores: Vec<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> TeamScore<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TeamScoreRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> TeamScore<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TeamScoreRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -90,18 +104,17 @@ pub struct TeamScoreRecord;
 impl XrpcResp for TeamScoreRecord {
     const NSID: &'static str = "pub.quizzy.teamScore";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TeamScoreGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TeamScoreGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TeamScoreGetRecordOutput<'_>> for TeamScore<'_> {
-    fn from(output: TeamScoreGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TeamScoreGetRecordOutput<S>> for TeamScore<S> {
+    fn from(output: TeamScoreGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for TeamScore<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for TeamScore<S> {
     const NSID: &'static str = "pub.quizzy.teamScore";
     type Record = TeamScoreRecord;
 }
@@ -111,7 +124,7 @@ impl Collection for TeamScoreRecord {
     type Record = TeamScoreRecord;
 }
 
-impl<'a> LexiconSchema for TeamScore<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TeamScore<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.teamScore"
     }
@@ -137,7 +150,7 @@ impl<'a> LexiconSchema for TeamScore<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ScoredAnswer<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ScoredAnswer<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.teamScore"
     }
@@ -206,49 +219,49 @@ pub mod team_score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Answers;
         type Team;
+        type Answers;
         type QuizBegin;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Answers = Unset;
         type Team = Unset;
+        type Answers = Unset;
         type QuizBegin = Unset;
-    }
-    ///State transition - sets the `answers` field to Set
-    pub struct SetAnswers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAnswers<S> {}
-    impl<S: State> State for SetAnswers<S> {
-        type Answers = Set<members::answers>;
-        type Team = S::Team;
-        type QuizBegin = S::QuizBegin;
     }
     ///State transition - sets the `team` field to Set
     pub struct SetTeam<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTeam<S> {}
     impl<S: State> State for SetTeam<S> {
-        type Answers = S::Answers;
         type Team = Set<members::team>;
+        type Answers = S::Answers;
+        type QuizBegin = S::QuizBegin;
+    }
+    ///State transition - sets the `answers` field to Set
+    pub struct SetAnswers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAnswers<S> {}
+    impl<S: State> State for SetAnswers<S> {
+        type Team = S::Team;
+        type Answers = Set<members::answers>;
         type QuizBegin = S::QuizBegin;
     }
     ///State transition - sets the `quiz_begin` field to Set
     pub struct SetQuizBegin<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuizBegin<S> {}
     impl<S: State> State for SetQuizBegin<S> {
-        type Answers = S::Answers;
         type Team = S::Team;
+        type Answers = S::Answers;
         type QuizBegin = Set<members::quiz_begin>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `answers` field
-        pub struct answers(());
         ///Marker type for the `team` field
         pub struct team(());
+        ///Marker type for the `answers` field
+        pub struct answers(());
         ///Marker type for the `quiz_begin` field
         pub struct quiz_begin(());
     }
@@ -258,9 +271,9 @@ pub mod team_score_state {
 pub struct TeamScoreBuilder<'a, S: team_score_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<team_score::ScoredAnswer<'a>>>,
-        Option<StrongRef<'a>>,
-        Option<StrongRef<'a>>,
+        Option<Vec<team_score::ScoredAnswer<S>>>,
+        Option<StrongRef<S>>,
+        Option<StrongRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -291,7 +304,7 @@ where
     /// Set the `answers` field (required)
     pub fn answers(
         mut self,
-        value: impl Into<Vec<team_score::ScoredAnswer<'a>>>,
+        value: impl Into<Vec<team_score::ScoredAnswer<S>>>,
     ) -> TeamScoreBuilder<'a, team_score_state::SetAnswers<S>> {
         self._fields.0 = Option::Some(value.into());
         TeamScoreBuilder {
@@ -310,7 +323,7 @@ where
     /// Set the `quizBegin` field (required)
     pub fn quiz_begin(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> TeamScoreBuilder<'a, team_score_state::SetQuizBegin<S>> {
         self._fields.1 = Option::Some(value.into());
         TeamScoreBuilder {
@@ -329,7 +342,7 @@ where
     /// Set the `team` field (required)
     pub fn team(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> TeamScoreBuilder<'a, team_score_state::SetTeam<S>> {
         self._fields.2 = Option::Some(value.into());
         TeamScoreBuilder {
@@ -343,8 +356,8 @@ where
 impl<'a, S> TeamScoreBuilder<'a, S>
 where
     S: team_score_state::State,
-    S::Answers: team_score_state::IsSet,
     S::Team: team_score_state::IsSet,
+    S::Answers: team_score_state::IsSet,
     S::QuizBegin: team_score_state::IsSet,
 {
     /// Build the final struct
@@ -359,10 +372,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TeamScore<'a> {
         TeamScore {
             answers: self._fields.0.unwrap(),
@@ -545,7 +555,7 @@ pub mod scored_answer_state {
 /// Builder for constructing an instance of this type
 pub struct ScoredAnswerBuilder<'a, S: scored_answer_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<StrongRef<'a>>, Option<CowStr<'a>>, Option<Vec<i64>>),
+    _fields: (Option<StrongRef<S>>, Option<S>, Option<Vec<i64>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -575,7 +585,7 @@ where
     /// Set the `answer` field (required)
     pub fn answer(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> ScoredAnswerBuilder<'a, scored_answer_state::SetAnswer<S>> {
         self._fields.0 = Option::Some(value.into());
         ScoredAnswerBuilder {
@@ -588,12 +598,12 @@ where
 
 impl<'a, S: scored_answer_state::State> ScoredAnswerBuilder<'a, S> {
     /// Set the `commentary` field (optional)
-    pub fn commentary(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn commentary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `commentary` field to an Option value (optional)
-    pub fn maybe_commentary(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_commentary(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -636,10 +646,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ScoredAnswer<'a> {
         ScoredAnswer {
             answer: self._fields.0.unwrap(),

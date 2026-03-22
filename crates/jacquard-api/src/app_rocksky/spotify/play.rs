@@ -18,8 +18,8 @@ pub struct PlayResponse;
 impl jacquard_common::xrpc::XrpcResp for PlayResponse {
     const NSID: &'static str = "app.rocksky.spotify.play";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for Play {
@@ -37,6 +37,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for PlayRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Play;
+    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = Play;
     type Response = PlayResponse;
 }

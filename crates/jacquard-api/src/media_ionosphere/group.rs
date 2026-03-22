@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Language};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,43 +32,44 @@ use crate::media_ionosphere::Genre;
 use crate::media_ionosphere::Membership;
 /// Represents a grouping of subgroups or programmes
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "media.ionosphere.group", tag = "$type")]
-pub struct Group<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "media.ionosphere.group",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Group<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genres: Option<Vec<Genre<'a>>>,
+    pub genres: Option<Vec<Genre<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub icon: Option<BlobRef<'a>>,
+    pub icon: Option<BlobRef<S>>,
     ///Version identifier
-    #[serde(borrow)]
-    pub ionosphere: CowStr<'a>,
+    pub ionosphere: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<Vec<CowStr<'a>>>,
+    pub keywords: Option<Vec<S>>,
     ///Type of group, see Table 30 of DAB SPI for idea
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub kind: Option<GroupKind<'a>>,
+    pub kind: Option<GroupKind<S>>,
     ///The language of the string values in this record. NOT the language of the content
     pub language: Language,
     ///A list of groups this record is a member of
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub member_of: Option<Vec<Membership<'a>>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub member_of: Option<Vec<Membership<S>>>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Type of group, see Table 30 of DAB SPI for idea
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum GroupKind<'a> {
+pub enum GroupKind<S: Bos<str> + AsRef<str> = DefaultStr> {
     Series,
     Show,
     Concept,
@@ -74,10 +77,10 @@ pub enum GroupKind<'a> {
     Topic,
     OtherCollection,
     OtherChoice,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> GroupKind<'a> {
+impl<S: Bos<str> + AsRef<str>> GroupKind<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Series => "series",
@@ -90,11 +93,9 @@ impl<'a> GroupKind<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for GroupKind<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "series" => Self::Series,
             "show" => Self::Show,
             "concept" => Self::Concept,
@@ -102,68 +103,51 @@ impl<'a> From<&'a str> for GroupKind<'a> {
             "topic" => Self::Topic,
             "otherCollection" => Self::OtherCollection,
             "otherChoice" => Self::OtherChoice,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for GroupKind<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "series" => Self::Series,
-            "show" => Self::Show,
-            "concept" => Self::Concept,
-            "magazine" => Self::Magazine,
-            "topic" => Self::Topic,
-            "otherCollection" => Self::OtherCollection,
-            "otherChoice" => Self::OtherChoice,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for GroupKind<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for GroupKind<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for GroupKind<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for GroupKind<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for GroupKind<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for GroupKind<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for GroupKind<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for GroupKind<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for GroupKind<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for GroupKind<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for GroupKind<'_> {
-    type Output = GroupKind<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for GroupKind<S> {
+    type Output = GroupKind<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             GroupKind::Series => GroupKind::Series,
@@ -181,22 +165,23 @@ impl jacquard_common::IntoStatic for GroupKind<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GroupGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Group<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Group<S>,
 }
 
-impl<'a> Group<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, GroupRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Group<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, GroupRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -207,18 +192,17 @@ pub struct GroupRecord;
 impl XrpcResp for GroupRecord {
     const NSID: &'static str = "media.ionosphere.group";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GroupGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GroupGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<GroupGetRecordOutput<'_>> for Group<'_> {
-    fn from(output: GroupGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<GroupGetRecordOutput<S>> for Group<S> {
+    fn from(output: GroupGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Group<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Group<S> {
     const NSID: &'static str = "media.ionosphere.group";
     type Record = GroupRecord;
 }
@@ -228,7 +212,7 @@ impl Collection for GroupRecord {
     type Record = GroupRecord;
 }
 
-impl<'a> LexiconSchema for Group<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Group<S> {
     fn nsid() -> &'static str {
         "media.ionosphere.group"
     }
@@ -323,51 +307,51 @@ pub mod group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Language;
         type Ionosphere;
         type Name;
-        type Language;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Language = Unset;
         type Ionosphere = Unset;
         type Name = Unset;
-        type Language = Unset;
-    }
-    ///State transition - sets the `ionosphere` field to Set
-    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
-    impl<S: State> State for SetIonosphere<S> {
-        type Ionosphere = Set<members::ionosphere>;
-        type Name = S::Name;
-        type Language = S::Language;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Ionosphere = S::Ionosphere;
-        type Name = Set<members::name>;
-        type Language = S::Language;
     }
     ///State transition - sets the `language` field to Set
     pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLanguage<S> {}
     impl<S: State> State for SetLanguage<S> {
+        type Language = Set<members::language>;
         type Ionosphere = S::Ionosphere;
         type Name = S::Name;
-        type Language = Set<members::language>;
+    }
+    ///State transition - sets the `ionosphere` field to Set
+    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
+    impl<S: State> State for SetIonosphere<S> {
+        type Language = S::Language;
+        type Ionosphere = Set<members::ionosphere>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Language = S::Language;
+        type Ionosphere = S::Ionosphere;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `language` field
+        pub struct language(());
         ///Marker type for the `ionosphere` field
         pub struct ionosphere(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `language` field
-        pub struct language(());
     }
 }
 
@@ -375,15 +359,15 @@ pub mod group_state {
 pub struct GroupBuilder<'a, S: group_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<Vec<Genre<'a>>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<GroupKind<'a>>,
+        Option<S>,
+        Option<Vec<Genre<S>>>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<Vec<S>>,
+        Option<GroupKind<S>>,
         Option<Language>,
-        Option<Vec<Membership<'a>>>,
-        Option<CowStr<'a>>,
+        Option<Vec<Membership<S>>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -408,12 +392,12 @@ impl<'a> GroupBuilder<'a, group_state::Empty> {
 
 impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -421,12 +405,12 @@ impl<'a, S: group_state::State> GroupBuilder<'a, S> {
 
 impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     /// Set the `genres` field (optional)
-    pub fn genres(mut self, value: impl Into<Option<Vec<Genre<'a>>>>) -> Self {
+    pub fn genres(mut self, value: impl Into<Option<Vec<Genre<S>>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `genres` field to an Option value (optional)
-    pub fn maybe_genres(mut self, value: Option<Vec<Genre<'a>>>) -> Self {
+    pub fn maybe_genres(mut self, value: Option<Vec<Genre<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -434,12 +418,12 @@ impl<'a, S: group_state::State> GroupBuilder<'a, S> {
 
 impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     /// Set the `icon` field (optional)
-    pub fn icon(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `icon` field to an Option value (optional)
-    pub fn maybe_icon(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_icon(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -453,7 +437,7 @@ where
     /// Set the `ionosphere` field (required)
     pub fn ionosphere(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GroupBuilder<'a, group_state::SetIonosphere<S>> {
         self._fields.3 = Option::Some(value.into());
         GroupBuilder {
@@ -466,12 +450,12 @@ where
 
 impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_keywords(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -479,12 +463,12 @@ impl<'a, S: group_state::State> GroupBuilder<'a, S> {
 
 impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     /// Set the `kind` field (optional)
-    pub fn kind(mut self, value: impl Into<Option<GroupKind<'a>>>) -> Self {
+    pub fn kind(mut self, value: impl Into<Option<GroupKind<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `kind` field to an Option value (optional)
-    pub fn maybe_kind(mut self, value: Option<GroupKind<'a>>) -> Self {
+    pub fn maybe_kind(mut self, value: Option<GroupKind<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -511,12 +495,12 @@ where
 
 impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     /// Set the `memberOf` field (optional)
-    pub fn member_of(mut self, value: impl Into<Option<Vec<Membership<'a>>>>) -> Self {
+    pub fn member_of(mut self, value: impl Into<Option<Vec<Membership<S>>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `memberOf` field to an Option value (optional)
-    pub fn maybe_member_of(mut self, value: Option<Vec<Membership<'a>>>) -> Self {
+    pub fn maybe_member_of(mut self, value: Option<Vec<Membership<S>>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -530,7 +514,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GroupBuilder<'a, group_state::SetName<S>> {
         self._fields.8 = Option::Some(value.into());
         GroupBuilder {
@@ -544,9 +528,9 @@ where
 impl<'a, S> GroupBuilder<'a, S>
 where
     S: group_state::State,
+    S::Language: group_state::IsSet,
     S::Ionosphere: group_state::IsSet,
     S::Name: group_state::IsSet,
-    S::Language: group_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Group<'a> {
@@ -564,13 +548,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Group<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Group<'a> {
         Group {
             description: self._fields.0,
             genres: self._fields.1,

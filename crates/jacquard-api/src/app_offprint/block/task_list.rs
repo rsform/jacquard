@@ -10,10 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,32 +26,43 @@ use serde::{Serialize, Deserialize};
 use crate::app_offprint::block::text::Text;
 use crate::app_offprint::block::task_list;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TaskList<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TaskList<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Task items
-    #[serde(borrow)]
-    pub children: Vec<task_list::TaskItem<'a>>,
+    pub children: Vec<task_list::TaskItem<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TaskItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TaskItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether the task is completed
     pub checked: bool,
     ///Nested task items
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub children: Option<Vec<task_list::TaskItem<'a>>>,
+    pub children: Option<Vec<task_list::TaskItem<S>>>,
     ///Text content of the task item
-    #[serde(borrow)]
-    pub content: Text<'a>,
+    pub content: Text<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for TaskList<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TaskList<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.taskList"
     }
@@ -63,7 +77,7 @@ impl<'a> LexiconSchema for TaskList<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TaskItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TaskItem<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.taskList"
     }
@@ -113,7 +127,7 @@ pub mod task_list_state {
 /// Builder for constructing an instance of this type
 pub struct TaskListBuilder<'a, S: task_list_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<task_list::TaskItem<'a>>>,),
+    _fields: (Option<Vec<task_list::TaskItem<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -143,7 +157,7 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<Vec<task_list::TaskItem<'a>>>,
+        value: impl Into<Vec<task_list::TaskItem<S>>>,
     ) -> TaskListBuilder<'a, task_list_state::SetChildren<S>> {
         self._fields.0 = Option::Some(value.into());
         TaskListBuilder {
@@ -169,10 +183,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TaskList<'a> {
         TaskList {
             children: self._fields.0.unwrap(),
@@ -308,7 +319,7 @@ pub mod task_item_state {
 /// Builder for constructing an instance of this type
 pub struct TaskItemBuilder<'a, S: task_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<Vec<task_list::TaskItem<'a>>>, Option<Text<'a>>),
+    _fields: (Option<bool>, Option<Vec<task_list::TaskItem<S>>>, Option<Text<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -353,16 +364,13 @@ impl<'a, S: task_item_state::State> TaskItemBuilder<'a, S> {
     /// Set the `children` field (optional)
     pub fn children(
         mut self,
-        value: impl Into<Option<Vec<task_list::TaskItem<'a>>>>,
+        value: impl Into<Option<Vec<task_list::TaskItem<S>>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `children` field to an Option value (optional)
-    pub fn maybe_children(
-        mut self,
-        value: Option<Vec<task_list::TaskItem<'a>>>,
-    ) -> Self {
+    pub fn maybe_children(mut self, value: Option<Vec<task_list::TaskItem<S>>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -376,7 +384,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<Text<'a>>,
+        value: impl Into<Text<S>>,
     ) -> TaskItemBuilder<'a, task_item_state::SetContent<S>> {
         self._fields.2 = Option::Some(value.into());
         TaskItemBuilder {
@@ -405,10 +413,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TaskItem<'a> {
         TaskItem {
             checked: self._fields.0.unwrap(),

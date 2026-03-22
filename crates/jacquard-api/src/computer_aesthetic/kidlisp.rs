@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,42 +29,49 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A KidLisp code snippet from Aesthetic Computer
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "computer.aesthetic.kidlisp", tag = "$type")]
-pub struct Kidlisp<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "computer.aesthetic.kidlisp",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Kidlisp<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Short alphanumeric code for easy lookup
-    #[serde(borrow)]
-    pub code: CowStr<'a>,
+    pub code: S,
     ///MongoDB ObjectId reference for bidirectional sync
-    #[serde(borrow)]
-    pub r#ref: CowStr<'a>,
+    pub r#ref: S,
     ///The KidLisp source code
-    #[serde(borrow)]
-    pub source: CowStr<'a>,
+    pub source: S,
     ///Creation timestamp (ISO 8601)
     pub when: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct KidlispGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct KidlispGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Kidlisp<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Kidlisp<S>,
 }
 
-impl<'a> Kidlisp<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, KidlispRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Kidlisp<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, KidlispRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -73,18 +82,17 @@ pub struct KidlispRecord;
 impl XrpcResp for KidlispRecord {
     const NSID: &'static str = "computer.aesthetic.kidlisp";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = KidlispGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = KidlispGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<KidlispGetRecordOutput<'_>> for Kidlisp<'_> {
-    fn from(output: KidlispGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<KidlispGetRecordOutput<S>> for Kidlisp<S> {
+    fn from(output: KidlispGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Kidlisp<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Kidlisp<S> {
     const NSID: &'static str = "computer.aesthetic.kidlisp";
     type Record = KidlispRecord;
 }
@@ -94,7 +102,7 @@ impl Collection for KidlispRecord {
     type Record = KidlispRecord;
 }
 
-impl<'a> LexiconSchema for Kidlisp<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Kidlisp<S> {
     fn nsid() -> &'static str {
         "computer.aesthetic.kidlisp"
     }
@@ -152,79 +160,74 @@ pub mod kidlisp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type When;
-        type Ref;
         type Code;
+        type When;
         type Source;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type When = Unset;
-        type Ref = Unset;
         type Code = Unset;
+        type When = Unset;
         type Source = Unset;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type When = Set<members::when>;
-        type Ref = S::Ref;
-        type Code = S::Code;
-        type Source = S::Source;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type When = S::When;
-        type Ref = Set<members::r#ref>;
-        type Code = S::Code;
-        type Source = S::Source;
+        type Ref = Unset;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
-        type When = S::When;
-        type Ref = S::Ref;
         type Code = Set<members::code>;
+        type When = S::When;
         type Source = S::Source;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Code = S::Code;
+        type When = Set<members::when>;
+        type Source = S::Source;
+        type Ref = S::Ref;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
-        type When = S::When;
-        type Ref = S::Ref;
         type Code = S::Code;
+        type When = S::When;
         type Source = Set<members::source>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Code = S::Code;
+        type When = S::When;
+        type Source = S::Source;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `when` field
-        pub struct when(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `code` field
         pub struct code(());
+        ///Marker type for the `when` field
+        pub struct when(());
         ///Marker type for the `source` field
         pub struct source(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct KidlispBuilder<'a, S: kidlisp_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -254,7 +257,7 @@ where
     /// Set the `code` field (required)
     pub fn code(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> KidlispBuilder<'a, kidlisp_state::SetCode<S>> {
         self._fields.0 = Option::Some(value.into());
         KidlispBuilder {
@@ -273,7 +276,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> KidlispBuilder<'a, kidlisp_state::SetRef<S>> {
         self._fields.1 = Option::Some(value.into());
         KidlispBuilder {
@@ -292,7 +295,7 @@ where
     /// Set the `source` field (required)
     pub fn source(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> KidlispBuilder<'a, kidlisp_state::SetSource<S>> {
         self._fields.2 = Option::Some(value.into());
         KidlispBuilder {
@@ -325,10 +328,10 @@ where
 impl<'a, S> KidlispBuilder<'a, S>
 where
     S: kidlisp_state::State,
-    S::When: kidlisp_state::IsSet,
-    S::Ref: kidlisp_state::IsSet,
     S::Code: kidlisp_state::IsSet,
+    S::When: kidlisp_state::IsSet,
     S::Source: kidlisp_state::IsSet,
+    S::Ref: kidlisp_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Kidlisp<'a> {
@@ -343,10 +346,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Kidlisp<'a> {
         Kidlisp {
             code: self._fields.0.unwrap(),

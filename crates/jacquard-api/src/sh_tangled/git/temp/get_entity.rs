@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
@@ -15,30 +15,49 @@ use crate::sh_tangled::git::temp::Blob;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetEntity<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetEntity<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub path: CowStr<'a>,
+    pub path: S,
     ///Defaults to `"HEAD"`.
     #[serde(default = "_default_ref")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#ref: Option<CowStr<'a>>,
+    pub r#ref: Option<S>,
     #[serde(borrow)]
-    pub repo: AtUri<'a>,
+    pub repo: AtUri<S>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetEntityOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetEntityOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Blob<'a>,
+    pub value: Blob<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -47,25 +66,29 @@ pub struct GetEntityOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetEntityError<'a> {
+pub enum GetEntityError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Blob not found
     #[serde(rename = "BlobNotFound")]
-    BlobNotFound(Option<CowStr<'a>>),
+    BlobNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for GetEntityError<'_> {
+impl core::fmt::Display for GetEntityError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -89,7 +112,13 @@ impl core::fmt::Display for GetEntityError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -99,11 +128,12 @@ pub struct GetEntityResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntityResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getEntity";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetEntityOutput<'de>;
-    type Err<'de> = GetEntityError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetEntityOutput<S>;
+    type Err = GetEntityError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntity<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetEntity<S> {
     const NSID: &'static str = "sh.tangled.git.temp.getEntity";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEntityResponse;
@@ -114,7 +144,7 @@ pub struct GetEntityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntityRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getEntity";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetEntity<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetEntity<S>;
     type Response = GetEntityResponse;
 }
 
@@ -132,44 +162,44 @@ pub mod get_entity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Path;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Path = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Path = S::Path;
+        type Repo = Unset;
     }
     ///State transition - sets the `path` field to Set
     pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPath<S> {}
     impl<S: State> State for SetPath<S> {
-        type Repo = S::Repo;
         type Path = Set<members::path>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Path = S::Path;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `path` field
         pub struct path(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetEntityBuilder<'a, S: get_entity_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -199,7 +229,7 @@ where
     /// Set the `path` field (required)
     pub fn path(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetEntityBuilder<'a, get_entity_state::SetPath<S>> {
         self._fields.0 = Option::Some(value.into());
         GetEntityBuilder {
@@ -212,12 +242,12 @@ where
 
 impl<'a, S: get_entity_state::State> GetEntityBuilder<'a, S> {
     /// Set the `ref` field (optional)
-    pub fn r#ref(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn r#ref(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
-    pub fn maybe_ref(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_ref(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -231,7 +261,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetEntityBuilder<'a, get_entity_state::SetRepo<S>> {
         self._fields.2 = Option::Some(value.into());
         GetEntityBuilder {
@@ -245,8 +275,8 @@ where
 impl<'a, S> GetEntityBuilder<'a, S>
 where
     S: get_entity_state::State,
-    S::Repo: get_entity_state::IsSet,
     S::Path: get_entity_state::IsSet,
+    S::Repo: get_entity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetEntity<'a> {

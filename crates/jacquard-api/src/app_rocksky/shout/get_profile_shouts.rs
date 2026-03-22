@@ -10,16 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetProfileShouts<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetProfileShouts<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: AtIdentifier<'a>,
+    pub did: AtIdentifier<S>,
     ///(min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -29,13 +37,21 @@ pub struct GetProfileShouts<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetProfileShoutsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetProfileShoutsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub shouts: Option<Vec<Data<'a>>>,
+    pub shouts: Option<Vec<Data<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.shout.getProfileShouts
@@ -43,11 +59,12 @@ pub struct GetProfileShoutsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileShoutsResponse {
     const NSID: &'static str = "app.rocksky.shout.getProfileShouts";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetProfileShoutsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetProfileShoutsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetProfileShouts<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetProfileShouts<S> {
     const NSID: &'static str = "app.rocksky.shout.getProfileShouts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetProfileShoutsResponse;
@@ -58,7 +75,7 @@ pub struct GetProfileShoutsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileShoutsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.getProfileShouts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetProfileShouts<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetProfileShouts<S>;
     type Response = GetProfileShoutsResponse;
 }
 
@@ -97,7 +114,7 @@ pub mod get_profile_shouts_state {
 /// Builder for constructing an instance of this type
 pub struct GetProfileShoutsBuilder<'a, S: get_profile_shouts_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>, Option<i64>, Option<i64>),
+    _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -127,7 +144,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetProfileShoutsBuilder<'a, get_profile_shouts_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetProfileShoutsBuilder {

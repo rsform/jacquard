@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,38 +27,47 @@ use serde::{Serialize, Deserialize};
 use crate::blog_pckt::mark::link;
 /// Link attributes
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LinkAttrs<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LinkAttrs<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The URL destination of the hyperlink
-    #[serde(borrow)]
-    pub href: UriValue<'a>,
+    pub href: UriValue<S>,
     ///Defines the relationship between the current document and the linked resource (e.g., nofollow, noopener)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rel: Option<CowStr<'a>>,
+    pub rel: Option<S>,
     ///Specifies where to open the linked document (e.g., _blank, _self)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub target: Option<CowStr<'a>>,
+    pub target: Option<S>,
     ///Additional information about the link, typically shown as a tooltip on hover
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Link<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Link<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Link attributes that define the hyperlink behavior and destination
-    #[serde(borrow)]
-    pub attrs: link::LinkAttrs<'a>,
+    pub attrs: link::LinkAttrs<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for LinkAttrs<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LinkAttrs<S> {
     fn nsid() -> &'static str {
         "blog.pckt.mark.link"
     }
@@ -112,7 +123,7 @@ impl<'a> LexiconSchema for LinkAttrs<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Link<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Link<S> {
     fn nsid() -> &'static str {
         "blog.pckt.mark.link"
     }
@@ -162,12 +173,7 @@ pub mod link_attrs_state {
 /// Builder for constructing an instance of this type
 pub struct LinkAttrsBuilder<'a, S: link_attrs_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<UriValue<S>>, Option<S>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -197,7 +203,7 @@ where
     /// Set the `href` field (required)
     pub fn href(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> LinkAttrsBuilder<'a, link_attrs_state::SetHref<S>> {
         self._fields.0 = Option::Some(value.into());
         LinkAttrsBuilder {
@@ -210,12 +216,12 @@ where
 
 impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
     /// Set the `rel` field (optional)
-    pub fn rel(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn rel(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `rel` field to an Option value (optional)
-    pub fn maybe_rel(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_rel(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -223,12 +229,12 @@ impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
 
 impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
     /// Set the `target` field (optional)
-    pub fn target(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn target(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `target` field to an Option value (optional)
-    pub fn maybe_target(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_target(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -236,12 +242,12 @@ impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
 
 impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -265,10 +271,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LinkAttrs<'a> {
         LinkAttrs {
             href: self._fields.0.unwrap(),
@@ -410,7 +413,7 @@ pub mod link_state {
 /// Builder for constructing an instance of this type
 pub struct LinkBuilder<'a, S: link_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<link::LinkAttrs<'a>>,),
+    _fields: (Option<link::LinkAttrs<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -440,7 +443,7 @@ where
     /// Set the `attrs` field (required)
     pub fn attrs(
         mut self,
-        value: impl Into<link::LinkAttrs<'a>>,
+        value: impl Into<link::LinkAttrs<S>>,
     ) -> LinkBuilder<'a, link_state::SetAttrs<S>> {
         self._fields.0 = Option::Some(value.into());
         LinkBuilder {
@@ -464,13 +467,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Link<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Link<'a> {
         Link {
             attrs: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

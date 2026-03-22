@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -28,47 +29,49 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// The real-world feature that an Observation is about.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "dev.sensorthings.featureOfInterest",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct FeatureOfInterest<'a> {
+pub struct FeatureOfInterest<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Encoding of the feature field, e.g. application/vnd.geo+json
-    #[serde(borrow)]
-    pub encoding_type: CowStr<'a>,
+    pub encoding_type: S,
     ///GeoJSON geometry or other spatial representation of the feature
-    #[serde(borrow)]
-    pub feature: Data<'a>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub feature: Data<S>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct FeatureOfInterestGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FeatureOfInterestGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: FeatureOfInterest<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: FeatureOfInterest<S>,
 }
 
-impl<'a> FeatureOfInterest<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, FeatureOfInterestRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> FeatureOfInterest<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, FeatureOfInterestRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -79,18 +82,18 @@ pub struct FeatureOfInterestRecord;
 impl XrpcResp for FeatureOfInterestRecord {
     const NSID: &'static str = "dev.sensorthings.featureOfInterest";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = FeatureOfInterestGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = FeatureOfInterestGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<FeatureOfInterestGetRecordOutput<'_>> for FeatureOfInterest<'_> {
-    fn from(output: FeatureOfInterestGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<FeatureOfInterestGetRecordOutput<S>>
+for FeatureOfInterest<S> {
+    fn from(output: FeatureOfInterestGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for FeatureOfInterest<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for FeatureOfInterest<S> {
     const NSID: &'static str = "dev.sensorthings.featureOfInterest";
     type Record = FeatureOfInterestRecord;
 }
@@ -100,7 +103,7 @@ impl Collection for FeatureOfInterestRecord {
     type Record = FeatureOfInterestRecord;
 }
 
-impl<'a> LexiconSchema for FeatureOfInterest<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeatureOfInterest<S> {
     fn nsid() -> &'static str {
         "dev.sensorthings.featureOfInterest"
     }
@@ -157,80 +160,74 @@ pub mod feature_of_interest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type EncodingType;
-        type CreatedAt;
         type Feature;
+        type EncodingType;
+        type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type EncodingType = Unset;
-        type CreatedAt = Unset;
         type Feature = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type EncodingType = S::EncodingType;
-        type CreatedAt = S::CreatedAt;
-        type Feature = S::Feature;
-    }
-    ///State transition - sets the `encoding_type` field to Set
-    pub struct SetEncodingType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEncodingType<S> {}
-    impl<S: State> State for SetEncodingType<S> {
-        type Name = S::Name;
-        type EncodingType = Set<members::encoding_type>;
-        type CreatedAt = S::CreatedAt;
-        type Feature = S::Feature;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type EncodingType = S::EncodingType;
-        type CreatedAt = Set<members::created_at>;
-        type Feature = S::Feature;
+        type EncodingType = Unset;
+        type Name = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `feature` field to Set
     pub struct SetFeature<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFeature<S> {}
     impl<S: State> State for SetFeature<S> {
-        type Name = S::Name;
-        type EncodingType = S::EncodingType;
-        type CreatedAt = S::CreatedAt;
         type Feature = Set<members::feature>;
+        type EncodingType = S::EncodingType;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `encoding_type` field to Set
+    pub struct SetEncodingType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEncodingType<S> {}
+    impl<S: State> State for SetEncodingType<S> {
+        type Feature = S::Feature;
+        type EncodingType = Set<members::encoding_type>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Feature = S::Feature;
+        type EncodingType = S::EncodingType;
+        type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Feature = S::Feature;
+        type EncodingType = S::EncodingType;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `encoding_type` field
-        pub struct encoding_type(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `feature` field
         pub struct feature(());
+        ///Marker type for the `encoding_type` field
+        pub struct encoding_type(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FeatureOfInterestBuilder<'a, S: feature_of_interest_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Data<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<S>, Option<Data<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -273,12 +270,12 @@ where
 
 impl<'a, S: feature_of_interest_state::State> FeatureOfInterestBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -292,7 +289,7 @@ where
     /// Set the `encodingType` field (required)
     pub fn encoding_type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> FeatureOfInterestBuilder<'a, feature_of_interest_state::SetEncodingType<S>> {
         self._fields.2 = Option::Some(value.into());
         FeatureOfInterestBuilder {
@@ -311,7 +308,7 @@ where
     /// Set the `feature` field (required)
     pub fn feature(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> FeatureOfInterestBuilder<'a, feature_of_interest_state::SetFeature<S>> {
         self._fields.3 = Option::Some(value.into());
         FeatureOfInterestBuilder {
@@ -330,7 +327,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> FeatureOfInterestBuilder<'a, feature_of_interest_state::SetName<S>> {
         self._fields.4 = Option::Some(value.into());
         FeatureOfInterestBuilder {
@@ -344,10 +341,10 @@ where
 impl<'a, S> FeatureOfInterestBuilder<'a, S>
 where
     S: feature_of_interest_state::State,
-    S::Name: feature_of_interest_state::IsSet,
-    S::EncodingType: feature_of_interest_state::IsSet,
-    S::CreatedAt: feature_of_interest_state::IsSet,
     S::Feature: feature_of_interest_state::IsSet,
+    S::EncodingType: feature_of_interest_state::IsSet,
+    S::Name: feature_of_interest_state::IsSet,
+    S::CreatedAt: feature_of_interest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FeatureOfInterest<'a> {
@@ -363,7 +360,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> FeatureOfInterest<'a> {
         FeatureOfInterest {
             created_at: self._fields.0.unwrap(),

@@ -10,24 +10,32 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Delete<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Delete<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///DID of the repository owner
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///Name of the repository to delete
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Rkey of the repository record
-    #[serde(borrow)]
-    pub rkey: CowStr<'a>,
+    pub rkey: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.tangled.repo.delete
@@ -35,11 +43,12 @@ pub struct DeleteResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteResponse {
     const NSID: &'static str = "sh.tangled.repo.delete";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Delete<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Delete<S> {
     const NSID: &'static str = "sh.tangled.repo.delete";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -54,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Delete<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Delete<S>;
     type Response = DeleteResponse;
 }
 
@@ -68,49 +77,49 @@ pub mod delete_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Name;
+        type Did;
         type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Name = Unset;
+        type Did = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Name = S::Name;
-        type Rkey = S::Rkey;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Did = S::Did;
         type Name = Set<members::name>;
+        type Did = S::Did;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Name = S::Name;
+        type Did = Set<members::did>;
         type Rkey = S::Rkey;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Did = S::Did;
         type Name = S::Name;
+        type Did = S::Did;
         type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
     }
@@ -119,7 +128,7 @@ pub mod delete_state {
 /// Builder for constructing an instance of this type
 pub struct DeleteBuilder<'a, S: delete_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Did<S>>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -149,7 +158,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> DeleteBuilder<'a, delete_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         DeleteBuilder {
@@ -168,7 +177,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DeleteBuilder<'a, delete_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         DeleteBuilder {
@@ -187,7 +196,7 @@ where
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DeleteBuilder<'a, delete_state::SetRkey<S>> {
         self._fields.2 = Option::Some(value.into());
         DeleteBuilder {
@@ -201,8 +210,8 @@ where
 impl<'a, S> DeleteBuilder<'a, S>
 where
     S: delete_state::State,
-    S::Did: delete_state::IsSet,
     S::Name: delete_state::IsSet,
+    S::Did: delete_state::IsSet,
     S::Rkey: delete_state::IsSet,
 {
     /// Build the final struct
@@ -215,13 +224,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Delete<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Delete<'a> {
         Delete {
             did: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

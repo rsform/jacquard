@@ -10,35 +10,50 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Status<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Status<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct StatusOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Authoritative boundaries assigned. Only included when request is authenticated.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub boundaries: Option<Vec<Data<'a>>>,
+    pub boundaries: Option<Vec<Data<S>>>,
     ///The DID that was checked.
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///Whether the DID is enrolled in this Stratos service.
     pub enrolled: bool,
     ///When the DID was enrolled, if enrolled.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enrolled_at: Option<Datetime>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for zone.stratos.enrollment.status
@@ -46,11 +61,12 @@ pub struct StatusResponse;
 impl jacquard_common::xrpc::XrpcResp for StatusResponse {
     const NSID: &'static str = "zone.stratos.enrollment.status";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StatusOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StatusOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Status<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Status<S> {
     const NSID: &'static str = "zone.stratos.enrollment.status";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = StatusResponse;
@@ -61,7 +77,7 @@ pub struct StatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StatusRequest {
     const PATH: &'static str = "/xrpc/zone.stratos.enrollment.status";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Status<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Status<S>;
     type Response = StatusResponse;
 }
 
@@ -100,7 +116,7 @@ pub mod status_state {
 /// Builder for constructing an instance of this type
 pub struct StatusBuilder<'a, S: status_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -130,7 +146,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> StatusBuilder<'a, status_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         StatusBuilder {

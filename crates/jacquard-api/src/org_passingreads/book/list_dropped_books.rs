@@ -10,16 +10,27 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::org_passingreads::book::StatefulBook;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListDroppedBooksOutput<'a> {
-    #[serde(borrow)]
-    pub books: Vec<StatefulBook<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListDroppedBooksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub books: Vec<StatefulBook<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// XRPC request marker type.
@@ -31,8 +42,8 @@ pub struct ListDroppedBooksResponse;
 impl jacquard_common::xrpc::XrpcResp for ListDroppedBooksResponse {
     const NSID: &'static str = "org.passingreads.book.listDroppedBooks";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListDroppedBooksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListDroppedBooksOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for ListDroppedBooks {
@@ -46,6 +57,6 @@ pub struct ListDroppedBooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListDroppedBooksRequest {
     const PATH: &'static str = "/xrpc/org.passingreads.book.listDroppedBooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListDroppedBooks;
+    type Request<S: Bos<str> + AsRef<str>> = ListDroppedBooks;
     type Response = ListDroppedBooksResponse;
 }

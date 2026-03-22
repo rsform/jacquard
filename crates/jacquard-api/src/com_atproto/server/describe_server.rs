@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,55 +26,71 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::server::describe_server;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Contact<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Contact<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub email: Option<CowStr<'a>>,
+    pub email: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Links<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Links<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub privacy_policy: Option<UriValue<'a>>,
+    pub privacy_policy: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub terms_of_service: Option<UriValue<'a>>,
+    pub terms_of_service: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DescribeServerOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DescribeServerOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of domain suffixes that can be used in account handles.
-    #[serde(borrow)]
-    pub available_user_domains: Vec<CowStr<'a>>,
+    pub available_user_domains: Vec<S>,
     ///Contact information
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub contact: Option<describe_server::Contact<'a>>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub contact: Option<describe_server::Contact<S>>,
+    pub did: Did<S>,
     ///If true, an invite code must be supplied to create an account on this instance.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub invite_code_required: Option<bool>,
     ///URLs of service policy documents.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub links: Option<describe_server::Links<'a>>,
+    pub links: Option<describe_server::Links<S>>,
     ///If true, a phone verification token must be supplied to create an account on this instance.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phone_verification_required: Option<bool>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Contact<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Contact<S> {
     fn nsid() -> &'static str {
         "com.atproto.server.describeServer"
     }
@@ -87,7 +105,7 @@ impl<'a> LexiconSchema for Contact<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Links<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Links<S> {
     fn nsid() -> &'static str {
         "com.atproto.server.describeServer"
     }
@@ -111,8 +129,8 @@ pub struct DescribeServerResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeServerResponse {
     const NSID: &'static str = "com.atproto.server.describeServer";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DescribeServerOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DescribeServerOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for DescribeServer {
@@ -126,7 +144,7 @@ pub struct DescribeServerRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeServerRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.describeServer";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = DescribeServer;
+    type Request<S: Bos<str> + AsRef<str>> = DescribeServer;
     type Response = DescribeServerResponse;
 }
 

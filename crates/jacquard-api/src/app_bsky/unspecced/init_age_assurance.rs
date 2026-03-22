@@ -10,38 +10,54 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::unspecced::AgeAssuranceState;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct InitAgeAssurance<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct InitAgeAssurance<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///An ISO 3166-1 alpha-2 code of the user's location.
-    #[serde(borrow)]
-    pub country_code: CowStr<'a>,
+    pub country_code: S,
     ///The user's email address to receive assurance instructions.
-    #[serde(borrow)]
-    pub email: CowStr<'a>,
+    pub email: S,
     ///The user's preferred language for communication during the assurance process.
-    #[serde(borrow)]
-    pub language: CowStr<'a>,
+    pub language: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct InitAgeAssuranceOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct InitAgeAssuranceOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: AgeAssuranceState<'a>,
+    pub value: AgeAssuranceState<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -50,22 +66,23 @@ pub struct InitAgeAssuranceOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum InitAgeAssuranceError<'a> {
+pub enum InitAgeAssuranceError {
     #[serde(rename = "InvalidEmail")]
-    InvalidEmail(Option<CowStr<'a>>),
+    InvalidEmail(Option<SmolStr>),
     #[serde(rename = "DidTooLong")]
-    DidTooLong(Option<CowStr<'a>>),
+    DidTooLong(Option<SmolStr>),
     #[serde(rename = "InvalidInitiation")]
-    InvalidInitiation(Option<CowStr<'a>>),
+    InvalidInitiation(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for InitAgeAssuranceError<'_> {
+impl core::fmt::Display for InitAgeAssuranceError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidEmail(msg) => {
@@ -89,7 +106,13 @@ impl core::fmt::Display for InitAgeAssuranceError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -99,11 +122,12 @@ pub struct InitAgeAssuranceResponse;
 impl jacquard_common::xrpc::XrpcResp for InitAgeAssuranceResponse {
     const NSID: &'static str = "app.bsky.unspecced.initAgeAssurance";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = InitAgeAssuranceOutput<'de>;
-    type Err<'de> = InitAgeAssuranceError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = InitAgeAssuranceOutput<S>;
+    type Err = InitAgeAssuranceError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for InitAgeAssurance<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for InitAgeAssurance<S> {
     const NSID: &'static str = "app.bsky.unspecced.initAgeAssurance";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -118,6 +142,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for InitAgeAssuranceRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = InitAgeAssurance<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = InitAgeAssurance<S>;
     type Response = InitAgeAssuranceResponse;
 }

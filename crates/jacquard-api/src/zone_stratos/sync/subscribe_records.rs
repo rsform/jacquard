@@ -10,14 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::cid::CidLink;
 use jacquard_common::types::string::{Did, Tid, Datetime, UriValue};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -27,58 +28,66 @@ use serde::{Serialize, Deserialize};
 use crate::zone_stratos::sync::subscribe_records;
 /// A commit event containing record operations.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Commit<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Commit<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The DID of the account.
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///List of record operations in this commit.
-    #[serde(borrow)]
-    pub ops: Vec<subscribe_records::RecordOp<'a>>,
+    pub ops: Vec<subscribe_records::RecordOp<S>>,
     ///The repo revision.
     pub rev: Tid,
     ///The sequence number of this event.
     pub seq: i64,
     ///Timestamp of when the event was sequenced.
     pub time: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// An enrollment event indicating a user has enrolled or unenrolled from the service.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Enrollment<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Enrollment<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The enrollment action.
-    #[serde(borrow)]
-    pub action: EnrollmentAction<'a>,
+    pub action: EnrollmentAction<S>,
     ///The boundaries assigned to the user.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub boundaries: Option<Vec<CowStr<'a>>>,
+    pub boundaries: Option<Vec<S>>,
     ///The DID of the user.
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///The Stratos service endpoint URL.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub service: Option<UriValue<'a>>,
+    pub service: Option<UriValue<S>>,
     ///Timestamp of the enrollment event.
     pub time: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The enrollment action.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EnrollmentAction<'a> {
+pub enum EnrollmentAction<S: Bos<str> + AsRef<str> = DefaultStr> {
     Enroll,
     Unenroll,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> EnrollmentAction<'a> {
+impl<S: Bos<str> + AsRef<str>> EnrollmentAction<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Enroll => "enroll",
@@ -86,70 +95,56 @@ impl<'a> EnrollmentAction<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for EnrollmentAction<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "enroll" => Self::Enroll,
             "unenroll" => Self::Unenroll,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for EnrollmentAction<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "enroll" => Self::Enroll,
-            "unenroll" => Self::Unenroll,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for EnrollmentAction<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for EnrollmentAction<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for EnrollmentAction<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for EnrollmentAction<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for EnrollmentAction<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for EnrollmentAction<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for EnrollmentAction<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for EnrollmentAction<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for EnrollmentAction<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for EnrollmentAction<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for EnrollmentAction<'_> {
-    type Output = EnrollmentAction<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for EnrollmentAction<S> {
+    type Output = EnrollmentAction<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             EnrollmentAction::Enroll => EnrollmentAction::Enroll,
@@ -161,96 +156,87 @@ impl jacquard_common::IntoStatic for EnrollmentAction<'_> {
 
 /// An informational message about the subscription state.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Info<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Info<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Additional details about the info message.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub message: Option<CowStr<'a>>,
+    pub message: Option<S>,
     ///The type of info message.
-    #[serde(borrow)]
-    pub name: InfoName<'a>,
+    pub name: InfoName<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The type of info message.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum InfoName<'a> {
+pub enum InfoName<S: Bos<str> + AsRef<str> = DefaultStr> {
     OutdatedCursor,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> InfoName<'a> {
+impl<S: Bos<str> + AsRef<str>> InfoName<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::OutdatedCursor => "OutdatedCursor",
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for InfoName<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "OutdatedCursor" => Self::OutdatedCursor,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for InfoName<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "OutdatedCursor" => Self::OutdatedCursor,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for InfoName<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for InfoName<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for InfoName<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for InfoName<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for InfoName<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for InfoName<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for InfoName<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for InfoName<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for InfoName<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for InfoName<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for InfoName<'_> {
-    type Output = InfoName<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for InfoName<S> {
+    type Output = InfoName<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             InfoName::OutdatedCursor => InfoName::OutdatedCursor,
@@ -262,19 +248,25 @@ impl jacquard_common::IntoStatic for InfoName<'_> {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SubscribeRecords<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SubscribeRecords<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub did: Option<Did<'a>>,
+    pub did: Option<Did<S>>,
     ///(max length: 253)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub domain: Option<CowStr<'a>>,
+    pub domain: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub sync_token: Option<CowStr<'a>>,
+    pub sync_token: Option<S>,
 }
 
 
@@ -284,11 +276,11 @@ pub struct SubscribeRecords<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SubscribeRecordsMessage<'a> {
     #[serde(rename = "#commit")]
-    Commit(Box<subscribe_records::Commit<'a>>),
+    Commit(Box<subscribe_records::Commit<S>>),
     #[serde(rename = "#enrollment")]
-    Enrollment(Box<subscribe_records::Enrollment<'a>>),
+    Enrollment(Box<subscribe_records::Enrollment<S>>),
     #[serde(rename = "#info")]
-    Info(Box<subscribe_records::Info<'a>>),
+    Info(Box<subscribe_records::Info<S>>),
 }
 
 impl<'a> SubscribeRecordsMessage<'a> {
@@ -328,7 +320,6 @@ impl<'a> SubscribeRecordsMessage<'a> {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -337,22 +328,23 @@ impl<'a> SubscribeRecordsMessage<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum SubscribeRecordsError<'a> {
+pub enum SubscribeRecordsError {
     /// Cursor is in the future.
     #[serde(rename = "FutureCursor")]
-    FutureCursor(Option<CowStr<'a>>),
+    FutureCursor(Option<SmolStr>),
     /// Authentication is required.
     #[serde(rename = "AuthRequired")]
-    AuthRequired(Option<CowStr<'a>>),
+    AuthRequired(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for SubscribeRecordsError<'_> {
+impl core::fmt::Display for SubscribeRecordsError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::FutureCursor(msg) => {
@@ -369,44 +361,53 @@ impl core::fmt::Display for SubscribeRecordsError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
 /// A single record operation within a commit.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordOp<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RecordOp<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The type of operation.
-    #[serde(borrow)]
-    pub action: RecordOpAction<'a>,
+    pub action: RecordOpAction<S>,
     ///The CID of the record. Present for create and update operations.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<CidLink<'a>>,
+    pub cid: Option<CidLink<S>>,
     ///The record path (collection/rkey).
-    #[serde(borrow)]
-    pub path: CowStr<'a>,
+    pub path: S,
     ///The record content. Present for create and update operations.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub record: Option<Data<'a>>,
+    pub record: Option<Data<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The type of operation.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RecordOpAction<'a> {
+pub enum RecordOpAction<S: Bos<str> + AsRef<str> = DefaultStr> {
     Create,
     Update,
     Delete,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> RecordOpAction<'a> {
+impl<S: Bos<str> + AsRef<str>> RecordOpAction<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Create => "create",
@@ -415,72 +416,57 @@ impl<'a> RecordOpAction<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for RecordOpAction<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "create" => Self::Create,
             "update" => Self::Update,
             "delete" => Self::Delete,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for RecordOpAction<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "create" => Self::Create,
-            "update" => Self::Update,
-            "delete" => Self::Delete,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for RecordOpAction<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for RecordOpAction<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for RecordOpAction<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for RecordOpAction<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for RecordOpAction<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for RecordOpAction<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for RecordOpAction<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for RecordOpAction<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for RecordOpAction<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for RecordOpAction<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for RecordOpAction<'_> {
-    type Output = RecordOpAction<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for RecordOpAction<S> {
+    type Output = RecordOpAction<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             RecordOpAction::Create => RecordOpAction::Create,
@@ -491,7 +477,7 @@ impl jacquard_common::IntoStatic for RecordOpAction<'_> {
     }
 }
 
-impl<'a> LexiconSchema for Commit<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Commit<S> {
     fn nsid() -> &'static str {
         "zone.stratos.sync.subscribeRecords"
     }
@@ -506,7 +492,7 @@ impl<'a> LexiconSchema for Commit<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Enrollment<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Enrollment<S> {
     fn nsid() -> &'static str {
         "zone.stratos.sync.subscribeRecords"
     }
@@ -532,7 +518,7 @@ impl<'a> LexiconSchema for Enrollment<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Info<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Info<S> {
     fn nsid() -> &'static str {
         "zone.stratos.sync.subscribeRecords"
     }
@@ -575,7 +561,7 @@ impl jacquard_common::xrpc::SubscriptionResp for SubscribeRecordsStream {
     const NSID: &'static str = "zone.stratos.sync.subscribeRecords";
     const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Message<'de> = SubscribeRecordsMessage<'de>;
-    type Error<'de> = SubscribeRecordsError<'de>;
+    type Error = SubscribeRecordsError;
 }
 
 impl<'a> jacquard_common::xrpc::XrpcSubscription for SubscribeRecords<'a> {
@@ -592,7 +578,7 @@ impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeRecordsEndpoint {
     type Stream = SubscribeRecordsStream;
 }
 
-impl<'a> LexiconSchema for RecordOp<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RecordOp<S> {
     fn nsid() -> &'static str {
         "zone.stratos.sync.subscribeRecords"
     }
@@ -640,84 +626,84 @@ pub mod commit_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Seq;
-        type Ops;
-        type Time;
-        type Did;
         type Rev;
+        type Did;
+        type Time;
+        type Ops;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Seq = Unset;
-        type Ops = Unset;
-        type Time = Unset;
-        type Did = Unset;
         type Rev = Unset;
+        type Did = Unset;
+        type Time = Unset;
+        type Ops = Unset;
     }
     ///State transition - sets the `seq` field to Set
     pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeq<S> {}
     impl<S: State> State for SetSeq<S> {
         type Seq = Set<members::seq>;
-        type Ops = S::Ops;
-        type Time = S::Time;
+        type Rev = S::Rev;
         type Did = S::Did;
-        type Rev = S::Rev;
-    }
-    ///State transition - sets the `ops` field to Set
-    pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOps<S> {}
-    impl<S: State> State for SetOps<S> {
-        type Seq = S::Seq;
-        type Ops = Set<members::ops>;
         type Time = S::Time;
-        type Did = S::Did;
-        type Rev = S::Rev;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Seq = S::Seq;
         type Ops = S::Ops;
-        type Time = Set<members::time>;
-        type Did = S::Did;
-        type Rev = S::Rev;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Seq = S::Seq;
-        type Ops = S::Ops;
-        type Time = S::Time;
-        type Did = Set<members::did>;
-        type Rev = S::Rev;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
         type Seq = S::Seq;
-        type Ops = S::Ops;
-        type Time = S::Time;
-        type Did = S::Did;
         type Rev = Set<members::rev>;
+        type Did = S::Did;
+        type Time = S::Time;
+        type Ops = S::Ops;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Seq = S::Seq;
+        type Rev = S::Rev;
+        type Did = Set<members::did>;
+        type Time = S::Time;
+        type Ops = S::Ops;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Seq = S::Seq;
+        type Rev = S::Rev;
+        type Did = S::Did;
+        type Time = Set<members::time>;
+        type Ops = S::Ops;
+    }
+    ///State transition - sets the `ops` field to Set
+    pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOps<S> {}
+    impl<S: State> State for SetOps<S> {
+        type Seq = S::Seq;
+        type Rev = S::Rev;
+        type Did = S::Did;
+        type Time = S::Time;
+        type Ops = Set<members::ops>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `seq` field
         pub struct seq(());
-        ///Marker type for the `ops` field
-        pub struct ops(());
-        ///Marker type for the `time` field
-        pub struct time(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `rev` field
         pub struct rev(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `time` field
+        pub struct time(());
+        ///Marker type for the `ops` field
+        pub struct ops(());
     }
 }
 
@@ -725,8 +711,8 @@ pub mod commit_state {
 pub struct CommitBuilder<'a, S: commit_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Did<'a>>,
-        Option<Vec<subscribe_records::RecordOp<'a>>>,
+        Option<Did<S>>,
+        Option<Vec<subscribe_records::RecordOp<S>>>,
         Option<Tid>,
         Option<i64>,
         Option<Datetime>,
@@ -760,7 +746,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> CommitBuilder<'a, commit_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         CommitBuilder {
@@ -779,7 +765,7 @@ where
     /// Set the `ops` field (required)
     pub fn ops(
         mut self,
-        value: impl Into<Vec<subscribe_records::RecordOp<'a>>>,
+        value: impl Into<Vec<subscribe_records::RecordOp<S>>>,
     ) -> CommitBuilder<'a, commit_state::SetOps<S>> {
         self._fields.1 = Option::Some(value.into());
         CommitBuilder {
@@ -851,10 +837,10 @@ impl<'a, S> CommitBuilder<'a, S>
 where
     S: commit_state::State,
     S::Seq: commit_state::IsSet,
-    S::Ops: commit_state::IsSet,
-    S::Time: commit_state::IsSet,
-    S::Did: commit_state::IsSet,
     S::Rev: commit_state::IsSet,
+    S::Did: commit_state::IsSet,
+    S::Time: commit_state::IsSet,
+    S::Ops: commit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Commit<'a> {
@@ -868,10 +854,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Commit<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Commit<'a> {
         Commit {
             did: self._fields.0.unwrap(),
             ops: self._fields.1.unwrap(),
@@ -1202,51 +1185,51 @@ pub mod enrollment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Time;
-        type Action;
         type Did;
+        type Action;
+        type Time;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Time = Unset;
-        type Action = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Time = Set<members::time>;
-        type Action = S::Action;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `action` field to Set
-    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAction<S> {}
-    impl<S: State> State for SetAction<S> {
-        type Time = S::Time;
-        type Action = Set<members::action>;
-        type Did = S::Did;
+        type Action = Unset;
+        type Time = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Time = S::Time;
-        type Action = S::Action;
         type Did = Set<members::did>;
+        type Action = S::Action;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAction<S> {}
+    impl<S: State> State for SetAction<S> {
+        type Did = S::Did;
+        type Action = Set<members::action>;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Did = S::Did;
+        type Action = S::Action;
+        type Time = Set<members::time>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `time` field
-        pub struct time(());
-        ///Marker type for the `action` field
-        pub struct action(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `action` field
+        pub struct action(());
+        ///Marker type for the `time` field
+        pub struct time(());
     }
 }
 
@@ -1254,10 +1237,10 @@ pub mod enrollment_state {
 pub struct EnrollmentBuilder<'a, S: enrollment_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<EnrollmentAction<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<Did<'a>>,
-        Option<UriValue<'a>>,
+        Option<EnrollmentAction<S>>,
+        Option<Vec<S>>,
+        Option<Did<S>>,
+        Option<UriValue<S>>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -1289,7 +1272,7 @@ where
     /// Set the `action` field (required)
     pub fn action(
         mut self,
-        value: impl Into<EnrollmentAction<'a>>,
+        value: impl Into<EnrollmentAction<S>>,
     ) -> EnrollmentBuilder<'a, enrollment_state::SetAction<S>> {
         self._fields.0 = Option::Some(value.into());
         EnrollmentBuilder {
@@ -1302,12 +1285,12 @@ where
 
 impl<'a, S: enrollment_state::State> EnrollmentBuilder<'a, S> {
     /// Set the `boundaries` field (optional)
-    pub fn boundaries(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn boundaries(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `boundaries` field to an Option value (optional)
-    pub fn maybe_boundaries(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_boundaries(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1321,7 +1304,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> EnrollmentBuilder<'a, enrollment_state::SetDid<S>> {
         self._fields.2 = Option::Some(value.into());
         EnrollmentBuilder {
@@ -1334,12 +1317,12 @@ where
 
 impl<'a, S: enrollment_state::State> EnrollmentBuilder<'a, S> {
     /// Set the `service` field (optional)
-    pub fn service(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn service(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `service` field to an Option value (optional)
-    pub fn maybe_service(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_service(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1367,9 +1350,9 @@ where
 impl<'a, S> EnrollmentBuilder<'a, S>
 where
     S: enrollment_state::State,
-    S::Time: enrollment_state::IsSet,
-    S::Action: enrollment_state::IsSet,
     S::Did: enrollment_state::IsSet,
+    S::Action: enrollment_state::IsSet,
+    S::Time: enrollment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Enrollment<'a> {
@@ -1385,7 +1368,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Enrollment<'a> {
         Enrollment {
             action: self._fields.0.unwrap(),
@@ -1420,7 +1403,7 @@ pub mod subscribe_records_state {
 /// Builder for constructing an instance of this type
 pub struct SubscribeRecordsBuilder<'a, S: subscribe_records_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<Did<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<i64>, Option<Did<S>>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1457,12 +1440,12 @@ impl<'a, S: subscribe_records_state::State> SubscribeRecordsBuilder<'a, S> {
 
 impl<'a, S: subscribe_records_state::State> SubscribeRecordsBuilder<'a, S> {
     /// Set the `did` field (optional)
-    pub fn did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
-    pub fn maybe_did(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_did(mut self, value: Option<Did<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1470,12 +1453,12 @@ impl<'a, S: subscribe_records_state::State> SubscribeRecordsBuilder<'a, S> {
 
 impl<'a, S: subscribe_records_state::State> SubscribeRecordsBuilder<'a, S> {
     /// Set the `domain` field (optional)
-    pub fn domain(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn domain(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `domain` field to an Option value (optional)
-    pub fn maybe_domain(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_domain(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1483,12 +1466,12 @@ impl<'a, S: subscribe_records_state::State> SubscribeRecordsBuilder<'a, S> {
 
 impl<'a, S: subscribe_records_state::State> SubscribeRecordsBuilder<'a, S> {
     /// Set the `syncToken` field (optional)
-    pub fn sync_token(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sync_token(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `syncToken` field to an Option value (optional)
-    pub fn maybe_sync_token(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sync_token(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }

@@ -12,11 +12,16 @@ pub mod play;
 pub mod previous;
 pub mod seek;
 
-use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,36 +29,38 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SpotifyTrackView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SpotifyTrackView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The name of the album.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub album: Option<CowStr<'a>>,
+    pub album: Option<S>,
     ///The name of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub artist: Option<CowStr<'a>>,
+    pub artist: Option<S>,
     ///The duration of the track in milliseconds.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration: Option<i64>,
     ///The unique identifier of the Spotify track.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///The name of the track.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///A URL to a preview of the track.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub preview_url: Option<CowStr<'a>>,
+    pub preview_url: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for SpotifyTrackView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SpotifyTrackView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.spotify.defs"
     }

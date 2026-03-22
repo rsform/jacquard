@@ -10,9 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 /// Raw binary part data
 
@@ -23,17 +25,24 @@ pub struct UploadPart {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct UploadPartOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UploadPartOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///ETag of the uploaded part, required for completeUpload
-    #[serde(borrow)]
-    pub etag: CowStr<'a>,
+    pub etag: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -42,22 +51,23 @@ pub struct UploadPartOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum UploadPartError<'a> {
+pub enum UploadPartError {
     #[serde(rename = "InvalidUploadId")]
-    InvalidUploadId(Option<CowStr<'a>>),
+    InvalidUploadId(Option<SmolStr>),
     #[serde(rename = "InvalidPartNumber")]
-    InvalidPartNumber(Option<CowStr<'a>>),
+    InvalidPartNumber(Option<SmolStr>),
     #[serde(rename = "UploadFailed")]
-    UploadFailed(Option<CowStr<'a>>),
+    UploadFailed(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for UploadPartError<'_> {
+impl core::fmt::Display for UploadPartError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidUploadId(msg) => {
@@ -81,7 +91,13 @@ impl core::fmt::Display for UploadPartError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -91,8 +107,8 @@ pub struct UploadPartResponse;
 impl jacquard_common::xrpc::XrpcResp for UploadPartResponse {
     const NSID: &'static str = "io.atcr.hold.uploadPart";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = UploadPartOutput<'de>;
-    type Err<'de> = UploadPartError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = UploadPartOutput<S>;
+    type Err = UploadPartError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for UploadPart {
@@ -108,7 +124,7 @@ impl jacquard_common::xrpc::XrpcRequest for UploadPart {
         body: &'de [u8],
     ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
     where
-        Self: serde::Deserialize<'de>,
+        Self: Deserialize<'de>,
     {
         Ok(
             Box::new(Self {
@@ -125,6 +141,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for UploadPartRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "*/*",
     );
-    type Request<'de> = UploadPart;
+    type Request<S: Bos<str> + AsRef<str>> = UploadPart;
     type Response = UploadPartResponse;
 }

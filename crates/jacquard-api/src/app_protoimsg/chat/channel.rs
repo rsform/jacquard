@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,42 +29,47 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A channel within a chat room. Created by the room owner.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.protoimsg.chat.channel", tag = "$type")]
-pub struct Channel<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.protoimsg.chat.channel",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Channel<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp of channel creation.
     pub created_at: Datetime,
     ///What the channel is about.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Display name for the channel.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Sort position within the room. Lower numbers appear first.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub position: Option<i64>,
     ///Who can post messages in this channel.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub post_policy: Option<ChannelPostPolicy<'a>>,
+    pub post_policy: Option<ChannelPostPolicy<S>>,
     ///AT-URI of the room this channel belongs to.
-    #[serde(borrow)]
-    pub room: AtUri<'a>,
+    pub room: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Who can post messages in this channel.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ChannelPostPolicy<'a> {
+pub enum ChannelPostPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {
     Everyone,
     Owner,
     Moderators,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ChannelPostPolicy<'a> {
+impl<S: Bos<str> + AsRef<str>> ChannelPostPolicy<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Everyone => "everyone",
@@ -71,72 +78,57 @@ impl<'a> ChannelPostPolicy<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ChannelPostPolicy<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "everyone" => Self::Everyone,
             "owner" => Self::Owner,
             "moderators" => Self::Moderators,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ChannelPostPolicy<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "everyone" => Self::Everyone,
-            "owner" => Self::Owner,
-            "moderators" => Self::Moderators,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ChannelPostPolicy<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ChannelPostPolicy<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ChannelPostPolicy<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ChannelPostPolicy<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ChannelPostPolicy<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ChannelPostPolicy<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ChannelPostPolicy<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ChannelPostPolicy<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ChannelPostPolicy<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ChannelPostPolicy<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ChannelPostPolicy<'_> {
-    type Output = ChannelPostPolicy<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ChannelPostPolicy<S> {
+    type Output = ChannelPostPolicy<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ChannelPostPolicy::Everyone => ChannelPostPolicy::Everyone,
@@ -150,22 +142,23 @@ impl jacquard_common::IntoStatic for ChannelPostPolicy<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ChannelGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ChannelGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Channel<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Channel<S>,
 }
 
-impl<'a> Channel<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ChannelRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Channel<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ChannelRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -176,18 +169,17 @@ pub struct ChannelRecord;
 impl XrpcResp for ChannelRecord {
     const NSID: &'static str = "app.protoimsg.chat.channel";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ChannelGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ChannelGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ChannelGetRecordOutput<'_>> for Channel<'_> {
-    fn from(output: ChannelGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ChannelGetRecordOutput<S>> for Channel<S> {
+    fn from(output: ChannelGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Channel<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Channel<S> {
     const NSID: &'static str = "app.protoimsg.chat.channel";
     type Record = ChannelRecord;
 }
@@ -197,7 +189,7 @@ impl Collection for ChannelRecord {
     type Record = ChannelRecord;
 }
 
-impl<'a> LexiconSchema for Channel<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Channel<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.channel"
     }
@@ -252,51 +244,51 @@ pub mod channel_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
         type Room;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
         type Room = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type Room = S::Room;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
         type Room = S::Room;
+        type Name = S::Name;
     }
     ///State transition - sets the `room` field to Set
     pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoom<S> {}
     impl<S: State> State for SetRoom<S> {
-        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
         type Room = Set<members::room>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Room = S::Room;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `room` field
         pub struct room(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -305,11 +297,11 @@ pub struct ChannelBuilder<'a, S: channel_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
         Option<i64>,
-        Option<ChannelPostPolicy<'a>>,
-        Option<AtUri<'a>>,
+        Option<ChannelPostPolicy<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -353,12 +345,12 @@ where
 
 impl<'a, S: channel_state::State> ChannelBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -372,7 +364,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ChannelBuilder<'a, channel_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         ChannelBuilder {
@@ -400,13 +392,13 @@ impl<'a, S: channel_state::State> ChannelBuilder<'a, S> {
     /// Set the `postPolicy` field (optional)
     pub fn post_policy(
         mut self,
-        value: impl Into<Option<ChannelPostPolicy<'a>>>,
+        value: impl Into<Option<ChannelPostPolicy<S>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `postPolicy` field to an Option value (optional)
-    pub fn maybe_post_policy(mut self, value: Option<ChannelPostPolicy<'a>>) -> Self {
+    pub fn maybe_post_policy(mut self, value: Option<ChannelPostPolicy<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -420,7 +412,7 @@ where
     /// Set the `room` field (required)
     pub fn room(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ChannelBuilder<'a, channel_state::SetRoom<S>> {
         self._fields.5 = Option::Some(value.into());
         ChannelBuilder {
@@ -434,9 +426,9 @@ where
 impl<'a, S> ChannelBuilder<'a, S>
 where
     S: channel_state::State,
-    S::Name: channel_state::IsSet,
     S::CreatedAt: channel_state::IsSet,
     S::Room: channel_state::IsSet,
+    S::Name: channel_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Channel<'a> {
@@ -453,10 +445,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Channel<'a> {
         Channel {
             created_at: self._fields.0.unwrap(),

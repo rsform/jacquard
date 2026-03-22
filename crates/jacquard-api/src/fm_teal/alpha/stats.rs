@@ -17,11 +17,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -29,51 +31,66 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ArtistView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ArtistView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///MusicBrainz artist ID
-    #[serde(borrow)]
-    pub mbid: CowStr<'a>,
+    pub mbid: S,
     ///Artist name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Total number of plays for this artist
     pub play_count: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RecordingView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RecordingView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///MusicBrainz recording ID
-    #[serde(borrow)]
-    pub mbid: CowStr<'a>,
+    pub mbid: S,
     ///Recording/track name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Total number of plays for this recording
     pub play_count: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReleaseView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReleaseView<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///MusicBrainz release ID
-    #[serde(borrow)]
-    pub mbid: CowStr<'a>,
+    pub mbid: S,
     ///Release/album name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Total number of plays for this release
     pub play_count: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for ArtistView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ArtistView<S> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.stats.defs"
     }
@@ -88,7 +105,7 @@ impl<'a> LexiconSchema for ArtistView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RecordingView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RecordingView<S> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.stats.defs"
     }
@@ -103,7 +120,7 @@ impl<'a> LexiconSchema for RecordingView<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ReleaseView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReleaseView<S> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.stats.defs"
     }
@@ -128,58 +145,58 @@ pub mod artist_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Mbid;
-        type Name;
         type PlayCount;
+        type Name;
+        type Mbid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Mbid = Unset;
-        type Name = Unset;
         type PlayCount = Unset;
-    }
-    ///State transition - sets the `mbid` field to Set
-    pub struct SetMbid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMbid<S> {}
-    impl<S: State> State for SetMbid<S> {
-        type Mbid = Set<members::mbid>;
-        type Name = S::Name;
-        type PlayCount = S::PlayCount;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Mbid = S::Mbid;
-        type Name = Set<members::name>;
-        type PlayCount = S::PlayCount;
+        type Name = Unset;
+        type Mbid = Unset;
     }
     ///State transition - sets the `play_count` field to Set
     pub struct SetPlayCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayCount<S> {}
     impl<S: State> State for SetPlayCount<S> {
-        type Mbid = S::Mbid;
-        type Name = S::Name;
         type PlayCount = Set<members::play_count>;
+        type Name = S::Name;
+        type Mbid = S::Mbid;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type PlayCount = S::PlayCount;
+        type Name = Set<members::name>;
+        type Mbid = S::Mbid;
+    }
+    ///State transition - sets the `mbid` field to Set
+    pub struct SetMbid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMbid<S> {}
+    impl<S: State> State for SetMbid<S> {
+        type PlayCount = S::PlayCount;
+        type Name = S::Name;
+        type Mbid = Set<members::mbid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mbid` field
-        pub struct mbid(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `play_count` field
         pub struct play_count(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `mbid` field
+        pub struct mbid(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ArtistViewBuilder<'a, S: artist_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -209,7 +226,7 @@ where
     /// Set the `mbid` field (required)
     pub fn mbid(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ArtistViewBuilder<'a, artist_view_state::SetMbid<S>> {
         self._fields.0 = Option::Some(value.into());
         ArtistViewBuilder {
@@ -228,7 +245,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ArtistViewBuilder<'a, artist_view_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         ArtistViewBuilder {
@@ -261,9 +278,9 @@ where
 impl<'a, S> ArtistViewBuilder<'a, S>
 where
     S: artist_view_state::State,
-    S::Mbid: artist_view_state::IsSet,
-    S::Name: artist_view_state::IsSet,
     S::PlayCount: artist_view_state::IsSet,
+    S::Name: artist_view_state::IsSet,
+    S::Mbid: artist_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ArtistView<'a> {
@@ -277,10 +294,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ArtistView<'a> {
         ArtistView {
             mbid: self._fields.0.unwrap(),
@@ -487,7 +501,7 @@ pub mod recording_view_state {
 /// Builder for constructing an instance of this type
 pub struct RecordingViewBuilder<'a, S: recording_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -517,7 +531,7 @@ where
     /// Set the `mbid` field (required)
     pub fn mbid(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RecordingViewBuilder<'a, recording_view_state::SetMbid<S>> {
         self._fields.0 = Option::Some(value.into());
         RecordingViewBuilder {
@@ -536,7 +550,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RecordingViewBuilder<'a, recording_view_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         RecordingViewBuilder {
@@ -585,10 +599,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RecordingView<'a> {
         RecordingView {
             mbid: self._fields.0.unwrap(),
@@ -660,7 +671,7 @@ pub mod release_view_state {
 /// Builder for constructing an instance of this type
 pub struct ReleaseViewBuilder<'a, S: release_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -690,7 +701,7 @@ where
     /// Set the `mbid` field (required)
     pub fn mbid(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReleaseViewBuilder<'a, release_view_state::SetMbid<S>> {
         self._fields.0 = Option::Some(value.into());
         ReleaseViewBuilder {
@@ -709,7 +720,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ReleaseViewBuilder<'a, release_view_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         ReleaseViewBuilder {
@@ -758,10 +769,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ReleaseView<'a> {
         ReleaseView {
             mbid: self._fields.0.unwrap(),

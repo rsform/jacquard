@@ -10,64 +10,80 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::GameDetailView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetGame<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetGame<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub apple_app_store_id: Option<CowStr<'a>>,
+    pub apple_app_store_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub epic_games_id: Option<CowStr<'a>>,
+    pub epic_games_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub gog_id: Option<CowStr<'a>>,
+    pub gog_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub google_play_id: Option<CowStr<'a>>,
+    pub google_play_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub humble_bundle_id: Option<CowStr<'a>>,
+    pub humble_bundle_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub igdb_id: Option<CowStr<'a>>,
+    pub igdb_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_actor_credits: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_org_credits: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub nintendo_eshop_id: Option<CowStr<'a>>,
+    pub nintendo_eshop_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub play_station_id: Option<CowStr<'a>>,
+    pub play_station_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub slug: Option<CowStr<'a>>,
+    pub slug: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub steam_id: Option<CowStr<'a>>,
+    pub steam_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub xbox_id: Option<CowStr<'a>>,
+    pub xbox_id: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetGameOutput<'a> {
-    #[serde(borrow)]
-    pub game: GameDetailView<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetGameOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub game: GameDetailView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for games.gamesgamesgamesgames.getGame
@@ -75,11 +91,12 @@ pub struct GetGameResponse;
 impl jacquard_common::xrpc::XrpcResp for GetGameResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.getGame";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetGameOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetGameOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetGame<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetGame<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.getGame";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetGameResponse;
@@ -90,7 +107,7 @@ pub struct GetGameRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetGameRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.getGame";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetGame<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetGame<S>;
     type Response = GetGameResponse;
 }
 
@@ -117,20 +134,20 @@ pub mod get_game_state {
 pub struct GetGameBuilder<'a, S: get_game_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<bool>,
         Option<bool>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -170,12 +187,12 @@ impl<'a> GetGameBuilder<'a, get_game_state::Empty> {
 
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `appleAppStoreId` field (optional)
-    pub fn apple_app_store_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn apple_app_store_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `appleAppStoreId` field to an Option value (optional)
-    pub fn maybe_apple_app_store_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_apple_app_store_id(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -183,12 +200,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `epicGamesId` field (optional)
-    pub fn epic_games_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn epic_games_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `epicGamesId` field to an Option value (optional)
-    pub fn maybe_epic_games_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_epic_games_id(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -196,12 +213,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `gogId` field (optional)
-    pub fn gog_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn gog_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `gogId` field to an Option value (optional)
-    pub fn maybe_gog_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_gog_id(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -209,12 +226,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `googlePlayId` field (optional)
-    pub fn google_play_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn google_play_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `googlePlayId` field to an Option value (optional)
-    pub fn maybe_google_play_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_google_play_id(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -222,12 +239,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `humbleBundleId` field (optional)
-    pub fn humble_bundle_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn humble_bundle_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `humbleBundleId` field to an Option value (optional)
-    pub fn maybe_humble_bundle_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_humble_bundle_id(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -235,12 +252,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `igdbId` field (optional)
-    pub fn igdb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn igdb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `igdbId` field to an Option value (optional)
-    pub fn maybe_igdb_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_igdb_id(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -274,12 +291,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `nintendoEshopId` field (optional)
-    pub fn nintendo_eshop_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn nintendo_eshop_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `nintendoEshopId` field to an Option value (optional)
-    pub fn maybe_nintendo_eshop_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_nintendo_eshop_id(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -287,12 +304,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `playStationId` field (optional)
-    pub fn play_station_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn play_station_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `playStationId` field to an Option value (optional)
-    pub fn maybe_play_station_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_play_station_id(mut self, value: Option<S>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -300,12 +317,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `slug` field (optional)
-    pub fn slug(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `slug` field to an Option value (optional)
-    pub fn maybe_slug(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_slug(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -313,12 +330,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `steamId` field (optional)
-    pub fn steam_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn steam_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `steamId` field to an Option value (optional)
-    pub fn maybe_steam_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_steam_id(mut self, value: Option<S>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -326,12 +343,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `uri` field (optional)
-    pub fn uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
-    pub fn maybe_uri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_uri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -339,12 +356,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `xboxId` field (optional)
-    pub fn xbox_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn xbox_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `xboxId` field to an Option value (optional)
-    pub fn maybe_xbox_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_xbox_id(mut self, value: Option<S>) -> Self {
         self._fields.13 = value;
         self
     }

@@ -15,13 +15,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -31,28 +33,35 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.tangled.repo.pull.status", tag = "$type")]
-pub struct Status<'a> {
-    #[serde(borrow)]
-    pub pull: AtUri<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.tangled.repo.pull.status",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Status<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub pull: AtUri<S>,
     ///status of the pull request
-    #[serde(borrow)]
-    pub status: StatusStatus<'a>,
+    pub status: StatusStatus<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// status of the pull request
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StatusStatus<'a> {
+pub enum StatusStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     ShTangledRepoPullStatusOpen,
     ShTangledRepoPullStatusClosed,
     ShTangledRepoPullStatusMerged,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> StatusStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> StatusStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ShTangledRepoPullStatusOpen => "sh.tangled.repo.pull.status.open",
@@ -61,72 +70,57 @@ impl<'a> StatusStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for StatusStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "sh.tangled.repo.pull.status.open" => Self::ShTangledRepoPullStatusOpen,
             "sh.tangled.repo.pull.status.closed" => Self::ShTangledRepoPullStatusClosed,
             "sh.tangled.repo.pull.status.merged" => Self::ShTangledRepoPullStatusMerged,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for StatusStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "sh.tangled.repo.pull.status.open" => Self::ShTangledRepoPullStatusOpen,
-            "sh.tangled.repo.pull.status.closed" => Self::ShTangledRepoPullStatusClosed,
-            "sh.tangled.repo.pull.status.merged" => Self::ShTangledRepoPullStatusMerged,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for StatusStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for StatusStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for StatusStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for StatusStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for StatusStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for StatusStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for StatusStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for StatusStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for StatusStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for StatusStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for StatusStatus<'_> {
-    type Output = StatusStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for StatusStatus<S> {
+    type Output = StatusStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             StatusStatus::ShTangledRepoPullStatusOpen => {
@@ -146,22 +140,23 @@ impl jacquard_common::IntoStatic for StatusStatus<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StatusGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StatusGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Status<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Status<S>,
 }
 
-impl<'a> Status<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, StatusRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Status<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, StatusRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -172,18 +167,17 @@ pub struct StatusRecord;
 impl XrpcResp for StatusRecord {
     const NSID: &'static str = "sh.tangled.repo.pull.status";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StatusGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StatusGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<StatusGetRecordOutput<'_>> for Status<'_> {
-    fn from(output: StatusGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<StatusGetRecordOutput<S>> for Status<S> {
+    fn from(output: StatusGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Status<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Status<S> {
     const NSID: &'static str = "sh.tangled.repo.pull.status";
     type Record = StatusRecord;
 }
@@ -193,7 +187,7 @@ impl Collection for StatusRecord {
     type Record = StatusRecord;
 }
 
-impl<'a> LexiconSchema for Status<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Status<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.pull.status"
     }
@@ -255,7 +249,7 @@ pub mod status_state {
 /// Builder for constructing an instance of this type
 pub struct StatusBuilder<'a, S: status_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<StatusStatus<'a>>),
+    _fields: (Option<AtUri<S>>, Option<StatusStatus<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -285,7 +279,7 @@ where
     /// Set the `pull` field (required)
     pub fn pull(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> StatusBuilder<'a, status_state::SetPull<S>> {
         self._fields.0 = Option::Some(value.into());
         StatusBuilder {
@@ -304,7 +298,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<StatusStatus<'a>>,
+        value: impl Into<StatusStatus<S>>,
     ) -> StatusBuilder<'a, status_state::SetStatus<S>> {
         self._fields.1 = Option::Some(value.into());
         StatusBuilder {
@@ -330,13 +324,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Status<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Status<'a> {
         Status {
             pull: self._fields.0.unwrap(),
             status: self._fields.1.unwrap(),

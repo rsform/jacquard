@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Language};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -31,59 +33,61 @@ use crate::media_ionosphere::Genre;
 use crate::media_ionosphere::Geocoordinates;
 /// Represents the service belonging to this PDS
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "media.ionosphere.service", tag = "$type")]
-pub struct Service<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "media.ionosphere.service",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Service<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub broadcast: Option<Vec<Broadcast<'a>>>,
+    pub broadcast: Option<Vec<Broadcast<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub genres: Option<Vec<Genre<'a>>>,
+    pub genres: Option<Vec<Genre<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub geolocation: Option<Geocoordinates<'a>>,
+    pub geolocation: Option<Geocoordinates<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub icon: Option<BlobRef<'a>>,
+    pub icon: Option<BlobRef<S>>,
     ///Version identifier
-    #[serde(borrow)]
-    pub ionosphere: CowStr<'a>,
+    pub ionosphere: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub keywords: Option<Vec<CowStr<'a>>>,
+    pub keywords: Option<Vec<S>>,
     ///The language of the string values in this record. NOT the language of the content
     pub language: Language,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///This is the language that the content is actually presented in. If multiple, choose to omit this.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub presentation_language: Option<Language>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ServiceGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ServiceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Service<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Service<S>,
 }
 
-impl<'a> Service<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ServiceRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Service<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ServiceRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -94,18 +98,17 @@ pub struct ServiceRecord;
 impl XrpcResp for ServiceRecord {
     const NSID: &'static str = "media.ionosphere.service";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ServiceGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ServiceGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ServiceGetRecordOutput<'_>> for Service<'_> {
-    fn from(output: ServiceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ServiceGetRecordOutput<S>> for Service<S> {
+    fn from(output: ServiceGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Service<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Service<S> {
     const NSID: &'static str = "media.ionosphere.service";
     type Record = ServiceRecord;
 }
@@ -115,7 +118,7 @@ impl Collection for ServiceRecord {
     type Record = ServiceRecord;
 }
 
-impl<'a> LexiconSchema for Service<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Service<S> {
     fn nsid() -> &'static str {
         "media.ionosphere.service"
     }
@@ -200,51 +203,51 @@ pub mod service_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Language;
         type Ionosphere;
         type Name;
+        type Language;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Language = Unset;
         type Ionosphere = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `language` field to Set
-    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLanguage<S> {}
-    impl<S: State> State for SetLanguage<S> {
-        type Language = Set<members::language>;
-        type Ionosphere = S::Ionosphere;
-        type Name = S::Name;
+        type Language = Unset;
     }
     ///State transition - sets the `ionosphere` field to Set
     pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIonosphere<S> {}
     impl<S: State> State for SetIonosphere<S> {
-        type Language = S::Language;
         type Ionosphere = Set<members::ionosphere>;
         type Name = S::Name;
+        type Language = S::Language;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Language = S::Language;
         type Ionosphere = S::Ionosphere;
         type Name = Set<members::name>;
+        type Language = S::Language;
+    }
+    ///State transition - sets the `language` field to Set
+    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLanguage<S> {}
+    impl<S: State> State for SetLanguage<S> {
+        type Ionosphere = S::Ionosphere;
+        type Name = S::Name;
+        type Language = Set<members::language>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `language` field
-        pub struct language(());
         ///Marker type for the `ionosphere` field
         pub struct ionosphere(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `language` field
+        pub struct language(());
     }
 }
 
@@ -252,15 +255,15 @@ pub mod service_state {
 pub struct ServiceBuilder<'a, S: service_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<Broadcast<'a>>>,
-        Option<CowStr<'a>>,
-        Option<Vec<Genre<'a>>>,
-        Option<Geocoordinates<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<CowStr<'a>>>,
+        Option<Vec<Broadcast<S>>>,
+        Option<S>,
+        Option<Vec<Genre<S>>>,
+        Option<Geocoordinates<S>>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<Vec<S>>,
         Option<Language>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Language>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -286,12 +289,12 @@ impl<'a> ServiceBuilder<'a, service_state::Empty> {
 
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `broadcast` field (optional)
-    pub fn broadcast(mut self, value: impl Into<Option<Vec<Broadcast<'a>>>>) -> Self {
+    pub fn broadcast(mut self, value: impl Into<Option<Vec<Broadcast<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `broadcast` field to an Option value (optional)
-    pub fn maybe_broadcast(mut self, value: Option<Vec<Broadcast<'a>>>) -> Self {
+    pub fn maybe_broadcast(mut self, value: Option<Vec<Broadcast<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -299,12 +302,12 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
 
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -312,12 +315,12 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
 
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `genres` field (optional)
-    pub fn genres(mut self, value: impl Into<Option<Vec<Genre<'a>>>>) -> Self {
+    pub fn genres(mut self, value: impl Into<Option<Vec<Genre<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `genres` field to an Option value (optional)
-    pub fn maybe_genres(mut self, value: Option<Vec<Genre<'a>>>) -> Self {
+    pub fn maybe_genres(mut self, value: Option<Vec<Genre<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -325,12 +328,12 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
 
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `geolocation` field (optional)
-    pub fn geolocation(mut self, value: impl Into<Option<Geocoordinates<'a>>>) -> Self {
+    pub fn geolocation(mut self, value: impl Into<Option<Geocoordinates<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `geolocation` field to an Option value (optional)
-    pub fn maybe_geolocation(mut self, value: Option<Geocoordinates<'a>>) -> Self {
+    pub fn maybe_geolocation(mut self, value: Option<Geocoordinates<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -338,12 +341,12 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
 
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `icon` field (optional)
-    pub fn icon(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `icon` field to an Option value (optional)
-    pub fn maybe_icon(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_icon(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -357,7 +360,7 @@ where
     /// Set the `ionosphere` field (required)
     pub fn ionosphere(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ServiceBuilder<'a, service_state::SetIonosphere<S>> {
         self._fields.5 = Option::Some(value.into());
         ServiceBuilder {
@@ -370,12 +373,12 @@ where
 
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
-    pub fn maybe_keywords(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_keywords(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -408,7 +411,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ServiceBuilder<'a, service_state::SetName<S>> {
         self._fields.8 = Option::Some(value.into());
         ServiceBuilder {
@@ -435,9 +438,9 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
 impl<'a, S> ServiceBuilder<'a, S>
 where
     S: service_state::State,
-    S::Language: service_state::IsSet,
     S::Ionosphere: service_state::IsSet,
     S::Name: service_state::IsSet,
+    S::Language: service_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Service<'a> {
@@ -458,10 +461,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Service<'a> {
         Service {
             broadcast: self._fields.0,

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,63 +32,84 @@ use crate::sh_weaver::actor::ProfileView;
 use crate::sh_weaver::notebook::authors;
 /// A single author in a Weaver notebook.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AuthorListItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AuthorListItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub index: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub profile: Option<AuthorListItemProfile<'a>>,
+    pub profile: Option<AuthorListItemProfile<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum AuthorListItemProfile<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum AuthorListItemProfile<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.bsky.actor.defs#profileViewBasic")]
-    ProfileViewBasic(Box<ProfileViewBasic<'a>>),
+    ProfileViewBasic(Box<ProfileViewBasic<S>>),
     #[serde(rename = "sh.weaver.actor.defs#profileView")]
-    ProfileView(Box<ProfileView<'a>>),
+    ProfileView(Box<ProfileView<S>>),
 }
 
 /// Authors of a Weaver notebook.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.weaver.notebook.authors", tag = "$type")]
-pub struct Authors<'a> {
-    #[serde(borrow)]
-    pub author_list: Vec<authors::AuthorListItem<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.weaver.notebook.authors",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Authors<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub author_list: Vec<authors::AuthorListItem<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AuthorsGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AuthorsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Authors<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Authors<S>,
 }
 
-impl<'a> Authors<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AuthorsRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Authors<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AuthorsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for AuthorListItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AuthorListItem<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.authors"
     }
@@ -108,18 +131,17 @@ pub struct AuthorsRecord;
 impl XrpcResp for AuthorsRecord {
     const NSID: &'static str = "sh.weaver.notebook.authors";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AuthorsGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AuthorsGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AuthorsGetRecordOutput<'_>> for Authors<'_> {
-    fn from(output: AuthorsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AuthorsGetRecordOutput<S>> for Authors<S> {
+    fn from(output: AuthorsGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Authors<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Authors<S> {
     const NSID: &'static str = "sh.weaver.notebook.authors";
     type Record = AuthorsRecord;
 }
@@ -129,7 +151,7 @@ impl Collection for AuthorsRecord {
     type Record = AuthorsRecord;
 }
 
-impl<'a> LexiconSchema for Authors<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Authors<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.authors"
     }
@@ -179,7 +201,7 @@ pub mod author_list_item_state {
 /// Builder for constructing an instance of this type
 pub struct AuthorListItemBuilder<'a, S: author_list_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<AuthorListItemProfile<'a>>),
+    _fields: (Option<i64>, Option<AuthorListItemProfile<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -218,13 +240,13 @@ impl<'a, S: author_list_item_state::State> AuthorListItemBuilder<'a, S> {
     /// Set the `profile` field (optional)
     pub fn profile(
         mut self,
-        value: impl Into<Option<AuthorListItemProfile<'a>>>,
+        value: impl Into<Option<AuthorListItemProfile<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `profile` field to an Option value (optional)
-    pub fn maybe_profile(mut self, value: Option<AuthorListItemProfile<'a>>) -> Self {
+    pub fn maybe_profile(mut self, value: Option<AuthorListItemProfile<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -246,10 +268,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> AuthorListItem<'a> {
         AuthorListItem {
             index: self._fields.0,
@@ -377,7 +396,7 @@ pub mod authors_state {
 /// Builder for constructing an instance of this type
 pub struct AuthorsBuilder<'a, S: authors_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<authors::AuthorListItem<'a>>>, Option<Datetime>),
+    _fields: (Option<Vec<authors::AuthorListItem<S>>>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -407,7 +426,7 @@ where
     /// Set the `authorList` field (required)
     pub fn author_list(
         mut self,
-        value: impl Into<Vec<authors::AuthorListItem<'a>>>,
+        value: impl Into<Vec<authors::AuthorListItem<S>>>,
     ) -> AuthorsBuilder<'a, authors_state::SetAuthorList<S>> {
         self._fields.0 = Option::Some(value.into());
         AuthorsBuilder {
@@ -447,10 +466,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Authors<'a> {
         Authors {
             author_list: self._fields.0.unwrap(),

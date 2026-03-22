@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,41 +28,49 @@ use crate::science_alt::dataset::entry::ShardChecksum;
 use crate::science_alt::dataset::storage_s3;
 /// S3 or S3-compatible storage for WebDataset tar archives. Supports custom endpoints for MinIO, Cloudflare R2, and other S3-compatible services.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StorageS3<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StorageS3<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///S3 bucket name
-    #[serde(borrow)]
-    pub bucket: CowStr<'a>,
+    pub bucket: S,
     ///Custom S3-compatible endpoint URL (e.g., for MinIO, Cloudflare R2). Omit for standard AWS S3.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub endpoint: Option<UriValue<'a>>,
+    pub endpoint: Option<UriValue<S>>,
     ///AWS region (e.g., 'us-east-1'). Optional for S3-compatible services.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub region: Option<CowStr<'a>>,
+    pub region: Option<S>,
     ///Array of shard entries with object key and integrity checksum
-    #[serde(borrow)]
-    pub shards: Vec<storage_s3::ShardEntry<'a>>,
+    pub shards: Vec<storage_s3::ShardEntry<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A single S3 object shard with integrity checksum
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ShardEntry<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ShardEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Content hash for integrity verification
-    #[serde(borrow)]
-    pub checksum: ShardChecksum<'a>,
+    pub checksum: ShardChecksum<S>,
     ///S3 object key for this WebDataset tar shard
-    #[serde(borrow)]
-    pub key: CowStr<'a>,
+    pub key: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for StorageS3<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for StorageS3<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageS3"
     }
@@ -117,7 +127,7 @@ impl<'a> LexiconSchema for StorageS3<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ShardEntry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ShardEntry<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageS3"
     }
@@ -153,37 +163,37 @@ pub mod storage_s3_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Shards;
         type Bucket;
+        type Shards;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Shards = Unset;
         type Bucket = Unset;
-    }
-    ///State transition - sets the `shards` field to Set
-    pub struct SetShards<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShards<S> {}
-    impl<S: State> State for SetShards<S> {
-        type Shards = Set<members::shards>;
-        type Bucket = S::Bucket;
+        type Shards = Unset;
     }
     ///State transition - sets the `bucket` field to Set
     pub struct SetBucket<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBucket<S> {}
     impl<S: State> State for SetBucket<S> {
-        type Shards = S::Shards;
         type Bucket = Set<members::bucket>;
+        type Shards = S::Shards;
+    }
+    ///State transition - sets the `shards` field to Set
+    pub struct SetShards<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShards<S> {}
+    impl<S: State> State for SetShards<S> {
+        type Bucket = S::Bucket;
+        type Shards = Set<members::shards>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `shards` field
-        pub struct shards(());
         ///Marker type for the `bucket` field
         pub struct bucket(());
+        ///Marker type for the `shards` field
+        pub struct shards(());
     }
 }
 
@@ -191,10 +201,10 @@ pub mod storage_s3_state {
 pub struct StorageS3Builder<'a, S: storage_s3_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<storage_s3::ShardEntry<'a>>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<S>,
+        Option<Vec<storage_s3::ShardEntry<S>>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -225,7 +235,7 @@ where
     /// Set the `bucket` field (required)
     pub fn bucket(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> StorageS3Builder<'a, storage_s3_state::SetBucket<S>> {
         self._fields.0 = Option::Some(value.into());
         StorageS3Builder {
@@ -238,12 +248,12 @@ where
 
 impl<'a, S: storage_s3_state::State> StorageS3Builder<'a, S> {
     /// Set the `endpoint` field (optional)
-    pub fn endpoint(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn endpoint(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `endpoint` field to an Option value (optional)
-    pub fn maybe_endpoint(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_endpoint(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -251,12 +261,12 @@ impl<'a, S: storage_s3_state::State> StorageS3Builder<'a, S> {
 
 impl<'a, S: storage_s3_state::State> StorageS3Builder<'a, S> {
     /// Set the `region` field (optional)
-    pub fn region(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn region(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `region` field to an Option value (optional)
-    pub fn maybe_region(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_region(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -270,7 +280,7 @@ where
     /// Set the `shards` field (required)
     pub fn shards(
         mut self,
-        value: impl Into<Vec<storage_s3::ShardEntry<'a>>>,
+        value: impl Into<Vec<storage_s3::ShardEntry<S>>>,
     ) -> StorageS3Builder<'a, storage_s3_state::SetShards<S>> {
         self._fields.3 = Option::Some(value.into());
         StorageS3Builder {
@@ -284,8 +294,8 @@ where
 impl<'a, S> StorageS3Builder<'a, S>
 where
     S: storage_s3_state::State,
-    S::Shards: storage_s3_state::IsSet,
     S::Bucket: storage_s3_state::IsSet,
+    S::Shards: storage_s3_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> StorageS3<'a> {
@@ -300,10 +310,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> StorageS3<'a> {
         StorageS3 {
             bucket: self._fields.0.unwrap(),
@@ -451,44 +458,44 @@ pub mod shard_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Checksum;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Checksum = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Checksum = S::Checksum;
+        type Key = Unset;
     }
     ///State transition - sets the `checksum` field to Set
     pub struct SetChecksum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChecksum<S> {}
     impl<S: State> State for SetChecksum<S> {
-        type Key = S::Key;
         type Checksum = Set<members::checksum>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Checksum = S::Checksum;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `checksum` field
         pub struct checksum(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ShardEntryBuilder<'a, S: shard_entry_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<ShardChecksum<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<ShardChecksum<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -518,7 +525,7 @@ where
     /// Set the `checksum` field (required)
     pub fn checksum(
         mut self,
-        value: impl Into<ShardChecksum<'a>>,
+        value: impl Into<ShardChecksum<S>>,
     ) -> ShardEntryBuilder<'a, shard_entry_state::SetChecksum<S>> {
         self._fields.0 = Option::Some(value.into());
         ShardEntryBuilder {
@@ -537,7 +544,7 @@ where
     /// Set the `key` field (required)
     pub fn key(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ShardEntryBuilder<'a, shard_entry_state::SetKey<S>> {
         self._fields.1 = Option::Some(value.into());
         ShardEntryBuilder {
@@ -551,8 +558,8 @@ where
 impl<'a, S> ShardEntryBuilder<'a, S>
 where
     S: shard_entry_state::State,
-    S::Key: shard_entry_state::IsSet,
     S::Checksum: shard_entry_state::IsSet,
+    S::Key: shard_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ShardEntry<'a> {
@@ -565,10 +572,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ShardEntry<'a> {
         ShardEntry {
             checksum: self._fields.0.unwrap(),

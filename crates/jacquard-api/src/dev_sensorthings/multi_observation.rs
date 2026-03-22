@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -30,21 +31,22 @@ use crate::dev_sensorthings::datastream::UnitOfMeasurement;
 use crate::dev_sensorthings::multi_observation;
 /// A composite observation bundling multiple co-produced results from a single act of sensing. Each entry carries its own ObservedProperty, unit, and scale metadata. Use this instead of separate Observations when the results are genuinely co-produced (e.g. wave statistics from spectral processing) and have no independent existence.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "dev.sensorthings.multiObservation",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct MultiObservation<'a> {
+pub struct MultiObservation<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///AT-URIs of source observations or datastreams
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub derived_from: Option<Vec<AtUri<'a>>>,
+    pub derived_from: Option<Vec<AtUri<S>>>,
     ///Array of co-produced result entries
-    #[serde(borrow)]
-    pub entries: Vec<multi_observation::MultiObservationEntry<'a>>,
+    pub entries: Vec<multi_observation::MultiObservationEntry<S>>,
     ///Time the phenomenon was observed. Start of interval if phenomenonTimeEnd is present.
     pub phenomenon_time: Datetime,
     ///End of observation interval. For wave statistics, this is the end of the burst window.
@@ -52,30 +54,29 @@ pub struct MultiObservation<'a> {
     pub phenomenon_time_end: Option<Datetime>,
     ///Quality flag applying to the composite observation as a whole
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub result_quality: Option<MultiObservationResultQuality<'a>>,
+    pub result_quality: Option<MultiObservationResultQuality<S>>,
     ///Time the results became available
     #[serde(skip_serializing_if = "Option::is_none")]
     pub result_time: Option<Datetime>,
     ///AT-URI of the dev.sensorthings.sensor record (the instrument or process that co-produced these results)
-    #[serde(borrow)]
-    pub sensor: AtUri<'a>,
+    pub sensor: AtUri<S>,
     ///AT-URI of the dev.sensorthings.thing record
-    #[serde(borrow)]
-    pub thing: AtUri<'a>,
+    pub thing: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Quality flag applying to the composite observation as a whole
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MultiObservationResultQuality<'a> {
+pub enum MultiObservationResultQuality<S: Bos<str> + AsRef<str> = DefaultStr> {
     Good,
     Suspect,
     Missing,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> MultiObservationResultQuality<'a> {
+impl<S: Bos<str> + AsRef<str>> MultiObservationResultQuality<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Good => "dev.sensorthings.quality#good",
@@ -84,72 +85,57 @@ impl<'a> MultiObservationResultQuality<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for MultiObservationResultQuality<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "dev.sensorthings.quality#good" => Self::Good,
             "dev.sensorthings.quality#suspect" => Self::Suspect,
             "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for MultiObservationResultQuality<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "dev.sensorthings.quality#good" => Self::Good,
-            "dev.sensorthings.quality#suspect" => Self::Suspect,
-            "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for MultiObservationResultQuality<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for MultiObservationResultQuality<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for MultiObservationResultQuality<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for MultiObservationResultQuality<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for MultiObservationResultQuality<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for MultiObservationResultQuality<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for MultiObservationResultQuality<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for MultiObservationResultQuality<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for MultiObservationResultQuality<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for MultiObservationResultQuality<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for MultiObservationResultQuality<'_> {
-    type Output = MultiObservationResultQuality<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for MultiObservationResultQuality<S> {
+    type Output = MultiObservationResultQuality<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             MultiObservationResultQuality::Good => MultiObservationResultQuality::Good,
@@ -169,55 +155,67 @@ impl jacquard_common::IntoStatic for MultiObservationResultQuality<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MultiObservationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MultiObservationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: MultiObservation<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: MultiObservation<S>,
 }
 
 /// A single result within a composite observation, fully self-describing.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MultiObservationEntry<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MultiObservationEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///AT-URI of the dev.sensorthings.observedProperty record
-    #[serde(borrow)]
-    pub observed_property: AtUri<'a>,
-    #[serde(borrow)]
-    pub result: MultiObservationEntryResult<'a>,
+    pub observed_property: AtUri<S>,
+    pub result: MultiObservationEntryResult<S>,
     ///Quality flag for this specific entry, if different from the composite quality
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub result_quality: Option<MultiObservationEntryResultQuality<'a>>,
+    pub result_quality: Option<MultiObservationEntryResultQuality<S>>,
     ///Scale factor for this entry's numeric result. Default 0.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub result_scale_factor: Option<i64>,
-    #[serde(borrow)]
-    pub unit_of_measurement: UnitOfMeasurement<'a>,
+    pub unit_of_measurement: UnitOfMeasurement<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum MultiObservationEntryResult<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum MultiObservationEntryResult<S: Bos<str> + AsRef<str> = DefaultStr> {}
 /// Quality flag for this specific entry, if different from the composite quality
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MultiObservationEntryResultQuality<'a> {
+pub enum MultiObservationEntryResultQuality<S: Bos<str> + AsRef<str> = DefaultStr> {
     Good,
     Suspect,
     Missing,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> MultiObservationEntryResultQuality<'a> {
+impl<S: Bos<str> + AsRef<str>> MultiObservationEntryResultQuality<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Good => "dev.sensorthings.quality#good",
@@ -226,72 +224,59 @@ impl<'a> MultiObservationEntryResultQuality<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for MultiObservationEntryResultQuality<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "dev.sensorthings.quality#good" => Self::Good,
             "dev.sensorthings.quality#suspect" => Self::Suspect,
             "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for MultiObservationEntryResultQuality<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "dev.sensorthings.quality#good" => Self::Good,
-            "dev.sensorthings.quality#suspect" => Self::Suspect,
-            "dev.sensorthings.quality#missing" => Self::Missing,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for MultiObservationEntryResultQuality<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display
+for MultiObservationEntryResultQuality<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for MultiObservationEntryResultQuality<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for MultiObservationEntryResultQuality<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for MultiObservationEntryResultQuality<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for MultiObservationEntryResultQuality<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for MultiObservationEntryResultQuality<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for MultiObservationEntryResultQuality<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for MultiObservationEntryResultQuality<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default
+for MultiObservationEntryResultQuality<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for MultiObservationEntryResultQuality<'_> {
-    type Output = MultiObservationEntryResultQuality<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for MultiObservationEntryResultQuality<S> {
+    type Output = MultiObservationEntryResultQuality<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             MultiObservationEntryResultQuality::Good => {
@@ -310,11 +295,9 @@ impl jacquard_common::IntoStatic for MultiObservationEntryResultQuality<'_> {
     }
 }
 
-impl<'a> MultiObservation<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, MultiObservationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> MultiObservation<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, MultiObservationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -325,18 +308,18 @@ pub struct MultiObservationRecord;
 impl XrpcResp for MultiObservationRecord {
     const NSID: &'static str = "dev.sensorthings.multiObservation";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MultiObservationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MultiObservationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<MultiObservationGetRecordOutput<'_>> for MultiObservation<'_> {
-    fn from(output: MultiObservationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<MultiObservationGetRecordOutput<S>>
+for MultiObservation<S> {
+    fn from(output: MultiObservationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for MultiObservation<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for MultiObservation<S> {
     const NSID: &'static str = "dev.sensorthings.multiObservation";
     type Record = MultiObservationRecord;
 }
@@ -346,7 +329,7 @@ impl Collection for MultiObservationRecord {
     type Record = MultiObservationRecord;
 }
 
-impl<'a> LexiconSchema for MultiObservation<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for MultiObservation<S> {
     fn nsid() -> &'static str {
         "dev.sensorthings.multiObservation"
     }
@@ -392,7 +375,7 @@ impl<'a> LexiconSchema for MultiObservation<'a> {
     }
 }
 
-impl<'a> LexiconSchema for MultiObservationEntry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for MultiObservationEntry<S> {
     fn nsid() -> &'static str {
         "dev.sensorthings.multiObservation"
     }
@@ -427,67 +410,67 @@ pub mod multi_observation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Entries;
-        type Thing;
         type PhenomenonTime;
+        type Thing;
         type Sensor;
+        type Entries;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Entries = Unset;
-        type Thing = Unset;
         type PhenomenonTime = Unset;
+        type Thing = Unset;
         type Sensor = Unset;
-    }
-    ///State transition - sets the `entries` field to Set
-    pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntries<S> {}
-    impl<S: State> State for SetEntries<S> {
-        type Entries = Set<members::entries>;
-        type Thing = S::Thing;
-        type PhenomenonTime = S::PhenomenonTime;
-        type Sensor = S::Sensor;
-    }
-    ///State transition - sets the `thing` field to Set
-    pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThing<S> {}
-    impl<S: State> State for SetThing<S> {
-        type Entries = S::Entries;
-        type Thing = Set<members::thing>;
-        type PhenomenonTime = S::PhenomenonTime;
-        type Sensor = S::Sensor;
+        type Entries = Unset;
     }
     ///State transition - sets the `phenomenon_time` field to Set
     pub struct SetPhenomenonTime<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPhenomenonTime<S> {}
     impl<S: State> State for SetPhenomenonTime<S> {
-        type Entries = S::Entries;
-        type Thing = S::Thing;
         type PhenomenonTime = Set<members::phenomenon_time>;
+        type Thing = S::Thing;
         type Sensor = S::Sensor;
+        type Entries = S::Entries;
+    }
+    ///State transition - sets the `thing` field to Set
+    pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThing<S> {}
+    impl<S: State> State for SetThing<S> {
+        type PhenomenonTime = S::PhenomenonTime;
+        type Thing = Set<members::thing>;
+        type Sensor = S::Sensor;
+        type Entries = S::Entries;
     }
     ///State transition - sets the `sensor` field to Set
     pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSensor<S> {}
     impl<S: State> State for SetSensor<S> {
-        type Entries = S::Entries;
-        type Thing = S::Thing;
         type PhenomenonTime = S::PhenomenonTime;
+        type Thing = S::Thing;
         type Sensor = Set<members::sensor>;
+        type Entries = S::Entries;
+    }
+    ///State transition - sets the `entries` field to Set
+    pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntries<S> {}
+    impl<S: State> State for SetEntries<S> {
+        type PhenomenonTime = S::PhenomenonTime;
+        type Thing = S::Thing;
+        type Sensor = S::Sensor;
+        type Entries = Set<members::entries>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entries` field
-        pub struct entries(());
-        ///Marker type for the `thing` field
-        pub struct thing(());
         ///Marker type for the `phenomenon_time` field
         pub struct phenomenon_time(());
+        ///Marker type for the `thing` field
+        pub struct thing(());
         ///Marker type for the `sensor` field
         pub struct sensor(());
+        ///Marker type for the `entries` field
+        pub struct entries(());
     }
 }
 
@@ -495,14 +478,14 @@ pub mod multi_observation_state {
 pub struct MultiObservationBuilder<'a, S: multi_observation_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<AtUri<'a>>>,
-        Option<Vec<multi_observation::MultiObservationEntry<'a>>>,
+        Option<Vec<AtUri<S>>>,
+        Option<Vec<multi_observation::MultiObservationEntry<S>>>,
         Option<Datetime>,
         Option<Datetime>,
-        Option<MultiObservationResultQuality<'a>>,
+        Option<MultiObservationResultQuality<S>>,
         Option<Datetime>,
-        Option<AtUri<'a>>,
-        Option<AtUri<'a>>,
+        Option<AtUri<S>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -527,12 +510,12 @@ impl<'a> MultiObservationBuilder<'a, multi_observation_state::Empty> {
 
 impl<'a, S: multi_observation_state::State> MultiObservationBuilder<'a, S> {
     /// Set the `derivedFrom` field (optional)
-    pub fn derived_from(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn derived_from(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `derivedFrom` field to an Option value (optional)
-    pub fn maybe_derived_from(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_derived_from(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -546,7 +529,7 @@ where
     /// Set the `entries` field (required)
     pub fn entries(
         mut self,
-        value: impl Into<Vec<multi_observation::MultiObservationEntry<'a>>>,
+        value: impl Into<Vec<multi_observation::MultiObservationEntry<S>>>,
     ) -> MultiObservationBuilder<'a, multi_observation_state::SetEntries<S>> {
         self._fields.1 = Option::Some(value.into());
         MultiObservationBuilder {
@@ -593,7 +576,7 @@ impl<'a, S: multi_observation_state::State> MultiObservationBuilder<'a, S> {
     /// Set the `resultQuality` field (optional)
     pub fn result_quality(
         mut self,
-        value: impl Into<Option<MultiObservationResultQuality<'a>>>,
+        value: impl Into<Option<MultiObservationResultQuality<S>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
@@ -601,7 +584,7 @@ impl<'a, S: multi_observation_state::State> MultiObservationBuilder<'a, S> {
     /// Set the `resultQuality` field to an Option value (optional)
     pub fn maybe_result_quality(
         mut self,
-        value: Option<MultiObservationResultQuality<'a>>,
+        value: Option<MultiObservationResultQuality<S>>,
     ) -> Self {
         self._fields.4 = value;
         self
@@ -629,7 +612,7 @@ where
     /// Set the `sensor` field (required)
     pub fn sensor(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> MultiObservationBuilder<'a, multi_observation_state::SetSensor<S>> {
         self._fields.6 = Option::Some(value.into());
         MultiObservationBuilder {
@@ -648,7 +631,7 @@ where
     /// Set the `thing` field (required)
     pub fn thing(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> MultiObservationBuilder<'a, multi_observation_state::SetThing<S>> {
         self._fields.7 = Option::Some(value.into());
         MultiObservationBuilder {
@@ -662,10 +645,10 @@ where
 impl<'a, S> MultiObservationBuilder<'a, S>
 where
     S: multi_observation_state::State,
-    S::Entries: multi_observation_state::IsSet,
-    S::Thing: multi_observation_state::IsSet,
     S::PhenomenonTime: multi_observation_state::IsSet,
+    S::Thing: multi_observation_state::IsSet,
     S::Sensor: multi_observation_state::IsSet,
+    S::Entries: multi_observation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MultiObservation<'a> {
@@ -684,7 +667,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> MultiObservation<'a> {
         MultiObservation {
             derived_from: self._fields.0,
@@ -928,51 +911,51 @@ pub mod multi_observation_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UnitOfMeasurement;
-        type ObservedProperty;
         type Result;
+        type ObservedProperty;
+        type UnitOfMeasurement;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UnitOfMeasurement = Unset;
-        type ObservedProperty = Unset;
         type Result = Unset;
-    }
-    ///State transition - sets the `unit_of_measurement` field to Set
-    pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
-    impl<S: State> State for SetUnitOfMeasurement<S> {
-        type UnitOfMeasurement = Set<members::unit_of_measurement>;
-        type ObservedProperty = S::ObservedProperty;
-        type Result = S::Result;
-    }
-    ///State transition - sets the `observed_property` field to Set
-    pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
-    impl<S: State> State for SetObservedProperty<S> {
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservedProperty = Set<members::observed_property>;
-        type Result = S::Result;
+        type ObservedProperty = Unset;
+        type UnitOfMeasurement = Unset;
     }
     ///State transition - sets the `result` field to Set
     pub struct SetResult<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResult<S> {}
     impl<S: State> State for SetResult<S> {
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservedProperty = S::ObservedProperty;
         type Result = Set<members::result>;
+        type ObservedProperty = S::ObservedProperty;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+    }
+    ///State transition - sets the `observed_property` field to Set
+    pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
+    impl<S: State> State for SetObservedProperty<S> {
+        type Result = S::Result;
+        type ObservedProperty = Set<members::observed_property>;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+    }
+    ///State transition - sets the `unit_of_measurement` field to Set
+    pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
+    impl<S: State> State for SetUnitOfMeasurement<S> {
+        type Result = S::Result;
+        type ObservedProperty = S::ObservedProperty;
+        type UnitOfMeasurement = Set<members::unit_of_measurement>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `unit_of_measurement` field
-        pub struct unit_of_measurement(());
-        ///Marker type for the `observed_property` field
-        pub struct observed_property(());
         ///Marker type for the `result` field
         pub struct result(());
+        ///Marker type for the `observed_property` field
+        pub struct observed_property(());
+        ///Marker type for the `unit_of_measurement` field
+        pub struct unit_of_measurement(());
     }
 }
 
@@ -980,11 +963,11 @@ pub mod multi_observation_entry_state {
 pub struct MultiObservationEntryBuilder<'a, S: multi_observation_entry_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtUri<'a>>,
-        Option<MultiObservationEntryResult<'a>>,
-        Option<MultiObservationEntryResultQuality<'a>>,
+        Option<AtUri<S>>,
+        Option<MultiObservationEntryResult<S>>,
+        Option<MultiObservationEntryResultQuality<S>>,
         Option<i64>,
-        Option<UnitOfMeasurement<'a>>,
+        Option<UnitOfMeasurement<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1018,7 +1001,7 @@ where
     /// Set the `observedProperty` field (required)
     pub fn observed_property(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> MultiObservationEntryBuilder<
         'a,
         multi_observation_entry_state::SetObservedProperty<S>,
@@ -1040,7 +1023,7 @@ where
     /// Set the `result` field (required)
     pub fn result(
         mut self,
-        value: impl Into<MultiObservationEntryResult<'a>>,
+        value: impl Into<MultiObservationEntryResult<S>>,
     ) -> MultiObservationEntryBuilder<'a, multi_observation_entry_state::SetResult<S>> {
         self._fields.1 = Option::Some(value.into());
         MultiObservationEntryBuilder {
@@ -1055,7 +1038,7 @@ impl<'a, S: multi_observation_entry_state::State> MultiObservationEntryBuilder<'
     /// Set the `resultQuality` field (optional)
     pub fn result_quality(
         mut self,
-        value: impl Into<Option<MultiObservationEntryResultQuality<'a>>>,
+        value: impl Into<Option<MultiObservationEntryResultQuality<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -1063,7 +1046,7 @@ impl<'a, S: multi_observation_entry_state::State> MultiObservationEntryBuilder<'
     /// Set the `resultQuality` field to an Option value (optional)
     pub fn maybe_result_quality(
         mut self,
-        value: Option<MultiObservationEntryResultQuality<'a>>,
+        value: Option<MultiObservationEntryResultQuality<S>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -1091,7 +1074,7 @@ where
     /// Set the `unitOfMeasurement` field (required)
     pub fn unit_of_measurement(
         mut self,
-        value: impl Into<UnitOfMeasurement<'a>>,
+        value: impl Into<UnitOfMeasurement<S>>,
     ) -> MultiObservationEntryBuilder<
         'a,
         multi_observation_entry_state::SetUnitOfMeasurement<S>,
@@ -1108,9 +1091,9 @@ where
 impl<'a, S> MultiObservationEntryBuilder<'a, S>
 where
     S: multi_observation_entry_state::State,
-    S::UnitOfMeasurement: multi_observation_entry_state::IsSet,
-    S::ObservedProperty: multi_observation_entry_state::IsSet,
     S::Result: multi_observation_entry_state::IsSet,
+    S::ObservedProperty: multi_observation_entry_state::IsSet,
+    S::UnitOfMeasurement: multi_observation_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MultiObservationEntry<'a> {
@@ -1126,7 +1109,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> MultiObservationEntry<'a> {
         MultiObservationEntry {
             observed_property: self._fields.0.unwrap(),

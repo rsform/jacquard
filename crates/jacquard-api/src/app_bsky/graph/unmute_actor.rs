@@ -10,16 +10,27 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct UnmuteActor<'a> {
-    #[serde(borrow)]
-    pub actor: AtIdentifier<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UnmuteActor<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub actor: AtIdentifier<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.graph.unmuteActor
@@ -27,11 +38,12 @@ pub struct UnmuteActorResponse;
 impl jacquard_common::xrpc::XrpcResp for UnmuteActorResponse {
     const NSID: &'static str = "app.bsky.graph.unmuteActor";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for UnmuteActor<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for UnmuteActor<S> {
     const NSID: &'static str = "app.bsky.graph.unmuteActor";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -46,7 +58,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UnmuteActorRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = UnmuteActor<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = UnmuteActor<S>;
     type Response = UnmuteActorResponse;
 }
 
@@ -85,7 +97,7 @@ pub mod unmute_actor_state {
 /// Builder for constructing an instance of this type
 pub struct UnmuteActorBuilder<'a, S: unmute_actor_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>,),
+    _fields: (Option<AtIdentifier<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -115,7 +127,7 @@ where
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> UnmuteActorBuilder<'a, unmute_actor_state::SetActor<S>> {
         self._fields.0 = Option::Some(value.into());
         UnmuteActorBuilder {
@@ -141,10 +153,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> UnmuteActor<'a> {
         UnmuteActor {
             actor: self._fields.0.unwrap(),

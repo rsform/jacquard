@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,42 +29,47 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A project for display on my website.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "com.chrisvanderloo.project", tag = "$type")]
-pub struct Project<'a> {
-    #[serde(borrow)]
-    pub description: CowStr<'a>,
-    #[serde(borrow)]
-    pub language: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "com.chrisvanderloo.project",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Project<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub description: S,
+    pub language: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub link: Option<UriValue<'a>>,
-    #[serde(borrow)]
-    pub repo: UriValue<'a>,
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub link: Option<UriValue<S>>,
+    pub repo: UriValue<S>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ProjectGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProjectGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Project<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Project<S>,
 }
 
-impl<'a> Project<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ProjectRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Project<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ProjectRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -73,18 +80,17 @@ pub struct ProjectRecord;
 impl XrpcResp for ProjectRecord {
     const NSID: &'static str = "com.chrisvanderloo.project";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ProjectGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ProjectGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ProjectGetRecordOutput<'_>> for Project<'_> {
-    fn from(output: ProjectGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ProjectGetRecordOutput<S>> for Project<S> {
+    fn from(output: ProjectGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Project<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Project<S> {
     const NSID: &'static str = "com.chrisvanderloo.project";
     type Record = ProjectRecord;
 }
@@ -94,7 +100,7 @@ impl Collection for ProjectRecord {
     type Record = ProjectRecord;
 }
 
-impl<'a> LexiconSchema for Project<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Project<S> {
     fn nsid() -> &'static str {
         "com.chrisvanderloo.project"
     }
@@ -173,80 +179,74 @@ pub mod project_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
-        type Description;
         type Title;
+        type Description;
         type Language;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
-        type Description = Unset;
         type Title = Unset;
+        type Description = Unset;
         type Language = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Description = S::Description;
-        type Title = S::Title;
-        type Language = S::Language;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Repo = S::Repo;
-        type Description = Set<members::description>;
-        type Title = S::Title;
-        type Language = S::Language;
+        type Repo = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Repo = S::Repo;
-        type Description = S::Description;
         type Title = Set<members::title>;
+        type Description = S::Description;
         type Language = S::Language;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Title = S::Title;
+        type Description = Set<members::description>;
+        type Language = S::Language;
+        type Repo = S::Repo;
     }
     ///State transition - sets the `language` field to Set
     pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLanguage<S> {}
     impl<S: State> State for SetLanguage<S> {
-        type Repo = S::Repo;
-        type Description = S::Description;
         type Title = S::Title;
+        type Description = S::Description;
         type Language = Set<members::language>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Title = S::Title;
+        type Description = S::Description;
+        type Language = S::Language;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `description` field
+        pub struct description(());
         ///Marker type for the `language` field
         pub struct language(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ProjectBuilder<'a, S: project_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<UriValue<S>>, Option<UriValue<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -276,7 +276,7 @@ where
     /// Set the `description` field (required)
     pub fn description(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProjectBuilder<'a, project_state::SetDescription<S>> {
         self._fields.0 = Option::Some(value.into());
         ProjectBuilder {
@@ -295,7 +295,7 @@ where
     /// Set the `language` field (required)
     pub fn language(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProjectBuilder<'a, project_state::SetLanguage<S>> {
         self._fields.1 = Option::Some(value.into());
         ProjectBuilder {
@@ -308,12 +308,12 @@ where
 
 impl<'a, S: project_state::State> ProjectBuilder<'a, S> {
     /// Set the `link` field (optional)
-    pub fn link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `link` field to an Option value (optional)
-    pub fn maybe_link(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_link(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -327,7 +327,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ProjectBuilder<'a, project_state::SetRepo<S>> {
         self._fields.3 = Option::Some(value.into());
         ProjectBuilder {
@@ -346,7 +346,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ProjectBuilder<'a, project_state::SetTitle<S>> {
         self._fields.4 = Option::Some(value.into());
         ProjectBuilder {
@@ -360,10 +360,10 @@ where
 impl<'a, S> ProjectBuilder<'a, S>
 where
     S: project_state::State,
-    S::Repo: project_state::IsSet,
-    S::Description: project_state::IsSet,
     S::Title: project_state::IsSet,
+    S::Description: project_state::IsSet,
     S::Language: project_state::IsSet,
+    S::Repo: project_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Project<'a> {
@@ -379,10 +379,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Project<'a> {
         Project {
             description: self._fields.0.unwrap(),

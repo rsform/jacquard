@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,53 +30,61 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::app_fitsky::trend;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DataPoint<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DataPoint<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub date: Datetime,
     ///Value in base units (meters, seconds, calories, count, bpm)
     pub value: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A shared fitness trend or dashboard snapshot
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.fitsky.trend", tag = "$type")]
-pub struct Trend<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.fitsky.trend",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Trend<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub caption: Option<CowStr<'a>>,
+    pub caption: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub chart_style: Option<TrendChartStyle<'a>>,
+    pub chart_style: Option<TrendChartStyle<S>>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub data_points: Option<Vec<trend::DataPoint<'a>>>,
+    pub data_points: Option<Vec<trend::DataPoint<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<BlobRef<'a>>,
-    #[serde(borrow)]
-    pub metric: TrendMetric<'a>,
-    #[serde(borrow)]
-    pub period: TrendPeriod<'a>,
-    #[serde(borrow)]
-    pub summary: trend::TrendSummary<'a>,
-    #[serde(borrow)]
-    pub widget_type: TrendWidgetType<'a>,
+    pub image: Option<BlobRef<S>>,
+    pub metric: TrendMetric<S>,
+    pub period: TrendPeriod<S>,
+    pub summary: trend::TrendSummary<S>,
+    pub widget_type: TrendWidgetType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TrendChartStyle<'a> {
+pub enum TrendChartStyle<S: Bos<str> + AsRef<str> = DefaultStr> {
     Line,
     Bar,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> TrendChartStyle<'a> {
+impl<S: Bos<str> + AsRef<str>> TrendChartStyle<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Line => "line",
@@ -82,70 +92,56 @@ impl<'a> TrendChartStyle<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for TrendChartStyle<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "line" => Self::Line,
             "bar" => Self::Bar,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for TrendChartStyle<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "line" => Self::Line,
-            "bar" => Self::Bar,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TrendChartStyle<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for TrendChartStyle<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for TrendChartStyle<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for TrendChartStyle<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for TrendChartStyle<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for TrendChartStyle<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for TrendChartStyle<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for TrendChartStyle<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for TrendChartStyle<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for TrendChartStyle<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for TrendChartStyle<'_> {
-    type Output = TrendChartStyle<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for TrendChartStyle<S> {
+    type Output = TrendChartStyle<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             TrendChartStyle::Line => TrendChartStyle::Line,
@@ -157,7 +153,7 @@ impl jacquard_common::IntoStatic for TrendChartStyle<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TrendMetric<'a> {
+pub enum TrendMetric<S: Bos<str> + AsRef<str> = DefaultStr> {
     Distance,
     Duration,
     Pace,
@@ -165,10 +161,10 @@ pub enum TrendMetric<'a> {
     Calories,
     HeartRate,
     WorkoutCount,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> TrendMetric<'a> {
+impl<S: Bos<str> + AsRef<str>> TrendMetric<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Distance => "distance",
@@ -181,11 +177,9 @@ impl<'a> TrendMetric<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for TrendMetric<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "distance" => Self::Distance,
             "duration" => Self::Duration,
             "pace" => Self::Pace,
@@ -193,68 +187,51 @@ impl<'a> From<&'a str> for TrendMetric<'a> {
             "calories" => Self::Calories,
             "heartRate" => Self::HeartRate,
             "workoutCount" => Self::WorkoutCount,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for TrendMetric<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "distance" => Self::Distance,
-            "duration" => Self::Duration,
-            "pace" => Self::Pace,
-            "steps" => Self::Steps,
-            "calories" => Self::Calories,
-            "heartRate" => Self::HeartRate,
-            "workoutCount" => Self::WorkoutCount,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TrendMetric<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for TrendMetric<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for TrendMetric<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for TrendMetric<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for TrendMetric<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for TrendMetric<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for TrendMetric<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for TrendMetric<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for TrendMetric<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for TrendMetric<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for TrendMetric<'_> {
-    type Output = TrendMetric<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for TrendMetric<S> {
+    type Output = TrendMetric<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             TrendMetric::Distance => TrendMetric::Distance,
@@ -271,16 +248,16 @@ impl jacquard_common::IntoStatic for TrendMetric<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TrendPeriod<'a> {
+pub enum TrendPeriod<S: Bos<str> + AsRef<str> = DefaultStr> {
     _1d,
     _7d,
     _30d,
     _90d,
     _1y,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> TrendPeriod<'a> {
+impl<S: Bos<str> + AsRef<str>> TrendPeriod<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::_1d => "1d",
@@ -291,76 +268,59 @@ impl<'a> TrendPeriod<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for TrendPeriod<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "1d" => Self::_1d,
             "7d" => Self::_7d,
             "30d" => Self::_30d,
             "90d" => Self::_90d,
             "1y" => Self::_1y,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for TrendPeriod<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "1d" => Self::_1d,
-            "7d" => Self::_7d,
-            "30d" => Self::_30d,
-            "90d" => Self::_90d,
-            "1y" => Self::_1y,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TrendPeriod<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for TrendPeriod<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for TrendPeriod<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for TrendPeriod<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for TrendPeriod<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for TrendPeriod<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for TrendPeriod<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for TrendPeriod<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for TrendPeriod<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for TrendPeriod<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for TrendPeriod<'_> {
-    type Output = TrendPeriod<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for TrendPeriod<S> {
+    type Output = TrendPeriod<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             TrendPeriod::_1d => TrendPeriod::_1d,
@@ -375,16 +335,16 @@ impl jacquard_common::IntoStatic for TrendPeriod<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TrendWidgetType<'a> {
+pub enum TrendWidgetType<S: Bos<str> + AsRef<str> = DefaultStr> {
     TodaySummary,
     WeeklyProgress,
     GoalProgress,
     RecentWorkouts,
     CustomTrend,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> TrendWidgetType<'a> {
+impl<S: Bos<str> + AsRef<str>> TrendWidgetType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::TodaySummary => "today-summary",
@@ -395,76 +355,59 @@ impl<'a> TrendWidgetType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for TrendWidgetType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "today-summary" => Self::TodaySummary,
             "weekly-progress" => Self::WeeklyProgress,
             "goal-progress" => Self::GoalProgress,
             "recent-workouts" => Self::RecentWorkouts,
             "custom-trend" => Self::CustomTrend,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for TrendWidgetType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "today-summary" => Self::TodaySummary,
-            "weekly-progress" => Self::WeeklyProgress,
-            "goal-progress" => Self::GoalProgress,
-            "recent-workouts" => Self::RecentWorkouts,
-            "custom-trend" => Self::CustomTrend,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TrendWidgetType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for TrendWidgetType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for TrendWidgetType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for TrendWidgetType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for TrendWidgetType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for TrendWidgetType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for TrendWidgetType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for TrendWidgetType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for TrendWidgetType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for TrendWidgetType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for TrendWidgetType<'_> {
-    type Output = TrendWidgetType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for TrendWidgetType<S> {
+    type Output = TrendWidgetType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             TrendWidgetType::TodaySummary => TrendWidgetType::TodaySummary,
@@ -480,22 +423,30 @@ impl jacquard_common::IntoStatic for TrendWidgetType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TrendGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TrendGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Trend<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Trend<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct TrendSummary<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TrendSummary<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Average value in base units
     #[serde(skip_serializing_if = "Option::is_none")]
     pub average: Option<i64>,
@@ -510,17 +461,17 @@ pub struct TrendSummary<'a> {
     ///Worst value in base units
     #[serde(skip_serializing_if = "Option::is_none")]
     pub worst: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Trend<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TrendRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Trend<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TrendRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for DataPoint<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DataPoint<S> {
     fn nsid() -> &'static str {
         "app.fitsky.trend"
     }
@@ -542,18 +493,17 @@ pub struct TrendRecord;
 impl XrpcResp for TrendRecord {
     const NSID: &'static str = "app.fitsky.trend";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TrendGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TrendGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TrendGetRecordOutput<'_>> for Trend<'_> {
-    fn from(output: TrendGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TrendGetRecordOutput<S>> for Trend<S> {
+    fn from(output: TrendGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Trend<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Trend<S> {
     const NSID: &'static str = "app.fitsky.trend";
     type Record = TrendRecord;
 }
@@ -563,7 +513,7 @@ impl Collection for TrendRecord {
     type Record = TrendRecord;
 }
 
-impl<'a> LexiconSchema for Trend<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Trend<S> {
     fn nsid() -> &'static str {
         "app.fitsky.trend"
     }
@@ -671,7 +621,7 @@ impl<'a> LexiconSchema for Trend<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TrendSummary<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TrendSummary<S> {
     fn nsid() -> &'static str {
         "app.fitsky.trend"
     }
@@ -696,37 +646,37 @@ pub mod data_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Date;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Date = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Date = S::Date;
+        type Value = Unset;
     }
     ///State transition - sets the `date` field to Set
     pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDate<S> {}
     impl<S: State> State for SetDate<S> {
-        type Value = S::Value;
         type Date = Set<members::date>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Date = S::Date;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `date` field
         pub struct date(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -796,8 +746,8 @@ where
 impl<'a, S> DataPointBuilder<'a, S>
 where
     S: data_point_state::State,
-    S::Value: data_point_state::IsSet,
     S::Date: data_point_state::IsSet,
+    S::Value: data_point_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DataPoint<'a> {
@@ -810,10 +760,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DataPoint<'a> {
         DataPoint {
             date: self._fields.0.unwrap(),
@@ -1009,85 +956,85 @@ pub mod trend_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WidgetType;
         type Summary;
-        type CreatedAt;
+        type WidgetType;
         type Metric;
         type Period;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WidgetType = Unset;
         type Summary = Unset;
-        type CreatedAt = Unset;
+        type WidgetType = Unset;
         type Metric = Unset;
         type Period = Unset;
-    }
-    ///State transition - sets the `widget_type` field to Set
-    pub struct SetWidgetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidgetType<S> {}
-    impl<S: State> State for SetWidgetType<S> {
-        type WidgetType = Set<members::widget_type>;
-        type Summary = S::Summary;
-        type CreatedAt = S::CreatedAt;
-        type Metric = S::Metric;
-        type Period = S::Period;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSummary<S> {}
     impl<S: State> State for SetSummary<S> {
-        type WidgetType = S::WidgetType;
         type Summary = Set<members::summary>;
-        type CreatedAt = S::CreatedAt;
-        type Metric = S::Metric;
-        type Period = S::Period;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type WidgetType = S::WidgetType;
-        type Summary = S::Summary;
-        type CreatedAt = Set<members::created_at>;
         type Metric = S::Metric;
         type Period = S::Period;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `widget_type` field to Set
+    pub struct SetWidgetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidgetType<S> {}
+    impl<S: State> State for SetWidgetType<S> {
+        type Summary = S::Summary;
+        type WidgetType = Set<members::widget_type>;
+        type Metric = S::Metric;
+        type Period = S::Period;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `metric` field to Set
     pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMetric<S> {}
     impl<S: State> State for SetMetric<S> {
-        type WidgetType = S::WidgetType;
         type Summary = S::Summary;
-        type CreatedAt = S::CreatedAt;
+        type WidgetType = S::WidgetType;
         type Metric = Set<members::metric>;
         type Period = S::Period;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `period` field to Set
     pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPeriod<S> {}
     impl<S: State> State for SetPeriod<S> {
-        type WidgetType = S::WidgetType;
         type Summary = S::Summary;
-        type CreatedAt = S::CreatedAt;
+        type WidgetType = S::WidgetType;
         type Metric = S::Metric;
         type Period = Set<members::period>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Summary = S::Summary;
+        type WidgetType = S::WidgetType;
+        type Metric = S::Metric;
+        type Period = S::Period;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `widget_type` field
-        pub struct widget_type(());
         ///Marker type for the `summary` field
         pub struct summary(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `widget_type` field
+        pub struct widget_type(());
         ///Marker type for the `metric` field
         pub struct metric(());
         ///Marker type for the `period` field
         pub struct period(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1095,15 +1042,15 @@ pub mod trend_state {
 pub struct TrendBuilder<'a, S: trend_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<TrendChartStyle<'a>>,
+        Option<S>,
+        Option<TrendChartStyle<S>>,
         Option<Datetime>,
-        Option<Vec<trend::DataPoint<'a>>>,
-        Option<BlobRef<'a>>,
-        Option<TrendMetric<'a>>,
-        Option<TrendPeriod<'a>>,
-        Option<trend::TrendSummary<'a>>,
-        Option<TrendWidgetType<'a>>,
+        Option<Vec<trend::DataPoint<S>>>,
+        Option<BlobRef<S>>,
+        Option<TrendMetric<S>>,
+        Option<TrendPeriod<S>>,
+        Option<trend::TrendSummary<S>>,
+        Option<TrendWidgetType<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1128,12 +1075,12 @@ impl<'a> TrendBuilder<'a, trend_state::Empty> {
 
 impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
     /// Set the `caption` field (optional)
-    pub fn caption(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn caption(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `caption` field to an Option value (optional)
-    pub fn maybe_caption(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_caption(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1141,12 +1088,12 @@ impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
 
 impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
     /// Set the `chartStyle` field (optional)
-    pub fn chart_style(mut self, value: impl Into<Option<TrendChartStyle<'a>>>) -> Self {
+    pub fn chart_style(mut self, value: impl Into<Option<TrendChartStyle<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `chartStyle` field to an Option value (optional)
-    pub fn maybe_chart_style(mut self, value: Option<TrendChartStyle<'a>>) -> Self {
+    pub fn maybe_chart_style(mut self, value: Option<TrendChartStyle<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1175,16 +1122,13 @@ impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
     /// Set the `dataPoints` field (optional)
     pub fn data_points(
         mut self,
-        value: impl Into<Option<Vec<trend::DataPoint<'a>>>>,
+        value: impl Into<Option<Vec<trend::DataPoint<S>>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `dataPoints` field to an Option value (optional)
-    pub fn maybe_data_points(
-        mut self,
-        value: Option<Vec<trend::DataPoint<'a>>>,
-    ) -> Self {
+    pub fn maybe_data_points(mut self, value: Option<Vec<trend::DataPoint<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1192,12 +1136,12 @@ impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
 
 impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1211,7 +1155,7 @@ where
     /// Set the `metric` field (required)
     pub fn metric(
         mut self,
-        value: impl Into<TrendMetric<'a>>,
+        value: impl Into<TrendMetric<S>>,
     ) -> TrendBuilder<'a, trend_state::SetMetric<S>> {
         self._fields.5 = Option::Some(value.into());
         TrendBuilder {
@@ -1230,7 +1174,7 @@ where
     /// Set the `period` field (required)
     pub fn period(
         mut self,
-        value: impl Into<TrendPeriod<'a>>,
+        value: impl Into<TrendPeriod<S>>,
     ) -> TrendBuilder<'a, trend_state::SetPeriod<S>> {
         self._fields.6 = Option::Some(value.into());
         TrendBuilder {
@@ -1249,7 +1193,7 @@ where
     /// Set the `summary` field (required)
     pub fn summary(
         mut self,
-        value: impl Into<trend::TrendSummary<'a>>,
+        value: impl Into<trend::TrendSummary<S>>,
     ) -> TrendBuilder<'a, trend_state::SetSummary<S>> {
         self._fields.7 = Option::Some(value.into());
         TrendBuilder {
@@ -1268,7 +1212,7 @@ where
     /// Set the `widgetType` field (required)
     pub fn widget_type(
         mut self,
-        value: impl Into<TrendWidgetType<'a>>,
+        value: impl Into<TrendWidgetType<S>>,
     ) -> TrendBuilder<'a, trend_state::SetWidgetType<S>> {
         self._fields.8 = Option::Some(value.into());
         TrendBuilder {
@@ -1282,11 +1226,11 @@ where
 impl<'a, S> TrendBuilder<'a, S>
 where
     S: trend_state::State,
-    S::WidgetType: trend_state::IsSet,
     S::Summary: trend_state::IsSet,
-    S::CreatedAt: trend_state::IsSet,
+    S::WidgetType: trend_state::IsSet,
     S::Metric: trend_state::IsSet,
     S::Period: trend_state::IsSet,
+    S::CreatedAt: trend_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Trend<'a> {
@@ -1304,13 +1248,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Trend<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Trend<'a> {
         Trend {
             caption: self._fields.0,
             chart_style: self._fields.1,

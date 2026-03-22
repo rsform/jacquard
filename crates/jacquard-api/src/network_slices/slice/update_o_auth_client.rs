@@ -10,57 +10,69 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::get_o_auth_clients::OauthClientDetails;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateOAuthClient<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateOAuthClient<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///OAuth client ID to update
-    #[serde(borrow)]
-    pub client_id: CowStr<'a>,
+    pub client_id: S,
     ///New human-readable name of the OAuth client
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub client_name: Option<CowStr<'a>>,
+    pub client_name: Option<S>,
     ///New URI of the client application
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub client_uri: Option<UriValue<'a>>,
+    pub client_uri: Option<UriValue<S>>,
     ///New URI of the client logo
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub logo_uri: Option<UriValue<'a>>,
+    pub logo_uri: Option<UriValue<S>>,
     ///New URI of the privacy policy
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub policy_uri: Option<UriValue<'a>>,
+    pub policy_uri: Option<UriValue<S>>,
     ///New allowed redirect URIs for OAuth flow
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub redirect_uris: Option<Vec<UriValue<'a>>>,
+    pub redirect_uris: Option<Vec<UriValue<S>>>,
     ///New OAuth scope
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub scope: Option<CowStr<'a>>,
+    pub scope: Option<S>,
     ///New URI of the terms of service
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tos_uri: Option<UriValue<'a>>,
+    pub tos_uri: Option<UriValue<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct UpdateOAuthClientOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct UpdateOAuthClientOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: OauthClientDetails<'a>,
+    pub value: OauthClientDetails<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for network.slices.slice.updateOAuthClient
@@ -68,11 +80,12 @@ pub struct UpdateOAuthClientResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateOAuthClientResponse {
     const NSID: &'static str = "network.slices.slice.updateOAuthClient";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = UpdateOAuthClientOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = UpdateOAuthClientOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for UpdateOAuthClient<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for UpdateOAuthClient<S> {
     const NSID: &'static str = "network.slices.slice.updateOAuthClient";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -87,6 +100,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateOAuthClientRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = UpdateOAuthClient<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = UpdateOAuthClient<S>;
     type Response = UpdateOAuthClientResponse;
 }

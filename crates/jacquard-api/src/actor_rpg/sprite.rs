@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,10 +30,17 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A user's RPG character sprite. One record per user (rkey: self).
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "actor.rpg.sprite", tag = "$type")]
-pub struct Sprite<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "actor.rpg.sprite",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Sprite<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Milliseconds per frame for animation playback  Defaults to `200`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_sprite_animation_speed")]
@@ -42,8 +51,7 @@ pub struct Sprite<'a> {
     ///When this record was first created
     pub created_at: Datetime,
     ///The game engine format this sprite is designed for. Determines animation interpretation.
-    #[serde(borrow)]
-    pub engine: SpriteEngine<'a>,
+    pub engine: SpriteEngine<S>,
     ///Height of a single frame in pixels (if not auto-calculated from height/rows)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub frame_height: Option<i64>,
@@ -58,34 +66,34 @@ pub struct Sprite<'a> {
     pub height: Option<i64>,
     ///Display name for the character (optional, can differ from Bluesky display name)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///Number of rows in the sprite sheet (typically 4 for directional sprites: down, left, right, up)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rows: Option<i64>,
     ///The sprite sheet image (PNG only). Max 10MB.
-    #[serde(borrow)]
-    pub sprite_sheet: BlobRef<'a>,
+    pub sprite_sheet: BlobRef<S>,
     ///When this record was last modified
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     ///Total width of the sprite sheet in pixels
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The game engine format this sprite is designed for. Determines animation interpretation.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SpriteEngine<'a> {
+pub enum SpriteEngine<S: Bos<str> + AsRef<str> = DefaultStr> {
     Rmmz,
     Rmmv,
     Rpgmaker2003,
     Custom,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SpriteEngine<'a> {
+impl<S: Bos<str> + AsRef<str>> SpriteEngine<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Rmmz => "rmmz",
@@ -95,74 +103,58 @@ impl<'a> SpriteEngine<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SpriteEngine<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "rmmz" => Self::Rmmz,
             "rmmv" => Self::Rmmv,
             "rpgmaker2003" => Self::Rpgmaker2003,
             "custom" => Self::Custom,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SpriteEngine<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "rmmz" => Self::Rmmz,
-            "rmmv" => Self::Rmmv,
-            "rpgmaker2003" => Self::Rpgmaker2003,
-            "custom" => Self::Custom,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SpriteEngine<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SpriteEngine<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for SpriteEngine<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SpriteEngine<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for SpriteEngine<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SpriteEngine<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SpriteEngine<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for SpriteEngine<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for SpriteEngine<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for SpriteEngine<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for SpriteEngine<'_> {
-    type Output = SpriteEngine<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SpriteEngine<S> {
+    type Output = SpriteEngine<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SpriteEngine::Rmmz => SpriteEngine::Rmmz,
@@ -177,22 +169,23 @@ impl jacquard_common::IntoStatic for SpriteEngine<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SpriteGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SpriteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Sprite<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Sprite<S>,
 }
 
-impl<'a> Sprite<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SpriteRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Sprite<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SpriteRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -203,18 +196,17 @@ pub struct SpriteRecord;
 impl XrpcResp for SpriteRecord {
     const NSID: &'static str = "actor.rpg.sprite";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SpriteGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SpriteGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SpriteGetRecordOutput<'_>> for Sprite<'_> {
-    fn from(output: SpriteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SpriteGetRecordOutput<S>> for Sprite<S> {
+    fn from(output: SpriteGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Sprite<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Sprite<S> {
     const NSID: &'static str = "actor.rpg.sprite";
     type Record = SpriteRecord;
 }
@@ -224,7 +216,7 @@ impl Collection for SpriteRecord {
     type Record = SpriteRecord;
 }
 
-impl<'a> LexiconSchema for Sprite<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Sprite<S> {
     fn nsid() -> &'static str {
         "actor.rpg.sprite"
     }
@@ -459,51 +451,51 @@ pub mod sprite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Engine;
-        type SpriteSheet;
         type CreatedAt;
+        type SpriteSheet;
+        type Engine;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Engine = Unset;
-        type SpriteSheet = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `engine` field to Set
-    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEngine<S> {}
-    impl<S: State> State for SetEngine<S> {
-        type Engine = Set<members::engine>;
-        type SpriteSheet = S::SpriteSheet;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `sprite_sheet` field to Set
-    pub struct SetSpriteSheet<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSpriteSheet<S> {}
-    impl<S: State> State for SetSpriteSheet<S> {
-        type Engine = S::Engine;
-        type SpriteSheet = Set<members::sprite_sheet>;
-        type CreatedAt = S::CreatedAt;
+        type SpriteSheet = Unset;
+        type Engine = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Engine = S::Engine;
-        type SpriteSheet = S::SpriteSheet;
         type CreatedAt = Set<members::created_at>;
+        type SpriteSheet = S::SpriteSheet;
+        type Engine = S::Engine;
+    }
+    ///State transition - sets the `sprite_sheet` field to Set
+    pub struct SetSpriteSheet<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSpriteSheet<S> {}
+    impl<S: State> State for SetSpriteSheet<S> {
+        type CreatedAt = S::CreatedAt;
+        type SpriteSheet = Set<members::sprite_sheet>;
+        type Engine = S::Engine;
+    }
+    ///State transition - sets the `engine` field to Set
+    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEngine<S> {}
+    impl<S: State> State for SetEngine<S> {
+        type CreatedAt = S::CreatedAt;
+        type SpriteSheet = S::SpriteSheet;
+        type Engine = Set<members::engine>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `engine` field
-        pub struct engine(());
-        ///Marker type for the `sprite_sheet` field
-        pub struct sprite_sheet(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `sprite_sheet` field
+        pub struct sprite_sheet(());
+        ///Marker type for the `engine` field
+        pub struct engine(());
     }
 }
 
@@ -514,14 +506,14 @@ pub struct SpriteBuilder<'a, S: sprite_state::State> {
         Option<i64>,
         Option<i64>,
         Option<Datetime>,
-        Option<SpriteEngine<'a>>,
+        Option<SpriteEngine<S>>,
         Option<i64>,
         Option<i64>,
         Option<i64>,
         Option<i64>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
-        Option<BlobRef<'a>>,
+        Option<BlobRef<S>>,
         Option<Datetime>,
         Option<i64>,
     ),
@@ -613,7 +605,7 @@ where
     /// Set the `engine` field (required)
     pub fn engine(
         mut self,
-        value: impl Into<SpriteEngine<'a>>,
+        value: impl Into<SpriteEngine<S>>,
     ) -> SpriteBuilder<'a, sprite_state::SetEngine<S>> {
         self._fields.3 = Option::Some(value.into());
         SpriteBuilder {
@@ -678,12 +670,12 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 
 impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -710,7 +702,7 @@ where
     /// Set the `spriteSheet` field (required)
     pub fn sprite_sheet(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> SpriteBuilder<'a, sprite_state::SetSpriteSheet<S>> {
         self._fields.10 = Option::Some(value.into());
         SpriteBuilder {
@@ -750,9 +742,9 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 impl<'a, S> SpriteBuilder<'a, S>
 where
     S: sprite_state::State,
-    S::Engine: sprite_state::IsSet,
-    S::SpriteSheet: sprite_state::IsSet,
     S::CreatedAt: sprite_state::IsSet,
+    S::SpriteSheet: sprite_state::IsSet,
+    S::Engine: sprite_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sprite<'a> {
@@ -774,13 +766,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Sprite<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Sprite<'a> {
         Sprite {
             animation_speed: self._fields.0.or_else(|| Some(200i64)),
             columns: self._fields.1,

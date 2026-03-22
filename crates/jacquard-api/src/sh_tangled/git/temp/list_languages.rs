@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,63 +26,79 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::sh_tangled::git::temp::list_languages;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Language<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Language<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Hex color code for this language
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub color: Option<CowStr<'a>>,
+    pub color: Option<S>,
     ///File extensions associated with this language
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub extensions: Option<Vec<CowStr<'a>>>,
+    pub extensions: Option<Vec<S>>,
     ///Number of files in this language
     #[serde(skip_serializing_if = "Option::is_none")]
     pub file_count: Option<i64>,
     ///Programming language name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Percentage of total codebase (0-100)
     pub percentage: i64,
     ///Total size of files in this language (bytes)
     pub size: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListLanguages<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListLanguages<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `"HEAD"`.
     #[serde(default = "_default_ref")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub r#ref: Option<CowStr<'a>>,
+    pub r#ref: Option<S>,
     #[serde(borrow)]
-    pub repo: AtUri<'a>,
+    pub repo: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListLanguagesOutput<'a> {
-    #[serde(borrow)]
-    pub languages: Vec<list_languages::Language<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListLanguagesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub languages: Vec<list_languages::Language<S>>,
     ///The git reference used
-    #[serde(borrow)]
-    pub r#ref: CowStr<'a>,
+    pub r#ref: S,
     ///Total number of files analyzed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_files: Option<i64>,
     ///Total size of all analyzed files in bytes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_size: Option<i64>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -89,25 +107,26 @@ pub struct ListLanguagesOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListLanguagesError<'a> {
+pub enum ListLanguagesError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<SmolStr>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(Option<CowStr<'a>>),
+    RefNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for ListLanguagesError<'_> {
+impl core::fmt::Display for ListLanguagesError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -131,12 +150,18 @@ impl core::fmt::Display for ListLanguagesError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
-impl<'a> LexiconSchema for Language<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Language<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.listLanguages"
     }
@@ -156,11 +181,12 @@ pub struct ListLanguagesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListLanguagesResponse {
     const NSID: &'static str = "sh.tangled.git.temp.listLanguages";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListLanguagesOutput<'de>;
-    type Err<'de> = ListLanguagesError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListLanguagesOutput<S>;
+    type Err = ListLanguagesError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListLanguages<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListLanguages<S> {
     const NSID: &'static str = "sh.tangled.git.temp.listLanguages";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListLanguagesResponse;
@@ -171,7 +197,7 @@ pub struct ListLanguagesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListLanguagesRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.listLanguages";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListLanguages<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListLanguages<S>;
     type Response = ListLanguagesResponse;
 }
 
@@ -185,49 +211,49 @@ pub mod language_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Size;
+        type Name;
         type Percentage;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Size = Unset;
+        type Name = Unset;
         type Percentage = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Size = S::Size;
-        type Percentage = S::Percentage;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSize<S> {}
     impl<S: State> State for SetSize<S> {
-        type Name = S::Name;
         type Size = Set<members::size>;
+        type Name = S::Name;
+        type Percentage = S::Percentage;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Size = S::Size;
+        type Name = Set<members::name>;
         type Percentage = S::Percentage;
     }
     ///State transition - sets the `percentage` field to Set
     pub struct SetPercentage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPercentage<S> {}
     impl<S: State> State for SetPercentage<S> {
-        type Name = S::Name;
         type Size = S::Size;
+        type Name = S::Name;
         type Percentage = Set<members::percentage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `size` field
         pub struct size(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `percentage` field
         pub struct percentage(());
     }
@@ -237,10 +263,10 @@ pub mod language_state {
 pub struct LanguageBuilder<'a, S: language_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<Vec<CowStr<'a>>>,
+        Option<S>,
+        Option<Vec<S>>,
         Option<i64>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<i64>,
         Option<i64>,
     ),
@@ -267,12 +293,12 @@ impl<'a> LanguageBuilder<'a, language_state::Empty> {
 
 impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
     /// Set the `color` field (optional)
-    pub fn color(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `color` field to an Option value (optional)
-    pub fn maybe_color(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_color(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -280,12 +306,12 @@ impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
 
 impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
     /// Set the `extensions` field (optional)
-    pub fn extensions(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn extensions(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `extensions` field to an Option value (optional)
-    pub fn maybe_extensions(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_extensions(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -312,7 +338,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LanguageBuilder<'a, language_state::SetName<S>> {
         self._fields.3 = Option::Some(value.into());
         LanguageBuilder {
@@ -364,8 +390,8 @@ where
 impl<'a, S> LanguageBuilder<'a, S>
 where
     S: language_state::State,
-    S::Name: language_state::IsSet,
     S::Size: language_state::IsSet,
+    S::Name: language_state::IsSet,
     S::Percentage: language_state::IsSet,
 {
     /// Build the final struct
@@ -383,10 +409,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Language<'a> {
         Language {
             color: self._fields.0,
@@ -560,7 +583,7 @@ pub mod list_languages_state {
 /// Builder for constructing an instance of this type
 pub struct ListLanguagesBuilder<'a, S: list_languages_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -584,12 +607,12 @@ impl<'a> ListLanguagesBuilder<'a, list_languages_state::Empty> {
 
 impl<'a, S: list_languages_state::State> ListLanguagesBuilder<'a, S> {
     /// Set the `ref` field (optional)
-    pub fn r#ref(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn r#ref(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
-    pub fn maybe_ref(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_ref(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -603,7 +626,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> ListLanguagesBuilder<'a, list_languages_state::SetRepo<S>> {
         self._fields.1 = Option::Some(value.into());
         ListLanguagesBuilder {

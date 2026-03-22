@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,69 +26,105 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::org_custorium::temp::jsonfg::coord_ref_sys;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct MultiRefSys<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MultiRefSys<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ref_sys: Option<Vec<coord_ref_sys::SingleRefSys<'a>>>,
+    pub ref_sys: Option<Vec<coord_ref_sys::SingleRefSys<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RefSysByRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RefSysByRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub epoch: Option<i64>,
-    #[serde(borrow)]
-    pub href: UriValue<'a>,
+    pub href: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct RefSysCustom<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RefSysCustom<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Value should not be reference
-    #[serde(borrow)]
-    pub r#type: CowStr<'a>,
+    pub r#type: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct RefSysSimpleRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RefSysSimpleRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The value is either a URI or a CURIE.
-    #[serde(borrow)]
-    pub uri: CowStr<'a>,
+    pub uri: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SingleRefSys<'a> {
-    #[serde(borrow)]
-    pub ref_sys: SingleRefSysRefSys<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SingleRefSys<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub ref_sys: SingleRefSysRefSys<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum SingleRefSysRefSys<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum SingleRefSysRefSys<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.custorium.temp.jsonfg.coordRefSys#refSysSimpleRef")]
-    RefSysSimpleRef(Box<coord_ref_sys::RefSysSimpleRef<'a>>),
+    RefSysSimpleRef(Box<coord_ref_sys::RefSysSimpleRef<S>>),
     #[serde(rename = "org.custorium.temp.jsonfg.coordRefSys#refSysByRef")]
-    RefSysByRef(Box<coord_ref_sys::RefSysByRef<'a>>),
+    RefSysByRef(Box<coord_ref_sys::RefSysByRef<S>>),
     #[serde(rename = "org.custorium.temp.jsonfg.coordRefSys#refSysCustom")]
-    RefSysCustom(Box<coord_ref_sys::RefSysCustom<'a>>),
+    RefSysCustom(Box<coord_ref_sys::RefSysCustom<S>>),
 }
 
-impl<'a> LexiconSchema for MultiRefSys<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for MultiRefSys<S> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
@@ -111,7 +149,7 @@ impl<'a> LexiconSchema for MultiRefSys<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RefSysByRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RefSysByRef<S> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
@@ -126,7 +164,7 @@ impl<'a> LexiconSchema for RefSysByRef<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RefSysCustom<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RefSysCustom<S> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
@@ -141,7 +179,7 @@ impl<'a> LexiconSchema for RefSysCustom<'a> {
     }
 }
 
-impl<'a> LexiconSchema for RefSysSimpleRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for RefSysSimpleRef<S> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
@@ -156,7 +194,7 @@ impl<'a> LexiconSchema for RefSysSimpleRef<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SingleRefSys<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SingleRefSys<S> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
@@ -334,7 +372,7 @@ pub mod ref_sys_by_ref_state {
 /// Builder for constructing an instance of this type
 pub struct RefSysByRefBuilder<'a, S: ref_sys_by_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<UriValue<'a>>),
+    _fields: (Option<i64>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -377,7 +415,7 @@ where
     /// Set the `href` field (required)
     pub fn href(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> RefSysByRefBuilder<'a, ref_sys_by_ref_state::SetHref<S>> {
         self._fields.1 = Option::Some(value.into());
         RefSysByRefBuilder {
@@ -404,10 +442,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> RefSysByRef<'a> {
         RefSysByRef {
             epoch: self._fields.0,
@@ -452,7 +487,7 @@ pub mod single_ref_sys_state {
 /// Builder for constructing an instance of this type
 pub struct SingleRefSysBuilder<'a, S: single_ref_sys_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<SingleRefSysRefSys<'a>>,),
+    _fields: (Option<SingleRefSysRefSys<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -482,7 +517,7 @@ where
     /// Set the `refSys` field (required)
     pub fn ref_sys(
         mut self,
-        value: impl Into<SingleRefSysRefSys<'a>>,
+        value: impl Into<SingleRefSysRefSys<S>>,
     ) -> SingleRefSysBuilder<'a, single_ref_sys_state::SetRefSys<S>> {
         self._fields.0 = Option::Some(value.into());
         SingleRefSysBuilder {
@@ -508,10 +543,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SingleRefSys<'a> {
         SingleRefSys {
             ref_sys: self._fields.0.unwrap(),

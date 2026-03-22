@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -27,36 +29,53 @@ use crate::sh_weaver::notebook::get_entry_notebooks;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetEntryNotebooks<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetEntryNotebooks<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub entry: AtUri<'a>,
+    pub entry: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetEntryNotebooksOutput<'a> {
-    #[serde(borrow)]
-    pub notebooks: Vec<get_entry_notebooks::NotebookRef<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetEntryNotebooksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub notebooks: Vec<get_entry_notebooks::NotebookRef<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Reference to a notebook containing this entry.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct NotebookRef<'a> {
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct NotebookRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub cid: Cid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub owner: Option<ProfileViewBasic<'a>>,
+    pub owner: Option<ProfileViewBasic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub title: Option<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.notebook.getEntryNotebooks
@@ -64,11 +83,12 @@ pub struct GetEntryNotebooksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryNotebooksResponse {
     const NSID: &'static str = "sh.weaver.notebook.getEntryNotebooks";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetEntryNotebooksOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetEntryNotebooksOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetEntryNotebooks<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetEntryNotebooks<S> {
     const NSID: &'static str = "sh.weaver.notebook.getEntryNotebooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEntryNotebooksResponse;
@@ -79,11 +99,11 @@ pub struct GetEntryNotebooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryNotebooksRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryNotebooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetEntryNotebooks<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetEntryNotebooks<S>;
     type Response = GetEntryNotebooksResponse;
 }
 
-impl<'a> LexiconSchema for NotebookRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for NotebookRef<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getEntryNotebooks"
     }
@@ -133,7 +153,7 @@ pub mod get_entry_notebooks_state {
 /// Builder for constructing an instance of this type
 pub struct GetEntryNotebooksBuilder<'a, S: get_entry_notebooks_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -163,7 +183,7 @@ where
     /// Set the `entry` field (required)
     pub fn entry(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetEntryNotebooksBuilder<'a, get_entry_notebooks_state::SetEntry<S>> {
         self._fields.0 = Option::Some(value.into());
         GetEntryNotebooksBuilder {
@@ -234,12 +254,7 @@ pub mod notebook_ref_state {
 /// Builder for constructing an instance of this type
 pub struct NotebookRefBuilder<'a, S: notebook_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Cid<'a>>,
-        Option<ProfileViewBasic<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-    ),
+    _fields: (Option<Cid<S>>, Option<ProfileViewBasic<S>>, Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -269,7 +284,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> NotebookRefBuilder<'a, notebook_ref_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         NotebookRefBuilder {
@@ -282,12 +297,12 @@ where
 
 impl<'a, S: notebook_ref_state::State> NotebookRefBuilder<'a, S> {
     /// Set the `owner` field (optional)
-    pub fn owner(mut self, value: impl Into<Option<ProfileViewBasic<'a>>>) -> Self {
+    pub fn owner(mut self, value: impl Into<Option<ProfileViewBasic<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `owner` field to an Option value (optional)
-    pub fn maybe_owner(mut self, value: Option<ProfileViewBasic<'a>>) -> Self {
+    pub fn maybe_owner(mut self, value: Option<ProfileViewBasic<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -295,12 +310,12 @@ impl<'a, S: notebook_ref_state::State> NotebookRefBuilder<'a, S> {
 
 impl<'a, S: notebook_ref_state::State> NotebookRefBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -314,7 +329,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> NotebookRefBuilder<'a, notebook_ref_state::SetUri<S>> {
         self._fields.3 = Option::Some(value.into());
         NotebookRefBuilder {
@@ -344,10 +359,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> NotebookRef<'a> {
         NotebookRef {
             cid: self._fields.0.unwrap(),

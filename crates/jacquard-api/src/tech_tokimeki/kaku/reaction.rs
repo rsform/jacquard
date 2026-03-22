@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,32 +30,39 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A reaction to a post
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "tech.tokimeki.kaku.reaction", tag = "$type")]
-pub struct Reaction<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "tech.tokimeki.kaku.reaction",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Reaction<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///Reference to the post being reacted to
-    #[serde(borrow)]
-    pub subject: StrongRef<'a>,
+    pub subject: StrongRef<S>,
     ///Type of reaction
-    #[serde(borrow)]
-    pub r#type: ReactionType<'a>,
+    pub r#type: ReactionType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Type of reaction
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReactionType<'a> {
+pub enum ReactionType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Suki,
     Tasukaru,
     Sugoi,
     Kawaii,
     Kami,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ReactionType<'a> {
+impl<S: Bos<str> + AsRef<str>> ReactionType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Suki => "suki",
@@ -64,76 +73,59 @@ impl<'a> ReactionType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ReactionType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "suki" => Self::Suki,
             "tasukaru" => Self::Tasukaru,
             "sugoi" => Self::Sugoi,
             "kawaii" => Self::Kawaii,
             "kami" => Self::Kami,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ReactionType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "suki" => Self::Suki,
-            "tasukaru" => Self::Tasukaru,
-            "sugoi" => Self::Sugoi,
-            "kawaii" => Self::Kawaii,
-            "kami" => Self::Kami,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ReactionType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ReactionType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ReactionType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ReactionType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ReactionType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ReactionType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ReactionType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ReactionType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ReactionType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ReactionType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ReactionType<'_> {
-    type Output = ReactionType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ReactionType<S> {
+    type Output = ReactionType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ReactionType::Suki => ReactionType::Suki,
@@ -149,22 +141,23 @@ impl jacquard_common::IntoStatic for ReactionType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ReactionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ReactionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Reaction<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Reaction<S>,
 }
 
-impl<'a> Reaction<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ReactionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Reaction<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ReactionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -175,18 +168,17 @@ pub struct ReactionRecord;
 impl XrpcResp for ReactionRecord {
     const NSID: &'static str = "tech.tokimeki.kaku.reaction";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ReactionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ReactionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ReactionGetRecordOutput<'_>> for Reaction<'_> {
-    fn from(output: ReactionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ReactionGetRecordOutput<S>> for Reaction<S> {
+    fn from(output: ReactionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Reaction<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Reaction<S> {
     const NSID: &'static str = "tech.tokimeki.kaku.reaction";
     type Record = ReactionRecord;
 }
@@ -196,7 +188,7 @@ impl Collection for ReactionRecord {
     type Record = ReactionRecord;
 }
 
-impl<'a> LexiconSchema for Reaction<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Reaction<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.reaction"
     }
@@ -272,7 +264,7 @@ pub mod reaction_state {
 /// Builder for constructing an instance of this type
 pub struct ReactionBuilder<'a, S: reaction_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<StrongRef<'a>>, Option<ReactionType<'a>>),
+    _fields: (Option<Datetime>, Option<StrongRef<S>>, Option<ReactionType<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -321,7 +313,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> ReactionBuilder<'a, reaction_state::SetSubject<S>> {
         self._fields.1 = Option::Some(value.into());
         ReactionBuilder {
@@ -340,7 +332,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<ReactionType<'a>>,
+        value: impl Into<ReactionType<S>>,
     ) -> ReactionBuilder<'a, reaction_state::SetType<S>> {
         self._fields.2 = Option::Some(value.into());
         ReactionBuilder {
@@ -370,10 +362,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Reaction<'a> {
         Reaction {
             created_at: self._fields.0.unwrap(),

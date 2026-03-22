@@ -17,11 +17,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -30,20 +33,25 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Reference to a Magic: The Gathering card with printing and oracle identifiers.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CardRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CardRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     /**Oracle card URI (oracle:<uuid>) - for external indexing.
 Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
-    #[serde(borrow)]
-    pub oracle_uri: UriValue<'a>,
+    pub oracle_uri: UriValue<S>,
     ///Scryfall printing URI (scry:<uuid>) - authoritative identifier
-    #[serde(borrow)]
-    pub scryfall_uri: UriValue<'a>,
+    pub scryfall_uri: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for CardRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardRef<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.defs"
     }
@@ -68,44 +76,44 @@ pub mod card_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type OracleUri;
         type ScryfallUri;
+        type OracleUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type OracleUri = Unset;
         type ScryfallUri = Unset;
-    }
-    ///State transition - sets the `oracle_uri` field to Set
-    pub struct SetOracleUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOracleUri<S> {}
-    impl<S: State> State for SetOracleUri<S> {
-        type OracleUri = Set<members::oracle_uri>;
-        type ScryfallUri = S::ScryfallUri;
+        type OracleUri = Unset;
     }
     ///State transition - sets the `scryfall_uri` field to Set
     pub struct SetScryfallUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScryfallUri<S> {}
     impl<S: State> State for SetScryfallUri<S> {
-        type OracleUri = S::OracleUri;
         type ScryfallUri = Set<members::scryfall_uri>;
+        type OracleUri = S::OracleUri;
+    }
+    ///State transition - sets the `oracle_uri` field to Set
+    pub struct SetOracleUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOracleUri<S> {}
+    impl<S: State> State for SetOracleUri<S> {
+        type ScryfallUri = S::ScryfallUri;
+        type OracleUri = Set<members::oracle_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `oracle_uri` field
-        pub struct oracle_uri(());
         ///Marker type for the `scryfall_uri` field
         pub struct scryfall_uri(());
+        ///Marker type for the `oracle_uri` field
+        pub struct oracle_uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CardRefBuilder<'a, S: card_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<UriValue<'a>>, Option<UriValue<'a>>),
+    _fields: (Option<UriValue<S>>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -135,7 +143,7 @@ where
     /// Set the `oracleUri` field (required)
     pub fn oracle_uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> CardRefBuilder<'a, card_ref_state::SetOracleUri<S>> {
         self._fields.0 = Option::Some(value.into());
         CardRefBuilder {
@@ -154,7 +162,7 @@ where
     /// Set the `scryfallUri` field (required)
     pub fn scryfall_uri(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> CardRefBuilder<'a, card_ref_state::SetScryfallUri<S>> {
         self._fields.1 = Option::Some(value.into());
         CardRefBuilder {
@@ -168,8 +176,8 @@ where
 impl<'a, S> CardRefBuilder<'a, S>
 where
     S: card_ref_state::State,
-    S::OracleUri: card_ref_state::IsSet,
     S::ScryfallUri: card_ref_state::IsSet,
+    S::OracleUri: card_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CardRef<'a> {
@@ -182,10 +190,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CardRef<'a> {
         CardRef {
             oracle_uri: self._fields.0.unwrap(),

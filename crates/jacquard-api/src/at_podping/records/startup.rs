@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,36 +29,36 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Normalized podping startup fields. Record TID timestamp should represent when the event was received, useful for global ordering.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "at.podping.records.startup", tag = "$type")]
-pub struct Startup<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "at.podping.records.startup",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Startup<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional, e.g. 1,078
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub capacity: Option<CowStr<'a>>,
+    pub capacity: Option<S>,
     ///Optional, e.g. https://rpc.mahdiyari.info
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub hive: Option<UriValue<'a>>,
+    pub hive: Option<UriValue<S>>,
     ///e.g. Podping startup complete
-    #[serde(borrow)]
-    pub message: CowStr<'a>,
+    pub message: S,
     ///Optional, e.g. hivepinger
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub pinging_app: Option<CowStr<'a>>,
+    pub pinging_app: Option<S>,
     ///e.g. podping.aaa
-    #[serde(borrow)]
-    pub server_account: CowStr<'a>,
+    pub server_account: S,
     ///Optional, e.g. 9887936240807410000
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub session_id: Option<CowStr<'a>>,
+    pub session_id: Option<S>,
     ///Optional source reference, minimized to save space, e.g. hive:92042659:cf11299faf19367f3f2d6bef0bf2bc4f59272506:0:podping.ccc (if mirroring the podping in hive block 92042659, transaction id cf11299faf19367f3f2d6bef0bf2bc4f59272506, first operation, hive auth podping.ccc)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source: Option<CowStr<'a>>,
+    pub source: Option<S>,
     ///Sender timestamp in ISO format, e.g. 2025-12-29T22:25:09.123Z
     pub timestamp: Datetime,
     ///Optional
@@ -64,33 +66,34 @@ pub struct Startup<'a> {
     pub use_test_node: Option<bool>,
     ///Optional, e.g. 38a44421-a535-42de-b634-d1f6edce18ce
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uuid: Option<CowStr<'a>>,
+    pub uuid: Option<S>,
     ///Optional, e.g. 2.1.0
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub v: Option<CowStr<'a>>,
+    pub v: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StartupGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StartupGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Startup<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Startup<S>,
 }
 
-impl<'a> Startup<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, StartupRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Startup<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, StartupRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -101,18 +104,17 @@ pub struct StartupRecord;
 impl XrpcResp for StartupRecord {
     const NSID: &'static str = "at.podping.records.startup";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StartupGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StartupGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<StartupGetRecordOutput<'_>> for Startup<'_> {
-    fn from(output: StartupGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<StartupGetRecordOutput<S>> for Startup<S> {
+    fn from(output: StartupGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Startup<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Startup<S> {
     const NSID: &'static str = "at.podping.records.startup";
     type Record = StartupRecord;
 }
@@ -122,7 +124,7 @@ impl Collection for StartupRecord {
     type Record = StartupRecord;
 }
 
-impl<'a> LexiconSchema for Startup<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Startup<S> {
     fn nsid() -> &'static str {
         "at.podping.records.startup"
     }
@@ -147,51 +149,51 @@ pub mod startup_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
-        type Timestamp;
         type ServerAccount;
+        type Timestamp;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
-        type Timestamp = Unset;
         type ServerAccount = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Message = Set<members::message>;
-        type Timestamp = S::Timestamp;
-        type ServerAccount = S::ServerAccount;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Message = S::Message;
-        type Timestamp = Set<members::timestamp>;
-        type ServerAccount = S::ServerAccount;
+        type Timestamp = Unset;
+        type Message = Unset;
     }
     ///State transition - sets the `server_account` field to Set
     pub struct SetServerAccount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetServerAccount<S> {}
     impl<S: State> State for SetServerAccount<S> {
-        type Message = S::Message;
-        type Timestamp = S::Timestamp;
         type ServerAccount = Set<members::server_account>;
+        type Timestamp = S::Timestamp;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type ServerAccount = S::ServerAccount;
+        type Timestamp = Set<members::timestamp>;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type ServerAccount = S::ServerAccount;
+        type Timestamp = S::Timestamp;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `server_account` field
         pub struct server_account(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
@@ -199,17 +201,17 @@ pub mod startup_state {
 pub struct StartupBuilder<'a, S: startup_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
         Option<bool>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -234,12 +236,12 @@ impl<'a> StartupBuilder<'a, startup_state::Empty> {
 
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `capacity` field (optional)
-    pub fn capacity(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn capacity(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `capacity` field to an Option value (optional)
-    pub fn maybe_capacity(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_capacity(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -247,12 +249,12 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `hive` field (optional)
-    pub fn hive(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn hive(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `hive` field to an Option value (optional)
-    pub fn maybe_hive(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_hive(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -266,7 +268,7 @@ where
     /// Set the `message` field (required)
     pub fn message(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> StartupBuilder<'a, startup_state::SetMessage<S>> {
         self._fields.2 = Option::Some(value.into());
         StartupBuilder {
@@ -279,12 +281,12 @@ where
 
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `pingingApp` field (optional)
-    pub fn pinging_app(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn pinging_app(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `pingingApp` field to an Option value (optional)
-    pub fn maybe_pinging_app(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_pinging_app(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -298,7 +300,7 @@ where
     /// Set the `serverAccount` field (required)
     pub fn server_account(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> StartupBuilder<'a, startup_state::SetServerAccount<S>> {
         self._fields.4 = Option::Some(value.into());
         StartupBuilder {
@@ -311,12 +313,12 @@ where
 
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `sessionId` field (optional)
-    pub fn session_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn session_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `sessionId` field to an Option value (optional)
-    pub fn maybe_session_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_session_id(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -324,12 +326,12 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
-    pub fn maybe_source(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_source(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -369,12 +371,12 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `uuid` field (optional)
-    pub fn uuid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn uuid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `uuid` field to an Option value (optional)
-    pub fn maybe_uuid(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_uuid(mut self, value: Option<S>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -382,12 +384,12 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `v` field (optional)
-    pub fn v(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn v(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `v` field to an Option value (optional)
-    pub fn maybe_v(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_v(mut self, value: Option<S>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -396,9 +398,9 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 impl<'a, S> StartupBuilder<'a, S>
 where
     S: startup_state::State,
-    S::Message: startup_state::IsSet,
-    S::Timestamp: startup_state::IsSet,
     S::ServerAccount: startup_state::IsSet,
+    S::Timestamp: startup_state::IsSet,
+    S::Message: startup_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Startup<'a> {
@@ -420,10 +422,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Startup<'a> {
         Startup {
             capacity: self._fields.0,

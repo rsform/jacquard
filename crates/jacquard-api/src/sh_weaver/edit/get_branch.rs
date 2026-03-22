@@ -10,24 +10,32 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::edit::EditBranchView;
 use crate::sh_weaver::edit::EditHistoryEntry;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetBranch<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetBranch<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub after_rkey: Option<CowStr<'a>>,
+    pub after_rkey: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     #[serde(borrow)]
-    pub head: AtUri<'a>,
+    pub head: AtUri<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -35,17 +43,23 @@ pub struct GetBranch<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetBranchOutput<'a> {
-    #[serde(borrow)]
-    pub branch: EditBranchView<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetBranchOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub branch: EditBranchView<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub diffs: Vec<EditHistoryEntry<'a>>,
+    pub cursor: Option<S>,
+    pub diffs: Vec<EditHistoryEntry<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.edit.getBranch
@@ -53,11 +67,12 @@ pub struct GetBranchResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBranchResponse {
     const NSID: &'static str = "sh.weaver.edit.getBranch";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetBranchOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetBranchOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetBranch<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetBranch<S> {
     const NSID: &'static str = "sh.weaver.edit.getBranch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBranchResponse;
@@ -68,7 +83,7 @@ pub struct GetBranchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBranchRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.edit.getBranch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetBranch<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetBranch<S>;
     type Response = GetBranchResponse;
 }
 
@@ -111,7 +126,7 @@ pub mod get_branch_state {
 /// Builder for constructing an instance of this type
 pub struct GetBranchBuilder<'a, S: get_branch_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<AtUri<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<S>, Option<AtUri<S>>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -135,12 +150,12 @@ impl<'a> GetBranchBuilder<'a, get_branch_state::Empty> {
 
 impl<'a, S: get_branch_state::State> GetBranchBuilder<'a, S> {
     /// Set the `afterRkey` field (optional)
-    pub fn after_rkey(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn after_rkey(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `afterRkey` field to an Option value (optional)
-    pub fn maybe_after_rkey(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_after_rkey(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -148,12 +163,12 @@ impl<'a, S: get_branch_state::State> GetBranchBuilder<'a, S> {
 
 impl<'a, S: get_branch_state::State> GetBranchBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -167,7 +182,7 @@ where
     /// Set the `head` field (required)
     pub fn head(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetBranchBuilder<'a, get_branch_state::SetHead<S>> {
         self._fields.2 = Option::Some(value.into());
         GetBranchBuilder {

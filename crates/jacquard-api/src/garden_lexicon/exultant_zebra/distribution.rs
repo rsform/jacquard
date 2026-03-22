@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,68 +31,75 @@ use serde::{Serialize, Deserialize};
 use crate::garden_lexicon::exultant_zebra::distribution;
 /// A downloadable artifact within a distribution.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Artifact<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Artifact<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///An optional description of this artifact.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The downloadable binary.
-    #[serde(borrow)]
-    pub download: BlobRef<'a>,
+    pub download: BlobRef<S>,
     ///Optional tags describing this artifact, e.g. 'aarch64', 'apple-darwin', 'linux'.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A distribution of an application.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "garden.lexicon.exultant-zebra.distribution",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Distribution<'a> {
+pub struct Distribution<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The list of downloadable artifacts for this distribution.
-    #[serde(borrow)]
-    pub artifacts: Vec<distribution::Artifact<'a>>,
+    pub artifacts: Vec<distribution::Artifact<S>>,
     ///An optional description of this distribution.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///The version of this distribution, e.g. '0.14.0'.
-    #[serde(borrow)]
-    pub version: CowStr<'a>,
+    pub version: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DistributionGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DistributionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Distribution<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Distribution<S>,
 }
 
-impl<'a> Distribution<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DistributionRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Distribution<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DistributionRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Artifact<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Artifact<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.distribution"
     }
@@ -139,18 +148,17 @@ pub struct DistributionRecord;
 impl XrpcResp for DistributionRecord {
     const NSID: &'static str = "garden.lexicon.exultant-zebra.distribution";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DistributionGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DistributionGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DistributionGetRecordOutput<'_>> for Distribution<'_> {
-    fn from(output: DistributionGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DistributionGetRecordOutput<S>> for Distribution<S> {
+    fn from(output: DistributionGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Distribution<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Distribution<S> {
     const NSID: &'static str = "garden.lexicon.exultant-zebra.distribution";
     type Record = DistributionRecord;
 }
@@ -160,7 +168,7 @@ impl Collection for DistributionRecord {
     type Record = DistributionRecord;
 }
 
-impl<'a> LexiconSchema for Distribution<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Distribution<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.distribution"
     }
@@ -210,7 +218,7 @@ pub mod artifact_state {
 /// Builder for constructing an instance of this type
 pub struct ArtifactBuilder<'a, S: artifact_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<BlobRef<'a>>, Option<Vec<CowStr<'a>>>),
+    _fields: (Option<S>, Option<BlobRef<S>>, Option<Vec<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -234,12 +242,12 @@ impl<'a> ArtifactBuilder<'a, artifact_state::Empty> {
 
 impl<'a, S: artifact_state::State> ArtifactBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -253,7 +261,7 @@ where
     /// Set the `download` field (required)
     pub fn download(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> ArtifactBuilder<'a, artifact_state::SetDownload<S>> {
         self._fields.1 = Option::Some(value.into());
         ArtifactBuilder {
@@ -266,12 +274,12 @@ where
 
 impl<'a, S: artifact_state::State> ArtifactBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -294,10 +302,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Artifact<'a> {
         Artifact {
             description: self._fields.0,
@@ -441,48 +446,44 @@ pub mod distribution_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artifacts;
         type Version;
+        type Artifacts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artifacts = Unset;
         type Version = Unset;
-    }
-    ///State transition - sets the `artifacts` field to Set
-    pub struct SetArtifacts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtifacts<S> {}
-    impl<S: State> State for SetArtifacts<S> {
-        type Artifacts = Set<members::artifacts>;
-        type Version = S::Version;
+        type Artifacts = Unset;
     }
     ///State transition - sets the `version` field to Set
     pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVersion<S> {}
     impl<S: State> State for SetVersion<S> {
-        type Artifacts = S::Artifacts;
         type Version = Set<members::version>;
+        type Artifacts = S::Artifacts;
+    }
+    ///State transition - sets the `artifacts` field to Set
+    pub struct SetArtifacts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtifacts<S> {}
+    impl<S: State> State for SetArtifacts<S> {
+        type Version = S::Version;
+        type Artifacts = Set<members::artifacts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artifacts` field
-        pub struct artifacts(());
         ///Marker type for the `version` field
         pub struct version(());
+        ///Marker type for the `artifacts` field
+        pub struct artifacts(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DistributionBuilder<'a, S: distribution_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Vec<distribution::Artifact<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<Vec<distribution::Artifact<S>>>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -512,7 +513,7 @@ where
     /// Set the `artifacts` field (required)
     pub fn artifacts(
         mut self,
-        value: impl Into<Vec<distribution::Artifact<'a>>>,
+        value: impl Into<Vec<distribution::Artifact<S>>>,
     ) -> DistributionBuilder<'a, distribution_state::SetArtifacts<S>> {
         self._fields.0 = Option::Some(value.into());
         DistributionBuilder {
@@ -525,12 +526,12 @@ where
 
 impl<'a, S: distribution_state::State> DistributionBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -544,7 +545,7 @@ where
     /// Set the `version` field (required)
     pub fn version(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DistributionBuilder<'a, distribution_state::SetVersion<S>> {
         self._fields.2 = Option::Some(value.into());
         DistributionBuilder {
@@ -558,8 +559,8 @@ where
 impl<'a, S> DistributionBuilder<'a, S>
 where
     S: distribution_state::State,
-    S::Artifacts: distribution_state::IsSet,
     S::Version: distribution_state::IsSet,
+    S::Artifacts: distribution_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Distribution<'a> {
@@ -573,10 +574,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Distribution<'a> {
         Distribution {
             artifacts: self._fields.0.unwrap(),

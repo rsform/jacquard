@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,55 +29,56 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Record indicating a livestream is published and available for replication at a given address. By convention, the record key is streamer::server
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "place.stream.broadcast.origin",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Origin<'a> {
+pub struct Origin<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///did of the broadcaster that operates the server syndicating the livestream
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub broadcaster: Option<Did<'a>>,
+    pub broadcaster: Option<Did<S>>,
     ///Iroh ticket that can be used to access the livestream from the server
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub iroh_ticket: Option<CowStr<'a>>,
+    pub iroh_ticket: Option<S>,
     ///did of the server that's currently rebroadcasting the livestream
-    #[serde(borrow)]
-    pub server: Did<'a>,
+    pub server: Did<S>,
     ///DID of the streamer whose livestream is being published
-    #[serde(borrow)]
-    pub streamer: Did<'a>,
+    pub streamer: Did<S>,
     ///Periodically updated timestamp when this origin last saw a livestream
     pub updated_at: Datetime,
     ///URL of the websocket endpoint for the livestream
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub websocket_url: Option<UriValue<'a>>,
+    pub websocket_url: Option<UriValue<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct OriginGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct OriginGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Origin<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Origin<S>,
 }
 
-impl<'a> Origin<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, OriginRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Origin<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, OriginRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -86,18 +89,17 @@ pub struct OriginRecord;
 impl XrpcResp for OriginRecord {
     const NSID: &'static str = "place.stream.broadcast.origin";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = OriginGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = OriginGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<OriginGetRecordOutput<'_>> for Origin<'_> {
-    fn from(output: OriginGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<OriginGetRecordOutput<S>> for Origin<S> {
+    fn from(output: OriginGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Origin<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Origin<S> {
     const NSID: &'static str = "place.stream.broadcast.origin";
     type Record = OriginRecord;
 }
@@ -107,7 +109,7 @@ impl Collection for OriginRecord {
     type Record = OriginRecord;
 }
 
-impl<'a> LexiconSchema for Origin<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Origin<S> {
     fn nsid() -> &'static str {
         "place.stream.broadcast.origin"
     }
@@ -194,12 +196,12 @@ pub mod origin_state {
 pub struct OriginBuilder<'a, S: origin_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<Did<'a>>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<Did<S>>,
         Option<Datetime>,
-        Option<UriValue<'a>>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -224,12 +226,12 @@ impl<'a> OriginBuilder<'a, origin_state::Empty> {
 
 impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
     /// Set the `broadcaster` field (optional)
-    pub fn broadcaster(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn broadcaster(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `broadcaster` field to an Option value (optional)
-    pub fn maybe_broadcaster(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_broadcaster(mut self, value: Option<Did<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -237,12 +239,12 @@ impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
 
 impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
     /// Set the `irohTicket` field (optional)
-    pub fn iroh_ticket(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn iroh_ticket(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `irohTicket` field to an Option value (optional)
-    pub fn maybe_iroh_ticket(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_iroh_ticket(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -256,7 +258,7 @@ where
     /// Set the `server` field (required)
     pub fn server(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> OriginBuilder<'a, origin_state::SetServer<S>> {
         self._fields.2 = Option::Some(value.into());
         OriginBuilder {
@@ -275,7 +277,7 @@ where
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> OriginBuilder<'a, origin_state::SetStreamer<S>> {
         self._fields.3 = Option::Some(value.into());
         OriginBuilder {
@@ -307,12 +309,12 @@ where
 
 impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
     /// Set the `websocketURL` field (optional)
-    pub fn websocket_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn websocket_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `websocketURL` field to an Option value (optional)
-    pub fn maybe_websocket_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_websocket_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -338,13 +340,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Origin<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Origin<'a> {
         Origin {
             broadcaster: self._fields.0,
             iroh_ticket: self._fields.1,

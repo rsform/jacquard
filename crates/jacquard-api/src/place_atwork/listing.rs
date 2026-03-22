@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,57 +32,61 @@ use crate::app_bsky::richtext::facet::Facet;
 use crate::community_lexicon::location::hthree::Hthree;
 /// A job listing
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "place.atwork.listing", tag = "$type")]
-pub struct Listing<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "place.atwork.listing",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Listing<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///URL where applicants can apply for the job.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub apply_link: Option<UriValue<'a>>,
+    pub apply_link: Option<UriValue<S>>,
     ///Larger horizontal image to display behind job listing view.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub banner: Option<BlobRef<'a>>,
+    pub banner: Option<BlobRef<S>>,
     ///The description of the job listing.
-    #[serde(borrow)]
-    pub description: CowStr<'a>,
+    pub description: S,
     ///Annotations of text (mentions, URLs, hashtags, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub facets: Option<Vec<Facet<'a>>>,
+    pub facets: Option<Vec<Facet<S>>>,
     ///Locations that are relevant to the job listing.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub locations: Option<Vec<Hthree<'a>>>,
+    pub locations: Option<Vec<Hthree<S>>>,
     ///Client-declared timestamp when the job listing expires.
     pub not_after: Datetime,
     ///Client-declared timestamp when the job listing becomes visible.
     pub not_before: Datetime,
     ///The title of the job listing.
-    #[serde(borrow)]
-    pub title: CowStr<'a>,
+    pub title: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ListingGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListingGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Listing<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Listing<S>,
 }
 
-impl<'a> Listing<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ListingRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Listing<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ListingRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -91,18 +97,17 @@ pub struct ListingRecord;
 impl XrpcResp for ListingRecord {
     const NSID: &'static str = "place.atwork.listing";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListingGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListingGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ListingGetRecordOutput<'_>> for Listing<'_> {
-    fn from(output: ListingGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ListingGetRecordOutput<S>> for Listing<S> {
+    fn from(output: ListingGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Listing<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Listing<S> {
     const NSID: &'static str = "place.atwork.listing";
     type Record = ListingRecord;
 }
@@ -112,7 +117,7 @@ impl Collection for ListingRecord {
     type Record = ListingRecord;
 }
 
-impl<'a> LexiconSchema for Listing<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Listing<S> {
     fn nsid() -> &'static str {
         "place.atwork.listing"
     }
@@ -212,67 +217,67 @@ pub mod listing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Description;
-        type NotBefore;
-        type Title;
         type NotAfter;
+        type NotBefore;
+        type Description;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Description = Unset;
-        type NotBefore = Unset;
-        type Title = Unset;
         type NotAfter = Unset;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Description = Set<members::description>;
-        type NotBefore = S::NotBefore;
-        type Title = S::Title;
-        type NotAfter = S::NotAfter;
-    }
-    ///State transition - sets the `not_before` field to Set
-    pub struct SetNotBefore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotBefore<S> {}
-    impl<S: State> State for SetNotBefore<S> {
-        type Description = S::Description;
-        type NotBefore = Set<members::not_before>;
-        type Title = S::Title;
-        type NotAfter = S::NotAfter;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Description = S::Description;
-        type NotBefore = S::NotBefore;
-        type Title = Set<members::title>;
-        type NotAfter = S::NotAfter;
+        type NotBefore = Unset;
+        type Description = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `not_after` field to Set
     pub struct SetNotAfter<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotAfter<S> {}
     impl<S: State> State for SetNotAfter<S> {
-        type Description = S::Description;
-        type NotBefore = S::NotBefore;
-        type Title = S::Title;
         type NotAfter = Set<members::not_after>;
+        type NotBefore = S::NotBefore;
+        type Description = S::Description;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `not_before` field to Set
+    pub struct SetNotBefore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotBefore<S> {}
+    impl<S: State> State for SetNotBefore<S> {
+        type NotAfter = S::NotAfter;
+        type NotBefore = Set<members::not_before>;
+        type Description = S::Description;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type NotAfter = S::NotAfter;
+        type NotBefore = S::NotBefore;
+        type Description = Set<members::description>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type NotAfter = S::NotAfter;
+        type NotBefore = S::NotBefore;
+        type Description = S::Description;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `not_before` field
-        pub struct not_before(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `not_after` field
         pub struct not_after(());
+        ///Marker type for the `not_before` field
+        pub struct not_before(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -280,14 +285,14 @@ pub mod listing_state {
 pub struct ListingBuilder<'a, S: listing_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<UriValue<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<Vec<Hthree<'a>>>,
+        Option<UriValue<S>>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<Vec<Hthree<S>>>,
         Option<Datetime>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -312,12 +317,12 @@ impl<'a> ListingBuilder<'a, listing_state::Empty> {
 
 impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     /// Set the `applyLink` field (optional)
-    pub fn apply_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn apply_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `applyLink` field to an Option value (optional)
-    pub fn maybe_apply_link(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_apply_link(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -325,12 +330,12 @@ impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
 
 impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     /// Set the `banner` field (optional)
-    pub fn banner(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn banner(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `banner` field to an Option value (optional)
-    pub fn maybe_banner(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_banner(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -344,7 +349,7 @@ where
     /// Set the `description` field (required)
     pub fn description(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ListingBuilder<'a, listing_state::SetDescription<S>> {
         self._fields.2 = Option::Some(value.into());
         ListingBuilder {
@@ -357,12 +362,12 @@ where
 
 impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     /// Set the `facets` field (optional)
-    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
+    pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
-    pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -370,12 +375,12 @@ impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
 
 impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     /// Set the `locations` field (optional)
-    pub fn locations(mut self, value: impl Into<Option<Vec<Hthree<'a>>>>) -> Self {
+    pub fn locations(mut self, value: impl Into<Option<Vec<Hthree<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `locations` field to an Option value (optional)
-    pub fn maybe_locations(mut self, value: Option<Vec<Hthree<'a>>>) -> Self {
+    pub fn maybe_locations(mut self, value: Option<Vec<Hthree<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -427,7 +432,7 @@ where
     /// Set the `title` field (required)
     pub fn title(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ListingBuilder<'a, listing_state::SetTitle<S>> {
         self._fields.7 = Option::Some(value.into());
         ListingBuilder {
@@ -441,10 +446,10 @@ where
 impl<'a, S> ListingBuilder<'a, S>
 where
     S: listing_state::State,
-    S::Description: listing_state::IsSet,
-    S::NotBefore: listing_state::IsSet,
-    S::Title: listing_state::IsSet,
     S::NotAfter: listing_state::IsSet,
+    S::NotBefore: listing_state::IsSet,
+    S::Description: listing_state::IsSet,
+    S::Title: listing_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Listing<'a> {
@@ -463,10 +468,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Listing<'a> {
         Listing {
             apply_link: self._fields.0,

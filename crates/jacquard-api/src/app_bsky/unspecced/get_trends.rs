@@ -10,7 +10,10 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::unspecced::TrendView;
 
@@ -24,12 +27,20 @@ pub struct GetTrends {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTrendsOutput<'a> {
-    #[serde(borrow)]
-    pub trends: Vec<TrendView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTrendsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub trends: Vec<TrendView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.bsky.unspecced.getTrends
@@ -37,8 +48,8 @@ pub struct GetTrendsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTrendsResponse {
     const NSID: &'static str = "app.bsky.unspecced.getTrends";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTrendsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetTrendsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetTrends {
@@ -52,7 +63,7 @@ pub struct GetTrendsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTrendsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getTrends";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTrends;
+    type Request<S: Bos<str> + AsRef<str>> = GetTrends;
     type Response = GetTrendsResponse;
 }
 

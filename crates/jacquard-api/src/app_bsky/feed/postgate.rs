@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,53 +30,69 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::postgate;
 /// Disables embedding of this post.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct DisableRule<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DisableRule<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Record defining interaction rules for a post. The record key (rkey) of the postgate record must match the record key of the post, and that record must be in the same repository.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.bsky.feed.postgate", tag = "$type")]
-pub struct Postgate<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.bsky.feed.postgate",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Postgate<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     ///List of AT-URIs embedding this post that the author has detached from.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub detached_embedding_uris: Option<Vec<AtUri<'a>>>,
+    pub detached_embedding_uris: Option<Vec<AtUri<S>>>,
     ///List of rules defining who can embed this post. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub embedding_rules: Option<Vec<postgate::DisableRule<'a>>>,
+    pub embedding_rules: Option<Vec<postgate::DisableRule<S>>>,
     ///Reference (AT-URI) to the post record.
-    #[serde(borrow)]
-    pub post: AtUri<'a>,
+    pub post: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PostgateGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PostgateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Postgate<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Postgate<S>,
 }
 
-impl<'a> Postgate<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PostgateRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Postgate<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PostgateRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for DisableRule<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DisableRule<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.postgate"
     }
@@ -96,18 +114,17 @@ pub struct PostgateRecord;
 impl XrpcResp for PostgateRecord {
     const NSID: &'static str = "app.bsky.feed.postgate";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PostgateGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PostgateGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PostgateGetRecordOutput<'_>> for Postgate<'_> {
-    fn from(output: PostgateGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PostgateGetRecordOutput<S>> for Postgate<S> {
+    fn from(output: PostgateGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Postgate<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Postgate<S> {
     const NSID: &'static str = "app.bsky.feed.postgate";
     type Record = PostgateRecord;
 }
@@ -117,7 +134,7 @@ impl Collection for PostgateRecord {
     type Record = PostgateRecord;
 }
 
-impl<'a> LexiconSchema for Postgate<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Postgate<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.postgate"
     }
@@ -306,9 +323,9 @@ pub struct PostgateBuilder<'a, S: postgate_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<Vec<AtUri<'a>>>,
-        Option<Vec<postgate::DisableRule<'a>>>,
-        Option<AtUri<'a>>,
+        Option<Vec<AtUri<S>>>,
+        Option<Vec<postgate::DisableRule<S>>>,
+        Option<AtUri<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -354,7 +371,7 @@ impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
     /// Set the `detachedEmbeddingUris` field (optional)
     pub fn detached_embedding_uris(
         mut self,
-        value: impl Into<Option<Vec<AtUri<'a>>>>,
+        value: impl Into<Option<Vec<AtUri<S>>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
@@ -362,7 +379,7 @@ impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
     /// Set the `detachedEmbeddingUris` field to an Option value (optional)
     pub fn maybe_detached_embedding_uris(
         mut self,
-        value: Option<Vec<AtUri<'a>>>,
+        value: Option<Vec<AtUri<S>>>,
     ) -> Self {
         self._fields.1 = value;
         self
@@ -373,7 +390,7 @@ impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
     /// Set the `embeddingRules` field (optional)
     pub fn embedding_rules(
         mut self,
-        value: impl Into<Option<Vec<postgate::DisableRule<'a>>>>,
+        value: impl Into<Option<Vec<postgate::DisableRule<S>>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
@@ -381,7 +398,7 @@ impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
     /// Set the `embeddingRules` field to an Option value (optional)
     pub fn maybe_embedding_rules(
         mut self,
-        value: Option<Vec<postgate::DisableRule<'a>>>,
+        value: Option<Vec<postgate::DisableRule<S>>>,
     ) -> Self {
         self._fields.2 = value;
         self
@@ -396,7 +413,7 @@ where
     /// Set the `post` field (required)
     pub fn post(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> PostgateBuilder<'a, postgate_state::SetPost<S>> {
         self._fields.3 = Option::Some(value.into());
         PostgateBuilder {
@@ -426,10 +443,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Postgate<'a> {
         Postgate {
             created_at: self._fields.0.unwrap(),

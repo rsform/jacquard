@@ -10,46 +10,61 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Language};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::communication::TemplateView;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateTemplate<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateTemplate<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Content of the template, markdown supported, can contain variable placeholders.
-    #[serde(borrow)]
-    pub content_markdown: CowStr<'a>,
+    pub content_markdown: S,
     ///DID of the user who is creating the template.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub created_by: Option<Did<'a>>,
+    pub created_by: Option<Did<S>>,
     ///Message language.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lang: Option<Language>,
     ///Name of the template.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Subject of the message, used in emails.
-    #[serde(borrow)]
-    pub subject: CowStr<'a>,
+    pub subject: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateTemplateOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateTemplateOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: TemplateView<'a>,
+    pub value: TemplateView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -58,18 +73,19 @@ pub struct CreateTemplateOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateTemplateError<'a> {
+pub enum CreateTemplateError {
     #[serde(rename = "DuplicateTemplateName")]
-    DuplicateTemplateName(Option<CowStr<'a>>),
+    DuplicateTemplateName(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for CreateTemplateError<'_> {
+impl core::fmt::Display for CreateTemplateError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::DuplicateTemplateName(msg) => {
@@ -79,7 +95,13 @@ impl core::fmt::Display for CreateTemplateError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -89,11 +111,12 @@ pub struct CreateTemplateResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateTemplateResponse {
     const NSID: &'static str = "tools.ozone.communication.createTemplate";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateTemplateOutput<'de>;
-    type Err<'de> = CreateTemplateError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CreateTemplateOutput<S>;
+    type Err = CreateTemplateError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateTemplate<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CreateTemplate<S> {
     const NSID: &'static str = "tools.ozone.communication.createTemplate";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -108,6 +131,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateTemplateRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CreateTemplate<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CreateTemplate<S>;
     type Response = CreateTemplateResponse;
 }

@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -25,38 +27,47 @@ use serde::{Serialize, Deserialize};
 use crate::garden_lexicon::exultant_zebra::masl;
 /// A bundle of resources.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Masl<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Masl<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Optional name for the bundle.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///The resources in this bundle.
-    #[serde(borrow)]
-    pub resources: Vec<masl::Resource<'a>>,
+    pub resources: Vec<masl::Resource<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A single resource identified by a CID.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Resource<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Resource<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_type: Option<CowStr<'a>>,
+    pub content_type: Option<S>,
     ///Optional path for this resource (e.g. '/index.html').
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub path: Option<CowStr<'a>>,
+    pub path: Option<S>,
     ///The content identifier for this resource.
-    #[serde(borrow)]
-    pub src: BlobRef<'a>,
+    pub src: BlobRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Masl<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Masl<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.masl"
     }
@@ -71,7 +82,7 @@ impl<'a> LexiconSchema for Masl<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Resource<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Resource<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.masl"
     }
@@ -121,7 +132,7 @@ pub mod masl_state {
 /// Builder for constructing an instance of this type
 pub struct MaslBuilder<'a, S: masl_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Vec<masl::Resource<'a>>>),
+    _fields: (Option<S>, Option<Vec<masl::Resource<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -145,12 +156,12 @@ impl<'a> MaslBuilder<'a, masl_state::Empty> {
 
 impl<'a, S: masl_state::State> MaslBuilder<'a, S> {
     /// Set the `name` field (optional)
-    pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
-    pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -164,7 +175,7 @@ where
     /// Set the `resources` field (required)
     pub fn resources(
         mut self,
-        value: impl Into<Vec<masl::Resource<'a>>>,
+        value: impl Into<Vec<masl::Resource<S>>>,
     ) -> MaslBuilder<'a, masl_state::SetResources<S>> {
         self._fields.1 = Option::Some(value.into());
         MaslBuilder {
@@ -189,13 +200,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Masl<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Masl<'a> {
         Masl {
             name: self._fields.0,
             resources: self._fields.1.unwrap(),
@@ -326,7 +331,7 @@ pub mod resource_state {
 /// Builder for constructing an instance of this type
 pub struct ResourceBuilder<'a, S: resource_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<BlobRef<'a>>),
+    _fields: (Option<S>, Option<S>, Option<BlobRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -350,12 +355,12 @@ impl<'a> ResourceBuilder<'a, resource_state::Empty> {
 
 impl<'a, S: resource_state::State> ResourceBuilder<'a, S> {
     /// Set the `contentType` field (optional)
-    pub fn content_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn content_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `contentType` field to an Option value (optional)
-    pub fn maybe_content_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_content_type(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -363,12 +368,12 @@ impl<'a, S: resource_state::State> ResourceBuilder<'a, S> {
 
 impl<'a, S: resource_state::State> ResourceBuilder<'a, S> {
     /// Set the `path` field (optional)
-    pub fn path(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn path(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `path` field to an Option value (optional)
-    pub fn maybe_path(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_path(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -382,7 +387,7 @@ where
     /// Set the `src` field (required)
     pub fn src(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> ResourceBuilder<'a, resource_state::SetSrc<S>> {
         self._fields.2 = Option::Some(value.into());
         ResourceBuilder {
@@ -410,10 +415,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Resource<'a> {
         Resource {
             content_type: self._fields.0,

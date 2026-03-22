@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -28,48 +29,51 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A master record validating one player's stats for one system. Multiple GMs can validate the same player.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "actor.rpg.master", tag = "$type")]
-pub struct Master<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "actor.rpg.master",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Master<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Name of the campaign this validation relates to
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub campaign: Option<CowStr<'a>>,
+    pub campaign: Option<S>,
     pub created_at: Datetime,
     ///DID of the player this record validates
-    #[serde(borrow)]
-    pub player: Did<'a>,
+    pub player: Did<S>,
     ///What portions of stats are validated. 'none' = inherent trust (always valid), 'custom' = selected fields only, 'full' = all fields must match
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub snapshot_scope: Option<MasterSnapshotScope<'a>>,
+    pub snapshot_scope: Option<MasterSnapshotScope<S>>,
     ///CID of the approved sprite blob (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sprite_cid: Option<CowStr<'a>>,
+    pub sprite_cid: Option<S>,
     ///Snapshot of the player's stats for this system. Omitted when snapshotScope is 'none'.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub stats: Option<Data<'a>>,
+    pub stats: Option<Data<S>>,
     ///The stat system being validated (e.g. 'dnd', 'reverie', 'rmmz')
-    #[serde(borrow)]
-    pub system: CowStr<'a>,
+    pub system: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// What portions of stats are validated. 'none' = inherent trust (always valid), 'custom' = selected fields only, 'full' = all fields must match
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MasterSnapshotScope<'a> {
+pub enum MasterSnapshotScope<S: Bos<str> + AsRef<str> = DefaultStr> {
     None,
     Custom,
     Full,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> MasterSnapshotScope<'a> {
+impl<S: Bos<str> + AsRef<str>> MasterSnapshotScope<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -78,72 +82,57 @@ impl<'a> MasterSnapshotScope<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for MasterSnapshotScope<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "none" => Self::None,
             "custom" => Self::Custom,
             "full" => Self::Full,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for MasterSnapshotScope<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "none" => Self::None,
-            "custom" => Self::Custom,
-            "full" => Self::Full,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for MasterSnapshotScope<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for MasterSnapshotScope<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for MasterSnapshotScope<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for MasterSnapshotScope<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for MasterSnapshotScope<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for MasterSnapshotScope<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for MasterSnapshotScope<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for MasterSnapshotScope<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for MasterSnapshotScope<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for MasterSnapshotScope<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for MasterSnapshotScope<'_> {
-    type Output = MasterSnapshotScope<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for MasterSnapshotScope<S> {
+    type Output = MasterSnapshotScope<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             MasterSnapshotScope::None => MasterSnapshotScope::None,
@@ -157,22 +146,23 @@ impl jacquard_common::IntoStatic for MasterSnapshotScope<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MasterGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MasterGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Master<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Master<S>,
 }
 
-impl<'a> Master<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, MasterRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Master<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, MasterRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -183,18 +173,17 @@ pub struct MasterRecord;
 impl XrpcResp for MasterRecord {
     const NSID: &'static str = "actor.rpg.master";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MasterGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MasterGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<MasterGetRecordOutput<'_>> for Master<'_> {
-    fn from(output: MasterGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<MasterGetRecordOutput<S>> for Master<S> {
+    fn from(output: MasterGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Master<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Master<S> {
     const NSID: &'static str = "actor.rpg.master";
     type Record = MasterRecord;
 }
@@ -204,7 +193,7 @@ impl Collection for MasterRecord {
     type Record = MasterRecord;
 }
 
-impl<'a> LexiconSchema for Master<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Master<S> {
     fn nsid() -> &'static str {
         "actor.rpg.master"
     }
@@ -302,13 +291,13 @@ pub mod master_state {
 pub struct MasterBuilder<'a, S: master_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<Did<'a>>,
-        Option<MasterSnapshotScope<'a>>,
-        Option<CowStr<'a>>,
-        Option<Data<'a>>,
-        Option<CowStr<'a>>,
+        Option<Did<S>>,
+        Option<MasterSnapshotScope<S>>,
+        Option<S>,
+        Option<Data<S>>,
+        Option<S>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -334,12 +323,12 @@ impl<'a> MasterBuilder<'a, master_state::Empty> {
 
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `campaign` field (optional)
-    pub fn campaign(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn campaign(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `campaign` field to an Option value (optional)
-    pub fn maybe_campaign(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_campaign(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -372,7 +361,7 @@ where
     /// Set the `player` field (required)
     pub fn player(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> MasterBuilder<'a, master_state::SetPlayer<S>> {
         self._fields.2 = Option::Some(value.into());
         MasterBuilder {
@@ -387,7 +376,7 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `snapshotScope` field (optional)
     pub fn snapshot_scope(
         mut self,
-        value: impl Into<Option<MasterSnapshotScope<'a>>>,
+        value: impl Into<Option<MasterSnapshotScope<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -395,7 +384,7 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `snapshotScope` field to an Option value (optional)
     pub fn maybe_snapshot_scope(
         mut self,
-        value: Option<MasterSnapshotScope<'a>>,
+        value: Option<MasterSnapshotScope<S>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -404,12 +393,12 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
 
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `spriteCid` field (optional)
-    pub fn sprite_cid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn sprite_cid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `spriteCid` field to an Option value (optional)
-    pub fn maybe_sprite_cid(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_sprite_cid(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -417,12 +406,12 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
 
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `stats` field (optional)
-    pub fn stats(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn stats(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `stats` field to an Option value (optional)
-    pub fn maybe_stats(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_stats(mut self, value: Option<Data<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -436,7 +425,7 @@ where
     /// Set the `system` field (required)
     pub fn system(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MasterBuilder<'a, master_state::SetSystem<S>> {
         self._fields.6 = Option::Some(value.into());
         MasterBuilder {
@@ -482,10 +471,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Master<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Master<'a> {
         Master {
             campaign: self._fields.0,
             created_at: self._fields.1.unwrap(),

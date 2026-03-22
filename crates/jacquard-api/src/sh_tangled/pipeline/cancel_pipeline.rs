@@ -10,24 +10,32 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CancelPipeline<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CancelPipeline<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///pipeline at-uri
-    #[serde(borrow)]
-    pub pipeline: AtUri<'a>,
+    pub pipeline: AtUri<S>,
     ///repo at-uri, spindle can't resolve repo from pipeline at-uri yet
-    #[serde(borrow)]
-    pub repo: AtUri<'a>,
+    pub repo: AtUri<S>,
     ///workflow name
-    #[serde(borrow)]
-    pub workflow: CowStr<'a>,
+    pub workflow: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.tangled.pipeline.cancelPipeline
@@ -35,11 +43,12 @@ pub struct CancelPipelineResponse;
 impl jacquard_common::xrpc::XrpcResp for CancelPipelineResponse {
     const NSID: &'static str = "sh.tangled.pipeline.cancelPipeline";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CancelPipeline<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CancelPipeline<S> {
     const NSID: &'static str = "sh.tangled.pipeline.cancelPipeline";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -54,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CancelPipelineRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CancelPipeline<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CancelPipeline<S>;
     type Response = CancelPipelineResponse;
 }
 
@@ -69,57 +78,57 @@ pub mod cancel_pipeline_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Repo;
-        type Pipeline;
         type Workflow;
+        type Pipeline;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Repo = Unset;
-        type Pipeline = Unset;
         type Workflow = Unset;
+        type Pipeline = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
         type Repo = Set<members::repo>;
+        type Workflow = S::Workflow;
         type Pipeline = S::Pipeline;
-        type Workflow = S::Workflow;
-    }
-    ///State transition - sets the `pipeline` field to Set
-    pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPipeline<S> {}
-    impl<S: State> State for SetPipeline<S> {
-        type Repo = S::Repo;
-        type Pipeline = Set<members::pipeline>;
-        type Workflow = S::Workflow;
     }
     ///State transition - sets the `workflow` field to Set
     pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkflow<S> {}
     impl<S: State> State for SetWorkflow<S> {
         type Repo = S::Repo;
-        type Pipeline = S::Pipeline;
         type Workflow = Set<members::workflow>;
+        type Pipeline = S::Pipeline;
+    }
+    ///State transition - sets the `pipeline` field to Set
+    pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPipeline<S> {}
+    impl<S: State> State for SetPipeline<S> {
+        type Repo = S::Repo;
+        type Workflow = S::Workflow;
+        type Pipeline = Set<members::pipeline>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `pipeline` field
-        pub struct pipeline(());
         ///Marker type for the `workflow` field
         pub struct workflow(());
+        ///Marker type for the `pipeline` field
+        pub struct pipeline(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CancelPipelineBuilder<'a, S: cancel_pipeline_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<AtUri<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<AtUri<S>>, Option<AtUri<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -149,7 +158,7 @@ where
     /// Set the `pipeline` field (required)
     pub fn pipeline(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> CancelPipelineBuilder<'a, cancel_pipeline_state::SetPipeline<S>> {
         self._fields.0 = Option::Some(value.into());
         CancelPipelineBuilder {
@@ -168,7 +177,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> CancelPipelineBuilder<'a, cancel_pipeline_state::SetRepo<S>> {
         self._fields.1 = Option::Some(value.into());
         CancelPipelineBuilder {
@@ -187,7 +196,7 @@ where
     /// Set the `workflow` field (required)
     pub fn workflow(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CancelPipelineBuilder<'a, cancel_pipeline_state::SetWorkflow<S>> {
         self._fields.2 = Option::Some(value.into());
         CancelPipelineBuilder {
@@ -202,8 +211,8 @@ impl<'a, S> CancelPipelineBuilder<'a, S>
 where
     S: cancel_pipeline_state::State,
     S::Repo: cancel_pipeline_state::IsSet,
-    S::Pipeline: cancel_pipeline_state::IsSet,
     S::Workflow: cancel_pipeline_state::IsSet,
+    S::Pipeline: cancel_pipeline_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CancelPipeline<'a> {
@@ -217,10 +226,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CancelPipeline<'a> {
         CancelPipeline {
             pipeline: self._fields.0.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,38 +30,47 @@ use serde::{Serialize, Deserialize};
 use crate::fm_teal::alpha::feed::PlayView;
 /// This lexicon is in a not officially released state. It is subject to change. | A declaration of the status of the actor. Only one can be shown at a time. If there are multiple, the latest record should be picked and earlier records should be deleted or tombstoned.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "fm.teal.alpha.actor.status", tag = "$type")]
-pub struct Status<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "fm.teal.alpha.actor.status",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Status<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The unix timestamp of the expiry time of the item. If unavailable, default to 10 minutes past the start time.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expiry: Option<Datetime>,
-    #[serde(borrow)]
-    pub item: PlayView<'a>,
+    pub item: PlayView<S>,
     ///The unix timestamp of when the item was recorded
     pub time: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StatusGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StatusGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Status<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Status<S>,
 }
 
-impl<'a> Status<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, StatusRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Status<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, StatusRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -70,18 +81,17 @@ pub struct StatusRecord;
 impl XrpcResp for StatusRecord {
     const NSID: &'static str = "fm.teal.alpha.actor.status";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StatusGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StatusGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<StatusGetRecordOutput<'_>> for Status<'_> {
-    fn from(output: StatusGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<StatusGetRecordOutput<S>> for Status<S> {
+    fn from(output: StatusGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Status<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Status<S> {
     const NSID: &'static str = "fm.teal.alpha.actor.status";
     type Record = StatusRecord;
 }
@@ -91,7 +101,7 @@ impl Collection for StatusRecord {
     type Record = StatusRecord;
 }
 
-impl<'a> LexiconSchema for Status<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Status<S> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.actor.status"
     }
@@ -116,44 +126,44 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Time;
         type Item;
+        type Time;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Time = Unset;
         type Item = Unset;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Time = Set<members::time>;
-        type Item = S::Item;
+        type Time = Unset;
     }
     ///State transition - sets the `item` field to Set
     pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetItem<S> {}
     impl<S: State> State for SetItem<S> {
-        type Time = S::Time;
         type Item = Set<members::item>;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Item = S::Item;
+        type Time = Set<members::time>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `time` field
-        pub struct time(());
         ///Marker type for the `item` field
         pub struct item(());
+        ///Marker type for the `time` field
+        pub struct time(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StatusBuilder<'a, S: status_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<PlayView<'a>>, Option<Datetime>),
+    _fields: (Option<Datetime>, Option<PlayView<S>>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -196,7 +206,7 @@ where
     /// Set the `item` field (required)
     pub fn item(
         mut self,
-        value: impl Into<PlayView<'a>>,
+        value: impl Into<PlayView<S>>,
     ) -> StatusBuilder<'a, status_state::SetItem<S>> {
         self._fields.1 = Option::Some(value.into());
         StatusBuilder {
@@ -229,8 +239,8 @@ where
 impl<'a, S> StatusBuilder<'a, S>
 where
     S: status_state::State,
-    S::Time: status_state::IsSet,
     S::Item: status_state::IsSet,
+    S::Time: status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Status<'a> {
@@ -242,13 +252,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Status<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Status<'a> {
         Status {
             expiry: self._fields.0,
             item: self._fields.1.unwrap(),

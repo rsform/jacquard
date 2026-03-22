@@ -72,7 +72,9 @@ impl CommonType {
     }
 
     /// The fully-qualified token path used in Macro mode.
-    /// Returns (path_tokens, needs_lifetime).
+    /// Returns (path, needs_type_param) where needs_type_param indicates the type
+    /// requires a generic parameter `S` (for BOS-parameterised types) or `'a` (for
+    /// lifetime-parameterised types like RawData).
     pub fn fully_qualified(&self) -> (&'static str, bool) {
         match self {
             Self::Did => ("jacquard_common::types::string::Did", true),
@@ -88,15 +90,15 @@ impl CommonType {
             Self::AtUri => ("jacquard_common::types::string::AtUri", true),
             Self::Nsid => ("jacquard_common::types::string::Nsid", true),
             Self::Cid => ("jacquard_common::types::string::Cid", true),
-            // RecordKey is a COMPOSITE type: RecordKey<Rkey<'a>>. needs_lifetime
-            // is false here because the lifetime is carried by the inner Rkey, not
+            // RecordKey is a COMPOSITE type: RecordKey<Rkey<S>>. needs_type_param
+            // is false here because the param is carried by the inner Rkey, not
             // RecordKey itself. type_tokens() must special-case this.
             Self::RecordKey => ("jacquard_common::types::string::RecordKey", false),
             Self::Rkey => ("jacquard_common::types::string::Rkey", true),
             Self::UriValue => ("jacquard_common::types::string::UriValue", true),
             Self::AtIdentifier => ("jacquard_common::types::ident::AtIdentifier", true),
             Self::Collection => ("jacquard_common::types::collection::Collection", false),
-            Self::RecordError => ("jacquard_common::types::collection::RecordError", true),
+            Self::RecordError => ("jacquard_common::types::collection::RecordError", false),
             Self::RawData => ("jacquard_common::types::value::RawData", true),
         }
     }
@@ -162,6 +164,9 @@ pub enum ExternalImport {
     // jacquard_common::types::uri types
     RecordUri,
     UriError,
+    // jacquard_common BOS types
+    Bos,
+    DefaultStr,
 }
 
 impl ExternalImport {
@@ -193,6 +198,8 @@ impl ExternalImport {
             Self::DecodeError => "DecodeError",
             Self::RecordUri => "RecordUri",
             Self::UriError => "UriError",
+            Self::Bos => "Bos",
+            Self::DefaultStr => "DefaultStr",
         }
     }
 
@@ -219,6 +226,7 @@ impl ExternalImport {
             | Self::EncodeError => "jacquard_common::xrpc",
             Self::DecodeError => "jacquard_common::error",
             Self::RecordUri | Self::UriError => "jacquard_common::types::uri",
+            Self::Bos | Self::DefaultStr => "jacquard_common",
         }
     }
 }
@@ -413,14 +421,22 @@ impl ResolvedImports {
     }
 
     /// Returns tokens for a CommonType — short name or fully-qualified.
-    /// Includes `<'a>` for types that need a lifetime parameter.
+    /// Includes `<S>` for BOS-parameterised types that need a type parameter.
     ///
-    /// Callers should NEVER manually append `<'a>` after calling this method.
+    /// Callers should NEVER manually append `<S>` after calling this method.
     ///
-    /// SPECIAL CASE: `RecordKey` is a composite type `RecordKey<Rkey<'a>>`.
-    /// It cannot use the generic `Type<'a>` pattern. Handle it explicitly.
+    /// SPECIAL CASE: `RecordKey` is a composite type `RecordKey<Rkey<S>>`.
+    /// It cannot use the generic `Type<S>` pattern. Handle it explicitly.
+    ///
+    /// SPECIAL CASE: `CowStr` returns bare `S` — in generated structs, string
+    /// fields use the type parameter directly, not `CowStr<'a>`.
     pub fn type_tokens(&self, ct: &CommonType) -> TokenStream {
-        // Special case: RecordKey<Rkey<'a>> is a composed generic.
+        // CowStr in field position becomes bare S.
+        if matches!(ct, CommonType::CowStr) {
+            return quote! { S };
+        }
+
+        // Special case: RecordKey<Rkey<S>> is a composed generic.
         if matches!(ct, CommonType::RecordKey) {
             let rkey_tokens = self.type_tokens(&CommonType::Rkey);
             if let Some(ident) = self.short.get(ct) {
@@ -433,17 +449,17 @@ impl ResolvedImports {
         }
 
         if let Some(ident) = self.short.get(ct) {
-            let needs_lifetime = ct.fully_qualified().1;
-            if needs_lifetime {
-                quote! { #ident<'a> }
+            let needs_param = ct.fully_qualified().1;
+            if needs_param {
+                quote! { #ident<S> }
             } else {
                 quote! { #ident }
             }
         } else {
-            let (path_str, needs_lifetime) = ct.fully_qualified();
+            let (path_str, needs_param) = ct.fully_qualified();
             let path: syn::Path = syn::parse_str(path_str).expect("valid path");
-            if needs_lifetime {
-                quote! { #path<'a> }
+            if needs_param {
+                quote! { #path<S> }
             } else {
                 quote! { #path }
             }
@@ -493,6 +509,16 @@ impl ResolvedImports {
             ct.short_name().to_string()
         } else {
             ct.fully_qualified().0.to_string()
+        }
+    }
+
+    /// Returns a string path for an external import in serde attribute string literals.
+    /// Short form if imported, fully-qualified otherwise.
+    pub fn serde_external_path(&self, ei: &ExternalImport) -> String {
+        if self.external_short.contains_key(ei) {
+            ei.short_name().to_string()
+        } else {
+            format!("{}::{}", ei.use_path(), ei.short_name())
         }
     }
 
@@ -571,12 +597,12 @@ impl ResolvedImports {
     }
 
     /// Derive attribute for error enums (adds thiserror::Error, miette::Diagnostic).
+    /// Error types are always owned (SmolStr-backed), so no IntoStatic needed.
     pub fn derive_error(&self) -> TokenStream {
         let ser = self.external_path(&ExternalImport::Serialize);
         let de = self.external_path(&ExternalImport::Deserialize);
-        let into_static = self.external_path(&ExternalImport::IntoStatic);
         quote! {
-            #[derive(#ser, #de, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic, #into_static)]
+            #[derive(#ser, #de, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic)]
         }
     }
 
@@ -623,6 +649,8 @@ impl ResolvedImports {
                 }
                 ExternalImport::PhantomData => "::core::marker::PhantomData",
                 ExternalImport::BTreeMap => "alloc::collections::BTreeMap",
+                ExternalImport::Bos => "jacquard_common::Bos",
+                ExternalImport::DefaultStr => "jacquard_common::DefaultStr",
             };
             let path: syn::Path = syn::parse_str(path_str).expect("valid path");
             quote! { #path }
@@ -1044,9 +1072,9 @@ mod tests {
         assert_eq!(path, "jacquard_common::types::collection::Collection");
         assert!(!needs_lifetime);
 
-        let (path, needs_lifetime) = CommonType::RecordError.fully_qualified();
+        let (path, needs_type_param) = CommonType::RecordError.fully_qualified();
         assert_eq!(path, "jacquard_common::types::collection::RecordError");
-        assert!(needs_lifetime);
+        assert!(!needs_type_param);
 
         // Test RecordKey special case (composite type)
         let (path, needs_lifetime) = CommonType::RecordKey.fully_qualified();
@@ -1330,12 +1358,12 @@ mod tests {
             &BTreeMap::new(),
         );
 
-        // For a short-named type with lifetime, type_tokens should emit ident<'a>.
+        // For a short-named type with type param, type_tokens should emit ident<S>.
         let tokens = resolved.type_tokens(&CommonType::Did);
         let tokens_str = tokens.to_string();
-        assert_eq!(tokens_str, "Did < 'a >");
+        assert_eq!(tokens_str, "Did < S >");
 
-        // For a type without lifetime, type_tokens should emit just the ident.
+        // For a type without type param, type_tokens should emit just the ident.
         let mut imports2 = ImportSet::default();
         imports2.common.insert(CommonType::Datetime);
         let resolved2 = ResolvedImports::resolve(
@@ -1363,15 +1391,15 @@ mod tests {
             &BTreeMap::new(),
         );
 
-        // In Macro mode, type_tokens should emit the fully-qualified path with lifetime.
+        // In Macro mode, type_tokens should emit the fully-qualified path with type param S.
         let tokens = resolved.type_tokens(&CommonType::Did);
         let tokens_str = tokens.to_string();
         assert!(tokens_str.contains("jacquard_common"));
         assert!(tokens_str.contains("string"));
         assert!(tokens_str.contains("Did"));
         assert!(
-            tokens_str.contains("'a"),
-            "Did should include lifetime in Macro mode"
+            tokens_str.contains("S"),
+            "Did should include type param S in Macro mode, got: {}", tokens_str
         );
     }
 

@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,48 +29,55 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "moe.karashiiro.kpaste.paste", tag = "$type")]
-pub struct Paste<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "moe.karashiiro.kpaste.paste",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Paste<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Blob reference to the paste content
-    #[serde(borrow)]
-    pub content: BlobRef<'a>,
+    pub content: BlobRef<S>,
     ///When the paste was created
     pub created_at: Datetime,
     ///Programming language for syntax highlighting  Defaults to `"text"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_paste_language")]
-    #[serde(borrow)]
-    pub language: Option<CowStr<'a>>,
+    pub language: Option<S>,
     ///Optional title for the paste
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     ///When the paste was last modified (optional, defaults to createdAt)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PasteGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PasteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Paste<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Paste<S>,
 }
 
-impl<'a> Paste<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PasteRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Paste<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PasteRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -79,18 +88,17 @@ pub struct PasteRecord;
 impl XrpcResp for PasteRecord {
     const NSID: &'static str = "moe.karashiiro.kpaste.paste";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PasteGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PasteGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PasteGetRecordOutput<'_>> for Paste<'_> {
-    fn from(output: PasteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PasteGetRecordOutput<S>> for Paste<S> {
+    fn from(output: PasteGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Paste<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Paste<S> {
     const NSID: &'static str = "moe.karashiiro.kpaste.paste";
     type Record = PasteRecord;
 }
@@ -100,7 +108,7 @@ impl Collection for PasteRecord {
     type Record = PasteRecord;
 }
 
-impl<'a> LexiconSchema for Paste<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Paste<S> {
     fn nsid() -> &'static str {
         "moe.karashiiro.kpaste.paste"
     }
@@ -175,8 +183,8 @@ impl<'a> LexiconSchema for Paste<'a> {
     }
 }
 
-fn _default_paste_language() -> Option<CowStr<'static>> {
-    Some(CowStr::from("text"))
+fn _default_paste_language<S: From<&'static str>>() -> ::core::option::Option<S> {
+    Some(S::from("text"))
 }
 
 pub mod paste_state {
@@ -227,10 +235,10 @@ pub mod paste_state {
 pub struct PasteBuilder<'a, S: paste_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<BlobRef<'a>>,
+        Option<BlobRef<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
     ),
     _lifetime: PhantomData<&'a ()>,
@@ -262,7 +270,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> PasteBuilder<'a, paste_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         PasteBuilder {
@@ -294,12 +302,12 @@ where
 
 impl<'a, S: paste_state::State> PasteBuilder<'a, S> {
     /// Set the `language` field (optional)
-    pub fn language(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn language(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `language` field to an Option value (optional)
-    pub fn maybe_language(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_language(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -307,12 +315,12 @@ impl<'a, S: paste_state::State> PasteBuilder<'a, S> {
 
 impl<'a, S: paste_state::State> PasteBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -349,13 +357,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Paste<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Paste<'a> {
         Paste {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

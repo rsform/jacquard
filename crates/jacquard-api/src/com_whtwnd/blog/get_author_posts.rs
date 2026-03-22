@@ -10,25 +10,42 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::com_whtwnd::blog::BlogEntry;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetAuthorPosts<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetAuthorPosts<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub author: Did<'a>,
+    pub author: Did<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetAuthorPostsOutput<'a> {
-    #[serde(borrow)]
-    pub post: Vec<BlogEntry<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetAuthorPostsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub post: Vec<BlogEntry<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.whtwnd.blog.getAuthorPosts
@@ -36,11 +53,12 @@ pub struct GetAuthorPostsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAuthorPostsResponse {
     const NSID: &'static str = "com.whtwnd.blog.getAuthorPosts";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetAuthorPostsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetAuthorPostsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetAuthorPosts<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetAuthorPosts<S> {
     const NSID: &'static str = "com.whtwnd.blog.getAuthorPosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAuthorPostsResponse;
@@ -51,7 +69,7 @@ pub struct GetAuthorPostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorPostsRequest {
     const PATH: &'static str = "/xrpc/com.whtwnd.blog.getAuthorPosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetAuthorPosts<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetAuthorPosts<S>;
     type Response = GetAuthorPostsResponse;
 }
 
@@ -90,7 +108,7 @@ pub mod get_author_posts_state {
 /// Builder for constructing an instance of this type
 pub struct GetAuthorPostsBuilder<'a, S: get_author_posts_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -120,7 +138,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetAuthorPostsBuilder<'a, get_author_posts_state::SetAuthor<S>> {
         self._fields.0 = Option::Some(value.into());
         GetAuthorPostsBuilder {

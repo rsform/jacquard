@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,47 +30,53 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Record containing an 88x31 button.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "store.88x31.button", tag = "$type")]
-pub struct Button<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "store.88x31.button",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Button<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Alt text description of the button, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub alt: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub blob: BlobRef<'a>,
+    pub alt: Option<S>,
+    pub blob: BlobRef<S>,
     ///Hypertext reference (link) for the button.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub href: Option<CowStr<'a>>,
+    pub href: Option<S>,
     ///Client-declared timestamp when this button was originally created.
     pub posted_at: Datetime,
     ///Title text description of the button, for flavor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ButtonGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ButtonGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Button<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Button<S>,
 }
 
-impl<'a> Button<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ButtonRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Button<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ButtonRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -79,18 +87,17 @@ pub struct ButtonRecord;
 impl XrpcResp for ButtonRecord {
     const NSID: &'static str = "store.88x31.button";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ButtonGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ButtonGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ButtonGetRecordOutput<'_>> for Button<'_> {
-    fn from(output: ButtonGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ButtonGetRecordOutput<S>> for Button<S> {
+    fn from(output: ButtonGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Button<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Button<S> {
     const NSID: &'static str = "store.88x31.button";
     type Record = ButtonRecord;
 }
@@ -100,7 +107,7 @@ impl Collection for ButtonRecord {
     type Record = ButtonRecord;
 }
 
-impl<'a> LexiconSchema for Button<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Button<S> {
     fn nsid() -> &'static str {
         "store.88x31.button"
     }
@@ -231,50 +238,44 @@ pub mod button_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blob;
         type PostedAt;
+        type Blob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blob = Unset;
         type PostedAt = Unset;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
-        type Blob = Set<members::blob>;
-        type PostedAt = S::PostedAt;
+        type Blob = Unset;
     }
     ///State transition - sets the `posted_at` field to Set
     pub struct SetPostedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPostedAt<S> {}
     impl<S: State> State for SetPostedAt<S> {
-        type Blob = S::Blob;
         type PostedAt = Set<members::posted_at>;
+        type Blob = S::Blob;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type PostedAt = S::PostedAt;
+        type Blob = Set<members::blob>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blob` field
-        pub struct blob(());
         ///Marker type for the `posted_at` field
         pub struct posted_at(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ButtonBuilder<'a, S: button_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<BlobRef<S>>, Option<S>, Option<Datetime>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -298,12 +299,12 @@ impl<'a> ButtonBuilder<'a, button_state::Empty> {
 
 impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
     /// Set the `alt` field (optional)
-    pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
-    pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_alt(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -317,7 +318,7 @@ where
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> ButtonBuilder<'a, button_state::SetBlob<S>> {
         self._fields.1 = Option::Some(value.into());
         ButtonBuilder {
@@ -330,12 +331,12 @@ where
 
 impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
     /// Set the `href` field (optional)
-    pub fn href(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn href(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `href` field to an Option value (optional)
-    pub fn maybe_href(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_href(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -362,12 +363,12 @@ where
 
 impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -376,8 +377,8 @@ impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
 impl<'a, S> ButtonBuilder<'a, S>
 where
     S: button_state::State,
-    S::Blob: button_state::IsSet,
     S::PostedAt: button_state::IsSet,
+    S::Blob: button_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Button<'a> {
@@ -391,13 +392,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Button<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Button<'a> {
         Button {
             alt: self._fields.0,
             blob: self._fields.1.unwrap(),

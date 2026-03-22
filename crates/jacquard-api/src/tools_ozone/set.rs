@@ -18,12 +18,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -31,33 +33,43 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Set<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Set<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub description: Option<S>,
+    pub name: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SetView<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SetView<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub description: Option<S>,
+    pub name: S,
     pub set_size: i64,
     pub updated_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for Set<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Set<S> {
     fn nsid() -> &'static str {
         "tools.ozone.set.defs"
     }
@@ -116,7 +128,7 @@ impl<'a> LexiconSchema for Set<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SetView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SetView<S> {
     fn nsid() -> &'static str {
         "tools.ozone.set.defs"
     }
@@ -284,8 +296,8 @@ pub mod set_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type SetSize;
-        type CreatedAt;
         type Name;
+        type CreatedAt;
         type UpdatedAt;
     }
     /// Empty state - all required fields are unset
@@ -293,8 +305,8 @@ pub mod set_view_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type SetSize = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
+        type CreatedAt = Unset;
         type UpdatedAt = Unset;
     }
     ///State transition - sets the `set_size` field to Set
@@ -302,17 +314,8 @@ pub mod set_view_state {
     impl<S: State> sealed::Sealed for SetSetSize<S> {}
     impl<S: State> State for SetSetSize<S> {
         type SetSize = Set<members::set_size>;
+        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type SetSize = S::SetSize;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
         type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `name` field to Set
@@ -320,8 +323,17 @@ pub mod set_view_state {
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type SetSize = S::SetSize;
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type SetSize = S::SetSize;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
         type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
@@ -329,8 +341,8 @@ pub mod set_view_state {
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
         type SetSize = S::SetSize;
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
         type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
@@ -338,10 +350,10 @@ pub mod set_view_state {
     pub mod members {
         ///Marker type for the `set_size` field
         pub struct set_size(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
     }
@@ -350,13 +362,7 @@ pub mod set_view_state {
 /// Builder for constructing an instance of this type
 pub struct SetViewBuilder<'a, S: set_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<S>, Option<i64>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -399,12 +405,12 @@ where
 
 impl<'a, S: set_view_state::State> SetViewBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -418,7 +424,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SetViewBuilder<'a, set_view_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         SetViewBuilder {
@@ -471,8 +477,8 @@ impl<'a, S> SetViewBuilder<'a, S>
 where
     S: set_view_state::State,
     S::SetSize: set_view_state::IsSet,
-    S::CreatedAt: set_view_state::IsSet,
     S::Name: set_view_state::IsSet,
+    S::CreatedAt: set_view_state::IsSet,
     S::UpdatedAt: set_view_state::IsSet,
 {
     /// Build the final struct
@@ -489,10 +495,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SetView<'a> {
         SetView {
             created_at: self._fields.0.unwrap(),

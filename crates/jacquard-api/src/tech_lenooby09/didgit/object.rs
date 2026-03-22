@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,34 +30,37 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A did-git object stored in an AT Protocol repository. Each record represents a single content-addressable object (blob, tree, commit, or tag), keyed by its hex SHA-256 object ID.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "tech.lenooby09.didgit.object",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Object<'a> {
+pub struct Object<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The git object content, stored as an AT Protocol blob.
-    #[serde(borrow)]
-    pub content: BlobRef<'a>,
+    pub content: BlobRef<S>,
     ///The type of the git object.
-    #[serde(borrow)]
-    pub object_type: ObjectObjectType<'a>,
+    pub object_type: ObjectObjectType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The type of the git object.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ObjectObjectType<'a> {
+pub enum ObjectObjectType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Blob,
     Tree,
     Commit,
     Tag,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ObjectObjectType<'a> {
+impl<S: Bos<str> + AsRef<str>> ObjectObjectType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Blob => "blob",
@@ -65,74 +70,58 @@ impl<'a> ObjectObjectType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ObjectObjectType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "blob" => Self::Blob,
             "tree" => Self::Tree,
             "commit" => Self::Commit,
             "tag" => Self::Tag,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ObjectObjectType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "blob" => Self::Blob,
-            "tree" => Self::Tree,
-            "commit" => Self::Commit,
-            "tag" => Self::Tag,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ObjectObjectType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ObjectObjectType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ObjectObjectType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ObjectObjectType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ObjectObjectType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ObjectObjectType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ObjectObjectType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ObjectObjectType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ObjectObjectType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ObjectObjectType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ObjectObjectType<'_> {
-    type Output = ObjectObjectType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ObjectObjectType<S> {
+    type Output = ObjectObjectType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ObjectObjectType::Blob => ObjectObjectType::Blob,
@@ -147,22 +136,23 @@ impl jacquard_common::IntoStatic for ObjectObjectType<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ObjectGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ObjectGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Object<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Object<S>,
 }
 
-impl<'a> Object<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ObjectRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Object<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ObjectRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -173,18 +163,17 @@ pub struct ObjectRecord;
 impl XrpcResp for ObjectRecord {
     const NSID: &'static str = "tech.lenooby09.didgit.object";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ObjectGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ObjectGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ObjectGetRecordOutput<'_>> for Object<'_> {
-    fn from(output: ObjectGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ObjectGetRecordOutput<S>> for Object<S> {
+    fn from(output: ObjectGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Object<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Object<S> {
     const NSID: &'static str = "tech.lenooby09.didgit.object";
     type Record = ObjectRecord;
 }
@@ -194,7 +183,7 @@ impl Collection for ObjectRecord {
     type Record = ObjectRecord;
 }
 
-impl<'a> LexiconSchema for Object<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Object<S> {
     fn nsid() -> &'static str {
         "tech.lenooby09.didgit.object"
     }
@@ -307,7 +296,7 @@ pub mod object_state {
 /// Builder for constructing an instance of this type
 pub struct ObjectBuilder<'a, S: object_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<BlobRef<'a>>, Option<ObjectObjectType<'a>>),
+    _fields: (Option<BlobRef<S>>, Option<ObjectObjectType<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -337,7 +326,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> ObjectBuilder<'a, object_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         ObjectBuilder {
@@ -356,7 +345,7 @@ where
     /// Set the `objectType` field (required)
     pub fn object_type(
         mut self,
-        value: impl Into<ObjectObjectType<'a>>,
+        value: impl Into<ObjectObjectType<S>>,
     ) -> ObjectBuilder<'a, object_state::SetObjectType<S>> {
         self._fields.1 = Option::Some(value.into());
         ObjectBuilder {
@@ -382,13 +371,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Object<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Object<'a> {
         Object {
             content: self._fields.0.unwrap(),
             object_type: self._fields.1.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,53 +29,57 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Normalized podping fields, supporting podping v0 through v1.1. Record TID timestamp should represent when the event was received, useful for global ordering.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "at.podping.records.podping", tag = "$type")]
-pub struct Podping<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "at.podping.records.podping",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Podping<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The updated feeds, e.g. [ "https://example.com/path/to/feed.xml" ]
-    #[serde(borrow)]
-    pub iris: Vec<UriValue<'a>>,
+    pub iris: Vec<UriValue<S>>,
     ///Common medium, e.g. podcast
-    #[serde(borrow)]
-    pub medium: CowStr<'a>,
+    pub medium: S,
     ///Common reason, e.g. update
-    #[serde(borrow)]
-    pub reason: CowStr<'a>,
+    pub reason: S,
     ///Optional identifier for the writer session, e.g. 9624937909978522000
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub session_id: Option<CowStr<'a>>,
+    pub session_id: Option<S>,
     ///Optional source reference, minimized to save space, e.g. hive:92042659:cf11299faf19367f3f2d6bef0bf2bc4f59272506:0:podping.ccc (if mirroring the podping in hive block 92042659, transaction id cf11299faf19367f3f2d6bef0bf2bc4f59272506, first operation, hive auth podping.ccc)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub source: Option<CowStr<'a>>,
+    pub source: Option<S>,
     ///Sender timestamp in ISO format, untrustworthy due to client bugs, not so useful for global ordering, in either millisecond (3 decimals) or nanosecond precision (9 decimals), e.g. 2025-12-29T22:25:09.123456789Z
     pub timestamp: Datetime,
     ///Podping schema version, e.g. 1.1
-    #[serde(borrow)]
-    pub version: CowStr<'a>,
+    pub version: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PodpingGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PodpingGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Podping<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Podping<S>,
 }
 
-impl<'a> Podping<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PodpingRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Podping<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PodpingRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -84,18 +90,17 @@ pub struct PodpingRecord;
 impl XrpcResp for PodpingRecord {
     const NSID: &'static str = "at.podping.records.podping";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PodpingGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PodpingGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PodpingGetRecordOutput<'_>> for Podping<'_> {
-    fn from(output: PodpingGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PodpingGetRecordOutput<S>> for Podping<S> {
+    fn from(output: PodpingGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Podping<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Podping<S> {
     const NSID: &'static str = "at.podping.records.podping";
     type Record = PodpingRecord;
 }
@@ -105,7 +110,7 @@ impl Collection for PodpingRecord {
     type Record = PodpingRecord;
 }
 
-impl<'a> LexiconSchema for Podping<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Podping<S> {
     fn nsid() -> &'static str {
         "at.podping.records.podping"
     }
@@ -130,85 +135,85 @@ pub mod podping_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Medium;
         type Reason;
         type Iris;
-        type Version;
         type Timestamp;
-        type Medium;
+        type Version;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Medium = Unset;
         type Reason = Unset;
         type Iris = Unset;
-        type Version = Unset;
         type Timestamp = Unset;
-        type Medium = Unset;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Reason = Set<members::reason>;
-        type Iris = S::Iris;
-        type Version = S::Version;
-        type Timestamp = S::Timestamp;
-        type Medium = S::Medium;
-    }
-    ///State transition - sets the `iris` field to Set
-    pub struct SetIris<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIris<S> {}
-    impl<S: State> State for SetIris<S> {
-        type Reason = S::Reason;
-        type Iris = Set<members::iris>;
-        type Version = S::Version;
-        type Timestamp = S::Timestamp;
-        type Medium = S::Medium;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type Reason = S::Reason;
-        type Iris = S::Iris;
-        type Version = Set<members::version>;
-        type Timestamp = S::Timestamp;
-        type Medium = S::Medium;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Reason = S::Reason;
-        type Iris = S::Iris;
-        type Version = S::Version;
-        type Timestamp = Set<members::timestamp>;
-        type Medium = S::Medium;
+        type Version = Unset;
     }
     ///State transition - sets the `medium` field to Set
     pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMedium<S> {}
     impl<S: State> State for SetMedium<S> {
+        type Medium = Set<members::medium>;
         type Reason = S::Reason;
         type Iris = S::Iris;
-        type Version = S::Version;
         type Timestamp = S::Timestamp;
-        type Medium = Set<members::medium>;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type Medium = S::Medium;
+        type Reason = Set<members::reason>;
+        type Iris = S::Iris;
+        type Timestamp = S::Timestamp;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `iris` field to Set
+    pub struct SetIris<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIris<S> {}
+    impl<S: State> State for SetIris<S> {
+        type Medium = S::Medium;
+        type Reason = S::Reason;
+        type Iris = Set<members::iris>;
+        type Timestamp = S::Timestamp;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type Medium = S::Medium;
+        type Reason = S::Reason;
+        type Iris = S::Iris;
+        type Timestamp = Set<members::timestamp>;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type Medium = S::Medium;
+        type Reason = S::Reason;
+        type Iris = S::Iris;
+        type Timestamp = S::Timestamp;
+        type Version = Set<members::version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `medium` field
+        pub struct medium(());
         ///Marker type for the `reason` field
         pub struct reason(());
         ///Marker type for the `iris` field
         pub struct iris(());
-        ///Marker type for the `version` field
-        pub struct version(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
-        ///Marker type for the `medium` field
-        pub struct medium(());
+        ///Marker type for the `version` field
+        pub struct version(());
     }
 }
 
@@ -216,13 +221,13 @@ pub mod podping_state {
 pub struct PodpingBuilder<'a, S: podping_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<UriValue<'a>>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<Vec<UriValue<S>>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -253,7 +258,7 @@ where
     /// Set the `iris` field (required)
     pub fn iris(
         mut self,
-        value: impl Into<Vec<UriValue<'a>>>,
+        value: impl Into<Vec<UriValue<S>>>,
     ) -> PodpingBuilder<'a, podping_state::SetIris<S>> {
         self._fields.0 = Option::Some(value.into());
         PodpingBuilder {
@@ -272,7 +277,7 @@ where
     /// Set the `medium` field (required)
     pub fn medium(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PodpingBuilder<'a, podping_state::SetMedium<S>> {
         self._fields.1 = Option::Some(value.into());
         PodpingBuilder {
@@ -291,7 +296,7 @@ where
     /// Set the `reason` field (required)
     pub fn reason(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PodpingBuilder<'a, podping_state::SetReason<S>> {
         self._fields.2 = Option::Some(value.into());
         PodpingBuilder {
@@ -304,12 +309,12 @@ where
 
 impl<'a, S: podping_state::State> PodpingBuilder<'a, S> {
     /// Set the `sessionId` field (optional)
-    pub fn session_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn session_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `sessionId` field to an Option value (optional)
-    pub fn maybe_session_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_session_id(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -317,12 +322,12 @@ impl<'a, S: podping_state::State> PodpingBuilder<'a, S> {
 
 impl<'a, S: podping_state::State> PodpingBuilder<'a, S> {
     /// Set the `source` field (optional)
-    pub fn source(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
-    pub fn maybe_source(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_source(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -355,7 +360,7 @@ where
     /// Set the `version` field (required)
     pub fn version(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PodpingBuilder<'a, podping_state::SetVersion<S>> {
         self._fields.6 = Option::Some(value.into());
         PodpingBuilder {
@@ -369,11 +374,11 @@ where
 impl<'a, S> PodpingBuilder<'a, S>
 where
     S: podping_state::State,
+    S::Medium: podping_state::IsSet,
     S::Reason: podping_state::IsSet,
     S::Iris: podping_state::IsSet,
-    S::Version: podping_state::IsSet,
     S::Timestamp: podping_state::IsSet,
-    S::Medium: podping_state::IsSet,
+    S::Version: podping_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Podping<'a> {
@@ -391,10 +396,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Podping<'a> {
         Podping {
             iris: self._fields.0.unwrap(),

@@ -7,16 +7,22 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct DeletePageParams<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DeletePageParams<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
 }
 
 /// XRPC request marker type.
@@ -28,8 +34,8 @@ pub struct DeletePageResponse;
 impl jacquard_common::xrpc::XrpcResp for DeletePageResponse {
     const NSID: &'static str = "app.blebbit.authr.page.deletePage";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for DeletePage {
@@ -47,7 +53,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeletePageRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = DeletePage;
+    type Request<S: Bos<str> + AsRef<str>> = DeletePage;
     type Response = DeletePageResponse;
 }
 
@@ -73,7 +79,7 @@ pub mod delete_page_params_state {
 /// Builder for constructing an instance of this type
 pub struct DeletePageParamsBuilder<'a, S: delete_page_params_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -97,12 +103,12 @@ impl<'a> DeletePageParamsBuilder<'a, delete_page_params_state::Empty> {
 
 impl<'a, S: delete_page_params_state::State> DeletePageParamsBuilder<'a, S> {
     /// Set the `id` field (optional)
-    pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
-    pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_id(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }

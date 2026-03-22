@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,32 +29,42 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Stub record for unpublished drafts. Acts as an anchor for edit.root/diff records and enables draft discovery via listRecords.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.weaver.edit.draft", tag = "$type")]
-pub struct Draft<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.weaver.edit.draft",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Draft<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DraftGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DraftGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Draft<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Draft<S>,
 }
 
-impl<'a> Draft<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DraftRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Draft<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DraftRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -63,18 +75,17 @@ pub struct DraftRecord;
 impl XrpcResp for DraftRecord {
     const NSID: &'static str = "sh.weaver.edit.draft";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DraftGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DraftGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DraftGetRecordOutput<'_>> for Draft<'_> {
-    fn from(output: DraftGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DraftGetRecordOutput<S>> for Draft<S> {
+    fn from(output: DraftGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Draft<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Draft<S> {
     const NSID: &'static str = "sh.weaver.edit.draft";
     type Record = DraftRecord;
 }
@@ -84,7 +95,7 @@ impl Collection for DraftRecord {
     type Record = DraftRecord;
 }
 
-impl<'a> LexiconSchema for Draft<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Draft<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.draft"
     }
@@ -188,13 +199,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Draft<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Draft<'a> {
         Draft {
             created_at: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

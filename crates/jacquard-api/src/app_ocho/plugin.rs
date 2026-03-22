@@ -16,14 +16,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::{Datetime, UriValue};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -32,272 +33,327 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::app_ocho::plugin;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct AdaptiveIcon<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AdaptiveIcon<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The background color of the adaptive icon.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub background_color: Option<CowStr<'a>>,
+    pub background_color: Option<S>,
     ///The URL to the foreground image of the adaptive icon.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub foreground_image: Option<CowStr<'a>>,
+    pub foreground_image: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub foreground_image_blob: Option<BlobRef<'a>>,
+    pub foreground_image_blob: Option<BlobRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Android<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Android<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Configuration for the adaptive icon on Android.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub adaptive_icon: Option<plugin::AdaptiveIcon<'a>>,
+    pub adaptive_icon: Option<plugin::AdaptiveIcon<S>>,
     ///Whether edge-to-edge mode is enabled for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub edge_to_edge_enabled: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Android status bar configuration.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct AndroidStatusBar<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AndroidStatusBar<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The background color of the Android status bar.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub background_color: Option<CowStr<'a>>,
+    pub background_color: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Asset<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Asset<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The blob of the asset
-    #[serde(borrow)]
-    pub blob: BlobRef<'a>,
+    pub blob: BlobRef<S>,
     ///The hash of the asset
-    #[serde(borrow)]
-    pub hash: CowStr<'a>,
+    pub hash: S,
     ///The type of the asset
-    #[serde(borrow)]
-    pub r#type: CowStr<'a>,
+    pub r#type: S,
     ///The date and time when this asset was last updated. Used to reset the jetstream cache, among other things.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Db<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Db<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The ID of the database.
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Developer<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Developer<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The tool used for development, e.g., 'expo-cli'.
-    #[serde(borrow)]
-    pub tool: CowStr<'a>,
+    pub tool: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ExpoClient<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExpoClient<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Android-specific configuration for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub android: Option<plugin::Android<'a>>,
+    pub android: Option<plugin::Android<S>>,
     ///Configuration for the Android status bar.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub android_status_bar: Option<plugin::AndroidStatusBar<'a>>,
+    pub android_status_bar: Option<plugin::AndroidStatusBar<S>>,
     ///Experimental features enabled for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub expirements: Option<Data<'a>>,
+    pub expirements: Option<Data<S>>,
     ///Additional configuration for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub extra: Option<Data<'a>>,
+    pub extra: Option<Data<S>>,
     ///The URL to the app icon.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub icon: Option<CowStr<'a>>,
+    pub icon: Option<S>,
     ///ios-specific configuration for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ios: Option<plugin::Ios<'a>>,
+    pub ios: Option<plugin::Ios<S>>,
     ///Localization settings for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub locales: Option<Data<'a>>,
+    pub locales: Option<Data<S>>,
     ///The name of the Expo client application.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Whether the new architecture is enabled for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub new_arch_enabled: Option<bool>,
     ///The default orientation of the app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub orientation: Option<CowStr<'a>>,
+    pub orientation: Option<S>,
     ///The platforms supported by the app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub platforms: Option<Vec<CowStr<'a>>>,
+    pub platforms: Option<Vec<S>>,
     ///A list of plugins used by the app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub plugins: Option<Data<'a>>,
+    pub plugins: Option<Data<S>>,
     ///The custom URI scheme for deep linking.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub scheme: Option<CowStr<'a>>,
+    pub scheme: Option<S>,
     ///The SDK version of the Expo client.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sdk_version: Option<CowStr<'a>>,
+    pub sdk_version: Option<S>,
     ///A URL-friendly identifier for the app.
-    #[serde(borrow)]
-    pub slug: CowStr<'a>,
+    pub slug: S,
     ///The default user interface style.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub user_interface_style: Option<CowStr<'a>>,
+    pub user_interface_style: Option<S>,
     ///The version of the app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub version: Option<CowStr<'a>>,
+    pub version: Option<S>,
     ///Web-specific configuration for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub web: Option<plugin::Web<'a>>,
+    pub web: Option<plugin::Web<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ExpoGo<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExpoGo<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Developer-specific configuration for the Expo Go app.
-    #[serde(borrow)]
-    pub developer: plugin::Developer<'a>,
+    pub developer: plugin::Developer<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Ios<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Ios<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether the app supports iPad.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub supports_tablet: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LaunchAsset<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LaunchAsset<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The MIME type of the asset, e.g., 'image/png'.
-    #[serde(borrow)]
-    pub content_type: CowStr<'a>,
+    pub content_type: S,
     ///The unique key for this asset, used to reference it in the plugin.
-    #[serde(borrow)]
-    pub key: CowStr<'a>,
+    pub key: S,
     ///The URL where the asset can be accessed.
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Manifest<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Manifest<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The date and time when this plugin manifest was created.
     pub created_at: Datetime,
     ///Additional metadata for the plugin, including Expo client and Go configurations.
-    #[serde(borrow)]
-    pub extra: plugin::ManifestExtra<'a>,
+    pub extra: plugin::ManifestExtra<S>,
     ///The unique identifier for this plugin manifest.
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
     ///The launch asset for the plugin (the main javascipt bundle).
-    #[serde(borrow)]
-    pub launch_asset: plugin::LaunchAsset<'a>,
-    #[serde(borrow)]
-    pub metadata: Data<'a>,
+    pub launch_asset: plugin::LaunchAsset<S>,
+    pub metadata: Data<S>,
     ///The version of the Expo runtime this plugin is compatible with.
-    #[serde(borrow)]
-    pub runtime_version: CowStr<'a>,
+    pub runtime_version: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ManifestExtra<'a> {
-    #[serde(borrow)]
-    pub expo_client: plugin::ExpoClient<'a>,
-    #[serde(borrow)]
-    pub expo_go: plugin::ExpoGo<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ManifestExtra<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub expo_client: plugin::ExpoClient<S>,
+    pub expo_go: plugin::ExpoGo<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum PluginItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum PluginItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "app.ocho.plugin.defs#stringId")]
-    StringId(Box<plugin::StringId<'a>>),
+    StringId(Box<plugin::StringId<S>>),
     #[serde(rename = "app.ocho.plugin.defs#pluginConfig")]
-    PluginConfig(Box<plugin::PluginConfig<'a>>),
+    PluginConfig(Box<plugin::PluginConfig<S>>),
 }
 
 pub type Plugin<'a> = Vec<PluginItem<'a>>;
-pub type PluginConfig<'a> = Data<'a>;
+pub type PluginConfig<'a> = Data<S>;
 /// A string identifier for a plugin, used to reference it in the app.
-pub type StringId<'a> = CowStr<'a>;
+pub type StringId<'a> = S;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Web<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Web<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The bundler used for the web app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub bundler: Option<CowStr<'a>>,
+    pub bundler: Option<S>,
     ///The URL to the favicon for the web app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub favicon: Option<CowStr<'a>>,
+    pub favicon: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub favicon_blob: Option<BlobRef<'a>>,
+    pub favicon_blob: Option<BlobRef<S>>,
     ///The output directory for the web app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub output: Option<CowStr<'a>>,
+    pub output: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for AdaptiveIcon<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AdaptiveIcon<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
@@ -312,7 +368,7 @@ impl<'a> LexiconSchema for AdaptiveIcon<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Android<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Android<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
@@ -327,7 +383,7 @@ impl<'a> LexiconSchema for Android<'a> {
     }
 }
 
-impl<'a> LexiconSchema for AndroidStatusBar<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AndroidStatusBar<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
@@ -342,7 +398,7 @@ impl<'a> LexiconSchema for AndroidStatusBar<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Asset<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Asset<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
@@ -357,7 +413,7 @@ impl<'a> LexiconSchema for Asset<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Db<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Db<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
@@ -372,7 +428,7 @@ impl<'a> LexiconSchema for Db<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Developer<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Developer<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
@@ -387,7 +443,7 @@ impl<'a> LexiconSchema for Developer<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ExpoClient<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExpoClient<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
@@ -402,7 +458,7 @@ impl<'a> LexiconSchema for ExpoClient<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ExpoGo<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExpoGo<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
@@ -417,7 +473,7 @@ impl<'a> LexiconSchema for ExpoGo<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Ios<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Ios<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
@@ -432,7 +488,7 @@ impl<'a> LexiconSchema for Ios<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LaunchAsset<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LaunchAsset<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
@@ -447,7 +503,7 @@ impl<'a> LexiconSchema for LaunchAsset<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Manifest<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Manifest<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
@@ -462,7 +518,7 @@ impl<'a> LexiconSchema for Manifest<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ManifestExtra<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ManifestExtra<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
@@ -477,7 +533,7 @@ impl<'a> LexiconSchema for ManifestExtra<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Web<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Web<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
@@ -1128,62 +1184,57 @@ pub mod asset_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Hash;
-        type Blob;
         type Type;
+        type Blob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Hash = Unset;
-        type Blob = Unset;
         type Type = Unset;
+        type Blob = Unset;
     }
     ///State transition - sets the `hash` field to Set
     pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHash<S> {}
     impl<S: State> State for SetHash<S> {
         type Hash = Set<members::hash>;
+        type Type = S::Type;
         type Blob = S::Blob;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
-        type Hash = S::Hash;
-        type Blob = Set<members::blob>;
-        type Type = S::Type;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
         type Hash = S::Hash;
-        type Blob = S::Blob;
         type Type = Set<members::r#type>;
+        type Blob = S::Blob;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type Hash = S::Hash;
+        type Type = S::Type;
+        type Blob = Set<members::blob>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `hash` field
         pub struct hash(());
-        ///Marker type for the `blob` field
-        pub struct blob(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AssetBuilder<'a, S: asset_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<BlobRef<S>>, Option<S>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1213,7 +1264,7 @@ where
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> AssetBuilder<'a, asset_state::SetBlob<S>> {
         self._fields.0 = Option::Some(value.into());
         AssetBuilder {
@@ -1232,7 +1283,7 @@ where
     /// Set the `hash` field (required)
     pub fn hash(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AssetBuilder<'a, asset_state::SetHash<S>> {
         self._fields.1 = Option::Some(value.into());
         AssetBuilder {
@@ -1251,7 +1302,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AssetBuilder<'a, asset_state::SetType<S>> {
         self._fields.2 = Option::Some(value.into());
         AssetBuilder {
@@ -1279,8 +1330,8 @@ impl<'a, S> AssetBuilder<'a, S>
 where
     S: asset_state::State,
     S::Hash: asset_state::IsSet,
-    S::Blob: asset_state::IsSet,
     S::Type: asset_state::IsSet,
+    S::Blob: asset_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Asset<'a> {
@@ -1293,10 +1344,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Asset<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Asset<'a> {
         Asset {
             blob: self._fields.0.unwrap(),
             hash: self._fields.1.unwrap(),
@@ -1342,7 +1390,7 @@ pub mod expo_go_state {
 /// Builder for constructing an instance of this type
 pub struct ExpoGoBuilder<'a, S: expo_go_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<plugin::Developer<'a>>,),
+    _fields: (Option<plugin::Developer<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1372,7 +1420,7 @@ where
     /// Set the `developer` field (required)
     pub fn developer(
         mut self,
-        value: impl Into<plugin::Developer<'a>>,
+        value: impl Into<plugin::Developer<S>>,
     ) -> ExpoGoBuilder<'a, expo_go_state::SetDeveloper<S>> {
         self._fields.0 = Option::Some(value.into());
         ExpoGoBuilder {
@@ -1396,10 +1444,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> ExpoGo<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> ExpoGo<'a> {
         ExpoGo {
             developer: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1468,7 +1513,7 @@ pub mod launch_asset_state {
 /// Builder for constructing an instance of this type
 pub struct LaunchAssetBuilder<'a, S: launch_asset_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _fields: (Option<S>, Option<S>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1498,7 +1543,7 @@ where
     /// Set the `contentType` field (required)
     pub fn content_type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LaunchAssetBuilder<'a, launch_asset_state::SetContentType<S>> {
         self._fields.0 = Option::Some(value.into());
         LaunchAssetBuilder {
@@ -1517,7 +1562,7 @@ where
     /// Set the `key` field (required)
     pub fn key(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LaunchAssetBuilder<'a, launch_asset_state::SetKey<S>> {
         self._fields.1 = Option::Some(value.into());
         LaunchAssetBuilder {
@@ -1536,7 +1581,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> LaunchAssetBuilder<'a, launch_asset_state::SetUrl<S>> {
         self._fields.2 = Option::Some(value.into());
         LaunchAssetBuilder {
@@ -1566,7 +1611,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LaunchAsset<'a> {
         LaunchAsset {
             content_type: self._fields.0.unwrap(),
@@ -1588,104 +1633,104 @@ pub mod manifest_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type RuntimeVersion;
-        type Id;
-        type LaunchAsset;
         type Metadata;
         type Extra;
+        type LaunchAsset;
+        type Id;
+        type RuntimeVersion;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type RuntimeVersion = Unset;
-        type Id = Unset;
-        type LaunchAsset = Unset;
         type Metadata = Unset;
         type Extra = Unset;
+        type LaunchAsset = Unset;
+        type Id = Unset;
+        type RuntimeVersion = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Id = S::Id;
+        type Metadata = S::Metadata;
+        type Extra = S::Extra;
         type LaunchAsset = S::LaunchAsset;
-        type Metadata = S::Metadata;
-        type Extra = S::Extra;
-    }
-    ///State transition - sets the `runtime_version` field to Set
-    pub struct SetRuntimeVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRuntimeVersion<S> {}
-    impl<S: State> State for SetRuntimeVersion<S> {
-        type CreatedAt = S::CreatedAt;
-        type RuntimeVersion = Set<members::runtime_version>;
         type Id = S::Id;
-        type LaunchAsset = S::LaunchAsset;
-        type Metadata = S::Metadata;
-        type Extra = S::Extra;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type CreatedAt = S::CreatedAt;
         type RuntimeVersion = S::RuntimeVersion;
-        type Id = Set<members::id>;
-        type LaunchAsset = S::LaunchAsset;
-        type Metadata = S::Metadata;
-        type Extra = S::Extra;
-    }
-    ///State transition - sets the `launch_asset` field to Set
-    pub struct SetLaunchAsset<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLaunchAsset<S> {}
-    impl<S: State> State for SetLaunchAsset<S> {
-        type CreatedAt = S::CreatedAt;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Id = S::Id;
-        type LaunchAsset = Set<members::launch_asset>;
-        type Metadata = S::Metadata;
-        type Extra = S::Extra;
     }
     ///State transition - sets the `metadata` field to Set
     pub struct SetMetadata<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMetadata<S> {}
     impl<S: State> State for SetMetadata<S> {
         type CreatedAt = S::CreatedAt;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Id = S::Id;
-        type LaunchAsset = S::LaunchAsset;
         type Metadata = Set<members::metadata>;
         type Extra = S::Extra;
+        type LaunchAsset = S::LaunchAsset;
+        type Id = S::Id;
+        type RuntimeVersion = S::RuntimeVersion;
     }
     ///State transition - sets the `extra` field to Set
     pub struct SetExtra<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExtra<S> {}
     impl<S: State> State for SetExtra<S> {
         type CreatedAt = S::CreatedAt;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Id = S::Id;
-        type LaunchAsset = S::LaunchAsset;
         type Metadata = S::Metadata;
         type Extra = Set<members::extra>;
+        type LaunchAsset = S::LaunchAsset;
+        type Id = S::Id;
+        type RuntimeVersion = S::RuntimeVersion;
+    }
+    ///State transition - sets the `launch_asset` field to Set
+    pub struct SetLaunchAsset<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLaunchAsset<S> {}
+    impl<S: State> State for SetLaunchAsset<S> {
+        type CreatedAt = S::CreatedAt;
+        type Metadata = S::Metadata;
+        type Extra = S::Extra;
+        type LaunchAsset = Set<members::launch_asset>;
+        type Id = S::Id;
+        type RuntimeVersion = S::RuntimeVersion;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type CreatedAt = S::CreatedAt;
+        type Metadata = S::Metadata;
+        type Extra = S::Extra;
+        type LaunchAsset = S::LaunchAsset;
+        type Id = Set<members::id>;
+        type RuntimeVersion = S::RuntimeVersion;
+    }
+    ///State transition - sets the `runtime_version` field to Set
+    pub struct SetRuntimeVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRuntimeVersion<S> {}
+    impl<S: State> State for SetRuntimeVersion<S> {
+        type CreatedAt = S::CreatedAt;
+        type Metadata = S::Metadata;
+        type Extra = S::Extra;
+        type LaunchAsset = S::LaunchAsset;
+        type Id = S::Id;
+        type RuntimeVersion = Set<members::runtime_version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `runtime_version` field
-        pub struct runtime_version(());
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `launch_asset` field
-        pub struct launch_asset(());
         ///Marker type for the `metadata` field
         pub struct metadata(());
         ///Marker type for the `extra` field
         pub struct extra(());
+        ///Marker type for the `launch_asset` field
+        pub struct launch_asset(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `runtime_version` field
+        pub struct runtime_version(());
     }
 }
 
@@ -1694,11 +1739,11 @@ pub struct ManifestBuilder<'a, S: manifest_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<plugin::ManifestExtra<'a>>,
-        Option<CowStr<'a>>,
-        Option<plugin::LaunchAsset<'a>>,
-        Option<Data<'a>>,
-        Option<CowStr<'a>>,
+        Option<plugin::ManifestExtra<S>>,
+        Option<S>,
+        Option<plugin::LaunchAsset<S>>,
+        Option<Data<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1748,7 +1793,7 @@ where
     /// Set the `extra` field (required)
     pub fn extra(
         mut self,
-        value: impl Into<plugin::ManifestExtra<'a>>,
+        value: impl Into<plugin::ManifestExtra<S>>,
     ) -> ManifestBuilder<'a, manifest_state::SetExtra<S>> {
         self._fields.1 = Option::Some(value.into());
         ManifestBuilder {
@@ -1767,7 +1812,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ManifestBuilder<'a, manifest_state::SetId<S>> {
         self._fields.2 = Option::Some(value.into());
         ManifestBuilder {
@@ -1786,7 +1831,7 @@ where
     /// Set the `launchAsset` field (required)
     pub fn launch_asset(
         mut self,
-        value: impl Into<plugin::LaunchAsset<'a>>,
+        value: impl Into<plugin::LaunchAsset<S>>,
     ) -> ManifestBuilder<'a, manifest_state::SetLaunchAsset<S>> {
         self._fields.3 = Option::Some(value.into());
         ManifestBuilder {
@@ -1805,7 +1850,7 @@ where
     /// Set the `metadata` field (required)
     pub fn metadata(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> ManifestBuilder<'a, manifest_state::SetMetadata<S>> {
         self._fields.4 = Option::Some(value.into());
         ManifestBuilder {
@@ -1824,7 +1869,7 @@ where
     /// Set the `runtimeVersion` field (required)
     pub fn runtime_version(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ManifestBuilder<'a, manifest_state::SetRuntimeVersion<S>> {
         self._fields.5 = Option::Some(value.into());
         ManifestBuilder {
@@ -1839,11 +1884,11 @@ impl<'a, S> ManifestBuilder<'a, S>
 where
     S: manifest_state::State,
     S::CreatedAt: manifest_state::IsSet,
-    S::RuntimeVersion: manifest_state::IsSet,
-    S::Id: manifest_state::IsSet,
-    S::LaunchAsset: manifest_state::IsSet,
     S::Metadata: manifest_state::IsSet,
     S::Extra: manifest_state::IsSet,
+    S::LaunchAsset: manifest_state::IsSet,
+    S::Id: manifest_state::IsSet,
+    S::RuntimeVersion: manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Manifest<'a> {
@@ -1860,7 +1905,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Manifest<'a> {
         Manifest {
             created_at: self._fields.0.unwrap(),
@@ -1884,44 +1929,44 @@ pub mod manifest_extra_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ExpoClient;
         type ExpoGo;
+        type ExpoClient;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ExpoClient = Unset;
         type ExpoGo = Unset;
-    }
-    ///State transition - sets the `expo_client` field to Set
-    pub struct SetExpoClient<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExpoClient<S> {}
-    impl<S: State> State for SetExpoClient<S> {
-        type ExpoClient = Set<members::expo_client>;
-        type ExpoGo = S::ExpoGo;
+        type ExpoClient = Unset;
     }
     ///State transition - sets the `expo_go` field to Set
     pub struct SetExpoGo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExpoGo<S> {}
     impl<S: State> State for SetExpoGo<S> {
-        type ExpoClient = S::ExpoClient;
         type ExpoGo = Set<members::expo_go>;
+        type ExpoClient = S::ExpoClient;
+    }
+    ///State transition - sets the `expo_client` field to Set
+    pub struct SetExpoClient<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpoClient<S> {}
+    impl<S: State> State for SetExpoClient<S> {
+        type ExpoGo = S::ExpoGo;
+        type ExpoClient = Set<members::expo_client>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `expo_client` field
-        pub struct expo_client(());
         ///Marker type for the `expo_go` field
         pub struct expo_go(());
+        ///Marker type for the `expo_client` field
+        pub struct expo_client(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ManifestExtraBuilder<'a, S: manifest_extra_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<plugin::ExpoClient<'a>>, Option<plugin::ExpoGo<'a>>),
+    _fields: (Option<plugin::ExpoClient<S>>, Option<plugin::ExpoGo<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1951,7 +1996,7 @@ where
     /// Set the `expoClient` field (required)
     pub fn expo_client(
         mut self,
-        value: impl Into<plugin::ExpoClient<'a>>,
+        value: impl Into<plugin::ExpoClient<S>>,
     ) -> ManifestExtraBuilder<'a, manifest_extra_state::SetExpoClient<S>> {
         self._fields.0 = Option::Some(value.into());
         ManifestExtraBuilder {
@@ -1970,7 +2015,7 @@ where
     /// Set the `expoGo` field (required)
     pub fn expo_go(
         mut self,
-        value: impl Into<plugin::ExpoGo<'a>>,
+        value: impl Into<plugin::ExpoGo<S>>,
     ) -> ManifestExtraBuilder<'a, manifest_extra_state::SetExpoGo<S>> {
         self._fields.1 = Option::Some(value.into());
         ManifestExtraBuilder {
@@ -1984,8 +2029,8 @@ where
 impl<'a, S> ManifestExtraBuilder<'a, S>
 where
     S: manifest_extra_state::State,
-    S::ExpoClient: manifest_extra_state::IsSet,
     S::ExpoGo: manifest_extra_state::IsSet,
+    S::ExpoClient: manifest_extra_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ManifestExtra<'a> {
@@ -1998,7 +2043,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ManifestExtra<'a> {
         ManifestExtra {
             expo_client: self._fields.0.unwrap(),

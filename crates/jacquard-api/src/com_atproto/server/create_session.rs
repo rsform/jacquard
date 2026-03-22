@@ -10,71 +10,80 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateSession<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateSession<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_takendown: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub auth_factor_token: Option<CowStr<'a>>,
+    pub auth_factor_token: Option<S>,
     ///Handle or other identifier supported by the server for the authenticating user.
-    #[serde(borrow)]
-    pub identifier: CowStr<'a>,
-    #[serde(borrow)]
-    pub password: CowStr<'a>,
+    pub identifier: S,
+    pub password: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateSessionOutput<'a> {
-    #[serde(borrow)]
-    pub access_jwt: CowStr<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CreateSessionOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub access_jwt: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub did_doc: Option<Data<'a>>,
+    pub did_doc: Option<Data<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub email: Option<CowStr<'a>>,
+    pub email: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email_auth_factor: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email_confirmed: Option<bool>,
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
-    #[serde(borrow)]
-    pub refresh_jwt: CowStr<'a>,
+    pub handle: Handle<S>,
+    pub refresh_jwt: S,
     ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub status: Option<CreateSessionOutputStatus<'a>>,
+    pub status: Option<CreateSessionOutputStatus<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CreateSessionOutputStatus<'a> {
+pub enum CreateSessionOutputStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Takendown,
     Suspended,
     Deactivated,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> CreateSessionOutputStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> CreateSessionOutputStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Takendown => "takendown",
@@ -83,72 +92,57 @@ impl<'a> CreateSessionOutputStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for CreateSessionOutputStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "takendown" => Self::Takendown,
             "suspended" => Self::Suspended,
             "deactivated" => Self::Deactivated,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for CreateSessionOutputStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "takendown" => Self::Takendown,
-            "suspended" => Self::Suspended,
-            "deactivated" => Self::Deactivated,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CreateSessionOutputStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CreateSessionOutputStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for CreateSessionOutputStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for CreateSessionOutputStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for CreateSessionOutputStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for CreateSessionOutputStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for CreateSessionOutputStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for CreateSessionOutputStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for CreateSessionOutputStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for CreateSessionOutputStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for CreateSessionOutputStatus<'_> {
-    type Output = CreateSessionOutputStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for CreateSessionOutputStatus<S> {
+    type Output = CreateSessionOutputStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             CreateSessionOutputStatus::Takendown => CreateSessionOutputStatus::Takendown,
@@ -164,7 +158,6 @@ impl jacquard_common::IntoStatic for CreateSessionOutputStatus<'_> {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -173,20 +166,21 @@ impl jacquard_common::IntoStatic for CreateSessionOutputStatus<'_> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CreateSessionError<'a> {
+pub enum CreateSessionError {
     #[serde(rename = "AccountTakedown")]
-    AccountTakedown(Option<CowStr<'a>>),
+    AccountTakedown(Option<SmolStr>),
     #[serde(rename = "AuthFactorTokenRequired")]
-    AuthFactorTokenRequired(Option<CowStr<'a>>),
+    AuthFactorTokenRequired(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for CreateSessionError<'_> {
+impl core::fmt::Display for CreateSessionError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::AccountTakedown(msg) => {
@@ -203,7 +197,13 @@ impl core::fmt::Display for CreateSessionError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -213,11 +213,12 @@ pub struct CreateSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateSessionResponse {
     const NSID: &'static str = "com.atproto.server.createSession";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CreateSessionOutput<'de>;
-    type Err<'de> = CreateSessionError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CreateSessionOutput<S>;
+    type Err = CreateSessionError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CreateSession<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CreateSession<S> {
     const NSID: &'static str = "com.atproto.server.createSession";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -232,6 +233,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateSessionRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CreateSession<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CreateSession<S>;
     type Response = CreateSessionResponse;
 }

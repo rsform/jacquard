@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Nsid;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,47 +26,66 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::stats;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionStats<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollectionStats<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Collection NSID
-    #[serde(borrow)]
-    pub collection: Nsid<'a>,
+    pub collection: Nsid<S>,
     ///Number of records in this collection
     pub record_count: i64,
     ///Number of unique actors with records in this collection
     pub unique_actors: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Stats<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Stats<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub slice: CowStr<'a>,
+    pub slice: S,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct StatsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StatsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Per-collection statistics
-    #[serde(borrow)]
-    pub collection_stats: Vec<stats::CollectionStats<'a>>,
+    pub collection_stats: Vec<stats::CollectionStats<S>>,
     ///List of collection NSIDs indexed in this slice
-    #[serde(borrow)]
-    pub collections: Vec<Nsid<'a>>,
+    pub collections: Vec<Nsid<S>>,
     ///Total number of unique actors indexed in this slice
     pub total_actors: i64,
     ///Total number of lexicons defined for this slice
     pub total_lexicons: i64,
     ///Total number of records indexed in this slice
     pub total_records: i64,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for CollectionStats<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionStats<S> {
     fn nsid() -> &'static str {
         "network.slices.slice.stats"
     }
@@ -84,11 +105,12 @@ pub struct StatsResponse;
 impl jacquard_common::xrpc::XrpcResp for StatsResponse {
     const NSID: &'static str = "network.slices.slice.stats";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StatsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StatsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Stats<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Stats<S> {
     const NSID: &'static str = "network.slices.slice.stats";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = StatsResponse;
@@ -99,7 +121,7 @@ pub struct StatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StatsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.stats";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Stats<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Stats<S>;
     type Response = StatsResponse;
 }
 
@@ -113,58 +135,58 @@ pub mod collection_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UniqueActors;
-        type Collection;
         type RecordCount;
+        type Collection;
+        type UniqueActors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UniqueActors = Unset;
-        type Collection = Unset;
         type RecordCount = Unset;
-    }
-    ///State transition - sets the `unique_actors` field to Set
-    pub struct SetUniqueActors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUniqueActors<S> {}
-    impl<S: State> State for SetUniqueActors<S> {
-        type UniqueActors = Set<members::unique_actors>;
-        type Collection = S::Collection;
-        type RecordCount = S::RecordCount;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type UniqueActors = S::UniqueActors;
-        type Collection = Set<members::collection>;
-        type RecordCount = S::RecordCount;
+        type Collection = Unset;
+        type UniqueActors = Unset;
     }
     ///State transition - sets the `record_count` field to Set
     pub struct SetRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecordCount<S> {}
     impl<S: State> State for SetRecordCount<S> {
-        type UniqueActors = S::UniqueActors;
-        type Collection = S::Collection;
         type RecordCount = Set<members::record_count>;
+        type Collection = S::Collection;
+        type UniqueActors = S::UniqueActors;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type RecordCount = S::RecordCount;
+        type Collection = Set<members::collection>;
+        type UniqueActors = S::UniqueActors;
+    }
+    ///State transition - sets the `unique_actors` field to Set
+    pub struct SetUniqueActors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUniqueActors<S> {}
+    impl<S: State> State for SetUniqueActors<S> {
+        type RecordCount = S::RecordCount;
+        type Collection = S::Collection;
+        type UniqueActors = Set<members::unique_actors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `unique_actors` field
-        pub struct unique_actors(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `record_count` field
         pub struct record_count(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `unique_actors` field
+        pub struct unique_actors(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CollectionStatsBuilder<'a, S: collection_stats_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Nsid<'a>>, Option<i64>, Option<i64>),
+    _fields: (Option<Nsid<S>>, Option<i64>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -194,7 +216,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<Nsid<'a>>,
+        value: impl Into<Nsid<S>>,
     ) -> CollectionStatsBuilder<'a, collection_stats_state::SetCollection<S>> {
         self._fields.0 = Option::Some(value.into());
         CollectionStatsBuilder {
@@ -246,9 +268,9 @@ where
 impl<'a, S> CollectionStatsBuilder<'a, S>
 where
     S: collection_stats_state::State,
-    S::UniqueActors: collection_stats_state::IsSet,
-    S::Collection: collection_stats_state::IsSet,
     S::RecordCount: collection_stats_state::IsSet,
+    S::Collection: collection_stats_state::IsSet,
+    S::UniqueActors: collection_stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionStats<'a> {
@@ -262,10 +284,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CollectionStats<'a> {
         CollectionStats {
             collection: self._fields.0.unwrap(),
@@ -393,7 +412,7 @@ pub mod stats_state {
 /// Builder for constructing an instance of this type
 pub struct StatsBuilder<'a, S: stats_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -423,7 +442,7 @@ where
     /// Set the `slice` field (required)
     pub fn slice(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> StatsBuilder<'a, stats_state::SetSlice<S>> {
         self._fields.0 = Option::Some(value.into());
         StatsBuilder {

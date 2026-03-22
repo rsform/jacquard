@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,37 +29,47 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A daily recording of your steps for that day. This record is expected to be update throughout the day and represent's 12am-12pm in your timezone, or what you count as a "day". The key is also traditionally the date of your "day" yyy-mm-dd.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.pace.daily.step", tag = "$type")]
-pub struct Step<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.pace.daily.step",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Step<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The first time this record was created
     pub created_at: Datetime,
     ///The number of steps taken during the day
     pub steps: i64,
     ///The last time this record was updated
     pub updated_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct StepGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StepGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Step<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Step<S>,
 }
 
-impl<'a> Step<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, StepRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Step<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, StepRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -68,18 +80,17 @@ pub struct StepRecord;
 impl XrpcResp for StepRecord {
     const NSID: &'static str = "social.pace.daily.step";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StepGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StepGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<StepGetRecordOutput<'_>> for Step<'_> {
-    fn from(output: StepGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<StepGetRecordOutput<S>> for Step<S> {
+    fn from(output: StepGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Step<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Step<S> {
     const NSID: &'static str = "social.pace.daily.step";
     type Record = StepRecord;
 }
@@ -89,7 +100,7 @@ impl Collection for StepRecord {
     type Record = StepRecord;
 }
 
-impl<'a> LexiconSchema for Step<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Step<S> {
     fn nsid() -> &'static str {
         "social.pace.daily.step"
     }
@@ -114,49 +125,49 @@ pub mod step_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Steps;
+        type CreatedAt;
         type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Steps = Unset;
+        type CreatedAt = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Steps = S::Steps;
-        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `steps` field to Set
     pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSteps<S> {}
     impl<S: State> State for SetSteps<S> {
-        type CreatedAt = S::CreatedAt;
         type Steps = Set<members::steps>;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Steps = S::Steps;
+        type CreatedAt = Set<members::created_at>;
         type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type CreatedAt = S::CreatedAt;
         type Steps = S::Steps;
+        type CreatedAt = S::CreatedAt;
         type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `steps` field
         pub struct steps(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
     }
@@ -247,8 +258,8 @@ where
 impl<'a, S> StepBuilder<'a, S>
 where
     S: step_state::State,
-    S::CreatedAt: step_state::IsSet,
     S::Steps: step_state::IsSet,
+    S::CreatedAt: step_state::IsSet,
     S::UpdatedAt: step_state::IsSet,
 {
     /// Build the final struct
@@ -261,13 +272,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Step<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Step<'a> {
         Step {
             created_at: self._fields.0.unwrap(),
             steps: self._fields.1.unwrap(),

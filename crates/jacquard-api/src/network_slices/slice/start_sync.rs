@@ -10,50 +10,64 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Nsid};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct StartSync<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StartSync<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of collection NSIDs to sync (primary collections matching slice domain)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub collections: Option<Vec<Nsid<'a>>>,
+    pub collections: Option<Vec<Nsid<S>>>,
     ///List of external collection NSIDs to sync (collections outside slice domain)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub external_collections: Option<Vec<Nsid<'a>>>,
+    pub external_collections: Option<Vec<Nsid<S>>>,
     ///Maximum number of records to sync per repository
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit_per_repo: Option<i64>,
     ///List of specific repository DIDs to sync from
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub repos: Option<Vec<Did<'a>>>,
+    pub repos: Option<Vec<Did<S>>>,
     ///Skip lexicon validation during sync  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_start_sync_skip_validation")]
     pub skip_validation: Option<bool>,
     ///AT-URI of the slice to sync data into
-    #[serde(borrow)]
-    pub slice: CowStr<'a>,
+    pub slice: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct StartSyncOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StartSyncOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///UUID of the enqueued sync job
-    #[serde(borrow)]
-    pub job_id: CowStr<'a>,
+    pub job_id: S,
     ///Success message confirming job enqueue
-    #[serde(borrow)]
-    pub message: CowStr<'a>,
+    pub message: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for network.slices.slice.startSync
@@ -61,11 +75,12 @@ pub struct StartSyncResponse;
 impl jacquard_common::xrpc::XrpcResp for StartSyncResponse {
     const NSID: &'static str = "network.slices.slice.startSync";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = StartSyncOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = StartSyncOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for StartSync<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for StartSync<S> {
     const NSID: &'static str = "network.slices.slice.startSync";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -80,7 +95,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for StartSyncRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = StartSync<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = StartSync<S>;
     type Response = StartSyncResponse;
 }
 

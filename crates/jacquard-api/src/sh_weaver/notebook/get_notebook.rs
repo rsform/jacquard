@@ -10,28 +10,44 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetNotebook<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetNotebook<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub notebook: AtUri<'a>,
+    pub notebook: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetNotebookOutput<'a> {
-    #[serde(borrow)]
-    pub entries: Vec<StrongRef<'a>>,
-    #[serde(borrow)]
-    pub notebook: NotebookView<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetNotebookOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub entries: Vec<StrongRef<S>>,
+    pub notebook: NotebookView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.notebook.getNotebook
@@ -39,11 +55,12 @@ pub struct GetNotebookResponse;
 impl jacquard_common::xrpc::XrpcResp for GetNotebookResponse {
     const NSID: &'static str = "sh.weaver.notebook.getNotebook";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetNotebookOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetNotebookOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetNotebook<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetNotebook<S> {
     const NSID: &'static str = "sh.weaver.notebook.getNotebook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetNotebookResponse;
@@ -54,7 +71,7 @@ pub struct GetNotebookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getNotebook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetNotebook<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetNotebook<S>;
     type Response = GetNotebookResponse;
 }
 
@@ -93,7 +110,7 @@ pub mod get_notebook_state {
 /// Builder for constructing an instance of this type
 pub struct GetNotebookBuilder<'a, S: get_notebook_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -123,7 +140,7 @@ where
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetNotebookBuilder<'a, get_notebook_state::SetNotebook<S>> {
         self._fields.0 = Option::Some(value.into());
         GetNotebookBuilder {

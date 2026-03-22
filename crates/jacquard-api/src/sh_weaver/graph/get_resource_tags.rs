@@ -7,6 +7,7 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -14,19 +15,39 @@ use crate::sh_weaver::graph::ResourceTagsView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetResourceTags<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetResourceTags<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub resource: AtUri<'a>,
+    pub resource: AtUri<S>,
 }
 
 
-#[jacquard_derive::lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetResourceTagsOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetResourceTagsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: ResourceTagsView<'a>,
+    pub value: ResourceTagsView<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<
+        alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<S>,
+        >,
+    >,
 }
 
 /// Response type for sh.weaver.graph.getResourceTags
@@ -34,11 +55,12 @@ pub struct GetResourceTagsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetResourceTagsResponse {
     const NSID: &'static str = "sh.weaver.graph.getResourceTags";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetResourceTagsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetResourceTagsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetResourceTags<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetResourceTags<S> {
     const NSID: &'static str = "sh.weaver.graph.getResourceTags";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetResourceTagsResponse;
@@ -49,7 +71,7 @@ pub struct GetResourceTagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetResourceTagsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getResourceTags";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetResourceTags<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetResourceTags<S>;
     type Response = GetResourceTagsResponse;
 }
 
@@ -88,7 +110,7 @@ pub mod get_resource_tags_state {
 /// Builder for constructing an instance of this type
 pub struct GetResourceTagsBuilder<'a, S: get_resource_tags_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -118,7 +140,7 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetResourceTagsBuilder<'a, get_resource_tags_state::SetResource<S>> {
         self._fields.0 = Option::Some(value.into());
         GetResourceTagsBuilder {

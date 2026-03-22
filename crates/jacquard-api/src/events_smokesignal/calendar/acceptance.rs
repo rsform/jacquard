@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,38 +29,43 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A cryptographic proof record that contains RSVP acceptance data.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "events.smokesignal.calendar.acceptance",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Acceptance<'a> {
+pub struct Acceptance<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The CID (Content Identifier) of the rsvp that this proof validates.
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+    pub cid: Cid<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AcceptanceGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AcceptanceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Acceptance<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Acceptance<S>,
 }
 
-impl<'a> Acceptance<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, AcceptanceRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Acceptance<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, AcceptanceRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -69,18 +76,17 @@ pub struct AcceptanceRecord;
 impl XrpcResp for AcceptanceRecord {
     const NSID: &'static str = "events.smokesignal.calendar.acceptance";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = AcceptanceGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = AcceptanceGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<AcceptanceGetRecordOutput<'_>> for Acceptance<'_> {
-    fn from(output: AcceptanceGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<AcceptanceGetRecordOutput<S>> for Acceptance<S> {
+    fn from(output: AcceptanceGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Acceptance<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Acceptance<S> {
     const NSID: &'static str = "events.smokesignal.calendar.acceptance";
     type Record = AcceptanceRecord;
 }
@@ -90,7 +96,7 @@ impl Collection for AcceptanceRecord {
     type Record = AcceptanceRecord;
 }
 
-impl<'a> LexiconSchema for Acceptance<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Acceptance<S> {
     fn nsid() -> &'static str {
         "events.smokesignal.calendar.acceptance"
     }
@@ -140,7 +146,7 @@ pub mod acceptance_state {
 /// Builder for constructing an instance of this type
 pub struct AcceptanceBuilder<'a, S: acceptance_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Cid<'a>>,),
+    _fields: (Option<Cid<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -170,7 +176,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> AcceptanceBuilder<'a, acceptance_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         AcceptanceBuilder {
@@ -196,10 +202,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Acceptance<'a> {
         Acceptance {
             cid: self._fields.0.unwrap(),

@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,45 +32,47 @@ use crate::app_bsky::richtext::facet::Facet;
 use crate::com_atproto::label::SelfLabels;
 /// Record declaring of the existence of a feed generator, and containing metadata about it. The record can exist in any repository.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.bsky.feed.generator", tag = "$type")]
-pub struct Generator<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.bsky.feed.generator",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Generator<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Declaration that a feed accepts feedback interactions from a client through app.bsky.feed.sendInteractions
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepts_interactions: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<BlobRef<'a>>,
+    pub avatar: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_mode: Option<GeneratorContentMode<'a>>,
+    pub content_mode: Option<GeneratorContentMode<S>>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description_facets: Option<Vec<Facet<'a>>>,
-    #[serde(borrow)]
-    pub did: Did<'a>,
-    #[serde(borrow)]
-    pub display_name: CowStr<'a>,
+    pub description_facets: Option<Vec<Facet<S>>>,
+    pub did: Did<S>,
+    pub display_name: S,
     ///Self-label values
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<SelfLabels<'a>>,
+    pub labels: Option<SelfLabels<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum GeneratorContentMode<'a> {
+pub enum GeneratorContentMode<S: Bos<str> + AsRef<str> = DefaultStr> {
     ContentModeUnspecified,
     ContentModeVideo,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> GeneratorContentMode<'a> {
+impl<S: Bos<str> + AsRef<str>> GeneratorContentMode<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ContentModeUnspecified => "app.bsky.feed.defs#contentModeUnspecified",
@@ -76,70 +80,56 @@ impl<'a> GeneratorContentMode<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for GeneratorContentMode<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "app.bsky.feed.defs#contentModeUnspecified" => Self::ContentModeUnspecified,
             "app.bsky.feed.defs#contentModeVideo" => Self::ContentModeVideo,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for GeneratorContentMode<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "app.bsky.feed.defs#contentModeUnspecified" => Self::ContentModeUnspecified,
-            "app.bsky.feed.defs#contentModeVideo" => Self::ContentModeVideo,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for GeneratorContentMode<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for GeneratorContentMode<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for GeneratorContentMode<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for GeneratorContentMode<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for GeneratorContentMode<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for GeneratorContentMode<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for GeneratorContentMode<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for GeneratorContentMode<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for GeneratorContentMode<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for GeneratorContentMode<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for GeneratorContentMode<'_> {
-    type Output = GeneratorContentMode<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for GeneratorContentMode<S> {
+    type Output = GeneratorContentMode<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             GeneratorContentMode::ContentModeUnspecified => {
@@ -158,22 +148,23 @@ impl jacquard_common::IntoStatic for GeneratorContentMode<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct GeneratorGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GeneratorGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Generator<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Generator<S>,
 }
 
-impl<'a> Generator<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, GeneratorRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Generator<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, GeneratorRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -184,18 +175,17 @@ pub struct GeneratorRecord;
 impl XrpcResp for GeneratorRecord {
     const NSID: &'static str = "app.bsky.feed.generator";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GeneratorGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GeneratorGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<GeneratorGetRecordOutput<'_>> for Generator<'_> {
-    fn from(output: GeneratorGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<GeneratorGetRecordOutput<S>> for Generator<S> {
+    fn from(output: GeneratorGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Generator<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Generator<S> {
     const NSID: &'static str = "app.bsky.feed.generator";
     type Record = GeneratorRecord;
 }
@@ -205,7 +195,7 @@ impl Collection for GeneratorRecord {
     type Record = GeneratorRecord;
 }
 
-impl<'a> LexiconSchema for Generator<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Generator<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.generator"
     }
@@ -316,51 +306,51 @@ pub mod generator_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Did;
         type DisplayName;
         type CreatedAt;
-        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Did = Unset;
         type DisplayName = Unset;
         type CreatedAt = Unset;
-        type Did = Unset;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type DisplayName = Set<members::display_name>;
-        type CreatedAt = S::CreatedAt;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type DisplayName = S::DisplayName;
-        type CreatedAt = Set<members::created_at>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
         type DisplayName = S::DisplayName;
         type CreatedAt = S::CreatedAt;
-        type Did = Set<members::did>;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Did = S::Did;
+        type DisplayName = Set<members::display_name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Did = S::Did;
+        type DisplayName = S::DisplayName;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `did` field
-        pub struct did(());
     }
 }
 
@@ -369,14 +359,14 @@ pub struct GeneratorBuilder<'a, S: generator_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<bool>,
-        Option<BlobRef<'a>>,
-        Option<GeneratorContentMode<'a>>,
+        Option<BlobRef<S>>,
+        Option<GeneratorContentMode<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Vec<Facet<'a>>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<SelfLabels<'a>>,
+        Option<S>,
+        Option<Vec<Facet<S>>>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<SelfLabels<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -414,12 +404,12 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
 
 impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
     /// Set the `avatar` field (optional)
-    pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_avatar(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -429,16 +419,13 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
     /// Set the `contentMode` field (optional)
     pub fn content_mode(
         mut self,
-        value: impl Into<Option<GeneratorContentMode<'a>>>,
+        value: impl Into<Option<GeneratorContentMode<S>>>,
     ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `contentMode` field to an Option value (optional)
-    pub fn maybe_content_mode(
-        mut self,
-        value: Option<GeneratorContentMode<'a>>,
-    ) -> Self {
+    pub fn maybe_content_mode(mut self, value: Option<GeneratorContentMode<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -465,12 +452,12 @@ where
 
 impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -480,13 +467,13 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
-        value: impl Into<Option<Vec<Facet<'a>>>>,
+        value: impl Into<Option<Vec<Facet<S>>>>,
     ) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
-    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
+    pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -500,7 +487,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GeneratorBuilder<'a, generator_state::SetDid<S>> {
         self._fields.6 = Option::Some(value.into());
         GeneratorBuilder {
@@ -519,7 +506,7 @@ where
     /// Set the `displayName` field (required)
     pub fn display_name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GeneratorBuilder<'a, generator_state::SetDisplayName<S>> {
         self._fields.7 = Option::Some(value.into());
         GeneratorBuilder {
@@ -532,12 +519,12 @@ where
 
 impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -546,9 +533,9 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
 impl<'a, S> GeneratorBuilder<'a, S>
 where
     S: generator_state::State,
+    S::Did: generator_state::IsSet,
     S::DisplayName: generator_state::IsSet,
     S::CreatedAt: generator_state::IsSet,
-    S::Did: generator_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Generator<'a> {
@@ -568,10 +555,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Generator<'a> {
         Generator {
             accepts_interactions: self._fields.0,

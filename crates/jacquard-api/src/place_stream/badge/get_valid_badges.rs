@@ -10,26 +10,43 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::place_stream::badge::BadgeView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetValidBadges<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetValidBadges<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub streamer: Option<Did<'a>>,
+    pub streamer: Option<Did<S>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetValidBadgesOutput<'a> {
-    #[serde(borrow)]
-    pub badges: Vec<BadgeView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetValidBadgesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub badges: Vec<BadgeView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for place.stream.badge.getValidBadges
@@ -37,11 +54,12 @@ pub struct GetValidBadgesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetValidBadgesResponse {
     const NSID: &'static str = "place.stream.badge.getValidBadges";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetValidBadgesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetValidBadgesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetValidBadges<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetValidBadges<S> {
     const NSID: &'static str = "place.stream.badge.getValidBadges";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetValidBadgesResponse;
@@ -52,7 +70,7 @@ pub struct GetValidBadgesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetValidBadgesRequest {
     const PATH: &'static str = "/xrpc/place.stream.badge.getValidBadges";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetValidBadges<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetValidBadges<S>;
     type Response = GetValidBadgesResponse;
 }
 
@@ -78,7 +96,7 @@ pub mod get_valid_badges_state {
 /// Builder for constructing an instance of this type
 pub struct GetValidBadgesBuilder<'a, S: get_valid_badges_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -102,12 +120,12 @@ impl<'a> GetValidBadgesBuilder<'a, get_valid_badges_state::Empty> {
 
 impl<'a, S: get_valid_badges_state::State> GetValidBadgesBuilder<'a, S> {
     /// Set the `streamer` field (optional)
-    pub fn streamer(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
+    pub fn streamer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `streamer` field to an Option value (optional)
-    pub fn maybe_streamer(mut self, value: Option<Did<'a>>) -> Self {
+    pub fn maybe_streamer(mut self, value: Option<Did<S>>) -> Self {
         self._fields.0 = value;
         self
     }

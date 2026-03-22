@@ -28,21 +28,17 @@ impl<'c> CodeGenerator<'c> {
                     let enum_name =
                         self.generate_field_type_name(nsid, parent_type_name, field_name, "");
                     let enum_ident = syn::Ident::new(&enum_name, proc_macro2::Span::call_site());
-                    Ok(quote! { #enum_ident<'a> })
+                    Ok(quote! { #enum_ident<S> })
                 } else {
                     Ok(self.string_to_rust_type(s, resolved))
                 }
             }
-            LexObjectProperty::Bytes(_) => Ok(resolved.external_type_tokens(&ExternalImport::Bytes)),
-            LexObjectProperty::CidLink(_) => {
-                Ok(resolved.type_tokens(&CommonType::CidLink))
+            LexObjectProperty::Bytes(_) => {
+                Ok(resolved.external_type_tokens(&ExternalImport::Bytes))
             }
-            LexObjectProperty::Blob(_) => {
-                Ok(resolved.type_tokens(&CommonType::BlobRef))
-            }
-            LexObjectProperty::Unknown(_) => {
-                Ok(resolved.type_tokens(&CommonType::Data))
-            }
+            LexObjectProperty::CidLink(_) => Ok(resolved.type_tokens(&CommonType::CidLink)),
+            LexObjectProperty::Blob(_) => Ok(resolved.type_tokens(&CommonType::BlobRef)),
+            LexObjectProperty::Unknown(_) => Ok(resolved.type_tokens(&CommonType::Data)),
             LexObjectProperty::Array(array) => {
                 // For arrays with union items, check if multi-variant
                 if let LexArrayItem::Union(union) = &array.items {
@@ -69,7 +65,7 @@ impl<'c> CodeGenerator<'c> {
                         );
                         let union_ident =
                             syn::Ident::new(&union_name, proc_macro2::Span::call_site());
-                        Ok(quote! { Vec<#union_ident<'a>> })
+                        Ok(quote! { Vec<#union_ident<S>> })
                     }
                 } else {
                     let item_type = self.array_item_to_rust_type(nsid, &array.items, resolved)?;
@@ -85,7 +81,7 @@ impl<'c> CodeGenerator<'c> {
                 let object_name =
                     self.generate_field_type_name(nsid, parent_type_name, field_name, "");
                 let object_ident = syn::Ident::new(&object_name, proc_macro2::Span::call_site());
-                Ok(quote! { #object_ident<'a> })
+                Ok(quote! { #object_ident<S> })
             }
             LexObjectProperty::Ref(ref_type) => {
                 // Handle local refs (starting with #) by prepending the current NSID
@@ -120,7 +116,7 @@ impl<'c> CodeGenerator<'c> {
                             self.generate_field_type_name(nsid, parent_type_name, field_name, "");
                         let union_ident =
                             syn::Ident::new(&union_name, proc_macro2::Span::call_site());
-                        Ok(quote! { #union_ident<'a> })
+                        Ok(quote! { #union_ident<S> })
                     } else {
                         // Non-self-ref single-variant: use the ref type directly
                         // Track namespace dependency for cross-namespace refs
@@ -132,7 +128,7 @@ impl<'c> CodeGenerator<'c> {
                     let union_name =
                         self.generate_field_type_name(nsid, parent_type_name, field_name, "");
                     let union_ident = syn::Ident::new(&union_name, proc_macro2::Span::call_site());
-                    Ok(quote! { #union_ident<'a> })
+                    Ok(quote! { #union_ident<S> })
                 }
             }
         }
@@ -150,15 +146,9 @@ impl<'c> CodeGenerator<'c> {
             LexArrayItem::Integer(_) => Ok(quote! { i64 }),
             LexArrayItem::String(s) => Ok(self.string_to_rust_type(s, resolved)),
             LexArrayItem::Bytes(_) => Ok(resolved.external_type_tokens(&ExternalImport::Bytes)),
-            LexArrayItem::CidLink(_) => {
-                Ok(resolved.type_tokens(&CommonType::CidLink))
-            }
-            LexArrayItem::Blob(_) => {
-                Ok(resolved.type_tokens(&CommonType::BlobRef))
-            }
-            LexArrayItem::Unknown(_) => {
-                Ok(resolved.type_tokens(&CommonType::Data))
-            }
+            LexArrayItem::CidLink(_) => Ok(resolved.type_tokens(&CommonType::CidLink)),
+            LexArrayItem::Blob(_) => Ok(resolved.type_tokens(&CommonType::BlobRef)),
+            LexArrayItem::Unknown(_) => Ok(resolved.type_tokens(&CommonType::Data)),
             LexArrayItem::Object(_) => {
                 // For inline objects in arrays, use Data since we can't generate a unique type name.
                 Ok(resolved.type_tokens(&CommonType::Data))
@@ -181,7 +171,11 @@ impl<'c> CodeGenerator<'c> {
 
     /// Convert string type to Rust type.
     /// Lifetimes are included by `type_tokens()` — callers must not add them.
-    pub(super) fn string_to_rust_type(&self, s: &LexString, resolved: &ResolvedImports) -> TokenStream {
+    pub(super) fn string_to_rust_type(
+        &self,
+        s: &LexString,
+        resolved: &ResolvedImports,
+    ) -> TokenStream {
         match s.format {
             Some(LexStringFormat::Datetime) => resolved.type_tokens(&CommonType::Datetime),
             Some(LexStringFormat::Did) => resolved.type_tokens(&CommonType::Did),
@@ -264,7 +258,11 @@ impl<'c> CodeGenerator<'c> {
     }
 
     /// Convert ref to Rust type path, using short names from resolved imports when available.
-    pub(super) fn ref_to_rust_type(&self, ref_str: &str, resolved: &ResolvedImports) -> Result<TokenStream> {
+    pub(super) fn ref_to_rust_type(
+        &self,
+        ref_str: &str,
+        resolved: &ResolvedImports,
+    ) -> Result<TokenStream> {
         use crate::error::CodegenError;
 
         let Some((path_str, _type_name)) = self.build_ref_path(ref_str) else {
@@ -273,8 +271,8 @@ impl<'c> CodeGenerator<'c> {
 
         // In Pretty mode, check if this path was imported via a use statement.
         if let Some(short_tokens) = resolved.lexicon_ref_tokens(&path_str) {
-            return if self.ref_needs_lifetime(ref_str) {
-                Ok(quote! { #short_tokens<'a> })
+            return if self.ref_needs_type_param(ref_str) {
+                Ok(quote! { #short_tokens<S> })
             } else {
                 Ok(quote! { #short_tokens })
             };
@@ -286,8 +284,8 @@ impl<'c> CodeGenerator<'c> {
                 source: e,
             })?;
 
-        if self.ref_needs_lifetime(ref_str) {
-            Ok(quote! { #path<'a> })
+        if self.ref_needs_type_param(ref_str) {
+            Ok(quote! { #path<S> })
         } else {
             Ok(quote! { #path })
         }

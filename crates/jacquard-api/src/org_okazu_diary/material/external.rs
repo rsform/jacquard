@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -31,83 +33,85 @@ use crate::org_okazu_diary::material::Tag;
 use crate::org_okazu_diary::material::external;
 /// A descriptor of a pornographic material.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.okazu-diary.material.external",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct External<'a> {
+pub struct External<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Description of the material, typically taken from the material's HTML metadata.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///General-purpose self-label values primarily for consumption by generic AT clients who may not expect the sensitive nature of this Lexicon. Publishers of this record are strongly recommended to always include at least one of the protocol-global label values; namely, `porn`, `sexual`, `graphic-media`, and `nudity`, unless the material and tags are all known to be safe by themselves. It is the safest to unconditionally include the `sexual` value, which has the `adultOnly` semantics, but it is acceptable to use a stronger (`porn`/`graphic-media`) or more moderate (`nudity`) value instead if the user decides so.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub generic_labels: Option<SelfLabels<'a>>,
+    pub generic_labels: Option<SelfLabels<S>>,
     ///User-specified self-label values for the material. While the Lexicon by its nature assumes the material to be possibly sensitive by default, these label values are intended to signal that a warning should be put on the material even for the explicit Okazu-Diary.org application users who are willing to see mature contents in general.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<SelfLabels<'a>>,
+    pub labels: Option<SelfLabels<S>>,
     ///Reference to a record representing the material, such as a Bluesky post.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub record: Option<StrongRef<'a>>,
+    pub record: Option<StrongRef<S>>,
     ///User-specified tags for the material.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<Tag<'a>>>,
+    pub tags: Option<Vec<Tag<S>>>,
     ///Link to a thumbnail of the material, typically taken from the material's HTML metadata.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumb: Option<external::Thumb<'a>>,
+    pub thumb: Option<external::Thumb<S>>,
     ///Title of the material, typically taken from the material's HTML `<title>` element.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     ///URI of the material, typically an HTTP(S) URL. If the URL is of a Web interface for an AT resource (such as a `bsky.app` URL), the record should also include the `record` property referencing the AT resource.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<UriValue<'a>>,
+    pub uri: Option<UriValue<S>>,
     ///Reference to an `org.okazu-diary.feed.material` record from another repository from which this collection item is derived. Clients can use this property to offer the user to update this record if the original record have updated from the referenced version.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub via: Option<StrongRef<'a>>,
+    pub via: Option<StrongRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ExternalGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExternalGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: External<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: External<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Thumb<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Thumb<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub cid: Option<Cid<S>>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> External<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ExternalRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> External<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ExternalRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -118,18 +122,17 @@ pub struct ExternalRecord;
 impl XrpcResp for ExternalRecord {
     const NSID: &'static str = "org.okazu-diary.material.external";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ExternalGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ExternalGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ExternalGetRecordOutput<'_>> for External<'_> {
-    fn from(output: ExternalGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ExternalGetRecordOutput<S>> for External<S> {
+    fn from(output: ExternalGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for External<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for External<S> {
     const NSID: &'static str = "org.okazu-diary.material.external";
     type Record = ExternalRecord;
 }
@@ -139,7 +142,7 @@ impl Collection for ExternalRecord {
     type Record = ExternalRecord;
 }
 
-impl<'a> LexiconSchema for External<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for External<S> {
     fn nsid() -> &'static str {
         "org.okazu-diary.material.external"
     }
@@ -164,7 +167,7 @@ impl<'a> LexiconSchema for External<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Thumb<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Thumb<S> {
     fn nsid() -> &'static str {
         "org.okazu-diary.material.external"
     }
@@ -202,15 +205,15 @@ pub mod external_state {
 pub struct ExternalBuilder<'a, S: external_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<SelfLabels<'a>>,
-        Option<SelfLabels<'a>>,
-        Option<StrongRef<'a>>,
-        Option<Vec<Tag<'a>>>,
-        Option<external::Thumb<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<StrongRef<'a>>,
+        Option<S>,
+        Option<SelfLabels<S>>,
+        Option<SelfLabels<S>>,
+        Option<StrongRef<S>>,
+        Option<Vec<Tag<S>>>,
+        Option<external::Thumb<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<StrongRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -235,12 +238,12 @@ impl<'a> ExternalBuilder<'a, external_state::Empty> {
 
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -248,12 +251,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `genericLabels` field (optional)
-    pub fn generic_labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
+    pub fn generic_labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `genericLabels` field to an Option value (optional)
-    pub fn maybe_generic_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
+    pub fn maybe_generic_labels(mut self, value: Option<SelfLabels<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -261,12 +264,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -274,12 +277,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `record` field (optional)
-    pub fn record(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn record(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `record` field to an Option value (optional)
-    pub fn maybe_record(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_record(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -287,12 +290,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<Tag<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<Tag<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<Tag<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<Tag<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -300,12 +303,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `thumb` field (optional)
-    pub fn thumb(mut self, value: impl Into<Option<external::Thumb<'a>>>) -> Self {
+    pub fn thumb(mut self, value: impl Into<Option<external::Thumb<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `thumb` field to an Option value (optional)
-    pub fn maybe_thumb(mut self, value: Option<external::Thumb<'a>>) -> Self {
+    pub fn maybe_thumb(mut self, value: Option<external::Thumb<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -313,12 +316,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -326,12 +329,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `uri` field (optional)
-    pub fn uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
-    pub fn maybe_uri(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_uri(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -339,12 +342,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `via` field (optional)
-    pub fn via(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn via(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `via` field to an Option value (optional)
-    pub fn maybe_via(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_via(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -372,10 +375,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> External<'a> {
         External {
             description: self._fields.0,
@@ -586,7 +586,7 @@ pub mod thumb_state {
 /// Builder for constructing an instance of this type
 pub struct ThumbBuilder<'a, S: thumb_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Cid<'a>>, Option<UriValue<'a>>),
+    _fields: (Option<Cid<S>>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -610,12 +610,12 @@ impl<'a> ThumbBuilder<'a, thumb_state::Empty> {
 
 impl<'a, S: thumb_state::State> ThumbBuilder<'a, S> {
     /// Set the `cid` field (optional)
-    pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
+    pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
-    pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
+    pub fn maybe_cid(mut self, value: Option<Cid<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -629,7 +629,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> ThumbBuilder<'a, thumb_state::SetUrl<S>> {
         self._fields.1 = Option::Some(value.into());
         ThumbBuilder {
@@ -654,13 +654,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Thumb<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Thumb<'a> {
         Thumb {
             cid: self._fields.0,
             url: self._fields.1.unwrap(),

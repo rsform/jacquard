@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -28,43 +30,60 @@ use crate::systems_timker::hawlt::list_notes;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListNotes<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListNotes<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///(max length: 100)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     ///(min: 1, max: 100)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(borrow)]
-    pub repo: AtIdentifier<'a>,
+    pub repo: AtIdentifier<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListNotesOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListNotesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub notes: Vec<list_notes::NoteView<'a>>,
+    pub cursor: Option<S>,
+    pub notes: Vec<list_notes::NoteView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A note record with its AT URI, CID, and server-side index timestamp.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct NoteView<'a> {
-    #[serde(borrow)]
-    pub cid: Cid<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct NoteView<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub cid: Cid<S>,
     pub indexed_at: Datetime,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Note<'a>,
+    pub uri: AtUri<S>,
+    pub value: Note<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for systems.timker.hawlt.listNotes
@@ -72,11 +91,12 @@ pub struct ListNotesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListNotesResponse {
     const NSID: &'static str = "systems.timker.hawlt.listNotes";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListNotesOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListNotesOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListNotes<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListNotes<S> {
     const NSID: &'static str = "systems.timker.hawlt.listNotes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListNotesResponse;
@@ -87,11 +107,11 @@ pub struct ListNotesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListNotesRequest {
     const PATH: &'static str = "/xrpc/systems.timker.hawlt.listNotes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListNotes<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListNotes<S>;
     type Response = ListNotesResponse;
 }
 
-impl<'a> LexiconSchema for NoteView<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for NoteView<S> {
     fn nsid() -> &'static str {
         "systems.timker.hawlt.listNotes"
     }
@@ -141,7 +161,7 @@ pub mod list_notes_state {
 /// Builder for constructing an instance of this type
 pub struct ListNotesBuilder<'a, S: list_notes_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>, Option<AtIdentifier<'a>>),
+    _fields: (Option<S>, Option<i64>, Option<AtIdentifier<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -165,12 +185,12 @@ impl<'a> ListNotesBuilder<'a, list_notes_state::Empty> {
 
 impl<'a, S: list_notes_state::State> ListNotesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -197,7 +217,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> ListNotesBuilder<'a, list_notes_state::SetRepo<S>> {
         self._fields.2 = Option::Some(value.into());
         ListNotesBuilder {
@@ -235,8 +255,8 @@ pub mod note_view_state {
     pub trait State: sealed::Sealed {
         type Uri;
         type Cid;
-        type IndexedAt;
         type Value;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -244,8 +264,8 @@ pub mod note_view_state {
     impl State for Empty {
         type Uri = Unset;
         type Cid = Unset;
-        type IndexedAt = Unset;
         type Value = Unset;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
@@ -253,8 +273,8 @@ pub mod note_view_state {
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
         type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
         type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
@@ -262,17 +282,8 @@ pub mod note_view_state {
     impl<S: State> State for SetCid<S> {
         type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type Value = S::Value;
         type IndexedAt = S::IndexedAt;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type IndexedAt = Set<members::indexed_at>;
-        type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
@@ -280,8 +291,17 @@ pub mod note_view_state {
     impl<S: State> State for SetValue<S> {
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
         type Value = Set<members::value>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Value = S::Value;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -290,17 +310,17 @@ pub mod note_view_state {
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct NoteViewBuilder<'a, S: note_view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Cid<'a>>, Option<Datetime>, Option<AtUri<'a>>, Option<Note<'a>>),
+    _fields: (Option<Cid<S>>, Option<Datetime>, Option<AtUri<S>>, Option<Note<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -330,7 +350,7 @@ where
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
-        value: impl Into<Cid<'a>>,
+        value: impl Into<Cid<S>>,
     ) -> NoteViewBuilder<'a, note_view_state::SetCid<S>> {
         self._fields.0 = Option::Some(value.into());
         NoteViewBuilder {
@@ -368,7 +388,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> NoteViewBuilder<'a, note_view_state::SetUri<S>> {
         self._fields.2 = Option::Some(value.into());
         NoteViewBuilder {
@@ -387,7 +407,7 @@ where
     /// Set the `value` field (required)
     pub fn value(
         mut self,
-        value: impl Into<Note<'a>>,
+        value: impl Into<Note<S>>,
     ) -> NoteViewBuilder<'a, note_view_state::SetValue<S>> {
         self._fields.3 = Option::Some(value.into());
         NoteViewBuilder {
@@ -403,8 +423,8 @@ where
     S: note_view_state::State,
     S::Uri: note_view_state::IsSet,
     S::Cid: note_view_state::IsSet,
-    S::IndexedAt: note_view_state::IsSet,
     S::Value: note_view_state::IsSet,
+    S::IndexedAt: note_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NoteView<'a> {
@@ -419,10 +439,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> NoteView<'a> {
         NoteView {
             cid: self._fields.0.unwrap(),

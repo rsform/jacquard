@@ -20,11 +20,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Datetime};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -34,43 +37,61 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileView;
 /// Associates a profile with the positional index of the contact import input in the call to `app.bsky.contact.importContacts`, so clients can know which phone caused a particular match.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MatchAndContactIndex<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MatchAndContactIndex<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The index of this match in the import contact input.
     pub contact_index: i64,
     ///Profile of the matched user.
-    #[serde(borrow)]
-    pub r#match: ProfileView<'a>,
+    pub r#match: ProfileView<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A stash object to be sent via bsync representing a notification to be created.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Notification<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Notification<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The DID of who this notification comes from.
-    #[serde(borrow)]
-    pub from: Did<'a>,
+    pub from: Did<S>,
     ///The DID of who this notification should go to.
-    #[serde(borrow)]
-    pub to: Did<'a>,
+    pub to: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SyncStatus<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SyncStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Number of existing contact matches resulting of the user imports and of their imported contacts having imported the user. Matches stop being counted when the user either follows the matched contact or dismisses the match.
     pub matches_count: i64,
     ///Last date when contacts where imported.
     pub synced_at: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for MatchAndContactIndex<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for MatchAndContactIndex<S> {
     fn nsid() -> &'static str {
         "app.bsky.contact.defs"
     }
@@ -105,7 +126,7 @@ impl<'a> LexiconSchema for MatchAndContactIndex<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Notification<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Notification<S> {
     fn nsid() -> &'static str {
         "app.bsky.contact.defs"
     }
@@ -120,7 +141,7 @@ impl<'a> LexiconSchema for Notification<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SyncStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SyncStatus<S> {
     fn nsid() -> &'static str {
         "app.bsky.contact.defs"
     }
@@ -155,44 +176,44 @@ pub mod match_and_contact_index_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Match;
         type ContactIndex;
+        type Match;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Match = Unset;
         type ContactIndex = Unset;
-    }
-    ///State transition - sets the `match` field to Set
-    pub struct SetMatch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMatch<S> {}
-    impl<S: State> State for SetMatch<S> {
-        type Match = Set<members::r#match>;
-        type ContactIndex = S::ContactIndex;
+        type Match = Unset;
     }
     ///State transition - sets the `contact_index` field to Set
     pub struct SetContactIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContactIndex<S> {}
     impl<S: State> State for SetContactIndex<S> {
-        type Match = S::Match;
         type ContactIndex = Set<members::contact_index>;
+        type Match = S::Match;
+    }
+    ///State transition - sets the `match` field to Set
+    pub struct SetMatch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMatch<S> {}
+    impl<S: State> State for SetMatch<S> {
+        type ContactIndex = S::ContactIndex;
+        type Match = Set<members::r#match>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `match` field
-        pub struct r#match(());
         ///Marker type for the `contact_index` field
         pub struct contact_index(());
+        ///Marker type for the `match` field
+        pub struct r#match(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MatchAndContactIndexBuilder<'a, S: match_and_contact_index_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<i64>, Option<ProfileView<'a>>),
+    _fields: (Option<i64>, Option<ProfileView<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -247,7 +268,7 @@ where
     /// Set the `match` field (required)
     pub fn r#match(
         mut self,
-        value: impl Into<ProfileView<'a>>,
+        value: impl Into<ProfileView<S>>,
     ) -> MatchAndContactIndexBuilder<'a, match_and_contact_index_state::SetMatch<S>> {
         self._fields.1 = Option::Some(value.into());
         MatchAndContactIndexBuilder {
@@ -261,8 +282,8 @@ where
 impl<'a, S> MatchAndContactIndexBuilder<'a, S>
 where
     S: match_and_contact_index_state::State,
-    S::Match: match_and_contact_index_state::IsSet,
     S::ContactIndex: match_and_contact_index_state::IsSet,
+    S::Match: match_and_contact_index_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MatchAndContactIndex<'a> {
@@ -275,10 +296,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> MatchAndContactIndex<'a> {
         MatchAndContactIndex {
             contact_index: self._fields.0.unwrap(),
@@ -469,7 +487,7 @@ pub mod notification_state {
 /// Builder for constructing an instance of this type
 pub struct NotificationBuilder<'a, S: notification_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>, Option<Did<'a>>),
+    _fields: (Option<Did<S>>, Option<Did<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -499,7 +517,7 @@ where
     /// Set the `from` field (required)
     pub fn from(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> NotificationBuilder<'a, notification_state::SetFrom<S>> {
         self._fields.0 = Option::Some(value.into());
         NotificationBuilder {
@@ -518,7 +536,7 @@ where
     /// Set the `to` field (required)
     pub fn to(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> NotificationBuilder<'a, notification_state::SetTo<S>> {
         self._fields.1 = Option::Some(value.into());
         NotificationBuilder {
@@ -546,10 +564,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Notification<'a> {
         Notification {
             from: self._fields.0.unwrap(),
@@ -683,10 +698,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SyncStatus<'a> {
         SyncStatus {
             matches_count: self._fields.0.unwrap(),

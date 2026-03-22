@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Cid, Language};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,62 +30,73 @@ use serde::{Serialize, Deserialize};
 use crate::social_psky::chat::room;
 /// A Picosky room belonging to the user.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "social.psky.chat.room", tag = "$type")]
-pub struct Room<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "social.psky.chat.room",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Room<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of users allowed to send messages in the room.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub allowlist: Option<room::ModlistRef<'a>>,
+    pub allowlist: Option<room::ModlistRef<S>>,
     ///List of users disallowed to send messages in the room.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub denylist: Option<room::ModlistRef<'a>>,
+    pub denylist: Option<room::ModlistRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub languages: Option<Vec<Language>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///Topic title of the room.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub topic: Option<CowStr<'a>>,
+    pub topic: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct RoomGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct RoomGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Room<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Room<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ModlistRef<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ModlistRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// Defaults to `false`.
     #[serde(default = "_default_modlist_ref_active")]
     pub active: bool,
-    #[serde(borrow)]
-    pub users: Vec<Did<'a>>,
+    pub users: Vec<Did<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Room<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, RoomRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Room<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, RoomRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -94,18 +107,17 @@ pub struct RoomRecord;
 impl XrpcResp for RoomRecord {
     const NSID: &'static str = "social.psky.chat.room";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = RoomGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = RoomGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<RoomGetRecordOutput<'_>> for Room<'_> {
-    fn from(output: RoomGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<RoomGetRecordOutput<S>> for Room<S> {
+    fn from(output: RoomGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Room<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Room<S> {
     const NSID: &'static str = "social.psky.chat.room";
     type Record = RoomRecord;
 }
@@ -115,7 +127,7 @@ impl Collection for RoomRecord {
     type Record = RoomRecord;
 }
 
-impl<'a> LexiconSchema for Room<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Room<S> {
     fn nsid() -> &'static str {
         "social.psky.chat.room"
     }
@@ -196,7 +208,7 @@ impl<'a> LexiconSchema for Room<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ModlistRef<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ModlistRef<S> {
     fn nsid() -> &'static str {
         "social.psky.chat.room"
     }
@@ -247,12 +259,12 @@ pub mod room_state {
 pub struct RoomBuilder<'a, S: room_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<room::ModlistRef<'a>>,
-        Option<room::ModlistRef<'a>>,
+        Option<room::ModlistRef<S>>,
+        Option<room::ModlistRef<S>>,
         Option<Vec<Language>>,
-        Option<CowStr<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<Vec<S>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -277,12 +289,12 @@ impl<'a> RoomBuilder<'a, room_state::Empty> {
 
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `allowlist` field (optional)
-    pub fn allowlist(mut self, value: impl Into<Option<room::ModlistRef<'a>>>) -> Self {
+    pub fn allowlist(mut self, value: impl Into<Option<room::ModlistRef<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `allowlist` field to an Option value (optional)
-    pub fn maybe_allowlist(mut self, value: Option<room::ModlistRef<'a>>) -> Self {
+    pub fn maybe_allowlist(mut self, value: Option<room::ModlistRef<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -290,12 +302,12 @@ impl<'a, S: room_state::State> RoomBuilder<'a, S> {
 
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `denylist` field (optional)
-    pub fn denylist(mut self, value: impl Into<Option<room::ModlistRef<'a>>>) -> Self {
+    pub fn denylist(mut self, value: impl Into<Option<room::ModlistRef<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `denylist` field to an Option value (optional)
-    pub fn maybe_denylist(mut self, value: Option<room::ModlistRef<'a>>) -> Self {
+    pub fn maybe_denylist(mut self, value: Option<room::ModlistRef<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -322,7 +334,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> RoomBuilder<'a, room_state::SetName<S>> {
         self._fields.3 = Option::Some(value.into());
         RoomBuilder {
@@ -335,12 +347,12 @@ where
 
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -348,12 +360,12 @@ impl<'a, S: room_state::State> RoomBuilder<'a, S> {
 
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `topic` field (optional)
-    pub fn topic(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn topic(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `topic` field to an Option value (optional)
-    pub fn maybe_topic(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_topic(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -377,13 +389,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Room<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Room<'a> {
         Room {
             allowlist: self._fields.0,
             denylist: self._fields.1,
@@ -566,7 +572,7 @@ pub mod modlist_ref_state {
 /// Builder for constructing an instance of this type
 pub struct ModlistRefBuilder<'a, S: modlist_ref_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<Vec<Did<'a>>>),
+    _fields: (Option<bool>, Option<Vec<Did<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -615,7 +621,7 @@ where
     /// Set the `users` field (required)
     pub fn users(
         mut self,
-        value: impl Into<Vec<Did<'a>>>,
+        value: impl Into<Vec<Did<S>>>,
     ) -> ModlistRefBuilder<'a, modlist_ref_state::SetUsers<S>> {
         self._fields.1 = Option::Some(value.into());
         ModlistRefBuilder {
@@ -643,10 +649,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ModlistRef<'a> {
         ModlistRef {
             active: self._fields.0.unwrap(),

@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,34 +30,45 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::app_chavatar::settings;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct AvatarItem<'a> {
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
-    #[serde(borrow)]
-    pub image: StrongRef<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct AvatarItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub id: S,
+    pub image: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Rotation configuration for a user.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.chavatar.settings", tag = "$type")]
-pub struct Settings<'a> {
-    #[serde(borrow)]
-    pub avatars: Vec<settings::AvatarItem<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.chavatar.settings",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Settings<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub avatars: Vec<settings::AvatarItem<S>>,
     pub enabled: bool,
-    #[serde(borrow)]
-    pub interval: SettingsInterval<'a>,
-    #[serde(borrow)]
-    pub mode: SettingsMode<'a>,
+    pub interval: SettingsInterval<S>,
+    pub mode: SettingsMode<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SettingsInterval<'a> {
+pub enum SettingsInterval<S: Bos<str> + AsRef<str> = DefaultStr> {
     _1h,
     _3h,
     _6h,
@@ -63,10 +76,10 @@ pub enum SettingsInterval<'a> {
     _1d,
     _1w,
     _1mo,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SettingsInterval<'a> {
+impl<S: Bos<str> + AsRef<str>> SettingsInterval<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::_1h => "1h",
@@ -79,11 +92,9 @@ impl<'a> SettingsInterval<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SettingsInterval<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "1h" => Self::_1h,
             "3h" => Self::_3h,
             "6h" => Self::_6h,
@@ -91,68 +102,51 @@ impl<'a> From<&'a str> for SettingsInterval<'a> {
             "1d" => Self::_1d,
             "1w" => Self::_1w,
             "1mo" => Self::_1mo,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SettingsInterval<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "1h" => Self::_1h,
-            "3h" => Self::_3h,
-            "6h" => Self::_6h,
-            "12h" => Self::_12h,
-            "1d" => Self::_1d,
-            "1w" => Self::_1w,
-            "1mo" => Self::_1mo,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SettingsInterval<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SettingsInterval<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for SettingsInterval<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SettingsInterval<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for SettingsInterval<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SettingsInterval<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SettingsInterval<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for SettingsInterval<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for SettingsInterval<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for SettingsInterval<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for SettingsInterval<'_> {
-    type Output = SettingsInterval<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SettingsInterval<S> {
+    type Output = SettingsInterval<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SettingsInterval::_1h => SettingsInterval::_1h,
@@ -169,13 +163,13 @@ impl jacquard_common::IntoStatic for SettingsInterval<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SettingsMode<'a> {
+pub enum SettingsMode<S: Bos<str> + AsRef<str> = DefaultStr> {
     Sequential,
     Random,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> SettingsMode<'a> {
+impl<S: Bos<str> + AsRef<str>> SettingsMode<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Sequential => "sequential",
@@ -183,70 +177,56 @@ impl<'a> SettingsMode<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for SettingsMode<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "sequential" => Self::Sequential,
             "random" => Self::Random,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for SettingsMode<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "sequential" => Self::Sequential,
-            "random" => Self::Random,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for SettingsMode<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SettingsMode<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for SettingsMode<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for SettingsMode<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for SettingsMode<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for SettingsMode<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for SettingsMode<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for SettingsMode<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for SettingsMode<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for SettingsMode<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for SettingsMode<'_> {
-    type Output = SettingsMode<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for SettingsMode<S> {
+    type Output = SettingsMode<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             SettingsMode::Sequential => SettingsMode::Sequential,
@@ -259,26 +239,27 @@ impl jacquard_common::IntoStatic for SettingsMode<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct SettingsGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SettingsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Settings<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Settings<S>,
 }
 
-impl<'a> Settings<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, SettingsRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Settings<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, SettingsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for AvatarItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for AvatarItem<S> {
     fn nsid() -> &'static str {
         "app.chavatar.settings"
     }
@@ -311,18 +292,17 @@ pub struct SettingsRecord;
 impl XrpcResp for SettingsRecord {
     const NSID: &'static str = "app.chavatar.settings";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = SettingsGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = SettingsGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<SettingsGetRecordOutput<'_>> for Settings<'_> {
-    fn from(output: SettingsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<SettingsGetRecordOutput<S>> for Settings<S> {
+    fn from(output: SettingsGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Settings<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Settings<S> {
     const NSID: &'static str = "app.chavatar.settings";
     type Record = SettingsRecord;
 }
@@ -332,7 +312,7 @@ impl Collection for SettingsRecord {
     type Record = SettingsRecord;
 }
 
-impl<'a> LexiconSchema for Settings<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Settings<S> {
     fn nsid() -> &'static str {
         "app.chavatar.settings"
     }
@@ -416,7 +396,7 @@ pub mod avatar_item_state {
 /// Builder for constructing an instance of this type
 pub struct AvatarItemBuilder<'a, S: avatar_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<StrongRef<'a>>),
+    _fields: (Option<S>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -446,7 +426,7 @@ where
     /// Set the `id` field (required)
     pub fn id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> AvatarItemBuilder<'a, avatar_item_state::SetId<S>> {
         self._fields.0 = Option::Some(value.into());
         AvatarItemBuilder {
@@ -465,7 +445,7 @@ where
     /// Set the `image` field (required)
     pub fn image(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> AvatarItemBuilder<'a, avatar_item_state::SetImage<S>> {
         self._fields.1 = Option::Some(value.into());
         AvatarItemBuilder {
@@ -493,10 +473,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> AvatarItem<'a> {
         AvatarItem {
             id: self._fields.0.unwrap(),
@@ -615,67 +592,67 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Interval;
-        type Mode;
         type Enabled;
+        type Mode;
         type Avatars;
+        type Interval;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Interval = Unset;
-        type Mode = Unset;
         type Enabled = Unset;
+        type Mode = Unset;
         type Avatars = Unset;
-    }
-    ///State transition - sets the `interval` field to Set
-    pub struct SetInterval<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInterval<S> {}
-    impl<S: State> State for SetInterval<S> {
-        type Interval = Set<members::interval>;
-        type Mode = S::Mode;
-        type Enabled = S::Enabled;
-        type Avatars = S::Avatars;
-    }
-    ///State transition - sets the `mode` field to Set
-    pub struct SetMode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMode<S> {}
-    impl<S: State> State for SetMode<S> {
-        type Interval = S::Interval;
-        type Mode = Set<members::mode>;
-        type Enabled = S::Enabled;
-        type Avatars = S::Avatars;
+        type Interval = Unset;
     }
     ///State transition - sets the `enabled` field to Set
     pub struct SetEnabled<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEnabled<S> {}
     impl<S: State> State for SetEnabled<S> {
-        type Interval = S::Interval;
-        type Mode = S::Mode;
         type Enabled = Set<members::enabled>;
+        type Mode = S::Mode;
         type Avatars = S::Avatars;
+        type Interval = S::Interval;
+    }
+    ///State transition - sets the `mode` field to Set
+    pub struct SetMode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMode<S> {}
+    impl<S: State> State for SetMode<S> {
+        type Enabled = S::Enabled;
+        type Mode = Set<members::mode>;
+        type Avatars = S::Avatars;
+        type Interval = S::Interval;
     }
     ///State transition - sets the `avatars` field to Set
     pub struct SetAvatars<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAvatars<S> {}
     impl<S: State> State for SetAvatars<S> {
-        type Interval = S::Interval;
-        type Mode = S::Mode;
         type Enabled = S::Enabled;
+        type Mode = S::Mode;
         type Avatars = Set<members::avatars>;
+        type Interval = S::Interval;
+    }
+    ///State transition - sets the `interval` field to Set
+    pub struct SetInterval<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInterval<S> {}
+    impl<S: State> State for SetInterval<S> {
+        type Enabled = S::Enabled;
+        type Mode = S::Mode;
+        type Avatars = S::Avatars;
+        type Interval = Set<members::interval>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `interval` field
-        pub struct interval(());
-        ///Marker type for the `mode` field
-        pub struct mode(());
         ///Marker type for the `enabled` field
         pub struct enabled(());
+        ///Marker type for the `mode` field
+        pub struct mode(());
         ///Marker type for the `avatars` field
         pub struct avatars(());
+        ///Marker type for the `interval` field
+        pub struct interval(());
     }
 }
 
@@ -683,10 +660,10 @@ pub mod settings_state {
 pub struct SettingsBuilder<'a, S: settings_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<settings::AvatarItem<'a>>>,
+        Option<Vec<settings::AvatarItem<S>>>,
         Option<bool>,
-        Option<SettingsInterval<'a>>,
-        Option<SettingsMode<'a>>,
+        Option<SettingsInterval<S>>,
+        Option<SettingsMode<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -717,7 +694,7 @@ where
     /// Set the `avatars` field (required)
     pub fn avatars(
         mut self,
-        value: impl Into<Vec<settings::AvatarItem<'a>>>,
+        value: impl Into<Vec<settings::AvatarItem<S>>>,
     ) -> SettingsBuilder<'a, settings_state::SetAvatars<S>> {
         self._fields.0 = Option::Some(value.into());
         SettingsBuilder {
@@ -755,7 +732,7 @@ where
     /// Set the `interval` field (required)
     pub fn interval(
         mut self,
-        value: impl Into<SettingsInterval<'a>>,
+        value: impl Into<SettingsInterval<S>>,
     ) -> SettingsBuilder<'a, settings_state::SetInterval<S>> {
         self._fields.2 = Option::Some(value.into());
         SettingsBuilder {
@@ -774,7 +751,7 @@ where
     /// Set the `mode` field (required)
     pub fn mode(
         mut self,
-        value: impl Into<SettingsMode<'a>>,
+        value: impl Into<SettingsMode<S>>,
     ) -> SettingsBuilder<'a, settings_state::SetMode<S>> {
         self._fields.3 = Option::Some(value.into());
         SettingsBuilder {
@@ -788,10 +765,10 @@ where
 impl<'a, S> SettingsBuilder<'a, S>
 where
     S: settings_state::State,
-    S::Interval: settings_state::IsSet,
-    S::Mode: settings_state::IsSet,
     S::Enabled: settings_state::IsSet,
+    S::Mode: settings_state::IsSet,
     S::Avatars: settings_state::IsSet,
+    S::Interval: settings_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Settings<'a> {
@@ -806,10 +783,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Settings<'a> {
         Settings {
             avatars: self._fields.0.unwrap(),

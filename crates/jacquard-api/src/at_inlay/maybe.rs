@@ -10,31 +10,49 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::at_inlay::Element;
 use crate::at_inlay::Response;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Maybe<'a> {
-    #[serde(borrow)]
-    pub children: Data<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Maybe<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub children: Data<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub fallback: Option<Element<'a>>,
+    pub fallback: Option<Element<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct MaybeOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MaybeOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(flatten)]
     #[serde(borrow)]
-    pub value: Response<'a>,
+    pub value: Response<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for at.inlay.Maybe
@@ -42,11 +60,12 @@ pub struct MaybeResponse;
 impl jacquard_common::xrpc::XrpcResp for MaybeResponse {
     const NSID: &'static str = "at.inlay.Maybe";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MaybeOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MaybeOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Maybe<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Maybe<S> {
     const NSID: &'static str = "at.inlay.Maybe";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -61,7 +80,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for MaybeRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Maybe<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Maybe<S>;
     type Response = MaybeResponse;
 }
 
@@ -100,7 +119,7 @@ pub mod maybe_state {
 /// Builder for constructing an instance of this type
 pub struct MaybeBuilder<'a, S: maybe_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Data<'a>>, Option<Element<'a>>),
+    _fields: (Option<Data<S>>, Option<Element<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -130,7 +149,7 @@ where
     /// Set the `children` field (required)
     pub fn children(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> MaybeBuilder<'a, maybe_state::SetChildren<S>> {
         self._fields.0 = Option::Some(value.into());
         MaybeBuilder {
@@ -143,12 +162,12 @@ where
 
 impl<'a, S: maybe_state::State> MaybeBuilder<'a, S> {
     /// Set the `fallback` field (optional)
-    pub fn fallback(mut self, value: impl Into<Option<Element<'a>>>) -> Self {
+    pub fn fallback(mut self, value: impl Into<Option<Element<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `fallback` field to an Option value (optional)
-    pub fn maybe_fallback(mut self, value: Option<Element<'a>>) -> Self {
+    pub fn maybe_fallback(mut self, value: Option<Element<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -168,10 +187,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> Maybe<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Maybe<'a> {
         Maybe {
             children: self._fields.0.unwrap(),
             fallback: self._fields.1,

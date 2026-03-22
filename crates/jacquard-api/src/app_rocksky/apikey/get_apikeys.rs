@@ -10,8 +10,10 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -24,13 +26,21 @@ pub struct GetApikeys {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetApikeysOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetApikeysOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub api_keys: Option<Vec<Data<'a>>>,
+    pub api_keys: Option<Vec<Data<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.apikey.getApikeys
@@ -38,8 +48,8 @@ pub struct GetApikeysResponse;
 impl jacquard_common::xrpc::XrpcResp for GetApikeysResponse {
     const NSID: &'static str = "app.rocksky.apikey.getApikeys";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetApikeysOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetApikeysOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetApikeys {
@@ -53,7 +63,7 @@ pub struct GetApikeysRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetApikeysRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.apikey.getApikeys";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetApikeys;
+    type Request<S: Bos<str> + AsRef<str>> = GetApikeys;
     type Response = GetApikeysResponse;
 }
 

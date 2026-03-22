@@ -22,13 +22,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Nsid};
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -38,32 +39,37 @@ use serde::{Serialize, Deserialize};
 use crate::at_inlay;
 /// Cache lifetime and invalidation tags returned by XRPC components.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CachePolicy<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CachePolicy<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///How frequently the underlying data changes
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub life: Option<CachePolicyLife<'a>>,
+    pub life: Option<CachePolicyLife<S>>,
     ///Data dependencies for cache invalidation
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CachePolicyTagsItem<'a>>>,
+    pub tags: Option<Vec<CachePolicyTagsItem<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// How frequently the underlying data changes
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CachePolicyLife<'a> {
+pub enum CachePolicyLife<S: Bos<str> + AsRef<str> = DefaultStr> {
     Seconds,
     Minutes,
     Hours,
     Max,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> CachePolicyLife<'a> {
+impl<S: Bos<str> + AsRef<str>> CachePolicyLife<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Seconds => "seconds",
@@ -73,74 +79,58 @@ impl<'a> CachePolicyLife<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for CachePolicyLife<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "seconds" => Self::Seconds,
             "minutes" => Self::Minutes,
             "hours" => Self::Hours,
             "max" => Self::Max,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for CachePolicyLife<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "seconds" => Self::Seconds,
-            "minutes" => Self::Minutes,
-            "hours" => Self::Hours,
-            "max" => Self::Max,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for CachePolicyLife<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CachePolicyLife<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for CachePolicyLife<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for CachePolicyLife<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for CachePolicyLife<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for CachePolicyLife<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for CachePolicyLife<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for CachePolicyLife<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for CachePolicyLife<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for CachePolicyLife<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for CachePolicyLife<'_> {
-    type Output = CachePolicyLife<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for CachePolicyLife<S> {
+    type Output = CachePolicyLife<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             CachePolicyLife::Seconds => CachePolicyLife::Seconds,
@@ -155,84 +145,116 @@ impl jacquard_common::IntoStatic for CachePolicyLife<'_> {
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum CachePolicyTagsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum CachePolicyTagsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "at.inlay.defs#tagRecord")]
-    TagRecord(Box<at_inlay::TagRecord<'a>>),
+    TagRecord(Box<at_inlay::TagRecord<S>>),
     #[serde(rename = "at.inlay.defs#tagLink")]
-    TagLink(Box<at_inlay::TagLink<'a>>),
+    TagLink(Box<at_inlay::TagLink<S>>),
 }
 
 /// A renderable Inlay element.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Element<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Element<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Stable key that identifies the component among its siblings.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub key: Option<CowStr<'a>>,
+    pub key: Option<S>,
     ///Properties to pass to the component.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub props: Option<Data<'a>>,
+    pub props: Option<Data<S>>,
     ///NSID of the component to render.
-    #[serde(borrow)]
-    pub r#type: Nsid<'a>,
+    pub r#type: Nsid<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Standard response from a component render call.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Response<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Response<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Cache lifetime and invalidation tags
-    #[serde(borrow)]
-    pub cache: at_inlay::CachePolicy<'a>,
+    pub cache: at_inlay::CachePolicy<S>,
     ///Rendered element tree
-    #[serde(borrow)]
-    pub node: at_inlay::Element<'a>,
+    pub node: at_inlay::Element<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Cache tag: depend on backlink relationships to a subject.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TagLink<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TagLink<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Collection NSID of the linking records. Omit for any collection.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub from: Option<Nsid<'a>>,
+    pub from: Option<Nsid<S>>,
     ///Subject AT URI that is linked to
-    #[serde(borrow)]
-    pub subject: AtUri<'a>,
+    pub subject: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Cache tag: depend on a specific record, collection, or identity.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TagRecord<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TagRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///AT URI at record, collection, or identity granularity
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ViaValtown<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ViaValtown<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Val Town val UUID
-    #[serde(borrow)]
-    pub val_id: CowStr<'a>,
+    pub val_id: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for CachePolicy<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CachePolicy<S> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
@@ -257,7 +279,7 @@ impl<'a> LexiconSchema for CachePolicy<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Element<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Element<S> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
@@ -282,7 +304,7 @@ impl<'a> LexiconSchema for Element<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Response<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Response<S> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
@@ -297,7 +319,7 @@ impl<'a> LexiconSchema for Response<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TagLink<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TagLink<S> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
@@ -312,7 +334,7 @@ impl<'a> LexiconSchema for TagLink<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TagRecord<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TagRecord<S> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
@@ -327,7 +349,7 @@ impl<'a> LexiconSchema for TagRecord<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ViaValtown<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViaValtown<S> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
@@ -612,7 +634,7 @@ pub mod element_state {
 /// Builder for constructing an instance of this type
 pub struct ElementBuilder<'a, S: element_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Data<'a>>, Option<Nsid<'a>>),
+    _fields: (Option<S>, Option<Data<S>>, Option<Nsid<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -636,12 +658,12 @@ impl<'a> ElementBuilder<'a, element_state::Empty> {
 
 impl<'a, S: element_state::State> ElementBuilder<'a, S> {
     /// Set the `key` field (optional)
-    pub fn key(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn key(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `key` field to an Option value (optional)
-    pub fn maybe_key(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_key(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -649,12 +671,12 @@ impl<'a, S: element_state::State> ElementBuilder<'a, S> {
 
 impl<'a, S: element_state::State> ElementBuilder<'a, S> {
     /// Set the `props` field (optional)
-    pub fn props(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
+    pub fn props(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `props` field to an Option value (optional)
-    pub fn maybe_props(mut self, value: Option<Data<'a>>) -> Self {
+    pub fn maybe_props(mut self, value: Option<Data<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -668,7 +690,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<Nsid<'a>>,
+        value: impl Into<Nsid<S>>,
     ) -> ElementBuilder<'a, element_state::SetType<S>> {
         self._fields.2 = Option::Some(value.into());
         ElementBuilder {
@@ -696,7 +718,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Element<'a> {
         Element {
             key: self._fields.0,
@@ -717,44 +739,44 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Node;
         type Cache;
+        type Node;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Node = Unset;
         type Cache = Unset;
-    }
-    ///State transition - sets the `node` field to Set
-    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNode<S> {}
-    impl<S: State> State for SetNode<S> {
-        type Node = Set<members::node>;
-        type Cache = S::Cache;
+        type Node = Unset;
     }
     ///State transition - sets the `cache` field to Set
     pub struct SetCache<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCache<S> {}
     impl<S: State> State for SetCache<S> {
-        type Node = S::Node;
         type Cache = Set<members::cache>;
+        type Node = S::Node;
+    }
+    ///State transition - sets the `node` field to Set
+    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNode<S> {}
+    impl<S: State> State for SetNode<S> {
+        type Cache = S::Cache;
+        type Node = Set<members::node>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `node` field
-        pub struct node(());
         ///Marker type for the `cache` field
         pub struct cache(());
+        ///Marker type for the `node` field
+        pub struct node(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ResponseBuilder<'a, S: response_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<at_inlay::CachePolicy<'a>>, Option<at_inlay::Element<'a>>),
+    _fields: (Option<at_inlay::CachePolicy<S>>, Option<at_inlay::Element<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -784,7 +806,7 @@ where
     /// Set the `cache` field (required)
     pub fn cache(
         mut self,
-        value: impl Into<at_inlay::CachePolicy<'a>>,
+        value: impl Into<at_inlay::CachePolicy<S>>,
     ) -> ResponseBuilder<'a, response_state::SetCache<S>> {
         self._fields.0 = Option::Some(value.into());
         ResponseBuilder {
@@ -803,7 +825,7 @@ where
     /// Set the `node` field (required)
     pub fn node(
         mut self,
-        value: impl Into<at_inlay::Element<'a>>,
+        value: impl Into<at_inlay::Element<S>>,
     ) -> ResponseBuilder<'a, response_state::SetNode<S>> {
         self._fields.1 = Option::Some(value.into());
         ResponseBuilder {
@@ -817,8 +839,8 @@ where
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
-    S::Node: response_state::IsSet,
     S::Cache: response_state::IsSet,
+    S::Node: response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Response<'a> {
@@ -831,7 +853,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Response<'a> {
         Response {
             cache: self._fields.0.unwrap(),
@@ -876,7 +898,7 @@ pub mod tag_link_state {
 /// Builder for constructing an instance of this type
 pub struct TagLinkBuilder<'a, S: tag_link_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Nsid<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<Nsid<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -900,12 +922,12 @@ impl<'a> TagLinkBuilder<'a, tag_link_state::Empty> {
 
 impl<'a, S: tag_link_state::State> TagLinkBuilder<'a, S> {
     /// Set the `from` field (optional)
-    pub fn from(mut self, value: impl Into<Option<Nsid<'a>>>) -> Self {
+    pub fn from(mut self, value: impl Into<Option<Nsid<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `from` field to an Option value (optional)
-    pub fn maybe_from(mut self, value: Option<Nsid<'a>>) -> Self {
+    pub fn maybe_from(mut self, value: Option<Nsid<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -919,7 +941,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> TagLinkBuilder<'a, tag_link_state::SetSubject<S>> {
         self._fields.1 = Option::Some(value.into());
         TagLinkBuilder {
@@ -946,7 +968,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TagLink<'a> {
         TagLink {
             from: self._fields.0,
@@ -991,7 +1013,7 @@ pub mod tag_record_state {
 /// Builder for constructing an instance of this type
 pub struct TagRecordBuilder<'a, S: tag_record_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>,),
+    _fields: (Option<AtUri<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1021,7 +1043,7 @@ where
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> TagRecordBuilder<'a, tag_record_state::SetUri<S>> {
         self._fields.0 = Option::Some(value.into());
         TagRecordBuilder {
@@ -1047,7 +1069,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TagRecord<'a> {
         TagRecord {
             uri: self._fields.0.unwrap(),

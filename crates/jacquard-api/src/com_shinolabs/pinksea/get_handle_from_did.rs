@@ -10,26 +10,43 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Handle;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetHandleFromDid<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetHandleFromDid<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: AtIdentifier<'a>,
+    pub did: AtIdentifier<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetHandleFromDidOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetHandleFromDidOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The handle.
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub handle: Handle<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.shinolabs.pinksea.getHandleFromDid
@@ -37,11 +54,12 @@ pub struct GetHandleFromDidResponse;
 impl jacquard_common::xrpc::XrpcResp for GetHandleFromDidResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getHandleFromDid";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetHandleFromDidOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetHandleFromDidOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetHandleFromDid<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetHandleFromDid<S> {
     const NSID: &'static str = "com.shinolabs.pinksea.getHandleFromDid";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetHandleFromDidResponse;
@@ -52,7 +70,7 @@ pub struct GetHandleFromDidRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetHandleFromDidRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getHandleFromDid";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetHandleFromDid<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetHandleFromDid<S>;
     type Response = GetHandleFromDidResponse;
 }
 
@@ -91,7 +109,7 @@ pub mod get_handle_from_did_state {
 /// Builder for constructing an instance of this type
 pub struct GetHandleFromDidBuilder<'a, S: get_handle_from_did_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>,),
+    _fields: (Option<AtIdentifier<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -121,7 +139,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetHandleFromDidBuilder<'a, get_handle_from_did_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetHandleFromDidBuilder {

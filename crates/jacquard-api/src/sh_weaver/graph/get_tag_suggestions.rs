@@ -10,17 +10,25 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::graph::TagView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTagSuggestions<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTagSuggestions<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub existing_tags: Option<Vec<CowStr<'a>>>,
+    pub existing_tags: Option<Vec<S>>,
     ///Defaults to `20`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -28,16 +36,24 @@ pub struct GetTagSuggestions<'a> {
     ///(max length: 128)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub query: Option<CowStr<'a>>,
+    pub query: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTagSuggestionsOutput<'a> {
-    #[serde(borrow)]
-    pub suggestions: Vec<TagView<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTagSuggestionsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub suggestions: Vec<TagView<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.graph.getTagSuggestions
@@ -45,11 +61,12 @@ pub struct GetTagSuggestionsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTagSuggestionsResponse {
     const NSID: &'static str = "sh.weaver.graph.getTagSuggestions";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTagSuggestionsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetTagSuggestionsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTagSuggestions<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetTagSuggestions<S> {
     const NSID: &'static str = "sh.weaver.graph.getTagSuggestions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTagSuggestionsResponse;
@@ -60,7 +77,7 @@ pub struct GetTagSuggestionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTagSuggestionsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getTagSuggestions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTagSuggestions<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetTagSuggestions<S>;
     type Response = GetTagSuggestionsResponse;
 }
 
@@ -90,7 +107,7 @@ pub mod get_tag_suggestions_state {
 /// Builder for constructing an instance of this type
 pub struct GetTagSuggestionsBuilder<'a, S: get_tag_suggestions_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<CowStr<'a>>>, Option<i64>, Option<CowStr<'a>>),
+    _fields: (Option<Vec<S>>, Option<i64>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -114,12 +131,12 @@ impl<'a> GetTagSuggestionsBuilder<'a, get_tag_suggestions_state::Empty> {
 
 impl<'a, S: get_tag_suggestions_state::State> GetTagSuggestionsBuilder<'a, S> {
     /// Set the `existingTags` field (optional)
-    pub fn existing_tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn existing_tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `existingTags` field to an Option value (optional)
-    pub fn maybe_existing_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_existing_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -140,12 +157,12 @@ impl<'a, S: get_tag_suggestions_state::State> GetTagSuggestionsBuilder<'a, S> {
 
 impl<'a, S: get_tag_suggestions_state::State> GetTagSuggestionsBuilder<'a, S> {
     /// Set the `query` field (optional)
-    pub fn query(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn query(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `query` field to an Option value (optional)
-    pub fn maybe_query(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_query(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }

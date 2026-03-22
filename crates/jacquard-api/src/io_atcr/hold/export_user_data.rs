@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Datetime};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,41 +26,49 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::io_atcr::hold::export_user_data;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CrewExport<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CrewExport<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub added_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub permissions: Option<Vec<CowStr<'a>>>,
+    pub permissions: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub role: Option<CowStr<'a>>,
+    pub role: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tier: Option<CowStr<'a>>,
+    pub tier: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct LayerExport<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LayerExport<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub digest: Option<CowStr<'a>>,
+    pub digest: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub manifest: Option<AtUri<'a>>,
+    pub manifest: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub media_type: Option<CowStr<'a>>,
+    pub media_type: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
@@ -66,37 +76,39 @@ pub struct LayerExport<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ExportUserData;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ExportUserDataOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ExportUserDataOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Bluesky posts that mention the user
-    #[serde(borrow)]
-    pub bluesky_posts: Vec<export_user_data::PostExport<'a>>,
+    pub bluesky_posts: Vec<export_user_data::PostExport<S>>,
     ///User's crew record (if they are a crew member)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub crew_record: Option<export_user_data::CrewExport<'a>>,
+    pub crew_record: Option<export_user_data::CrewExport<S>>,
     ///RFC3339 timestamp of when the export was generated
     pub exported_at: Datetime,
     ///DID of this hold service
-    #[serde(borrow)]
-    pub hold_did: Did<'a>,
+    pub hold_did: Did<S>,
     ///Whether the user is the captain (owner) of this hold
     pub is_captain: bool,
     ///Layer records uploaded by the user
-    #[serde(borrow)]
-    pub layer_records: Vec<export_user_data::LayerExport<'a>>,
+    pub layer_records: Vec<export_user_data::LayerExport<S>>,
     ///Repository stats records owned by the user
-    #[serde(borrow)]
-    pub stats_records: Vec<export_user_data::StatsExport<'a>>,
+    pub stats_records: Vec<export_user_data::StatsExport<S>>,
     ///DID of the user whose data was exported
-    #[serde(borrow)]
-    pub user_did: Did<'a>,
+    pub user_did: Did<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -105,18 +117,19 @@ pub struct ExportUserDataOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ExportUserDataError<'a> {
+pub enum ExportUserDataError {
     #[serde(rename = "AuthRequired")]
-    AuthRequired(Option<CowStr<'a>>),
+    AuthRequired(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for ExportUserDataError<'_> {
+impl core::fmt::Display for ExportUserDataError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::AuthRequired(msg) => {
@@ -126,31 +139,47 @@ impl core::fmt::Display for ExportUserDataError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct PostExport<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PostExport<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub text: Option<CowStr<'a>>,
+    pub text: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct StatsExport<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct StatsExport<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_pull: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -160,13 +189,14 @@ pub struct StatsExport<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub push_count: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub repository: Option<CowStr<'a>>,
+    pub repository: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for CrewExport<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CrewExport<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.exportUserData"
     }
@@ -201,7 +231,7 @@ impl<'a> LexiconSchema for CrewExport<'a> {
     }
 }
 
-impl<'a> LexiconSchema for LayerExport<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LayerExport<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.exportUserData"
     }
@@ -241,8 +271,8 @@ pub struct ExportUserDataResponse;
 impl jacquard_common::xrpc::XrpcResp for ExportUserDataResponse {
     const NSID: &'static str = "io.atcr.hold.exportUserData";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ExportUserDataOutput<'de>;
-    type Err<'de> = ExportUserDataError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ExportUserDataOutput<S>;
+    type Err = ExportUserDataError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for ExportUserData {
@@ -256,11 +286,11 @@ pub struct ExportUserDataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ExportUserDataRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.exportUserData";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ExportUserData;
+    type Request<S: Bos<str> + AsRef<str>> = ExportUserData;
     type Response = ExportUserDataResponse;
 }
 
-impl<'a> LexiconSchema for PostExport<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PostExport<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.exportUserData"
     }
@@ -297,7 +327,7 @@ impl<'a> LexiconSchema for PostExport<'a> {
     }
 }
 
-impl<'a> LexiconSchema for StatsExport<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for StatsExport<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.exportUserData"
     }

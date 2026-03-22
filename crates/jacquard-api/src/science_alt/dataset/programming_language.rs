@@ -21,15 +21,17 @@ impl core::fmt::Display for Javascript {
 /// Programming language identifier for code references. Uses Linguist language identifiers (lowercase). Known values correspond to token definitions in this Lexicon. New languages can be added as tokens without breaking changes.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProgrammingLanguage<'a> {
+pub enum ProgrammingLanguage<
+    S: jacquard_common::Bos<str> + AsRef<str> = jacquard_common::DefaultStr,
+> {
     Python,
     Typescript,
     Javascript,
     Rust,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ProgrammingLanguage<'a> {
+impl<S: jacquard_common::Bos<str> + AsRef<str>> ProgrammingLanguage<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Python => "python",
@@ -39,68 +41,53 @@ impl<'a> ProgrammingLanguage<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ProgrammingLanguage<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "python" => Self::Python,
             "typescript" => Self::Typescript,
             "javascript" => Self::Javascript,
             "rust" => Self::Rust,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ProgrammingLanguage<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "python" => Self::Python,
-            "typescript" => Self::Typescript,
-            "javascript" => Self::Javascript,
-            "rust" => Self::Rust,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> AsRef<str> for ProgrammingLanguage<'a> {
+impl<S: jacquard_common::Bos<str> + AsRef<str>> AsRef<str> for ProgrammingLanguage<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> core::fmt::Display for ProgrammingLanguage<'a> {
+impl<S: jacquard_common::Bos<str> + AsRef<str>> core::fmt::Display
+for ProgrammingLanguage<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> serde::Serialize for ProgrammingLanguage<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: jacquard_common::Bos<str> + AsRef<str>> Serialize for ProgrammingLanguage<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ProgrammingLanguage<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + jacquard_common::Bos<str> + AsRef<str>> Deserialize<'de>
+for ProgrammingLanguage<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl jacquard_common::IntoStatic for ProgrammingLanguage<'_> {
-    type Output = ProgrammingLanguage<'static>;
+impl<S: jacquard_common::Bos<str> + AsRef<str>> IntoStatic for ProgrammingLanguage<S> {
+    type Output = ProgrammingLanguage<jacquard_common::DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ProgrammingLanguage::Python => ProgrammingLanguage::Python,

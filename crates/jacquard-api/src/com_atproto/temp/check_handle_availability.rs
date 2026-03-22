@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Handle, Datetime};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,41 +28,59 @@ use crate::com_atproto::temp::check_handle_availability;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CheckHandleAvailability<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CheckHandleAvailability<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub birth_date: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub email: Option<CowStr<'a>>,
+    pub email: Option<S>,
     #[serde(borrow)]
-    pub handle: Handle<'a>,
+    pub handle: Handle<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CheckHandleAvailabilityOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CheckHandleAvailabilityOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Echo of the input handle.
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
-    #[serde(borrow)]
-    pub result: CheckHandleAvailabilityOutputResult<'a>,
+    pub handle: Handle<S>,
+    pub result: CheckHandleAvailabilityOutputResult<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum CheckHandleAvailabilityOutputResult<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum CheckHandleAvailabilityOutputResult<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "com.atproto.temp.checkHandleAvailability#resultAvailable")]
-    ResultAvailable(Box<check_handle_availability::ResultAvailable<'a>>),
+    ResultAvailable(Box<check_handle_availability::ResultAvailable<S>>),
     #[serde(rename = "com.atproto.temp.checkHandleAvailability#resultUnavailable")]
-    ResultUnavailable(Box<check_handle_availability::ResultUnavailable<'a>>),
+    ResultUnavailable(Box<check_handle_availability::ResultUnavailable<S>>),
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -69,19 +89,20 @@ pub enum CheckHandleAvailabilityOutputResult<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CheckHandleAvailabilityError<'a> {
+pub enum CheckHandleAvailabilityError {
     /// An invalid email was provided.
     #[serde(rename = "InvalidEmail")]
-    InvalidEmail(Option<CowStr<'a>>),
+    InvalidEmail(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for CheckHandleAvailabilityError<'_> {
+impl core::fmt::Display for CheckHandleAvailabilityError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidEmail(msg) => {
@@ -91,38 +112,64 @@ impl core::fmt::Display for CheckHandleAvailabilityError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
 /// Indicates the provided handle is available.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ResultAvailable<'a> {}
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResultAvailable<S: Bos<str> + AsRef<str> = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Indicates the provided handle is unavailable and gives suggestions of available handles.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ResultUnavailable<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ResultUnavailable<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///List of suggested handles based on the provided inputs.
-    #[serde(borrow)]
-    pub suggestions: Vec<check_handle_availability::Suggestion<'a>>,
+    pub suggestions: Vec<check_handle_availability::Suggestion<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Suggestion<'a> {
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Suggestion<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub handle: Handle<S>,
     ///Method used to build this suggestion. Should be considered opaque to clients. Can be used for metrics.
-    #[serde(borrow)]
-    pub method: CowStr<'a>,
+    pub method: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.atproto.temp.checkHandleAvailability
@@ -130,11 +177,12 @@ pub struct CheckHandleAvailabilityResponse;
 impl jacquard_common::xrpc::XrpcResp for CheckHandleAvailabilityResponse {
     const NSID: &'static str = "com.atproto.temp.checkHandleAvailability";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CheckHandleAvailabilityOutput<'de>;
-    type Err<'de> = CheckHandleAvailabilityError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CheckHandleAvailabilityOutput<S>;
+    type Err = CheckHandleAvailabilityError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CheckHandleAvailability<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CheckHandleAvailability<S> {
     const NSID: &'static str = "com.atproto.temp.checkHandleAvailability";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = CheckHandleAvailabilityResponse;
@@ -145,11 +193,11 @@ pub struct CheckHandleAvailabilityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CheckHandleAvailabilityRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.checkHandleAvailability";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = CheckHandleAvailability<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CheckHandleAvailability<S>;
     type Response = CheckHandleAvailabilityResponse;
 }
 
-impl<'a> LexiconSchema for ResultAvailable<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ResultAvailable<S> {
     fn nsid() -> &'static str {
         "com.atproto.temp.checkHandleAvailability"
     }
@@ -164,7 +212,7 @@ impl<'a> LexiconSchema for ResultAvailable<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ResultUnavailable<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ResultUnavailable<S> {
     fn nsid() -> &'static str {
         "com.atproto.temp.checkHandleAvailability"
     }
@@ -179,7 +227,7 @@ impl<'a> LexiconSchema for ResultUnavailable<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Suggestion<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Suggestion<S> {
     fn nsid() -> &'static str {
         "com.atproto.temp.checkHandleAvailability"
     }
@@ -232,7 +280,7 @@ pub struct CheckHandleAvailabilityBuilder<
     S: check_handle_availability_state::State,
 > {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<Handle<'a>>),
+    _fields: (Option<Datetime>, Option<S>, Option<Handle<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -278,12 +326,12 @@ impl<
     S: check_handle_availability_state::State,
 > CheckHandleAvailabilityBuilder<'a, S> {
     /// Set the `email` field (optional)
-    pub fn email(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn email(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
-    pub fn maybe_email(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_email(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -297,7 +345,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<Handle<'a>>,
+        value: impl Into<Handle<S>>,
     ) -> CheckHandleAvailabilityBuilder<
         'a,
         check_handle_availability_state::SetHandle<S>,
@@ -509,7 +557,7 @@ pub mod result_unavailable_state {
 /// Builder for constructing an instance of this type
 pub struct ResultUnavailableBuilder<'a, S: result_unavailable_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<check_handle_availability::Suggestion<'a>>>,),
+    _fields: (Option<Vec<check_handle_availability::Suggestion<S>>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -539,7 +587,7 @@ where
     /// Set the `suggestions` field (required)
     pub fn suggestions(
         mut self,
-        value: impl Into<Vec<check_handle_availability::Suggestion<'a>>>,
+        value: impl Into<Vec<check_handle_availability::Suggestion<S>>>,
     ) -> ResultUnavailableBuilder<'a, result_unavailable_state::SetSuggestions<S>> {
         self._fields.0 = Option::Some(value.into());
         ResultUnavailableBuilder {
@@ -565,10 +613,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ResultUnavailable<'a> {
         ResultUnavailable {
             suggestions: self._fields.0.unwrap(),
@@ -624,7 +669,7 @@ pub mod suggestion_state {
 /// Builder for constructing an instance of this type
 pub struct SuggestionBuilder<'a, S: suggestion_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Handle<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<Handle<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -654,7 +699,7 @@ where
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
-        value: impl Into<Handle<'a>>,
+        value: impl Into<Handle<S>>,
     ) -> SuggestionBuilder<'a, suggestion_state::SetHandle<S>> {
         self._fields.0 = Option::Some(value.into());
         SuggestionBuilder {
@@ -673,7 +718,7 @@ where
     /// Set the `method` field (required)
     pub fn method(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SuggestionBuilder<'a, suggestion_state::SetMethod<S>> {
         self._fields.1 = Option::Some(value.into());
         SuggestionBuilder {
@@ -701,10 +746,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Suggestion<'a> {
         Suggestion {
             handle: self._fields.0.unwrap(),

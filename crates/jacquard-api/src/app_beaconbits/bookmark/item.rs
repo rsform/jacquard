@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -29,67 +31,65 @@ use crate::community_lexicon::location::address::Address;
 use crate::community_lexicon::location::geo::Geo;
 /// A saved venue bookmark
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.beaconbits.bookmark.item",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Item<'a> {
+pub struct Item<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Structured address using community lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub address_details: Option<Address<'a>>,
+    pub address_details: Option<Address<S>>,
     ///Timestamp when the bookmark was created
     pub created_at: Datetime,
     ///Reference to a bookmark folder
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub folder_uri: Option<AtUri<'a>>,
+    pub folder_uri: Option<AtUri<S>>,
     ///Structured location using community lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub location: Option<Geo<'a>>,
+    pub location: Option<Geo<S>>,
     ///User notes about the bookmark
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub notes: Option<CowStr<'a>>,
+    pub notes: Option<S>,
     ///Human-readable address
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub venue_address: Option<CowStr<'a>>,
+    pub venue_address: Option<S>,
     ///Category classification
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub venue_category: Option<CowStr<'a>>,
+    pub venue_category: Option<S>,
     ///Display name of the venue
-    #[serde(borrow)]
-    pub venue_name: CowStr<'a>,
+    pub venue_name: S,
     ///URI identifier for the venue (typically OSM URI)
-    #[serde(borrow)]
-    pub venue_uri: CowStr<'a>,
+    pub venue_uri: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ItemGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ItemGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Item<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Item<S>,
 }
 
-impl<'a> Item<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ItemRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Item<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ItemRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -100,18 +100,17 @@ pub struct ItemRecord;
 impl XrpcResp for ItemRecord {
     const NSID: &'static str = "app.beaconbits.bookmark.item";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ItemGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ItemGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ItemGetRecordOutput<'_>> for Item<'_> {
-    fn from(output: ItemGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ItemGetRecordOutput<S>> for Item<S> {
+    fn from(output: ItemGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Item<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Item<S> {
     const NSID: &'static str = "app.beaconbits.bookmark.item";
     type Record = ItemRecord;
 }
@@ -121,7 +120,7 @@ impl Collection for ItemRecord {
     type Record = ItemRecord;
 }
 
-impl<'a> LexiconSchema for Item<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Item<S> {
     fn nsid() -> &'static str {
         "app.beaconbits.bookmark.item"
     }
@@ -208,51 +207,51 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type VenueUri;
         type VenueName;
+        type VenueUri;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type VenueUri = Unset;
         type VenueName = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type VenueUri = S::VenueUri;
-        type VenueName = S::VenueName;
-    }
-    ///State transition - sets the `venue_uri` field to Set
-    pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVenueUri<S> {}
-    impl<S: State> State for SetVenueUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type VenueUri = Set<members::venue_uri>;
-        type VenueName = S::VenueName;
+        type VenueUri = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `venue_name` field to Set
     pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVenueName<S> {}
     impl<S: State> State for SetVenueName<S> {
-        type CreatedAt = S::CreatedAt;
-        type VenueUri = S::VenueUri;
         type VenueName = Set<members::venue_name>;
+        type VenueUri = S::VenueUri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `venue_uri` field to Set
+    pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVenueUri<S> {}
+    impl<S: State> State for SetVenueUri<S> {
+        type VenueName = S::VenueName;
+        type VenueUri = Set<members::venue_uri>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type VenueName = S::VenueName;
+        type VenueUri = S::VenueUri;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `venue_uri` field
-        pub struct venue_uri(());
         ///Marker type for the `venue_name` field
         pub struct venue_name(());
+        ///Marker type for the `venue_uri` field
+        pub struct venue_uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -260,15 +259,15 @@ pub mod item_state {
 pub struct ItemBuilder<'a, S: item_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Address<'a>>,
+        Option<Address<S>>,
         Option<Datetime>,
-        Option<AtUri<'a>>,
-        Option<Geo<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<AtUri<S>>,
+        Option<Geo<S>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -293,12 +292,12 @@ impl<'a> ItemBuilder<'a, item_state::Empty> {
 
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `addressDetails` field (optional)
-    pub fn address_details(mut self, value: impl Into<Option<Address<'a>>>) -> Self {
+    pub fn address_details(mut self, value: impl Into<Option<Address<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `addressDetails` field to an Option value (optional)
-    pub fn maybe_address_details(mut self, value: Option<Address<'a>>) -> Self {
+    pub fn maybe_address_details(mut self, value: Option<Address<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -325,12 +324,12 @@ where
 
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `folderUri` field (optional)
-    pub fn folder_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn folder_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `folderUri` field to an Option value (optional)
-    pub fn maybe_folder_uri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_folder_uri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -338,12 +337,12 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `location` field (optional)
-    pub fn location(mut self, value: impl Into<Option<Geo<'a>>>) -> Self {
+    pub fn location(mut self, value: impl Into<Option<Geo<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
-    pub fn maybe_location(mut self, value: Option<Geo<'a>>) -> Self {
+    pub fn maybe_location(mut self, value: Option<Geo<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -351,12 +350,12 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `notes` field (optional)
-    pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
-    pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_notes(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -364,12 +363,12 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `venueAddress` field (optional)
-    pub fn venue_address(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn venue_address(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `venueAddress` field to an Option value (optional)
-    pub fn maybe_venue_address(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_venue_address(mut self, value: Option<S>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -377,12 +376,12 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `venueCategory` field (optional)
-    pub fn venue_category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn venue_category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `venueCategory` field to an Option value (optional)
-    pub fn maybe_venue_category(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_venue_category(mut self, value: Option<S>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -396,7 +395,7 @@ where
     /// Set the `venueName` field (required)
     pub fn venue_name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ItemBuilder<'a, item_state::SetVenueName<S>> {
         self._fields.7 = Option::Some(value.into());
         ItemBuilder {
@@ -415,7 +414,7 @@ where
     /// Set the `venueUri` field (required)
     pub fn venue_uri(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ItemBuilder<'a, item_state::SetVenueUri<S>> {
         self._fields.8 = Option::Some(value.into());
         ItemBuilder {
@@ -429,9 +428,9 @@ where
 impl<'a, S> ItemBuilder<'a, S>
 where
     S: item_state::State,
-    S::CreatedAt: item_state::IsSet,
-    S::VenueUri: item_state::IsSet,
     S::VenueName: item_state::IsSet,
+    S::VenueUri: item_state::IsSet,
+    S::CreatedAt: item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Item<'a> {
@@ -449,13 +448,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Item<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Item<'a> {
         Item {
             address_details: self._fields.0,
             created_at: self._fields.1.unwrap(),

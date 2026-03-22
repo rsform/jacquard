@@ -10,19 +10,27 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Tid, Cid};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListBlobs<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListBlobs<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
     #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///Defaults to `500`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -32,19 +40,25 @@ pub struct ListBlobs<'a> {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct ListBlobsOutput<'a> {
-    #[serde(borrow)]
-    pub cids: Vec<Cid<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListBlobsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub cids: Vec<Cid<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cursor: Option<CowStr<'a>>,
+    pub cursor: Option<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -53,24 +67,25 @@ pub struct ListBlobsOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum ListBlobsError<'a> {
+pub enum ListBlobsError {
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<SmolStr>),
     #[serde(rename = "RepoTakendown")]
-    RepoTakendown(Option<CowStr<'a>>),
+    RepoTakendown(Option<SmolStr>),
     #[serde(rename = "RepoSuspended")]
-    RepoSuspended(Option<CowStr<'a>>),
+    RepoSuspended(Option<SmolStr>),
     #[serde(rename = "RepoDeactivated")]
-    RepoDeactivated(Option<CowStr<'a>>),
+    RepoDeactivated(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for ListBlobsError<'_> {
+impl core::fmt::Display for ListBlobsError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -101,7 +116,13 @@ impl core::fmt::Display for ListBlobsError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -111,11 +132,12 @@ pub struct ListBlobsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListBlobsResponse {
     const NSID: &'static str = "com.atproto.sync.listBlobs";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ListBlobsOutput<'de>;
-    type Err<'de> = ListBlobsError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ListBlobsOutput<S>;
+    type Err = ListBlobsError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for ListBlobs<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for ListBlobs<S> {
     const NSID: &'static str = "com.atproto.sync.listBlobs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListBlobsResponse;
@@ -126,7 +148,7 @@ pub struct ListBlobsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListBlobsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.listBlobs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = ListBlobs<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = ListBlobs<S>;
     type Response = ListBlobsResponse;
 }
 
@@ -169,7 +191,7 @@ pub mod list_blobs_state {
 /// Builder for constructing an instance of this type
 pub struct ListBlobsBuilder<'a, S: list_blobs_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<Did<'a>>, Option<i64>, Option<Tid>),
+    _fields: (Option<S>, Option<Did<S>>, Option<i64>, Option<Tid>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -193,12 +215,12 @@ impl<'a> ListBlobsBuilder<'a, list_blobs_state::Empty> {
 
 impl<'a, S: list_blobs_state::State> ListBlobsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
-    pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
-    pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_cursor(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -212,7 +234,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> ListBlobsBuilder<'a, list_blobs_state::SetDid<S>> {
         self._fields.1 = Option::Some(value.into());
         ListBlobsBuilder {

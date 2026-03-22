@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -28,44 +29,54 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A test record type for geometries
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.custorium.temp.jsonfg.testRecord",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct TestRecord<'a> {
-    #[serde(borrow)]
-    pub geometry: TestRecordGeometry<'a>,
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+pub struct TestRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub geometry: TestRecordGeometry<S>,
+    pub text: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum TestRecordGeometry<'a> {}
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum TestRecordGeometry<S: Bos<str> + AsRef<str> = DefaultStr> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TestRecordGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TestRecordGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: TestRecord<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: TestRecord<S>,
 }
 
-impl<'a> TestRecord<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TestRecordRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> TestRecord<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TestRecordRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -76,18 +87,17 @@ pub struct TestRecordRecord;
 impl XrpcResp for TestRecordRecord {
     const NSID: &'static str = "org.custorium.temp.jsonfg.testRecord";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TestRecordGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TestRecordGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TestRecordGetRecordOutput<'_>> for TestRecord<'_> {
-    fn from(output: TestRecordGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TestRecordGetRecordOutput<S>> for TestRecord<S> {
+    fn from(output: TestRecordGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for TestRecord<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for TestRecord<S> {
     const NSID: &'static str = "org.custorium.temp.jsonfg.testRecord";
     type Record = TestRecordRecord;
 }
@@ -97,7 +107,7 @@ impl Collection for TestRecordRecord {
     type Record = TestRecordRecord;
 }
 
-impl<'a> LexiconSchema for TestRecord<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TestRecord<S> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.testRecord"
     }
@@ -170,7 +180,7 @@ pub mod test_record_state {
 /// Builder for constructing an instance of this type
 pub struct TestRecordBuilder<'a, S: test_record_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<TestRecordGeometry<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<TestRecordGeometry<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -200,7 +210,7 @@ where
     /// Set the `geometry` field (required)
     pub fn geometry(
         mut self,
-        value: impl Into<TestRecordGeometry<'a>>,
+        value: impl Into<TestRecordGeometry<S>>,
     ) -> TestRecordBuilder<'a, test_record_state::SetGeometry<S>> {
         self._fields.0 = Option::Some(value.into());
         TestRecordBuilder {
@@ -219,7 +229,7 @@ where
     /// Set the `text` field (required)
     pub fn text(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TestRecordBuilder<'a, test_record_state::SetText<S>> {
         self._fields.1 = Option::Some(value.into());
         TestRecordBuilder {
@@ -247,7 +257,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TestRecord<'a> {
         TestRecord {
             geometry: self._fields.0.unwrap(),

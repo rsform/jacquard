@@ -10,26 +10,43 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::actor::NeighbourViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetActorNeighbours<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetActorNeighbours<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: AtIdentifier<'a>,
+    pub did: AtIdentifier<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetActorNeighboursOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetActorNeighboursOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub neighbours: Option<Vec<NeighbourViewBasic<'a>>>,
+    pub neighbours: Option<Vec<NeighbourViewBasic<S>>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.actor.getActorNeighbours
@@ -37,11 +54,12 @@ pub struct GetActorNeighboursResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorNeighboursResponse {
     const NSID: &'static str = "app.rocksky.actor.getActorNeighbours";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetActorNeighboursOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetActorNeighboursOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetActorNeighbours<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetActorNeighbours<S> {
     const NSID: &'static str = "app.rocksky.actor.getActorNeighbours";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetActorNeighboursResponse;
@@ -52,7 +70,7 @@ pub struct GetActorNeighboursRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorNeighboursRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.actor.getActorNeighbours";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetActorNeighbours<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetActorNeighbours<S>;
     type Response = GetActorNeighboursResponse;
 }
 
@@ -91,7 +109,7 @@ pub mod get_actor_neighbours_state {
 /// Builder for constructing an instance of this type
 pub struct GetActorNeighboursBuilder<'a, S: get_actor_neighbours_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtIdentifier<'a>>,),
+    _fields: (Option<AtIdentifier<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -121,7 +139,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<AtIdentifier<'a>>,
+        value: impl Into<AtIdentifier<S>>,
     ) -> GetActorNeighboursBuilder<'a, get_actor_neighbours_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetActorNeighboursBuilder {

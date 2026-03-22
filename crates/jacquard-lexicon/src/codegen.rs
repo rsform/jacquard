@@ -7,20 +7,20 @@ use quote::quote;
 pub(crate) mod builder_gen;
 pub(crate) mod builder_heuristics;
 pub(crate) mod collect;
-pub(crate) mod lifetime;
 pub(crate) mod names;
 pub(crate) mod nsid_utils;
 pub(crate) mod output;
 pub(crate) mod prettify;
 pub(crate) mod schema_impl;
 pub(crate) mod structs;
+pub(crate) mod type_param;
 pub(crate) mod types;
 pub(crate) mod union_codegen;
 pub(crate) mod utils;
 pub(crate) mod xrpc;
 
 // Re-export types that external consumers need (binaries, test crates).
-pub use prettify::{CodegenMode, GeneratedCode, FileOutput};
+pub use prettify::{CodegenMode, FileOutput, GeneratedCode};
 
 /// Code generator for lexicon types
 pub struct CodeGenerator<'c> {
@@ -133,12 +133,10 @@ impl<'c> CodeGenerator<'c> {
                 prettify::CodegenMode::Macro => DocPaths::qualified(),
             };
             let scoped_imports = doc_paths.scoped_imports();
-            let doc_literal = doc_to_tokens_with_paths(
-                lex_doc,
-                &std::collections::BTreeMap::new(),
-                &doc_paths,
-            );
-            let lexicon_doc_path = resolved.external_type_tokens(&prettify::ExternalImport::LexiconDoc);
+            let doc_literal =
+                doc_to_tokens_with_paths(lex_doc, &std::collections::BTreeMap::new(), &doc_paths);
+            let lexicon_doc_path =
+                resolved.external_type_tokens(&prettify::ExternalImport::LexiconDoc);
             Some(quote! {
                 fn #shared_fn_ident() -> #lexicon_doc_path<'static> {
                     #scoped_imports
@@ -149,23 +147,24 @@ impl<'c> CodeGenerator<'c> {
             None
         };
 
-        // Generate lightweight trait impl that calls shared function
+        // Generate lightweight trait impl that calls shared function.
         let type_ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
+        let bos_tok = resolved.external_type_tokens(&prettify::ExternalImport::Bos);
         let (impl_generics, type_generics) = if has_lifetime {
-            (quote! { <'a> }, quote! { <'a> })
+            (quote! { <S: #bos_tok<str> + AsRef<str>> }, quote! { <S> })
         } else {
             (quote! {}, quote! {})
         };
 
         // Extract validation checks for this specific def.
         let validation_checks = schema_impl::extract_validation_checks(lex_doc, def_name);
-        let validation_code =
-            crate::derive_impl::doc_to_tokens::validations_to_tokens_resolved(
-                &validation_checks,
-                Some(resolved),
-            );
+        let validation_code = crate::derive_impl::doc_to_tokens::validations_to_tokens_resolved(
+            &validation_checks,
+            Some(resolved),
+        );
 
-        let constraint_error_type = resolved.external_type_tokens(&prettify::ExternalImport::ConstraintError);
+        let constraint_error_type =
+            resolved.external_type_tokens(&prettify::ExternalImport::ConstraintError);
         let schema_path = resolved.external_type_tokens(&prettify::ExternalImport::LexiconSchema);
         let lexicon_doc_path = resolved.external_type_tokens(&prettify::ExternalImport::LexiconDoc);
 
@@ -204,7 +203,9 @@ impl<'c> CodeGenerator<'c> {
             LexUserType::Record(record) => self.generate_record(nsid, def_name, record, resolved),
             LexUserType::Object(obj) => self.generate_object(nsid, def_name, obj, resolved),
             LexUserType::XrpcQuery(query) => self.generate_query(nsid, def_name, query, resolved),
-            LexUserType::XrpcProcedure(proc) => self.generate_procedure(nsid, def_name, proc, resolved),
+            LexUserType::XrpcProcedure(proc) => {
+                self.generate_procedure(nsid, def_name, proc, resolved)
+            }
             LexUserType::Token(token) => {
                 // Token types are marker structs that can be used as union refs
                 let type_name = self.def_to_type_name(nsid, def_name);
@@ -251,13 +252,20 @@ impl<'c> CodeGenerator<'c> {
                 let type_name = self.def_to_type_name(nsid, def_name);
                 let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
                 let doc = self.generate_doc_comment(array.description.as_ref());
-                let needs_lifetime = self.array_item_needs_lifetime(&array.items);
+                let needs_lifetime = self.array_item_needs_type_param(&array.items);
 
                 // Check if items are a union - if so, generate the union enum first
                 if let LexArrayItem::Union(union) = &array.items {
                     let union_name = format!("{}Item", type_name);
                     let refs: Vec<_> = union.refs.iter().cloned().collect();
-                    let union_generated = self.generate_union(nsid, &union_name, &refs, None, union.closed, resolved)?;
+                    let union_generated = self.generate_union(
+                        nsid,
+                        &union_name,
+                        &refs,
+                        None,
+                        union.closed,
+                        resolved,
+                    )?;
 
                     let union_ident = syn::Ident::new(&union_name, proc_macro2::Span::call_site());
                     let union_tokens = union_generated.into_tokens();
@@ -307,9 +315,10 @@ impl<'c> CodeGenerator<'c> {
                 let (rust_type, needs_lifetime) = match def {
                     LexUserType::Boolean(_) => (quote! { bool }, false),
                     LexUserType::Integer(_) => (quote! { i64 }, false),
-                    LexUserType::Bytes(_) => {
-                        (resolved.external_type_tokens(&prettify::ExternalImport::Bytes), false)
-                    }
+                    LexUserType::Bytes(_) => (
+                        resolved.external_type_tokens(&prettify::ExternalImport::Bytes),
+                        false,
+                    ),
                     LexUserType::CidLink(_) => {
                         (resolved.type_tokens(&prettify::CommonType::CidLink), true)
                     }
@@ -385,7 +394,12 @@ mod tests {
         // Check basic structure
         assert!(formatted.contains("struct Post"));
         assert!(formatted.contains("pub text"));
-        assert!(formatted.contains("CowStr<'a>"));
+        // String fields use the bare type parameter S (CowStr becomes S in BOS mode).
+        assert!(
+            formatted.contains(": S,"),
+            "expected bare S for string fields, got:\n{}",
+            formatted
+        );
     }
 
     #[test]
@@ -487,8 +501,18 @@ mod tests {
         assert!(formatted.contains("NoPromote"));
         assert!(formatted.contains("Warn"));
         assert!(formatted.contains("DmcaViolation"));
-        assert!(formatted.contains("Other(jacquard_common::CowStr"));
-        assert!(formatted.contains("impl<'a> From<&'a str>"));
+        // The catch-all variant uses the bare S type parameter.
+        assert!(
+            formatted.contains("Other(S)"),
+            "expected Other(S) variant, got:\n{}",
+            formatted
+        );
+        // from_value replaces the old From<&str> impl.
+        assert!(
+            formatted.contains("fn from_value"),
+            "expected from_value method, got:\n{}",
+            formatted
+        );
         assert!(formatted.contains("fn as_str(&self)"));
     }
 
@@ -749,7 +773,12 @@ mod tests {
         // Test option fragment
         let option_def = doc.defs.get("option").expect("get option def");
         let option_generated = codegen
-            .generate_def("pub.leaflet.poll.definition", "option", option_def, &resolved)
+            .generate_def(
+                "pub.leaflet.poll.definition",
+                "option",
+                option_def,
+                &resolved,
+            )
             .expect("generate option");
         let option_tokens = option_generated.into_tokens();
         let option_file: syn::File = syn::parse2(option_tokens).expect("parse option tokens");

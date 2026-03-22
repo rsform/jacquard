@@ -9,20 +9,20 @@ pub mod deltarune;
 pub mod site;
 pub mod state;
 
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 /// Identifies as female.
-pub type GenderFemale<'a> = CowStr<'a>;
+pub type GenderFemale<'a> = S;
 /// Identifies as male.
-pub type GenderMale<'a> = CowStr<'a>;
+pub type GenderMale<'a> = S;
 /// Identifies as non-binary.
-pub type GenderNonBinary<'a> = CowStr<'a>;
+pub type GenderNonBinary<'a> = S;
 /// Other gender identity not listed.
-pub type GenderOther<'a> = CowStr<'a>;
+pub type GenderOther<'a> = S;
 /// Currently questioning gender identity.
-pub type GenderQuestioning<'a> = CowStr<'a>;
-pub type PronounsAny<'a> = CowStr<'a>;
-pub type PronounsHeHim<'a> = CowStr<'a>;
-pub type PronounsHeThey<'a> = CowStr<'a>;
-pub type PronounsSheHer<'a> = CowStr<'a>;
-pub type PronounsSheThey<'a> = CowStr<'a>;
-pub type PronounsTheyThem<'a> = CowStr<'a>;
+pub type GenderQuestioning<'a> = S;
+pub type PronounsAny<'a> = S;
+pub type PronounsHeHim<'a> = S;
+pub type PronounsHeThey<'a> = S;
+pub type PronounsSheHer<'a> = S;
+pub type PronounsSheThey<'a> = S;
+pub type PronounsTheyThem<'a> = S;

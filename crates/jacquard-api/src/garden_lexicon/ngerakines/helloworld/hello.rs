@@ -10,26 +10,42 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Hello<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Hello<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///(max length: 55)
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub subject: Option<CowStr<'a>>,
+    pub subject: Option<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct HelloOutput<'a> {
-    #[serde(borrow)]
-    pub message: CowStr<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct HelloOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub message: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for garden.lexicon.ngerakines.helloworld.Hello
@@ -37,11 +53,12 @@ pub struct HelloResponse;
 impl jacquard_common::xrpc::XrpcResp for HelloResponse {
     const NSID: &'static str = "garden.lexicon.ngerakines.helloworld.Hello";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = HelloOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = HelloOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Hello<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Hello<S> {
     const NSID: &'static str = "garden.lexicon.ngerakines.helloworld.Hello";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = HelloResponse;
@@ -52,7 +69,7 @@ pub struct HelloRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for HelloRequest {
     const PATH: &'static str = "/xrpc/garden.lexicon.ngerakines.helloworld.Hello";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Hello<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Hello<S>;
     type Response = HelloResponse;
 }
 
@@ -78,7 +95,7 @@ pub mod hello_state {
 /// Builder for constructing an instance of this type
 pub struct HelloBuilder<'a, S: hello_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>,),
+    _fields: (Option<S>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -102,12 +119,12 @@ impl<'a> HelloBuilder<'a, hello_state::Empty> {
 
 impl<'a, S: hello_state::State> HelloBuilder<'a, S> {
     /// Set the `subject` field (optional)
-    pub fn subject(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn subject(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
-    pub fn maybe_subject(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_subject(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }

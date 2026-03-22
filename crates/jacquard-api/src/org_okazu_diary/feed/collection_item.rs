@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -31,54 +33,55 @@ use crate::org_okazu_diary::feed::Subject;
 use crate::org_okazu_diary::feed::Tag;
 /// Record declaring the inclusion of a single material or a set of materials in a specific collection.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.okazu-diary.feed.collectionItem",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct CollectionItem<'a> {
+pub struct CollectionItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Reference to the collection record (`org.okazu-diary.feed.collection`).
-    #[serde(borrow)]
-    pub collection: AtUri<'a>,
+    pub collection: AtUri<S>,
     pub created_at: Datetime,
     ///General-purpose self-label values primarily for consumption by generic AT clients. See the `labels` property of `org.okazu-diary.feed.entry` for details.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub labels: Option<SelfLabels<'a>>,
+    pub labels: Option<SelfLabels<S>>,
     ///The material or set of materials to be included in the collection.
-    #[serde(borrow)]
-    pub subjects: Vec<Subject<'a>>,
+    pub subjects: Vec<Subject<S>>,
     ///User-specified tags for the collection item.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<Tag<'a>>>,
+    pub tags: Option<Vec<Tag<S>>>,
     ///Reference to an `org.okazu-diary.feed.entry` record or an `org.okazu-diary.feed.collectionItem` of another collection whose `subjects` this collection item is derived from.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub via: Option<StrongRef<'a>>,
+    pub via: Option<StrongRef<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionItemGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollectionItemGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: CollectionItem<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: CollectionItem<S>,
 }
 
-impl<'a> CollectionItem<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CollectionItemRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> CollectionItem<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CollectionItemRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -89,18 +92,18 @@ pub struct CollectionItemRecord;
 impl XrpcResp for CollectionItemRecord {
     const NSID: &'static str = "org.okazu-diary.feed.collectionItem";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollectionItemGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CollectionItemGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CollectionItemGetRecordOutput<'_>> for CollectionItem<'_> {
-    fn from(output: CollectionItemGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CollectionItemGetRecordOutput<S>>
+for CollectionItem<S> {
+    fn from(output: CollectionItemGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for CollectionItem<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for CollectionItem<S> {
     const NSID: &'static str = "org.okazu-diary.feed.collectionItem";
     type Record = CollectionItemRecord;
 }
@@ -110,7 +113,7 @@ impl Collection for CollectionItemRecord {
     type Record = CollectionItemRecord;
 }
 
-impl<'a> LexiconSchema for CollectionItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionItem<S> {
     fn nsid() -> &'static str {
         "org.okazu-diary.feed.collectionItem"
     }
@@ -219,12 +222,12 @@ pub mod collection_item_state {
 pub struct CollectionItemBuilder<'a, S: collection_item_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<AtUri<'a>>,
+        Option<AtUri<S>>,
         Option<Datetime>,
-        Option<SelfLabels<'a>>,
-        Option<Vec<Subject<'a>>>,
-        Option<Vec<Tag<'a>>>,
-        Option<StrongRef<'a>>,
+        Option<SelfLabels<S>>,
+        Option<Vec<Subject<S>>>,
+        Option<Vec<Tag<S>>>,
+        Option<StrongRef<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -255,7 +258,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> CollectionItemBuilder<'a, collection_item_state::SetCollection<S>> {
         self._fields.0 = Option::Some(value.into());
         CollectionItemBuilder {
@@ -287,12 +290,12 @@ where
 
 impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
     /// Set the `labels` field (optional)
-    pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
+    pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
-    pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
+    pub fn maybe_labels(mut self, value: Option<SelfLabels<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -306,7 +309,7 @@ where
     /// Set the `subjects` field (required)
     pub fn subjects(
         mut self,
-        value: impl Into<Vec<Subject<'a>>>,
+        value: impl Into<Vec<Subject<S>>>,
     ) -> CollectionItemBuilder<'a, collection_item_state::SetSubjects<S>> {
         self._fields.3 = Option::Some(value.into());
         CollectionItemBuilder {
@@ -319,12 +322,12 @@ where
 
 impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<Tag<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<Tag<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<Tag<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<Tag<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -332,12 +335,12 @@ impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
 
 impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
     /// Set the `via` field (optional)
-    pub fn via(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
+    pub fn via(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `via` field to an Option value (optional)
-    pub fn maybe_via(mut self, value: Option<StrongRef<'a>>) -> Self {
+    pub fn maybe_via(mut self, value: Option<StrongRef<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -365,10 +368,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CollectionItem<'a> {
         CollectionItem {
             collection: self._fields.0.unwrap(),

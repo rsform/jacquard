@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+use jacquard_common::{Bos, DefaultStr};
 use jacquard_common::types::string::Datetime;
 /// Timestamp when the post was last edited. Used as an extension field in app.bsky.feed.post records to indicate post modification by Klearsky's edit feature.
 pub type UpdatedAt<'a> = Datetime;

@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -26,22 +28,35 @@ use crate::tools_ozone::moderation::get_account_timeline;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetAccountTimeline<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetAccountTimeline<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetAccountTimelineOutput<'a> {
-    #[serde(borrow)]
-    pub timeline: Vec<get_account_timeline::TimelineItem<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetAccountTimelineOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub timeline: Vec<get_account_timeline::TimelineItem<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -50,18 +65,19 @@ pub struct GetAccountTimelineOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetAccountTimelineError<'a> {
+pub enum GetAccountTimelineError {
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetAccountTimelineError<'_> {
+impl core::fmt::Display for GetAccountTimelineError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -71,44 +87,60 @@ impl core::fmt::Display for GetAccountTimelineError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TimelineItem<'a> {
-    #[serde(borrow)]
-    pub day: CowStr<'a>,
-    #[serde(borrow)]
-    pub summary: Vec<get_account_timeline::TimelineItemSummary<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TimelineItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub day: S,
+    pub summary: Vec<get_account_timeline::TimelineItemSummary<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TimelineItemSummary<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TimelineItemSummary<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub count: i64,
-    #[serde(borrow)]
-    pub event_subject_type: TimelineItemSummaryEventSubjectType<'a>,
-    #[serde(borrow)]
-    pub event_type: TimelineItemSummaryEventType<'a>,
+    pub event_subject_type: TimelineItemSummaryEventSubjectType<S>,
+    pub event_type: TimelineItemSummaryEventType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TimelineItemSummaryEventSubjectType<'a> {
+pub enum TimelineItemSummaryEventSubjectType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Account,
     Record,
     Chat,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> TimelineItemSummaryEventSubjectType<'a> {
+impl<S: Bos<str> + AsRef<str>> TimelineItemSummaryEventSubjectType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Account => "account",
@@ -117,72 +149,59 @@ impl<'a> TimelineItemSummaryEventSubjectType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for TimelineItemSummaryEventSubjectType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "account" => Self::Account,
             "record" => Self::Record,
             "chat" => Self::Chat,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for TimelineItemSummaryEventSubjectType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "account" => Self::Account,
-            "record" => Self::Record,
-            "chat" => Self::Chat,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TimelineItemSummaryEventSubjectType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display
+for TimelineItemSummaryEventSubjectType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for TimelineItemSummaryEventSubjectType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for TimelineItemSummaryEventSubjectType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for TimelineItemSummaryEventSubjectType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for TimelineItemSummaryEventSubjectType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for TimelineItemSummaryEventSubjectType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for TimelineItemSummaryEventSubjectType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for TimelineItemSummaryEventSubjectType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default
+for TimelineItemSummaryEventSubjectType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for TimelineItemSummaryEventSubjectType<'_> {
-    type Output = TimelineItemSummaryEventSubjectType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for TimelineItemSummaryEventSubjectType<S> {
+    type Output = TimelineItemSummaryEventSubjectType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             TimelineItemSummaryEventSubjectType::Account => {
@@ -203,7 +222,7 @@ impl jacquard_common::IntoStatic for TimelineItemSummaryEventSubjectType<'_> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TimelineItemSummaryEventType<'a> {
+pub enum TimelineItemSummaryEventType<S: Bos<str> + AsRef<str> = DefaultStr> {
     ModEventTakedown,
     ModEventReverseTakedown,
     ModEventComment,
@@ -235,10 +254,10 @@ pub enum TimelineItemSummaryEventType<'a> {
     HandleUpdated,
     ScheduleTakedownEvent,
     CancelScheduledTakedownEvent,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> TimelineItemSummaryEventType<'a> {
+impl<S: Bos<str> + AsRef<str>> TimelineItemSummaryEventType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ModEventTakedown => "tools.ozone.moderation.defs#modEventTakedown",
@@ -307,11 +326,9 @@ impl<'a> TimelineItemSummaryEventType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for TimelineItemSummaryEventType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "tools.ozone.moderation.defs#modEventTakedown" => Self::ModEventTakedown,
             "tools.ozone.moderation.defs#modEventReverseTakedown" => {
                 Self::ModEventReverseTakedown
@@ -375,124 +392,51 @@ impl<'a> From<&'a str> for TimelineItemSummaryEventType<'a> {
             "tools.ozone.moderation.defs#cancelScheduledTakedownEvent" => {
                 Self::CancelScheduledTakedownEvent
             }
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for TimelineItemSummaryEventType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "tools.ozone.moderation.defs#modEventTakedown" => Self::ModEventTakedown,
-            "tools.ozone.moderation.defs#modEventReverseTakedown" => {
-                Self::ModEventReverseTakedown
-            }
-            "tools.ozone.moderation.defs#modEventComment" => Self::ModEventComment,
-            "tools.ozone.moderation.defs#modEventReport" => Self::ModEventReport,
-            "tools.ozone.moderation.defs#modEventLabel" => Self::ModEventLabel,
-            "tools.ozone.moderation.defs#modEventAcknowledge" => {
-                Self::ModEventAcknowledge
-            }
-            "tools.ozone.moderation.defs#modEventEscalate" => Self::ModEventEscalate,
-            "tools.ozone.moderation.defs#modEventMute" => Self::ModEventMute,
-            "tools.ozone.moderation.defs#modEventUnmute" => Self::ModEventUnmute,
-            "tools.ozone.moderation.defs#modEventMuteReporter" => {
-                Self::ModEventMuteReporter
-            }
-            "tools.ozone.moderation.defs#modEventUnmuteReporter" => {
-                Self::ModEventUnmuteReporter
-            }
-            "tools.ozone.moderation.defs#modEventEmail" => Self::ModEventEmail,
-            "tools.ozone.moderation.defs#modEventResolveAppeal" => {
-                Self::ModEventResolveAppeal
-            }
-            "tools.ozone.moderation.defs#modEventDivert" => Self::ModEventDivert,
-            "tools.ozone.moderation.defs#modEventTag" => Self::ModEventTag,
-            "tools.ozone.moderation.defs#accountEvent" => Self::AccountEvent,
-            "tools.ozone.moderation.defs#identityEvent" => Self::IdentityEvent,
-            "tools.ozone.moderation.defs#recordEvent" => Self::RecordEvent,
-            "tools.ozone.moderation.defs#modEventPriorityScore" => {
-                Self::ModEventPriorityScore
-            }
-            "tools.ozone.moderation.defs#revokeAccountCredentialsEvent" => {
-                Self::RevokeAccountCredentialsEvent
-            }
-            "tools.ozone.moderation.defs#ageAssuranceEvent" => Self::AgeAssuranceEvent,
-            "tools.ozone.moderation.defs#ageAssuranceOverrideEvent" => {
-                Self::AgeAssuranceOverrideEvent
-            }
-            "tools.ozone.moderation.defs#timelineEventPlcCreate" => {
-                Self::TimelineEventPlcCreate
-            }
-            "tools.ozone.moderation.defs#timelineEventPlcOperation" => {
-                Self::TimelineEventPlcOperation
-            }
-            "tools.ozone.moderation.defs#timelineEventPlcTombstone" => {
-                Self::TimelineEventPlcTombstone
-            }
-            "tools.ozone.hosting.getAccountHistory#accountCreated" => {
-                Self::AccountCreated
-            }
-            "tools.ozone.hosting.getAccountHistory#emailConfirmed" => {
-                Self::EmailConfirmed
-            }
-            "tools.ozone.hosting.getAccountHistory#passwordUpdated" => {
-                Self::PasswordUpdated
-            }
-            "tools.ozone.hosting.getAccountHistory#handleUpdated" => Self::HandleUpdated,
-            "tools.ozone.moderation.defs#scheduleTakedownEvent" => {
-                Self::ScheduleTakedownEvent
-            }
-            "tools.ozone.moderation.defs#cancelScheduledTakedownEvent" => {
-                Self::CancelScheduledTakedownEvent
-            }
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TimelineItemSummaryEventType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for TimelineItemSummaryEventType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for TimelineItemSummaryEventType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for TimelineItemSummaryEventType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for TimelineItemSummaryEventType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for TimelineItemSummaryEventType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for TimelineItemSummaryEventType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for TimelineItemSummaryEventType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for TimelineItemSummaryEventType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for TimelineItemSummaryEventType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for TimelineItemSummaryEventType<'_> {
-    type Output = TimelineItemSummaryEventType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for TimelineItemSummaryEventType<S> {
+    type Output = TimelineItemSummaryEventType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             TimelineItemSummaryEventType::ModEventTakedown => {
@@ -600,11 +544,12 @@ pub struct GetAccountTimelineResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAccountTimelineResponse {
     const NSID: &'static str = "tools.ozone.moderation.getAccountTimeline";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetAccountTimelineOutput<'de>;
-    type Err<'de> = GetAccountTimelineError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetAccountTimelineOutput<S>;
+    type Err = GetAccountTimelineError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetAccountTimeline<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetAccountTimeline<S> {
     const NSID: &'static str = "tools.ozone.moderation.getAccountTimeline";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAccountTimelineResponse;
@@ -615,11 +560,11 @@ pub struct GetAccountTimelineRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAccountTimelineRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.getAccountTimeline";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetAccountTimeline<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetAccountTimeline<S>;
     type Response = GetAccountTimelineResponse;
 }
 
-impl<'a> LexiconSchema for TimelineItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TimelineItem<S> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.getAccountTimeline"
     }
@@ -634,7 +579,7 @@ impl<'a> LexiconSchema for TimelineItem<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TimelineItemSummary<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TimelineItemSummary<S> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.getAccountTimeline"
     }
@@ -684,7 +629,7 @@ pub mod get_account_timeline_state {
 /// Builder for constructing an instance of this type
 pub struct GetAccountTimelineBuilder<'a, S: get_account_timeline_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -714,7 +659,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetAccountTimelineBuilder<'a, get_account_timeline_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         GetAccountTimelineBuilder {
@@ -785,10 +730,7 @@ pub mod timeline_item_state {
 /// Builder for constructing an instance of this type
 pub struct TimelineItemBuilder<'a, S: timeline_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Vec<get_account_timeline::TimelineItemSummary<'a>>>,
-    ),
+    _fields: (Option<S>, Option<Vec<get_account_timeline::TimelineItemSummary<S>>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -818,7 +760,7 @@ where
     /// Set the `day` field (required)
     pub fn day(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TimelineItemBuilder<'a, timeline_item_state::SetDay<S>> {
         self._fields.0 = Option::Some(value.into());
         TimelineItemBuilder {
@@ -837,7 +779,7 @@ where
     /// Set the `summary` field (required)
     pub fn summary(
         mut self,
-        value: impl Into<Vec<get_account_timeline::TimelineItemSummary<'a>>>,
+        value: impl Into<Vec<get_account_timeline::TimelineItemSummary<S>>>,
     ) -> TimelineItemBuilder<'a, timeline_item_state::SetSummary<S>> {
         self._fields.1 = Option::Some(value.into());
         TimelineItemBuilder {
@@ -865,10 +807,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TimelineItem<'a> {
         TimelineItem {
             day: self._fields.0.unwrap(),
@@ -988,49 +927,49 @@ pub mod timeline_item_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Count;
         type EventType;
+        type Count;
         type EventSubjectType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Count = Unset;
         type EventType = Unset;
+        type Count = Unset;
         type EventSubjectType = Unset;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Count = Set<members::count>;
-        type EventType = S::EventType;
-        type EventSubjectType = S::EventSubjectType;
     }
     ///State transition - sets the `event_type` field to Set
     pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEventType<S> {}
     impl<S: State> State for SetEventType<S> {
-        type Count = S::Count;
         type EventType = Set<members::event_type>;
+        type Count = S::Count;
+        type EventSubjectType = S::EventSubjectType;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type EventType = S::EventType;
+        type Count = Set<members::count>;
         type EventSubjectType = S::EventSubjectType;
     }
     ///State transition - sets the `event_subject_type` field to Set
     pub struct SetEventSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEventSubjectType<S> {}
     impl<S: State> State for SetEventSubjectType<S> {
-        type Count = S::Count;
         type EventType = S::EventType;
+        type Count = S::Count;
         type EventSubjectType = Set<members::event_subject_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count` field
-        pub struct count(());
         ///Marker type for the `event_type` field
         pub struct event_type(());
+        ///Marker type for the `count` field
+        pub struct count(());
         ///Marker type for the `event_subject_type` field
         pub struct event_subject_type(());
     }
@@ -1041,8 +980,8 @@ pub struct TimelineItemSummaryBuilder<'a, S: timeline_item_summary_state::State>
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<i64>,
-        Option<TimelineItemSummaryEventSubjectType<'a>>,
-        Option<TimelineItemSummaryEventType<'a>>,
+        Option<TimelineItemSummaryEventSubjectType<S>>,
+        Option<TimelineItemSummaryEventType<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1092,7 +1031,7 @@ where
     /// Set the `eventSubjectType` field (required)
     pub fn event_subject_type(
         mut self,
-        value: impl Into<TimelineItemSummaryEventSubjectType<'a>>,
+        value: impl Into<TimelineItemSummaryEventSubjectType<S>>,
     ) -> TimelineItemSummaryBuilder<
         'a,
         timeline_item_summary_state::SetEventSubjectType<S>,
@@ -1114,7 +1053,7 @@ where
     /// Set the `eventType` field (required)
     pub fn event_type(
         mut self,
-        value: impl Into<TimelineItemSummaryEventType<'a>>,
+        value: impl Into<TimelineItemSummaryEventType<S>>,
     ) -> TimelineItemSummaryBuilder<'a, timeline_item_summary_state::SetEventType<S>> {
         self._fields.2 = Option::Some(value.into());
         TimelineItemSummaryBuilder {
@@ -1128,8 +1067,8 @@ where
 impl<'a, S> TimelineItemSummaryBuilder<'a, S>
 where
     S: timeline_item_summary_state::State,
-    S::Count: timeline_item_summary_state::IsSet,
     S::EventType: timeline_item_summary_state::IsSet,
+    S::Count: timeline_item_summary_state::IsSet,
     S::EventSubjectType: timeline_item_summary_state::IsSet,
 {
     /// Build the final struct
@@ -1144,10 +1083,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TimelineItemSummary<'a> {
         TimelineItemSummary {
             count: self._fields.0.unwrap(),

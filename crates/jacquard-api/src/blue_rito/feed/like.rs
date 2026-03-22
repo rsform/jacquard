@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,34 +29,43 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Records a like.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "blue.rito.feed.like", tag = "$type")]
-pub struct Like<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "blue.rito.feed.like",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Like<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub subject: UriValue<'a>,
+    pub subject: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LikeGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LikeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Like<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Like<S>,
 }
 
-impl<'a> Like<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, LikeRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Like<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, LikeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -65,18 +76,17 @@ pub struct LikeRecord;
 impl XrpcResp for LikeRecord {
     const NSID: &'static str = "blue.rito.feed.like";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = LikeGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = LikeGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<LikeGetRecordOutput<'_>> for Like<'_> {
-    fn from(output: LikeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<LikeGetRecordOutput<S>> for Like<S> {
+    fn from(output: LikeGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Like<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Like<S> {
     const NSID: &'static str = "blue.rito.feed.like";
     type Record = LikeRecord;
 }
@@ -86,7 +96,7 @@ impl Collection for LikeRecord {
     type Record = LikeRecord;
 }
 
-impl<'a> LexiconSchema for Like<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Like<S> {
     fn nsid() -> &'static str {
         "blue.rito.feed.like"
     }
@@ -148,7 +158,7 @@ pub mod like_state {
 /// Builder for constructing an instance of this type
 pub struct LikeBuilder<'a, S: like_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<UriValue<'a>>),
+    _fields: (Option<Datetime>, Option<UriValue<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -197,7 +207,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> LikeBuilder<'a, like_state::SetSubject<S>> {
         self._fields.1 = Option::Some(value.into());
         LikeBuilder {
@@ -223,13 +233,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Like<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Like<'a> {
         Like {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

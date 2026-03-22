@@ -10,11 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -23,36 +25,48 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::io_atcr::hold::complete_upload;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct CompleteUpload<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CompleteUpload<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Final blob digest (e.g., sha256:abc123...)
-    #[serde(borrow)]
-    pub digest: CowStr<'a>,
+    pub digest: S,
     ///List of uploaded parts with their ETags
-    #[serde(borrow)]
-    pub parts: Vec<complete_upload::PartInfo<'a>>,
+    pub parts: Vec<complete_upload::PartInfo<S>>,
     ///Upload session ID from initiateUpload
-    #[serde(borrow)]
-    pub upload_id: CowStr<'a>,
+    pub upload_id: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct CompleteUploadOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CompleteUploadOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The digest of the completed blob
-    #[serde(borrow)]
-    pub digest: CowStr<'a>,
+    pub digest: S,
     ///Always 'completed' on success
-    #[serde(borrow)]
-    pub status: CowStr<'a>,
+    pub status: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -61,24 +75,25 @@ pub struct CompleteUploadOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CompleteUploadError<'a> {
+pub enum CompleteUploadError {
     #[serde(rename = "InvalidUploadId")]
-    InvalidUploadId(Option<CowStr<'a>>),
+    InvalidUploadId(Option<SmolStr>),
     #[serde(rename = "InvalidDigest")]
-    InvalidDigest(Option<CowStr<'a>>),
+    InvalidDigest(Option<SmolStr>),
     #[serde(rename = "MissingParts")]
-    MissingParts(Option<CowStr<'a>>),
+    MissingParts(Option<SmolStr>),
     #[serde(rename = "CompletionFailed")]
-    CompletionFailed(Option<CowStr<'a>>),
+    CompletionFailed(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for CompleteUploadError<'_> {
+impl core::fmt::Display for CompleteUploadError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::InvalidUploadId(msg) => {
@@ -109,22 +124,34 @@ impl core::fmt::Display for CompleteUploadError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
 /// Information about a completed upload part
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PartInfo<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PartInfo<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///ETag returned when the part was uploaded
-    #[serde(borrow)]
-    pub etag: CowStr<'a>,
+    pub etag: S,
     ///Part sequence number (1-indexed)
     pub part_number: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for io.atcr.hold.completeUpload
@@ -132,11 +159,12 @@ pub struct CompleteUploadResponse;
 impl jacquard_common::xrpc::XrpcResp for CompleteUploadResponse {
     const NSID: &'static str = "io.atcr.hold.completeUpload";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CompleteUploadOutput<'de>;
-    type Err<'de> = CompleteUploadError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CompleteUploadOutput<S>;
+    type Err = CompleteUploadError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for CompleteUpload<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for CompleteUpload<S> {
     const NSID: &'static str = "io.atcr.hold.completeUpload";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -151,11 +179,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for CompleteUploadRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = CompleteUpload<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = CompleteUpload<S>;
     type Response = CompleteUploadResponse;
 }
 
-impl<'a> LexiconSchema for PartInfo<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for PartInfo<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.completeUpload"
     }
@@ -201,49 +229,49 @@ pub mod complete_upload_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UploadId;
         type Digest;
+        type UploadId;
         type Parts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UploadId = Unset;
         type Digest = Unset;
+        type UploadId = Unset;
         type Parts = Unset;
-    }
-    ///State transition - sets the `upload_id` field to Set
-    pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUploadId<S> {}
-    impl<S: State> State for SetUploadId<S> {
-        type UploadId = Set<members::upload_id>;
-        type Digest = S::Digest;
-        type Parts = S::Parts;
     }
     ///State transition - sets the `digest` field to Set
     pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDigest<S> {}
     impl<S: State> State for SetDigest<S> {
-        type UploadId = S::UploadId;
         type Digest = Set<members::digest>;
+        type UploadId = S::UploadId;
+        type Parts = S::Parts;
+    }
+    ///State transition - sets the `upload_id` field to Set
+    pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUploadId<S> {}
+    impl<S: State> State for SetUploadId<S> {
+        type Digest = S::Digest;
+        type UploadId = Set<members::upload_id>;
         type Parts = S::Parts;
     }
     ///State transition - sets the `parts` field to Set
     pub struct SetParts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParts<S> {}
     impl<S: State> State for SetParts<S> {
-        type UploadId = S::UploadId;
         type Digest = S::Digest;
+        type UploadId = S::UploadId;
         type Parts = Set<members::parts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `upload_id` field
-        pub struct upload_id(());
         ///Marker type for the `digest` field
         pub struct digest(());
+        ///Marker type for the `upload_id` field
+        pub struct upload_id(());
         ///Marker type for the `parts` field
         pub struct parts(());
     }
@@ -252,11 +280,7 @@ pub mod complete_upload_state {
 /// Builder for constructing an instance of this type
 pub struct CompleteUploadBuilder<'a, S: complete_upload_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Vec<complete_upload::PartInfo<'a>>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<Vec<complete_upload::PartInfo<S>>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -286,7 +310,7 @@ where
     /// Set the `digest` field (required)
     pub fn digest(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CompleteUploadBuilder<'a, complete_upload_state::SetDigest<S>> {
         self._fields.0 = Option::Some(value.into());
         CompleteUploadBuilder {
@@ -305,7 +329,7 @@ where
     /// Set the `parts` field (required)
     pub fn parts(
         mut self,
-        value: impl Into<Vec<complete_upload::PartInfo<'a>>>,
+        value: impl Into<Vec<complete_upload::PartInfo<S>>>,
     ) -> CompleteUploadBuilder<'a, complete_upload_state::SetParts<S>> {
         self._fields.1 = Option::Some(value.into());
         CompleteUploadBuilder {
@@ -324,7 +348,7 @@ where
     /// Set the `uploadId` field (required)
     pub fn upload_id(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CompleteUploadBuilder<'a, complete_upload_state::SetUploadId<S>> {
         self._fields.2 = Option::Some(value.into());
         CompleteUploadBuilder {
@@ -338,8 +362,8 @@ where
 impl<'a, S> CompleteUploadBuilder<'a, S>
 where
     S: complete_upload_state::State,
-    S::UploadId: complete_upload_state::IsSet,
     S::Digest: complete_upload_state::IsSet,
+    S::UploadId: complete_upload_state::IsSet,
     S::Parts: complete_upload_state::IsSet,
 {
     /// Build the final struct
@@ -354,10 +378,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CompleteUpload<'a> {
         CompleteUpload {
             digest: self._fields.0.unwrap(),
@@ -415,7 +436,7 @@ pub mod part_info_state {
 /// Builder for constructing an instance of this type
 pub struct PartInfoBuilder<'a, S: part_info_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _fields: (Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -445,7 +466,7 @@ where
     /// Set the `etag` field (required)
     pub fn etag(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PartInfoBuilder<'a, part_info_state::SetEtag<S>> {
         self._fields.0 = Option::Some(value.into());
         PartInfoBuilder {
@@ -492,10 +513,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> PartInfo<'a> {
         PartInfo {
             etag: self._fields.0.unwrap(),

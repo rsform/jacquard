@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,114 +30,148 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::place_wisp::fs;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Directory<'a> {
-    #[serde(borrow)]
-    pub entries: Vec<fs::Entry<'a>>,
-    #[serde(borrow)]
-    pub r#type: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Directory<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub entries: Vec<fs::Entry<S>>,
+    pub r#type: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Entry<'a> {
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
-    #[serde(borrow)]
-    pub node: EntryNode<'a>,
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub name: S,
+    pub node: EntryNode<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum EntryNode<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum EntryNode<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "place.wisp.fs#file")]
-    File(Box<fs::File<'a>>),
+    File(Box<fs::File<S>>),
     #[serde(rename = "place.wisp.fs#directory")]
-    Directory(Box<fs::Directory<'a>>),
+    Directory(Box<fs::Directory<S>>),
     #[serde(rename = "place.wisp.fs#subfs")]
-    Subfs(Box<fs::Subfs<'a>>),
+    Subfs(Box<fs::Subfs<S>>),
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct File<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct File<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///True if blob content is base64-encoded (used to bypass PDS content sniffing)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub base64: Option<bool>,
     ///Content blob ref
-    #[serde(borrow)]
-    pub blob: BlobRef<'a>,
+    pub blob: BlobRef<S>,
     ///Content encoding (e.g., gzip for compressed files)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub encoding: Option<CowStr<'a>>,
+    pub encoding: Option<S>,
     ///Original MIME type before compression
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mime_type: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub r#type: CowStr<'a>,
+    pub mime_type: Option<S>,
+    pub r#type: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Virtual filesystem manifest for a Wisp site
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "place.wisp.fs", tag = "$type")]
-pub struct Fs<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "place.wisp.fs",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Fs<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub file_count: Option<i64>,
-    #[serde(borrow)]
-    pub root: fs::Directory<'a>,
-    #[serde(borrow)]
-    pub site: CowStr<'a>,
+    pub root: fs::Directory<S>,
+    pub site: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct FsGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Fs<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Fs<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Subfs<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Subfs<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///If true, the subfs record's root entries are merged (flattened) into the parent directory, replacing the subfs entry. If false (default), the subfs entries are placed in a subdirectory with the subfs entry's name. Flat merging is useful for splitting large directories across multiple records while maintaining a flat structure.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub flat: Option<bool>,
     ///AT-URI pointing to a place.wisp.subfs record containing this subtree.
-    #[serde(borrow)]
-    pub subject: AtUri<'a>,
-    #[serde(borrow)]
-    pub r#type: CowStr<'a>,
+    pub subject: AtUri<S>,
+    pub r#type: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Fs<'a> {
-    pub fn uri(uri: impl Into<CowStr<'a>>) -> Result<RecordUri<'a, FsRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Fs<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, FsRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for Directory<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Directory<S> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
@@ -161,7 +197,7 @@ impl<'a> LexiconSchema for Directory<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Entry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entry<S> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
@@ -187,7 +223,7 @@ impl<'a> LexiconSchema for Entry<'a> {
     }
 }
 
-impl<'a> LexiconSchema for File<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for File<S> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
@@ -249,18 +285,17 @@ pub struct FsRecord;
 impl XrpcResp for FsRecord {
     const NSID: &'static str = "place.wisp.fs";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = FsGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = FsGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<FsGetRecordOutput<'_>> for Fs<'_> {
-    fn from(output: FsGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<FsGetRecordOutput<S>> for Fs<S> {
+    fn from(output: FsGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Fs<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Fs<S> {
     const NSID: &'static str = "place.wisp.fs";
     type Record = FsRecord;
 }
@@ -270,7 +305,7 @@ impl Collection for FsRecord {
     type Record = FsRecord;
 }
 
-impl<'a> LexiconSchema for Fs<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Fs<S> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
@@ -303,7 +338,7 @@ impl<'a> LexiconSchema for Fs<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Subfs<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Subfs<S> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
@@ -365,7 +400,7 @@ pub mod directory_state {
 /// Builder for constructing an instance of this type
 pub struct DirectoryBuilder<'a, S: directory_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<fs::Entry<'a>>>, Option<CowStr<'a>>),
+    _fields: (Option<Vec<fs::Entry<S>>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -395,7 +430,7 @@ where
     /// Set the `entries` field (required)
     pub fn entries(
         mut self,
-        value: impl Into<Vec<fs::Entry<'a>>>,
+        value: impl Into<Vec<fs::Entry<S>>>,
     ) -> DirectoryBuilder<'a, directory_state::SetEntries<S>> {
         self._fields.0 = Option::Some(value.into());
         DirectoryBuilder {
@@ -414,7 +449,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> DirectoryBuilder<'a, directory_state::SetType<S>> {
         self._fields.1 = Option::Some(value.into());
         DirectoryBuilder {
@@ -442,10 +477,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Directory<'a> {
         Directory {
             entries: self._fields.0.unwrap(),
@@ -714,7 +746,7 @@ pub mod entry_state {
 /// Builder for constructing an instance of this type
 pub struct EntryBuilder<'a, S: entry_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<EntryNode<'a>>),
+    _fields: (Option<S>, Option<EntryNode<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -744,7 +776,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> EntryBuilder<'a, entry_state::SetName<S>> {
         self._fields.0 = Option::Some(value.into());
         EntryBuilder {
@@ -763,7 +795,7 @@ where
     /// Set the `node` field (required)
     pub fn node(
         mut self,
-        value: impl Into<EntryNode<'a>>,
+        value: impl Into<EntryNode<S>>,
     ) -> EntryBuilder<'a, entry_state::SetNode<S>> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
@@ -789,13 +821,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Entry<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Entry<'a> {
         Entry {
             name: self._fields.0.unwrap(),
             node: self._fields.1.unwrap(),
@@ -851,13 +877,7 @@ pub mod file_state {
 /// Builder for constructing an instance of this type
 pub struct FileBuilder<'a, S: file_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<bool>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<bool>, Option<BlobRef<S>>, Option<S>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -900,7 +920,7 @@ where
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
-        value: impl Into<BlobRef<'a>>,
+        value: impl Into<BlobRef<S>>,
     ) -> FileBuilder<'a, file_state::SetBlob<S>> {
         self._fields.1 = Option::Some(value.into());
         FileBuilder {
@@ -913,12 +933,12 @@ where
 
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `encoding` field (optional)
-    pub fn encoding(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn encoding(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `encoding` field to an Option value (optional)
-    pub fn maybe_encoding(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_encoding(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -926,12 +946,12 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
 
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `mimeType` field (optional)
-    pub fn mime_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn mime_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `mimeType` field to an Option value (optional)
-    pub fn maybe_mime_type(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_mime_type(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -945,7 +965,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> FileBuilder<'a, file_state::SetType<S>> {
         self._fields.4 = Option::Some(value.into());
         FileBuilder {
@@ -974,13 +994,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> File<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> File<'a> {
         File {
             base64: self._fields.0,
             blob: self._fields.1.unwrap(),
@@ -1002,63 +1016,58 @@ pub mod fs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Site;
         type Root;
         type CreatedAt;
+        type Site;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Site = Unset;
         type Root = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `site` field to Set
-    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSite<S> {}
-    impl<S: State> State for SetSite<S> {
-        type Site = Set<members::site>;
-        type Root = S::Root;
-        type CreatedAt = S::CreatedAt;
+        type Site = Unset;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoot<S> {}
     impl<S: State> State for SetRoot<S> {
-        type Site = S::Site;
         type Root = Set<members::root>;
         type CreatedAt = S::CreatedAt;
+        type Site = S::Site;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Site = S::Site;
         type Root = S::Root;
         type CreatedAt = Set<members::created_at>;
+        type Site = S::Site;
+    }
+    ///State transition - sets the `site` field to Set
+    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSite<S> {}
+    impl<S: State> State for SetSite<S> {
+        type Root = S::Root;
+        type CreatedAt = S::CreatedAt;
+        type Site = Set<members::site>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `site` field
-        pub struct site(());
         ///Marker type for the `root` field
         pub struct root(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `site` field
+        pub struct site(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FsBuilder<'a, S: fs_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<Datetime>,
-        Option<i64>,
-        Option<fs::Directory<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<Datetime>, Option<i64>, Option<fs::Directory<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1120,7 +1129,7 @@ where
     /// Set the `root` field (required)
     pub fn root(
         mut self,
-        value: impl Into<fs::Directory<'a>>,
+        value: impl Into<fs::Directory<S>>,
     ) -> FsBuilder<'a, fs_state::SetRoot<S>> {
         self._fields.2 = Option::Some(value.into());
         FsBuilder {
@@ -1137,10 +1146,7 @@ where
     S::Site: fs_state::IsUnset,
 {
     /// Set the `site` field (required)
-    pub fn site(
-        mut self,
-        value: impl Into<CowStr<'a>>,
-    ) -> FsBuilder<'a, fs_state::SetSite<S>> {
+    pub fn site(mut self, value: impl Into<S>) -> FsBuilder<'a, fs_state::SetSite<S>> {
         self._fields.3 = Option::Some(value.into());
         FsBuilder {
             _state: PhantomData,
@@ -1153,9 +1159,9 @@ where
 impl<'a, S> FsBuilder<'a, S>
 where
     S: fs_state::State,
-    S::Site: fs_state::IsSet,
     S::Root: fs_state::IsSet,
     S::CreatedAt: fs_state::IsSet,
+    S::Site: fs_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fs<'a> {
@@ -1168,13 +1174,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Fs<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Fs<'a> {
         Fs {
             created_at: self._fields.0.unwrap(),
             file_count: self._fields.1,
@@ -1232,7 +1232,7 @@ pub mod subfs_state {
 /// Builder for constructing an instance of this type
 pub struct SubfsBuilder<'a, S: subfs_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<AtUri<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<bool>, Option<AtUri<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1275,7 +1275,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> SubfsBuilder<'a, subfs_state::SetSubject<S>> {
         self._fields.1 = Option::Some(value.into());
         SubfsBuilder {
@@ -1294,7 +1294,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SubfsBuilder<'a, subfs_state::SetType<S>> {
         self._fields.2 = Option::Some(value.into());
         SubfsBuilder {
@@ -1321,13 +1321,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Subfs<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Subfs<'a> {
         Subfs {
             flat: self._fields.0,
             subject: self._fields.1.unwrap(),

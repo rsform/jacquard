@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -33,53 +35,56 @@ use crate::sh_weaver::notebook::Tags;
 use crate::sh_weaver::notebook::Title;
 /// A grouping of entries in a notebook.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.weaver.notebook.chapter", tag = "$type")]
-pub struct Chapter<'a> {
-    #[serde(borrow)]
-    pub authors: Vec<Author<'a>>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.weaver.notebook.chapter",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Chapter<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub authors: Vec<Author<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub content_warnings: Option<ContentWarnings<'a>>,
+    pub content_warnings: Option<ContentWarnings<S>>,
     ///Client-declared timestamp when this was originally created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    #[serde(borrow)]
-    pub entry_list: Vec<StrongRef<'a>>,
+    pub entry_list: Vec<StrongRef<S>>,
     ///The notebook this chapter belongs to.
-    #[serde(borrow)]
-    pub notebook: StrongRef<'a>,
+    pub notebook: StrongRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rating: Option<ContentRating<'a>>,
+    pub rating: Option<ContentRating<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Tags<'a>>,
+    pub tags: Option<Tags<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<Title<'a>>,
+    pub title: Option<Title<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ChapterGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ChapterGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Chapter<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Chapter<S>,
 }
 
-impl<'a> Chapter<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ChapterRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Chapter<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ChapterRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -90,18 +95,17 @@ pub struct ChapterRecord;
 impl XrpcResp for ChapterRecord {
     const NSID: &'static str = "sh.weaver.notebook.chapter";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ChapterGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ChapterGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ChapterGetRecordOutput<'_>> for Chapter<'_> {
-    fn from(output: ChapterGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ChapterGetRecordOutput<S>> for Chapter<S> {
+    fn from(output: ChapterGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Chapter<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Chapter<S> {
     const NSID: &'static str = "sh.weaver.notebook.chapter";
     type Record = ChapterRecord;
 }
@@ -111,7 +115,7 @@ impl Collection for ChapterRecord {
     type Record = ChapterRecord;
 }
 
-impl<'a> LexiconSchema for Chapter<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Chapter<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.chapter"
     }
@@ -136,51 +140,51 @@ pub mod chapter_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Authors;
-        type Notebook;
         type EntryList;
+        type Notebook;
+        type Authors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Authors = Unset;
-        type Notebook = Unset;
         type EntryList = Unset;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type Authors = Set<members::authors>;
-        type Notebook = S::Notebook;
-        type EntryList = S::EntryList;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Authors = S::Authors;
-        type Notebook = Set<members::notebook>;
-        type EntryList = S::EntryList;
+        type Notebook = Unset;
+        type Authors = Unset;
     }
     ///State transition - sets the `entry_list` field to Set
     pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntryList<S> {}
     impl<S: State> State for SetEntryList<S> {
-        type Authors = S::Authors;
-        type Notebook = S::Notebook;
         type EntryList = Set<members::entry_list>;
+        type Notebook = S::Notebook;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotebook<S> {}
+    impl<S: State> State for SetNotebook<S> {
+        type EntryList = S::EntryList;
+        type Notebook = Set<members::notebook>;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type EntryList = S::EntryList;
+        type Notebook = S::Notebook;
+        type Authors = Set<members::authors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `authors` field
-        pub struct authors(());
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
         ///Marker type for the `entry_list` field
         pub struct entry_list(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
     }
 }
 
@@ -188,14 +192,14 @@ pub mod chapter_state {
 pub struct ChapterBuilder<'a, S: chapter_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Vec<Author<'a>>>,
-        Option<ContentWarnings<'a>>,
+        Option<Vec<Author<S>>>,
+        Option<ContentWarnings<S>>,
         Option<Datetime>,
-        Option<Vec<StrongRef<'a>>>,
-        Option<StrongRef<'a>>,
-        Option<ContentRating<'a>>,
-        Option<Tags<'a>>,
-        Option<Title<'a>>,
+        Option<Vec<StrongRef<S>>>,
+        Option<StrongRef<S>>,
+        Option<ContentRating<S>>,
+        Option<Tags<S>>,
+        Option<Title<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -226,7 +230,7 @@ where
     /// Set the `authors` field (required)
     pub fn authors(
         mut self,
-        value: impl Into<Vec<Author<'a>>>,
+        value: impl Into<Vec<Author<S>>>,
     ) -> ChapterBuilder<'a, chapter_state::SetAuthors<S>> {
         self._fields.0 = Option::Some(value.into());
         ChapterBuilder {
@@ -241,13 +245,13 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     /// Set the `contentWarnings` field (optional)
     pub fn content_warnings(
         mut self,
-        value: impl Into<Option<ContentWarnings<'a>>>,
+        value: impl Into<Option<ContentWarnings<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `contentWarnings` field to an Option value (optional)
-    pub fn maybe_content_warnings(mut self, value: Option<ContentWarnings<'a>>) -> Self {
+    pub fn maybe_content_warnings(mut self, value: Option<ContentWarnings<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -274,7 +278,7 @@ where
     /// Set the `entryList` field (required)
     pub fn entry_list(
         mut self,
-        value: impl Into<Vec<StrongRef<'a>>>,
+        value: impl Into<Vec<StrongRef<S>>>,
     ) -> ChapterBuilder<'a, chapter_state::SetEntryList<S>> {
         self._fields.3 = Option::Some(value.into());
         ChapterBuilder {
@@ -293,7 +297,7 @@ where
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> ChapterBuilder<'a, chapter_state::SetNotebook<S>> {
         self._fields.4 = Option::Some(value.into());
         ChapterBuilder {
@@ -306,12 +310,12 @@ where
 
 impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     /// Set the `rating` field (optional)
-    pub fn rating(mut self, value: impl Into<Option<ContentRating<'a>>>) -> Self {
+    pub fn rating(mut self, value: impl Into<Option<ContentRating<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `rating` field to an Option value (optional)
-    pub fn maybe_rating(mut self, value: Option<ContentRating<'a>>) -> Self {
+    pub fn maybe_rating(mut self, value: Option<ContentRating<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -319,12 +323,12 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
 
 impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Tags<'a>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Tags<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Tags<'a>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Tags<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -332,12 +336,12 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
 
 impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<Title<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<Title<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<Title<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<Title<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -346,9 +350,9 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
 impl<'a, S> ChapterBuilder<'a, S>
 where
     S: chapter_state::State,
-    S::Authors: chapter_state::IsSet,
-    S::Notebook: chapter_state::IsSet,
     S::EntryList: chapter_state::IsSet,
+    S::Notebook: chapter_state::IsSet,
+    S::Authors: chapter_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Chapter<'a> {
@@ -367,10 +371,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Chapter<'a> {
         Chapter {
             authors: self._fields.0.unwrap(),

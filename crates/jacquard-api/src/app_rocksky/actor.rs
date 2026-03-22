@@ -15,12 +15,17 @@ pub mod get_actor_scrobbles;
 pub mod get_actor_songs;
 pub mod get_profile;
 
-use jacquard_common::CowStr;
+
+#[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Datetime, UriValue};
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -30,35 +35,43 @@ use serde::{Serialize, Deserialize};
 use crate::app_rocksky::actor;
 use crate::app_rocksky::artist;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ArtistViewBasic<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ArtistViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub picture: Option<UriValue<'a>>,
+    pub picture: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user1_rank: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user2_rank: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub weight: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct CompatibilityViewBasic<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CompatibilityViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub compatibility_level: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -66,35 +79,36 @@ pub struct CompatibilityViewBasic<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shared_artists: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub top_shared_artist_names: Option<Vec<CowStr<'a>>>,
+    pub top_shared_artist_names: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub top_shared_detailed_artists: Option<Vec<actor::ArtistViewBasic<'a>>>,
+    pub top_shared_detailed_artists: Option<Vec<actor::ArtistViewBasic<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user1_artist_count: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user2_artist_count: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct NeighbourViewBasic<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct NeighbourViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The URL of the actor's avatar image.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<UriValue<'a>>,
+    pub avatar: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub did: Option<CowStr<'a>>,
+    pub did: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub handle: Option<CowStr<'a>>,
+    pub handle: Option<S>,
     ///The number of artists shared with the actor.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shared_artists_count: Option<i64>,
@@ -103,84 +117,87 @@ pub struct NeighbourViewBasic<'a> {
     pub similarity_score: Option<i64>,
     ///The top shared artist names with the actor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub top_shared_artist_names: Option<Vec<CowStr<'a>>>,
+    pub top_shared_artist_names: Option<Vec<S>>,
     ///The top shared artist details with the actor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub top_shared_artists_details: Option<Vec<artist::ArtistViewBasic<'a>>>,
+    pub top_shared_artists_details: Option<Vec<artist::ArtistViewBasic<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub user_id: Option<CowStr<'a>>,
+    pub user_id: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileViewBasic<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProfileViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The URL of the actor's avatar image.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<UriValue<'a>>,
+    pub avatar: Option<UriValue<S>>,
     ///The date and time when the actor was created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///The DID of the actor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub did: Option<CowStr<'a>>,
+    pub did: Option<S>,
     ///The display name of the actor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     ///The handle of the actor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub handle: Option<CowStr<'a>>,
+    pub handle: Option<S>,
     ///The unique identifier of the actor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///The date and time when the actor was last updated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ProfileViewDetailed<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ProfileViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The URL of the actor's avatar image.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<UriValue<'a>>,
+    pub avatar: Option<UriValue<S>>,
     ///The date and time when the actor was created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///The DID of the actor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub did: Option<CowStr<'a>>,
+    pub did: Option<S>,
     ///The display name of the actor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     ///The handle of the actor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub handle: Option<CowStr<'a>>,
+    pub handle: Option<S>,
     ///The unique identifier of the actor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///The date and time when the actor was last updated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for ArtistViewBasic<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ArtistViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.actor.defs"
     }
@@ -195,7 +212,7 @@ impl<'a> LexiconSchema for ArtistViewBasic<'a> {
     }
 }
 
-impl<'a> LexiconSchema for CompatibilityViewBasic<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CompatibilityViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.actor.defs"
     }
@@ -210,7 +227,7 @@ impl<'a> LexiconSchema for CompatibilityViewBasic<'a> {
     }
 }
 
-impl<'a> LexiconSchema for NeighbourViewBasic<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for NeighbourViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.actor.defs"
     }
@@ -225,7 +242,7 @@ impl<'a> LexiconSchema for NeighbourViewBasic<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ProfileViewBasic<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.actor.defs"
     }
@@ -240,7 +257,7 @@ impl<'a> LexiconSchema for ProfileViewBasic<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ProfileViewDetailed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileViewDetailed<S> {
     fn nsid() -> &'static str {
         "app.rocksky.actor.defs"
     }

@@ -7,20 +7,26 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Compare<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Compare<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub repo: CowStr<'a>,
+    pub repo: S,
     #[serde(borrow)]
-    pub rev1: CowStr<'a>,
+    pub rev1: S,
     #[serde(borrow)]
-    pub rev2: CowStr<'a>,
+    pub rev2: S,
 }
 
 /// Compare output in application/json
@@ -32,7 +38,6 @@ pub struct CompareOutput {
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -41,28 +46,32 @@ pub struct CompareOutput {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum CompareError<'a> {
+pub enum CompareError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// One or both revisions not found
     #[serde(rename = "RevisionNotFound")]
-    RevisionNotFound(Option<CowStr<'a>>),
+    RevisionNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
     /// Failed to compare revisions
     #[serde(rename = "CompareError")]
-    CompareError(Option<CowStr<'a>>),
+    CompareError(Option<jacquard_common::deps::smol_str::SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other {
+        error: jacquard_common::deps::smol_str::SmolStr,
+        message: Option<jacquard_common::deps::smol_str::SmolStr>,
+    },
 }
 
-impl core::fmt::Display for CompareError<'_> {
+impl core::fmt::Display for CompareError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -93,7 +102,13 @@ impl core::fmt::Display for CompareError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
@@ -103,18 +118,22 @@ pub struct CompareResponse;
 impl jacquard_common::xrpc::XrpcResp for CompareResponse {
     const NSID: &'static str = "sh.tangled.repo.compare";
     const ENCODING: &'static str = "*/*";
-    type Output<'de> = CompareOutput;
-    type Err<'de> = CompareError<'de>;
-    fn encode_output(
-        output: &Self::Output<'_>,
-    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
+    type Output<S: Bos<str> + AsRef<str>> = CompareOutput;
+    type Err = CompareError;
+    fn encode_output<S: Bos<str> + AsRef<str>>(
+        output: &Self::Output<S>,
+    ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
+    where
+        Self::Output<S>: Serialize,
+    {
         Ok(output.body.to_vec())
     }
-    fn decode_output<'de>(
+    fn decode_output<'de, S>(
         body: &'de [u8],
-    ) -> Result<Self::Output<'de>, jacquard_common::error::DecodeError>
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        Self::Output<'de>: serde::Deserialize<'de>,
+        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        Self::Output<S>: Deserialize<'de>,
     {
         Ok(CompareOutput {
             body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
@@ -122,7 +141,8 @@ impl jacquard_common::xrpc::XrpcResp for CompareResponse {
     }
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Compare<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Compare<S> {
     const NSID: &'static str = "sh.tangled.repo.compare";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = CompareResponse;
@@ -133,7 +153,7 @@ pub struct CompareRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CompareRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.compare";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = Compare<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Compare<S>;
     type Response = CompareResponse;
 }
 
@@ -148,57 +168,57 @@ pub mod compare_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Rev2;
-        type Repo;
         type Rev1;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Rev2 = Unset;
-        type Repo = Unset;
         type Rev1 = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `rev2` field to Set
     pub struct SetRev2<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev2<S> {}
     impl<S: State> State for SetRev2<S> {
         type Rev2 = Set<members::rev2>;
+        type Rev1 = S::Rev1;
         type Repo = S::Repo;
-        type Rev1 = S::Rev1;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Rev2 = S::Rev2;
-        type Repo = Set<members::repo>;
-        type Rev1 = S::Rev1;
     }
     ///State transition - sets the `rev1` field to Set
     pub struct SetRev1<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev1<S> {}
     impl<S: State> State for SetRev1<S> {
         type Rev2 = S::Rev2;
-        type Repo = S::Repo;
         type Rev1 = Set<members::rev1>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Rev2 = S::Rev2;
+        type Rev1 = S::Rev1;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `rev2` field
         pub struct rev2(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `rev1` field
         pub struct rev1(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CompareBuilder<'a, S: compare_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<S>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -228,7 +248,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CompareBuilder<'a, compare_state::SetRepo<S>> {
         self._fields.0 = Option::Some(value.into());
         CompareBuilder {
@@ -247,7 +267,7 @@ where
     /// Set the `rev1` field (required)
     pub fn rev1(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CompareBuilder<'a, compare_state::SetRev1<S>> {
         self._fields.1 = Option::Some(value.into());
         CompareBuilder {
@@ -266,7 +286,7 @@ where
     /// Set the `rev2` field (required)
     pub fn rev2(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> CompareBuilder<'a, compare_state::SetRev2<S>> {
         self._fields.2 = Option::Some(value.into());
         CompareBuilder {
@@ -281,8 +301,8 @@ impl<'a, S> CompareBuilder<'a, S>
 where
     S: compare_state::State,
     S::Rev2: compare_state::IsSet,
-    S::Repo: compare_state::IsSet,
     S::Rev1: compare_state::IsSet,
+    S::Repo: compare_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Compare<'a> {

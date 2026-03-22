@@ -10,43 +10,46 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct Merge<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Merge<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Author email for the merge commit
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author_email: Option<CowStr<'a>>,
+    pub author_email: Option<S>,
     ///Author name for the merge commit
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author_name: Option<CowStr<'a>>,
+    pub author_name: Option<S>,
     ///Target branch to merge into
-    #[serde(borrow)]
-    pub branch: CowStr<'a>,
+    pub branch: S,
     ///Additional commit message body
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub commit_body: Option<CowStr<'a>>,
+    pub commit_body: Option<S>,
     ///Merge commit message
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub commit_message: Option<CowStr<'a>>,
+    pub commit_message: Option<S>,
     ///DID of the repository owner
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
     ///Name of the repository
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Patch content to merge
-    #[serde(borrow)]
-    pub patch: CowStr<'a>,
+    pub patch: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.tangled.repo.merge
@@ -54,11 +57,12 @@ pub struct MergeResponse;
 impl jacquard_common::xrpc::XrpcResp for MergeResponse {
     const NSID: &'static str = "sh.tangled.repo.merge";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for Merge<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for Merge<S> {
     const NSID: &'static str = "sh.tangled.repo.merge";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -73,7 +77,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for MergeRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = Merge<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = Merge<S>;
     type Response = MergeResponse;
 }
 
@@ -88,8 +92,8 @@ pub mod merge_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Branch;
-        type Name;
         type Did;
+        type Name;
         type Patch;
     }
     /// Empty state - all required fields are unset
@@ -97,8 +101,8 @@ pub mod merge_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Branch = Unset;
-        type Name = Unset;
         type Did = Unset;
+        type Name = Unset;
         type Patch = Unset;
     }
     ///State transition - sets the `branch` field to Set
@@ -106,17 +110,8 @@ pub mod merge_state {
     impl<S: State> sealed::Sealed for SetBranch<S> {}
     impl<S: State> State for SetBranch<S> {
         type Branch = Set<members::branch>;
+        type Did = S::Did;
         type Name = S::Name;
-        type Did = S::Did;
-        type Patch = S::Patch;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Branch = S::Branch;
-        type Name = Set<members::name>;
-        type Did = S::Did;
         type Patch = S::Patch;
     }
     ///State transition - sets the `did` field to Set
@@ -124,8 +119,17 @@ pub mod merge_state {
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Branch = S::Branch;
-        type Name = S::Name;
         type Did = Set<members::did>;
+        type Name = S::Name;
+        type Patch = S::Patch;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Branch = S::Branch;
+        type Did = S::Did;
+        type Name = Set<members::name>;
         type Patch = S::Patch;
     }
     ///State transition - sets the `patch` field to Set
@@ -133,8 +137,8 @@ pub mod merge_state {
     impl<S: State> sealed::Sealed for SetPatch<S> {}
     impl<S: State> State for SetPatch<S> {
         type Branch = S::Branch;
-        type Name = S::Name;
         type Did = S::Did;
+        type Name = S::Name;
         type Patch = Set<members::patch>;
     }
     /// Marker types for field names
@@ -142,10 +146,10 @@ pub mod merge_state {
     pub mod members {
         ///Marker type for the `branch` field
         pub struct branch(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `patch` field
         pub struct patch(());
     }
@@ -155,14 +159,14 @@ pub mod merge_state {
 pub struct MergeBuilder<'a, S: merge_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -187,12 +191,12 @@ impl<'a> MergeBuilder<'a, merge_state::Empty> {
 
 impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
     /// Set the `authorEmail` field (optional)
-    pub fn author_email(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn author_email(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `authorEmail` field to an Option value (optional)
-    pub fn maybe_author_email(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_author_email(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -200,12 +204,12 @@ impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
 
 impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
     /// Set the `authorName` field (optional)
-    pub fn author_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn author_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `authorName` field to an Option value (optional)
-    pub fn maybe_author_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_author_name(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -219,7 +223,7 @@ where
     /// Set the `branch` field (required)
     pub fn branch(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MergeBuilder<'a, merge_state::SetBranch<S>> {
         self._fields.2 = Option::Some(value.into());
         MergeBuilder {
@@ -232,12 +236,12 @@ where
 
 impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
     /// Set the `commitBody` field (optional)
-    pub fn commit_body(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn commit_body(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `commitBody` field to an Option value (optional)
-    pub fn maybe_commit_body(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_commit_body(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -245,12 +249,12 @@ impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
 
 impl<'a, S: merge_state::State> MergeBuilder<'a, S> {
     /// Set the `commitMessage` field (optional)
-    pub fn commit_message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn commit_message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `commitMessage` field to an Option value (optional)
-    pub fn maybe_commit_message(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_commit_message(mut self, value: Option<S>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -264,7 +268,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> MergeBuilder<'a, merge_state::SetDid<S>> {
         self._fields.5 = Option::Some(value.into());
         MergeBuilder {
@@ -283,7 +287,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MergeBuilder<'a, merge_state::SetName<S>> {
         self._fields.6 = Option::Some(value.into());
         MergeBuilder {
@@ -302,7 +306,7 @@ where
     /// Set the `patch` field (required)
     pub fn patch(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> MergeBuilder<'a, merge_state::SetPatch<S>> {
         self._fields.7 = Option::Some(value.into());
         MergeBuilder {
@@ -317,8 +321,8 @@ impl<'a, S> MergeBuilder<'a, S>
 where
     S: merge_state::State,
     S::Branch: merge_state::IsSet,
-    S::Name: merge_state::IsSet,
     S::Did: merge_state::IsSet,
+    S::Name: merge_state::IsSet,
     S::Patch: merge_state::IsSet,
 {
     /// Build the final struct
@@ -336,13 +340,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Merge<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Merge<'a> {
         Merge {
             author_email: self._fields.0,
             author_name: self._fields.1,

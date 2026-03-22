@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,94 +32,112 @@ use crate::org_hypercerts::SmallVideo;
 use crate::org_hypercerts::Uri;
 /// User-declared visual presentation defaults for how a contributor appears on hyperboards. Stored in the contributor's own PDS and reusable across multiple boards.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "org.hyperboards.displayProfile",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct DisplayProfile<'a> {
+pub struct DisplayProfile<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Client-declared timestamp when this record was originally created.
     pub created_at: Datetime,
     ///Display name override for this user on hyperboards.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     ///Default hover iframe URL for this user across boards.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub hover_iframe_url: Option<UriValue<'a>>,
+    pub hover_iframe_url: Option<UriValue<S>>,
     ///Default hover image for this user across boards, as a URI or image blob.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub hover_image: Option<DisplayProfileHoverImage<'a>>,
+    pub hover_image: Option<DisplayProfileHoverImage<S>>,
     ///Avatar or face image override for this user on hyperboards, as a URI or image blob.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub image: Option<DisplayProfileImage<'a>>,
+    pub image: Option<DisplayProfileImage<S>>,
     ///Default click-through link URL for this user across boards.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub url: Option<UriValue<'a>>,
+    pub url: Option<UriValue<S>>,
     ///Default video for this user across boards, as a URI (embed/direct link) or uploaded video blob.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub video: Option<DisplayProfileVideo<'a>>,
+    pub video: Option<DisplayProfileVideo<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum DisplayProfileHoverImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum DisplayProfileHoverImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallImage")]
-    SmallImage(Box<SmallImage<'a>>),
+    SmallImage(Box<SmallImage<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum DisplayProfileImage<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum DisplayProfileImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallImage")]
-    SmallImage(Box<SmallImage<'a>>),
+    SmallImage(Box<SmallImage<S>>),
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum DisplayProfileVideo<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum DisplayProfileVideo<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
-    Uri(Box<Uri<'a>>),
+    Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallVideo")]
-    SmallVideo(Box<SmallVideo<'a>>),
+    SmallVideo(Box<SmallVideo<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct DisplayProfileGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct DisplayProfileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: DisplayProfile<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: DisplayProfile<S>,
 }
 
-impl<'a> DisplayProfile<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, DisplayProfileRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> DisplayProfile<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, DisplayProfileRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -128,18 +148,18 @@ pub struct DisplayProfileRecord;
 impl XrpcResp for DisplayProfileRecord {
     const NSID: &'static str = "org.hyperboards.displayProfile";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = DisplayProfileGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = DisplayProfileGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<DisplayProfileGetRecordOutput<'_>> for DisplayProfile<'_> {
-    fn from(output: DisplayProfileGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<DisplayProfileGetRecordOutput<S>>
+for DisplayProfile<S> {
+    fn from(output: DisplayProfileGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for DisplayProfile<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for DisplayProfile<S> {
     const NSID: &'static str = "org.hyperboards.displayProfile";
     type Record = DisplayProfileRecord;
 }
@@ -149,7 +169,7 @@ impl Collection for DisplayProfileRecord {
     type Record = DisplayProfileRecord;
 }
 
-impl<'a> LexiconSchema for DisplayProfile<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for DisplayProfile<S> {
     fn nsid() -> &'static str {
         "org.hyperboards.displayProfile"
     }
@@ -243,12 +263,12 @@ pub struct DisplayProfileBuilder<'a, S: display_profile_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<DisplayProfileHoverImage<'a>>,
-        Option<DisplayProfileImage<'a>>,
-        Option<UriValue<'a>>,
-        Option<DisplayProfileVideo<'a>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<DisplayProfileHoverImage<S>>,
+        Option<DisplayProfileImage<S>>,
+        Option<UriValue<S>>,
+        Option<DisplayProfileVideo<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -292,12 +312,12 @@ where
 
 impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     /// Set the `displayName` field (optional)
-    pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_display_name(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -305,12 +325,12 @@ impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
 
 impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     /// Set the `hoverIframeUrl` field (optional)
-    pub fn hover_iframe_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn hover_iframe_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `hoverIframeUrl` field to an Option value (optional)
-    pub fn maybe_hover_iframe_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_hover_iframe_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -320,7 +340,7 @@ impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     /// Set the `hoverImage` field (optional)
     pub fn hover_image(
         mut self,
-        value: impl Into<Option<DisplayProfileHoverImage<'a>>>,
+        value: impl Into<Option<DisplayProfileHoverImage<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
@@ -328,7 +348,7 @@ impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     /// Set the `hoverImage` field to an Option value (optional)
     pub fn maybe_hover_image(
         mut self,
-        value: Option<DisplayProfileHoverImage<'a>>,
+        value: Option<DisplayProfileHoverImage<S>>,
     ) -> Self {
         self._fields.3 = value;
         self
@@ -337,12 +357,12 @@ impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
 
 impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     /// Set the `image` field (optional)
-    pub fn image(mut self, value: impl Into<Option<DisplayProfileImage<'a>>>) -> Self {
+    pub fn image(mut self, value: impl Into<Option<DisplayProfileImage<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
-    pub fn maybe_image(mut self, value: Option<DisplayProfileImage<'a>>) -> Self {
+    pub fn maybe_image(mut self, value: Option<DisplayProfileImage<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -350,12 +370,12 @@ impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
 
 impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     /// Set the `url` field (optional)
-    pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
-    pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -363,12 +383,12 @@ impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
 
 impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     /// Set the `video` field (optional)
-    pub fn video(mut self, value: impl Into<Option<DisplayProfileVideo<'a>>>) -> Self {
+    pub fn video(mut self, value: impl Into<Option<DisplayProfileVideo<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
-    pub fn maybe_video(mut self, value: Option<DisplayProfileVideo<'a>>) -> Self {
+    pub fn maybe_video(mut self, value: Option<DisplayProfileVideo<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -395,10 +415,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> DisplayProfile<'a> {
         DisplayProfile {
             created_at: self._fields.0.unwrap(),

@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,52 +26,70 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::migrate_claim;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct MigrateClaim<'a> {
-    #[serde(borrow)]
-    pub claim: AtUri<'a>,
-    #[serde(borrow)]
-    pub claim_review: AtUri<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MigrateClaim<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub claim: AtUri<S>,
+    pub claim_review: AtUri<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct MigrateClaimOutput<'a> {
-    #[serde(borrow)]
-    pub results: Vec<migrate_claim::MigrationResult<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MigrateClaimOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub results: Vec<migrate_claim::MigrationResult<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct MigrationResult<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct MigrationResult<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub error: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub game_uri: AtUri<'a>,
+    pub error: Option<S>,
+    pub game_uri: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub new_uri: Option<AtUri<'a>>,
-    #[serde(borrow)]
-    pub status: MigrationResultStatus<'a>,
+    pub new_uri: Option<AtUri<S>>,
+    pub status: MigrationResultStatus<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MigrationResultStatus<'a> {
+pub enum MigrationResultStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Success,
     Failed,
     Skipped,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> MigrationResultStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> MigrationResultStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Success => "success",
@@ -78,72 +98,57 @@ impl<'a> MigrationResultStatus<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for MigrationResultStatus<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "success" => Self::Success,
             "failed" => Self::Failed,
             "skipped" => Self::Skipped,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for MigrationResultStatus<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "success" => Self::Success,
-            "failed" => Self::Failed,
-            "skipped" => Self::Skipped,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for MigrationResultStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for MigrationResultStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for MigrationResultStatus<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for MigrationResultStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for MigrationResultStatus<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for MigrationResultStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for MigrationResultStatus<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for MigrationResultStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for MigrationResultStatus<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for MigrationResultStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for MigrationResultStatus<'_> {
-    type Output = MigrationResultStatus<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for MigrationResultStatus<S> {
+    type Output = MigrationResultStatus<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             MigrationResultStatus::Success => MigrationResultStatus::Success,
@@ -161,11 +166,12 @@ pub struct MigrateClaimResponse;
 impl jacquard_common::xrpc::XrpcResp for MigrateClaimResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.migrateClaim";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = MigrateClaimOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = MigrateClaimOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for MigrateClaim<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for MigrateClaim<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.migrateClaim";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -180,11 +186,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for MigrateClaimRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = MigrateClaim<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = MigrateClaim<S>;
     type Response = MigrateClaimResponse;
 }
 
-impl<'a> LexiconSchema for MigrationResult<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for MigrationResult<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.migrateClaim"
     }
@@ -209,44 +215,44 @@ pub mod migrate_claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ClaimReview;
         type Claim;
+        type ClaimReview;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ClaimReview = Unset;
         type Claim = Unset;
-    }
-    ///State transition - sets the `claim_review` field to Set
-    pub struct SetClaimReview<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClaimReview<S> {}
-    impl<S: State> State for SetClaimReview<S> {
-        type ClaimReview = Set<members::claim_review>;
-        type Claim = S::Claim;
+        type ClaimReview = Unset;
     }
     ///State transition - sets the `claim` field to Set
     pub struct SetClaim<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClaim<S> {}
     impl<S: State> State for SetClaim<S> {
-        type ClaimReview = S::ClaimReview;
         type Claim = Set<members::claim>;
+        type ClaimReview = S::ClaimReview;
+    }
+    ///State transition - sets the `claim_review` field to Set
+    pub struct SetClaimReview<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClaimReview<S> {}
+    impl<S: State> State for SetClaimReview<S> {
+        type Claim = S::Claim;
+        type ClaimReview = Set<members::claim_review>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `claim_review` field
-        pub struct claim_review(());
         ///Marker type for the `claim` field
         pub struct claim(());
+        ///Marker type for the `claim_review` field
+        pub struct claim_review(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MigrateClaimBuilder<'a, S: migrate_claim_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<AtUri<S>>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -276,7 +282,7 @@ where
     /// Set the `claim` field (required)
     pub fn claim(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> MigrateClaimBuilder<'a, migrate_claim_state::SetClaim<S>> {
         self._fields.0 = Option::Some(value.into());
         MigrateClaimBuilder {
@@ -295,7 +301,7 @@ where
     /// Set the `claimReview` field (required)
     pub fn claim_review(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> MigrateClaimBuilder<'a, migrate_claim_state::SetClaimReview<S>> {
         self._fields.1 = Option::Some(value.into());
         MigrateClaimBuilder {
@@ -309,8 +315,8 @@ where
 impl<'a, S> MigrateClaimBuilder<'a, S>
 where
     S: migrate_claim_state::State,
-    S::ClaimReview: migrate_claim_state::IsSet,
     S::Claim: migrate_claim_state::IsSet,
+    S::ClaimReview: migrate_claim_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MigrateClaim<'a> {
@@ -323,10 +329,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> MigrateClaim<'a> {
         MigrateClaim {
             claim: self._fields.0.unwrap(),
@@ -346,37 +349,37 @@ pub mod migration_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type GameUri;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type GameUri = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type GameUri = S::GameUri;
+        type Status = Unset;
     }
     ///State transition - sets the `game_uri` field to Set
     pub struct SetGameUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGameUri<S> {}
     impl<S: State> State for SetGameUri<S> {
-        type Status = S::Status;
         type GameUri = Set<members::game_uri>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type GameUri = S::GameUri;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `game_uri` field
         pub struct game_uri(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -384,10 +387,10 @@ pub mod migration_result_state {
 pub struct MigrationResultBuilder<'a, S: migration_result_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<AtUri<'a>>,
-        Option<MigrationResultStatus<'a>>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<AtUri<S>>,
+        Option<MigrationResultStatus<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -412,12 +415,12 @@ impl<'a> MigrationResultBuilder<'a, migration_result_state::Empty> {
 
 impl<'a, S: migration_result_state::State> MigrationResultBuilder<'a, S> {
     /// Set the `error` field (optional)
-    pub fn error(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn error(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `error` field to an Option value (optional)
-    pub fn maybe_error(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_error(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -431,7 +434,7 @@ where
     /// Set the `gameUri` field (required)
     pub fn game_uri(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> MigrationResultBuilder<'a, migration_result_state::SetGameUri<S>> {
         self._fields.1 = Option::Some(value.into());
         MigrationResultBuilder {
@@ -444,12 +447,12 @@ where
 
 impl<'a, S: migration_result_state::State> MigrationResultBuilder<'a, S> {
     /// Set the `newUri` field (optional)
-    pub fn new_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
+    pub fn new_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `newUri` field to an Option value (optional)
-    pub fn maybe_new_uri(mut self, value: Option<AtUri<'a>>) -> Self {
+    pub fn maybe_new_uri(mut self, value: Option<AtUri<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -463,7 +466,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<MigrationResultStatus<'a>>,
+        value: impl Into<MigrationResultStatus<S>>,
     ) -> MigrationResultBuilder<'a, migration_result_state::SetStatus<S>> {
         self._fields.3 = Option::Some(value.into());
         MigrationResultBuilder {
@@ -477,8 +480,8 @@ where
 impl<'a, S> MigrationResultBuilder<'a, S>
 where
     S: migration_result_state::State,
-    S::Status: migration_result_state::IsSet,
     S::GameUri: migration_result_state::IsSet,
+    S::Status: migration_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MigrationResult<'a> {
@@ -493,10 +496,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> MigrationResult<'a> {
         MigrationResult {
             error: self._fields.0,

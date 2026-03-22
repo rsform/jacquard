@@ -110,9 +110,8 @@ impl<'c> CodeGenerator<'c> {
                 let type_name = self.def_to_type_name(nsid, def_name);
                 let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
 
-                // Records always get a lifetime since they have the #[lexicon] attribute
-                // which adds extra_data: BTreeMap<..., Data<'a>>
-                // Skip custom builder for types that conflict with the macro's unqualified type references
+                // Records always get a type param since they have extra_data: BTreeMap<..., Data<S>>.
+                // Skip custom builder for types that conflict with the macro's unqualified type references.
                 let has_builder =
                     !super::builder_heuristics::conflicts_with_builder_macro(&type_name);
 
@@ -123,22 +122,43 @@ impl<'c> CodeGenerator<'c> {
                 let manual_default = self.generate_manual_default(&type_name, obj, resolved);
 
                 let derive_attr = resolved.derive_standard();
-                let lexicon_attr =
-                    resolved.attribute_tokens(&super::prettify::ExternalImport::LexiconAttr);
+                let bos_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Bos);
+                let default_str_path =
+                    resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
+                let bos_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Bos);
+                let ser_serde =
+                    resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
+                let de_serde =
+                    resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
+                let serde_ser_bound = format!("S: {} + {}<str> + AsRef<str>", ser_serde, bos_serde);
+                let serde_de_bound =
+                    format!("S: {}<'de> + {}<str> + AsRef<str>", de_serde, bos_serde);
+
+                // Generate the extra_data field directly instead of using #[lexicon] attribute.
+                let smolstr_type = resolved.type_tokens(&super::prettify::CommonType::SmolStr);
+                let data_type = resolved.type_tokens(&super::prettify::CommonType::Data);
+                let btree_map = resolved.btree_map_path();
+                let is_none_path = resolved.option_is_none_path();
+                let extra_data_type =
+                    resolved.option_type(quote! { #btree_map<#smolstr_type, #data_type> });
                 let struct_def = quote! {
                     #doc
-                    #lexicon_attr
                     #derive_attr
-                    #[serde(rename_all = "camelCase", rename = #nsid, tag = "$type")]
-                    pub struct #ident<'a> {
+                    #[serde(rename_all = "camelCase", rename = #nsid, tag = "$type", bound(
+                        serialize = #serde_ser_bound,
+                        deserialize = #serde_de_bound
+                    ))]
+                    pub struct #ident<S: #bos_path<str> + AsRef<str> = #default_str_path> {
                         #fields
+                        #[serde(flatten, default, skip_serializing_if = #is_none_path)]
+                        pub extra_data: #extra_data_type,
                     }
                 };
 
-                // Generate custom builder if needed
+                // Generate custom builder if needed.
                 let builder = if has_builder {
                     let ctx = super::builder_gen::BuilderGenContext::from_object(
-                        self, nsid, &type_name, obj, true, // records always have lifetime
+                        self, nsid, &type_name, obj, true, // records always have type param
                         resolved,
                     );
                     ctx.generate()
@@ -146,11 +166,11 @@ impl<'c> CodeGenerator<'c> {
                     quote! {}
                 };
 
-                // Generate union types and nested object types for this record
+                // Generate union types and nested object types for this record.
                 let unions =
                     self.generate_nested_types(nsid, &type_name, &obj.properties, true, resolved)?;
 
-                // Generate typed GetRecordOutput wrapper
+                // Generate typed GetRecordOutput wrapper.
                 let output_type_name = format!("{}GetRecordOutput", type_name);
                 let output_type_ident =
                     syn::Ident::new(&output_type_name, proc_macro2::Span::call_site());
@@ -162,15 +182,15 @@ impl<'c> CodeGenerator<'c> {
                 let output_wrapper = quote! {
                     /// Typed wrapper for GetRecord response with this collection's record type.
                     #derive_attr
-                    #[serde(rename_all = "camelCase")]
-                    pub struct #output_type_ident<'a> {
+                    #[serde(rename_all = "camelCase", bound(
+                        serialize = #serde_ser_bound,
+                        deserialize = #serde_de_bound
+                    ))]
+                    pub struct #output_type_ident<S: #bos_path<str> + AsRef<str> = #default_str_path> {
                         #[serde(skip_serializing_if = #is_none_path)]
-                        #[serde(borrow)]
                         pub cid: #option_cid,
-                        #[serde(borrow)]
                         pub uri: #at_uri_type,
-                        #[serde(borrow)]
-                        pub value: #ident<'a>,
+                        pub value: #ident<S>,
                     }
                 };
 
@@ -185,8 +205,8 @@ impl<'c> CodeGenerator<'c> {
                     resolved.external_type_tokens(&super::prettify::ExternalImport::Deserialize);
                 let xrpc_resp_path =
                     resolved.external_type_tokens(&super::prettify::ExternalImport::XrpcResp);
-                let record_error_type = resolved
-                    .type_tokens_with_lifetime(&super::prettify::CommonType::RecordError, "de");
+                let record_error_type =
+                    resolved.type_tokens(&super::prettify::CommonType::RecordError);
                 let record_marker = quote! {
                     /// Marker type for deserializing records from this collection.
                     #[derive(Debug, #ser_path, #de_path)]
@@ -195,17 +215,14 @@ impl<'c> CodeGenerator<'c> {
                     impl #xrpc_resp_path for #record_marker_ident {
                         const NSID: &'static str = #nsid;
                         const ENCODING: &'static str = "application/json";
-                        type Output<'de> = #output_type_ident<'de>;
-                        type Err<'de> = #record_error_type;
+                        type Output<S: #bos_path<str> + AsRef<str>> = #output_type_ident<S>;
+                        type Err = #record_error_type;
                     }
-
-
                 };
                 let from_impl = quote! {
-                    impl From<#output_type_ident<'_>> for #ident<'_> {
-                        fn from(output: #output_type_ident<'_>) -> Self {
-                            use jacquard_common::IntoStatic;
-                            output.value.into_static()
+                    impl<S: #bos_path<str> + AsRef<str>> From<#output_type_ident<S>> for #ident<S> {
+                        fn from(output: #output_type_ident<S>) -> Self {
+                            output.value
                         }
                     }
                 };
@@ -213,7 +230,7 @@ impl<'c> CodeGenerator<'c> {
                 // Generate Collection trait impl.
                 let collection_path = resolved.type_path(&super::prettify::CommonType::Collection);
                 let collection_impl = quote! {
-                    impl #collection_path for #ident<'_> {
+                    impl<S: #bos_path<str> + AsRef<str>> #collection_path for #ident<S> {
                         const NSID: &'static str = #nsid;
                         type Record = #record_marker_ident;
                     }
@@ -248,16 +265,15 @@ impl<'c> CodeGenerator<'c> {
                     #output_wrapper
                 };
 
-                let cowstr_type = resolved.type_tokens(&super::prettify::CommonType::CowStr);
                 let at_uri_path = resolved.type_path(&super::prettify::CommonType::AtUri);
                 let record_uri_path =
                     resolved.external_type_tokens(&super::prettify::ExternalImport::RecordUri);
                 let uri_error_path =
                     resolved.external_type_tokens(&super::prettify::ExternalImport::UriError);
                 let inherent_impls = quote! {
-                    impl<'a> #ident<'a> {
-                        pub fn uri(uri: impl Into<#cowstr_type>) -> Result<#record_uri_path<'a, #record_marker_ident>, #uri_error_path> {
-                            #record_uri_path::try_from_uri(#at_uri_path::new_cow(uri.into())?)
+                    impl<S: #bos_path<str> + AsRef<str>> #ident<S> {
+                        pub fn uri(uri: S) -> Result<#record_uri_path<S, #record_marker_ident>, #uri_error_path> {
+                            #record_uri_path::try_from_uri(#at_uri_path::new(uri)?)
                         }
                     }
                 };
@@ -300,8 +316,7 @@ impl<'c> CodeGenerator<'c> {
         let type_name = self.def_to_type_name(nsid, def_name);
         let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
 
-        // Objects always get a lifetime since they have the #[lexicon] attribute
-        // which adds extra_data: BTreeMap<..., Data<'a>>
+        // Objects always get a type param since they have extra_data: BTreeMap<..., Data<S>>.
 
         // Smart heuristics for builder generation:
         // - 0 required fields: Default instead of builder
@@ -321,26 +336,45 @@ impl<'c> CodeGenerator<'c> {
         let manual_default = self.generate_manual_default(&type_name, obj, resolved);
         let use_derive_default = manual_default.is_none() && decision.has_default;
 
-        let lexicon_attr = resolved.attribute_tokens(&super::prettify::ExternalImport::LexiconAttr);
+        let bos_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Bos);
+        let default_str_path =
+            resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
+        let bos_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Bos);
+        let ser_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
+        let de_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
+        let serde_ser_bound = format!("S: {} + {}<str> + AsRef<str>", ser_serde, bos_serde);
+        let serde_de_bound = format!("S: {}<'de> + {}<str> + AsRef<str>", de_serde, bos_serde);
         let derive_attr = if use_derive_default {
             resolved.derive_standard_with(quote! { Default })
         } else {
             resolved.derive_standard()
         };
+
+        // Generate the extra_data field directly instead of using #[lexicon] attribute.
+        let smolstr_type = resolved.type_tokens(&super::prettify::CommonType::SmolStr);
+        let data_type = resolved.type_tokens(&super::prettify::CommonType::Data);
+        let btree_map = resolved.btree_map_path();
+        let is_none_path = resolved.option_is_none_path();
+        let extra_data_type =
+            resolved.option_type(quote! { #btree_map<#smolstr_type, #data_type> });
         let struct_def = quote! {
             #doc
-            #lexicon_attr
             #derive_attr
-            #[serde(rename_all = "camelCase")]
-            pub struct #ident<'a> {
+            #[serde(rename_all = "camelCase", bound(
+                serialize = #serde_ser_bound,
+                deserialize = #serde_de_bound
+            ))]
+            pub struct #ident<S: #bos_path<str> + AsRef<str> = #default_str_path> {
                 #fields
+                #[serde(flatten, default, skip_serializing_if = #is_none_path)]
+                pub extra_data: #extra_data_type,
             }
         };
 
-        // Generate custom builder if needed
+        // Generate custom builder if needed.
         let builder = if has_builder {
             let ctx = super::builder_gen::BuilderGenContext::from_object(
-                self, nsid, &type_name, obj, true, // objects always have lifetime
+                self, nsid, &type_name, obj, true, // objects always have type param
                 resolved,
             );
             ctx.generate()
@@ -451,7 +485,6 @@ impl<'c> CodeGenerator<'c> {
 
         let rust_type =
             self.property_to_rust_type(nsid, parent_type_name, field_name, field_type, resolved)?;
-        let needs_lifetime = self.property_needs_lifetime(field_type);
 
         let is_optional = !is_required || is_nullable;
         let rust_type = if !is_optional {
@@ -508,11 +541,6 @@ impl<'c> CodeGenerator<'c> {
 
         if let Some(serde_attr) = serde_default_attr {
             attrs.push(serde_attr);
-        }
-
-        // Add serde(borrow) to all fields with lifetimes.
-        if needs_lifetime {
-            attrs.push(quote! { #[serde(borrow)] });
         }
 
         if matches!(field_type, LexObjectProperty::Bytes(_)) {
@@ -603,15 +631,16 @@ impl<'c> CodeGenerator<'c> {
             LexObjectProperty::String(s) if s.default.is_some() && s.known_values.is_none() => {
                 let v = s.default.as_ref().unwrap().as_ref();
                 let doc = format!(" Defaults to `\"{}\"`.", v);
-                let cowstr_path = resolved.type_path(&super::prettify::CommonType::CowStr);
+                // The default function is generic over S: From<&'static str>.
+                // Type inference picks up S from the field's expected type,
+                // and the serde(bound) on the struct ensures the bound is met.
                 if is_optional {
-                    let opt_cowstr = resolved.option_type(quote! { #cowstr_path<'static> });
                     (
                         Some(doc),
                         Some(serde_attr),
                         Some(quote! {
-                            fn #fn_ident() -> #opt_cowstr {
-                                Some(#cowstr_path::from(#v))
+                            fn #fn_ident<S: From<&'static str>>() -> ::core::option::Option<S> {
+                                Some(S::from(#v))
                             }
                         }),
                     )
@@ -620,8 +649,8 @@ impl<'c> CodeGenerator<'c> {
                         Some(doc),
                         Some(serde_attr),
                         Some(quote! {
-                            fn #fn_ident() -> #cowstr_path<'static> {
-                                #cowstr_path::from(#v)
+                            fn #fn_ident<S: From<&'static str>>() -> S {
+                                S::from(#v)
                             }
                         }),
                     )
@@ -671,8 +700,10 @@ impl<'c> CodeGenerator<'c> {
             })
             .collect();
 
+        // Manual Default impl uses DefaultStr (SmolStr) since string fields
+        // with schema defaults need a concrete string type for construction.
         Some(quote! {
-            impl Default for #ident<'_> {
+            impl Default for #ident {
                 fn default() -> Self {
                     Self {
                         #(#field_defaults,)*
@@ -701,8 +732,8 @@ impl<'c> CodeGenerator<'c> {
             }
             LexObjectProperty::String(s) if s.default.is_some() && s.known_values.is_none() => {
                 let v = s.default.as_ref().unwrap().as_ref();
-                let cowstr_path = resolved.type_path(&super::prettify::CommonType::CowStr);
-                Some(quote! { #cowstr_path::from(#v) })
+                let smolstr_path = resolved.type_path(&super::prettify::CommonType::SmolStr);
+                Some(quote! { #smolstr_path::from(#v) })
             }
             _ => None,
         };
@@ -745,6 +776,21 @@ impl<'c> CodeGenerator<'c> {
         // Only add open_union if not closed.
         let is_open = closed != Some(true);
         let derive_attr = resolved.derive_standard();
+        let bos_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Bos);
+        let default_str_path =
+            resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
+        let bos_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Bos);
+        let ser_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
+        let de_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
+        let serde_ser_bound = format!("S: {} + {}<str> + AsRef<str>", ser_serde, bos_serde);
+        let serde_de_bound = format!("S: {}<'de> + {}<str> + AsRef<str>", de_serde, bos_serde);
+
+        let serde_bound = quote! {
+            #[serde(tag = "$type", bound(
+                serialize = #serde_ser_bound,
+                deserialize = #serde_de_bound
+            ))]
+        };
 
         let enum_def = if is_open {
             let open_union_attr =
@@ -753,8 +799,8 @@ impl<'c> CodeGenerator<'c> {
                 #doc
                 #open_union_attr
                 #derive_attr
-                #[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-                pub enum #enum_ident<'a> {
+                #serde_bound
+                pub enum #enum_ident<S: #bos_path<str> + AsRef<str> = #default_str_path> {
                     #(#variants,)*
                 }
             }
@@ -762,9 +808,8 @@ impl<'c> CodeGenerator<'c> {
             quote! {
                 #doc
                 #derive_attr
-                #[serde(tag = "$type")]
-                #[serde(bound(deserialize = "'de: 'a"))]
-                pub enum #enum_ident<'a> {
+                #serde_bound
+                pub enum #enum_ident<S: #bos_path<str> + AsRef<str> = #default_str_path> {
                     #(#variants,)*
                 }
             }
@@ -833,76 +878,67 @@ impl<'c> CodeGenerator<'c> {
             )))
             .collect();
         let into_static_impl =
-            self.generate_into_static_for_enum(&type_name, &variant_info, true, false);
+            self.generate_into_static_for_enum(&type_name, &variant_info, true, false, resolved);
 
         let cowstr_type = resolved.type_tokens(&super::prettify::CommonType::CowStr);
-        let cowstr_path = resolved.type_path(&super::prettify::CommonType::CowStr);
+        let bos_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Bos);
+        let default_str_path =
+            resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
+        let ser_serde = resolved.external_type_tokens(&super::prettify::ExternalImport::Serialize);
+        let de_serde = resolved.external_type_tokens(&super::prettify::ExternalImport::Deserialize);
         let enum_def = quote! {
             #doc
             #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-            pub enum #ident<'a> {
+            pub enum #ident<S: #bos_path<str> + AsRef<str> = #default_str_path> {
                 #(#variants,)*
                 #catchall_ident(#cowstr_type),
             }
 
-            impl<'a> #ident<'a> {
+            impl<S: #bos_path<str> + AsRef<str>> #ident<S> {
                 pub fn as_str(&self) -> &str {
                     match self {
                         #(#as_str_arms,)*
                         Self::#catchall_ident(s) => s.as_ref(),
                     }
                 }
-            }
 
-            impl<'a> From<&'a str> for #ident<'a> {
-                fn from(s: &'a str) -> Self {
-                    match s {
+                /// Construct from a string-like value, matching known values.
+                pub fn from_value(s: S) -> Self {
+                    match s.as_ref() {
                         #(#from_str_arms,)*
-                        _ => Self::#catchall_ident(#cowstr_path::from(s)),
+                        _ => Self::#catchall_ident(s),
                     }
                 }
             }
 
-            impl<'a> From<String> for #ident<'a> {
-                fn from(s: String) -> Self {
-                    match s.as_str() {
-                        #(#from_str_arms,)*
-                        _ => Self::#catchall_ident(#cowstr_path::from(s)),
-                    }
-                }
-            }
-
-            impl<'a> AsRef<str> for #ident<'a> {
+            impl<S: #bos_path<str> + AsRef<str>> AsRef<str> for #ident<S> {
                 fn as_ref(&self) -> &str {
                     self.as_str()
                 }
             }
 
-            impl<'a> core::fmt::Display for #ident<'a> {
+            impl<S: #bos_path<str> + AsRef<str>> core::fmt::Display for #ident<S> {
                 fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
                     write!(f, "{}", self.as_str())
                 }
             }
 
-            impl<'a> serde::Serialize for #ident<'a> {
-                fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+            impl<S: #bos_path<str> + AsRef<str>> #ser_serde for #ident<S> {
+                fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
                 where
-                    S: serde::Serializer,
+                    Ser: serde::Serializer,
                 {
                     serializer.serialize_str(self.as_str())
                 }
             }
 
-            impl<'de, 'a> serde::Deserialize<'de> for #ident<'a>
-            where
-                'de: 'a,
-            {
+            impl<'de, S: #de_serde<'de> + #bos_path<str> + AsRef<str>> #de_serde<'de> for #ident<S> {
                 fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
                 where
                     D: serde::Deserializer<'de>,
                 {
-                    let s = <&'de str>::deserialize(deserializer)?;
-                    Ok(Self::from(s))
+                    let s = S::deserialize(deserializer)?;
+                    Ok(Self::from_value(s))
                 }
             }
 
@@ -972,80 +1008,71 @@ impl<'c> CodeGenerator<'c> {
             )))
             .collect();
         let into_static_impl =
-            self.generate_into_static_for_enum(type_name, &variant_info, true, false);
+            self.generate_into_static_for_enum(type_name, &variant_info, true, false, resolved);
 
         let cowstr_type = resolved.type_tokens(&super::prettify::CommonType::CowStr);
-        let cowstr_path = resolved.type_path(&super::prettify::CommonType::CowStr);
+        let bos_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Bos);
+        let default_str_path =
+            resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
+        let ser_serde = resolved.external_type_tokens(&super::prettify::ExternalImport::Serialize);
+        let de_serde = resolved.external_type_tokens(&super::prettify::ExternalImport::Deserialize);
         let enum_def = quote! {
             #doc
             #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-            pub enum #ident<'a> {
+            pub enum #ident<S: #bos_path<str> + AsRef<str> = #default_str_path> {
                 #(#variants,)*
                 #catchall_ident(#cowstr_type),
             }
 
-            impl<'a> #ident<'a> {
+            impl<S: #bos_path<str> + AsRef<str>> #ident<S> {
                 pub fn as_str(&self) -> &str {
                     match self {
                         #(#as_str_arms,)*
                         Self::#catchall_ident(s) => s.as_ref(),
                     }
                 }
-            }
 
-            impl<'a> From<&'a str> for #ident<'a> {
-                fn from(s: &'a str) -> Self {
-                    match s {
+                /// Construct from a string-like value, matching known values.
+                pub fn from_value(s: S) -> Self {
+                    match s.as_ref() {
                         #(#from_str_arms,)*
-                        _ => Self::#catchall_ident(#cowstr_path::from(s)),
+                        _ => Self::#catchall_ident(s),
                     }
                 }
             }
 
-            impl<'a> From<String> for #ident<'a> {
-                fn from(s: String) -> Self {
-                    match s.as_str() {
-                        #(#from_str_arms,)*
-                        _ => Self::#catchall_ident(#cowstr_path::from(s)),
-                    }
-                }
-            }
-
-            impl<'a> core::fmt::Display for #ident<'a> {
+            impl<S: #bos_path<str> + AsRef<str>> core::fmt::Display for #ident<S> {
                 fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
                     write!(f, "{}", self.as_str())
                 }
             }
 
-            impl<'a> AsRef<str> for #ident<'a> {
+            impl<S: #bos_path<str> + AsRef<str>> AsRef<str> for #ident<S> {
                 fn as_ref(&self) -> &str {
                     self.as_str()
                 }
             }
 
-            impl<'a> serde::Serialize for #ident<'a> {
-                fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+            impl<S: #bos_path<str> + AsRef<str>> #ser_serde for #ident<S> {
+                fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
                 where
-                    S: serde::Serializer,
+                    Ser: serde::Serializer,
                 {
                     serializer.serialize_str(self.as_str())
                 }
             }
 
-            impl<'de, 'a> serde::Deserialize<'de> for #ident<'a>
-            where
-                'de: 'a,
-            {
+            impl<'de, S: #de_serde<'de> + #bos_path<str> + AsRef<str>> #de_serde<'de> for #ident<S> {
                 fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
                 where
                     D: serde::Deserializer<'de>,
                 {
-                    let s = <&'de str>::deserialize(deserializer)?;
-                    Ok(Self::from(s))
+                    let s = S::deserialize(deserializer)?;
+                    Ok(Self::from_value(s))
                 }
             }
 
-            impl<'a> Default for #ident<'a> {
+            impl<S: #bos_path<str> + AsRef<str> + Default> Default for #ident<S> {
                 fn default() -> Self {
                     Self::#catchall_ident(Default::default())
                 }
@@ -1142,70 +1169,23 @@ impl<'c> CodeGenerator<'c> {
         Ok(GeneratedCode::type_only(enum_def))
     }
 
-    /// Generate IntoStatic impl for a struct
-    #[allow(dead_code)]
-    pub(super) fn generate_into_static_for_struct(
-        &self,
-        type_name: &str,
-        field_names: &[&str],
-        has_lifetime: bool,
-        has_extra_data: bool,
-    ) -> TokenStream {
-        let ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
-
-        let field_idents: Vec<_> = field_names
-            .iter()
-            .map(|name| make_ident(&name.to_snake_case()))
-            .collect();
-
-        if has_lifetime {
-            let field_conversions: Vec<_> = field_idents
-                .iter()
-                .map(|field| quote! { #field: self.#field.into_static() })
-                .collect();
-
-            let extra_data_conversion = if has_extra_data {
-                quote! { extra_data: self.extra_data.into_static(), }
-            } else {
-                quote! {}
-            };
-
-            quote! {
-                impl jacquard_common::IntoStatic for #ident<'_> {
-                    type Output = #ident<'static>;
-
-                    fn into_static(self) -> Self::Output {
-                        #ident {
-                            #(#field_conversions,)*
-                            #extra_data_conversion
-                        }
-                    }
-                }
-            }
-        } else {
-            quote! {
-                impl jacquard_common::IntoStatic for #ident {
-                    type Output = #ident;
-
-                    fn into_static(self) -> Self::Output {
-                        self
-                    }
-                }
-            }
-        }
-    }
-
-    /// Generate IntoStatic impl for an enum
+    /// Generate IntoStatic impl for an enum.
     pub(super) fn generate_into_static_for_enum(
         &self,
         type_name: &str,
         variant_info: &[(String, EnumVariantKind)],
-        has_lifetime: bool,
+        has_type_param: bool,
         is_open: bool,
+        resolved: &super::prettify::ResolvedImports,
     ) -> TokenStream {
         let ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
+        let bos_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Bos);
+        let default_str_path =
+            resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
+        let into_static_path =
+            resolved.external_type_tokens(&super::prettify::ExternalImport::IntoStatic);
 
-        if has_lifetime {
+        if has_type_param {
             let variant_conversions: Vec<_> = variant_info
                 .iter()
                 .map(|(variant_name, kind)| {
@@ -1249,8 +1229,8 @@ impl<'c> CodeGenerator<'c> {
             };
 
             quote! {
-                impl jacquard_common::IntoStatic for #ident<'_> {
-                    type Output = #ident<'static>;
+                impl<S: #bos_path<str> + AsRef<str>> #into_static_path for #ident<S> {
+                    type Output = #ident<#default_str_path>;
 
                     fn into_static(self) -> Self::Output {
                         match self {
@@ -1262,7 +1242,7 @@ impl<'c> CodeGenerator<'c> {
             }
         } else {
             quote! {
-                impl jacquard_common::IntoStatic for #ident {
+                impl #into_static_path for #ident {
                     type Output = #ident;
 
                     fn into_static(self) -> Self::Output {

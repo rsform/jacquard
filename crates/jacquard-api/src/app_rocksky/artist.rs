@@ -16,14 +16,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -35,203 +37,220 @@ use serde::{Serialize, Deserialize};
 use crate::app_rocksky::artist;
 /// A declaration of an artist.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "app.rocksky.artist", tag = "$type")]
-pub struct Artist<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "app.rocksky.artist",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Artist<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The biography of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub bio: Option<CowStr<'a>>,
+    pub bio: Option<S>,
     ///The birth date of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub born: Option<Datetime>,
     ///The birth place of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub born_in: Option<CowStr<'a>>,
+    pub born_in: Option<S>,
     ///The date when the artist was created.
     pub created_at: Datetime,
     ///The death date of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub died: Option<Datetime>,
     ///The name of the artist.
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///The picture of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub picture: Option<BlobRef<'a>>,
+    pub picture: Option<BlobRef<S>>,
     ///The URL of the picture of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub picture_url: Option<UriValue<'a>>,
+    pub picture_url: Option<UriValue<S>>,
     ///The tags of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ArtistGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ArtistGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Artist<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Artist<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ArtistMbid<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ArtistMbid<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The MusicBrainz Identifier (MBID) of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub mbid: Option<CowStr<'a>>,
+    pub mbid: Option<S>,
     ///The name of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ArtistViewBasic<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ArtistViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The unique identifier of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///The name of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///The picture of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub picture: Option<CowStr<'a>>,
+    pub picture: Option<S>,
     ///The number of times the artist has been played.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub play_count: Option<i64>,
     ///The SHA256 hash of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sha256: Option<CowStr<'a>>,
+    pub sha256: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///The number of unique listeners who have played the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub unique_listeners: Option<i64>,
     ///The URI of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ArtistViewDetailed<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ArtistViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The unique identifier of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     ///The name of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub name: Option<CowStr<'a>>,
+    pub name: Option<S>,
     ///The picture of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub picture: Option<CowStr<'a>>,
+    pub picture: Option<S>,
     ///The number of times the artist has been played.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub play_count: Option<i64>,
     ///The SHA256 hash of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub sha256: Option<CowStr<'a>>,
+    pub sha256: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub tags: Option<Vec<CowStr<'a>>>,
+    pub tags: Option<Vec<S>>,
     ///The number of unique listeners who have played the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub unique_listeners: Option<i64>,
     ///The URI of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ListenerViewBasic<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ListenerViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The URL of the listener's avatar image.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub avatar: Option<UriValue<'a>>,
+    pub avatar: Option<UriValue<S>>,
     ///The DID of the listener.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub did: Option<CowStr<'a>>,
+    pub did: Option<S>,
     ///The display name of the listener.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub display_name: Option<CowStr<'a>>,
+    pub display_name: Option<S>,
     ///The handle of the listener.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub handle: Option<CowStr<'a>>,
+    pub handle: Option<S>,
     ///The unique identifier of the actor.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub id: Option<CowStr<'a>>,
+    pub id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub most_listened_song: Option<artist::SongViewBasic<'a>>,
+    pub most_listened_song: Option<artist::SongViewBasic<S>>,
     ///The rank of the listener among all listeners of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rank: Option<i64>,
     ///The total number of plays by the listener.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_plays: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct SongViewBasic<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SongViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The number of times the song has been played.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub play_count: Option<i64>,
     ///The title of the song.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
     ///The URI of the song.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub uri: Option<AtUri<'a>>,
+    pub uri: Option<AtUri<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Artist<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ArtistRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Artist<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ArtistRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -242,18 +261,17 @@ pub struct ArtistRecord;
 impl XrpcResp for ArtistRecord {
     const NSID: &'static str = "app.rocksky.artist";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ArtistGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ArtistGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ArtistGetRecordOutput<'_>> for Artist<'_> {
-    fn from(output: ArtistGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ArtistGetRecordOutput<S>> for Artist<S> {
+    fn from(output: ArtistGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Artist<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Artist<S> {
     const NSID: &'static str = "app.rocksky.artist";
     type Record = ArtistRecord;
 }
@@ -263,7 +281,7 @@ impl Collection for ArtistRecord {
     type Record = ArtistRecord;
 }
 
-impl<'a> LexiconSchema for Artist<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Artist<S> {
     fn nsid() -> &'static str {
         "app.rocksky.artist"
     }
@@ -360,7 +378,7 @@ impl<'a> LexiconSchema for Artist<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ArtistMbid<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ArtistMbid<S> {
     fn nsid() -> &'static str {
         "app.rocksky.artist.defs"
     }
@@ -395,7 +413,7 @@ impl<'a> LexiconSchema for ArtistMbid<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ArtistViewBasic<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ArtistViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.artist.defs"
     }
@@ -428,7 +446,7 @@ impl<'a> LexiconSchema for ArtistViewBasic<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ArtistViewDetailed<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ArtistViewDetailed<S> {
     fn nsid() -> &'static str {
         "app.rocksky.artist.defs"
     }
@@ -461,7 +479,7 @@ impl<'a> LexiconSchema for ArtistViewDetailed<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ListenerViewBasic<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListenerViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.artist.defs"
     }
@@ -494,7 +512,7 @@ impl<'a> LexiconSchema for ListenerViewBasic<'a> {
     }
 }
 
-impl<'a> LexiconSchema for SongViewBasic<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for SongViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.artist.defs"
     }
@@ -566,15 +584,15 @@ pub mod artist_state {
 pub struct ArtistBuilder<'a, S: artist_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
         Option<Datetime>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<UriValue<'a>>,
-        Option<Vec<CowStr<'a>>>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<UriValue<S>>,
+        Option<Vec<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -599,12 +617,12 @@ impl<'a> ArtistBuilder<'a, artist_state::Empty> {
 
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `bio` field (optional)
-    pub fn bio(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn bio(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `bio` field to an Option value (optional)
-    pub fn maybe_bio(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_bio(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -625,12 +643,12 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
 
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `bornIn` field (optional)
-    pub fn born_in(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn born_in(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `bornIn` field to an Option value (optional)
-    pub fn maybe_born_in(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_born_in(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -676,7 +694,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ArtistBuilder<'a, artist_state::SetName<S>> {
         self._fields.5 = Option::Some(value.into());
         ArtistBuilder {
@@ -689,12 +707,12 @@ where
 
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `picture` field (optional)
-    pub fn picture(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn picture(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `picture` field to an Option value (optional)
-    pub fn maybe_picture(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_picture(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -702,12 +720,12 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
 
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `pictureUrl` field (optional)
-    pub fn picture_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
+    pub fn picture_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `pictureUrl` field to an Option value (optional)
-    pub fn maybe_picture_url(mut self, value: Option<UriValue<'a>>) -> Self {
+    pub fn maybe_picture_url(mut self, value: Option<UriValue<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -715,12 +733,12 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
 
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `tags` field (optional)
-    pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
-    pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -748,13 +766,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Artist<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Artist<'a> {
         Artist {
             bio: self._fields.0,
             born: self._fields.1,

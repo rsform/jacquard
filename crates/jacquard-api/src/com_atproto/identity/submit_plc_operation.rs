@@ -10,16 +10,26 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct SubmitPlcOperation<'a> {
-    #[serde(borrow)]
-    pub operation: Data<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct SubmitPlcOperation<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub operation: Data<S>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.atproto.identity.submitPlcOperation
@@ -27,11 +37,12 @@ pub struct SubmitPlcOperationResponse;
 impl jacquard_common::xrpc::XrpcResp for SubmitPlcOperationResponse {
     const NSID: &'static str = "com.atproto.identity.submitPlcOperation";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ();
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for SubmitPlcOperation<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for SubmitPlcOperation<S> {
     const NSID: &'static str = "com.atproto.identity.submitPlcOperation";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -46,7 +57,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SubmitPlcOperationRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<'de> = SubmitPlcOperation<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = SubmitPlcOperation<S>;
     type Response = SubmitPlcOperationResponse;
 }
 
@@ -85,7 +96,7 @@ pub mod submit_plc_operation_state {
 /// Builder for constructing an instance of this type
 pub struct SubmitPlcOperationBuilder<'a, S: submit_plc_operation_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Data<'a>>,),
+    _fields: (Option<Data<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -115,7 +126,7 @@ where
     /// Set the `operation` field (required)
     pub fn operation(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> SubmitPlcOperationBuilder<'a, submit_plc_operation_state::SetOperation<S>> {
         self._fields.0 = Option::Some(value.into());
         SubmitPlcOperationBuilder {
@@ -141,7 +152,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> SubmitPlcOperation<'a> {
         SubmitPlcOperation {
             operation: self._fields.0.unwrap(),

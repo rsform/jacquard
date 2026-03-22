@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,40 +29,45 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// DEPRECATED: Use app.gainforest.dwc.occurrence instead. A declaration of a fauna observation for an organization.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "app.gainforest.organization.observations.fauna",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Fauna<'a> {
+pub struct Fauna<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,
     ///An array of GBIF taxon keys for each fauna observation
-    #[serde(borrow)]
-    pub gbif_taxon_keys: Vec<CowStr<'a>>,
+    pub gbif_taxon_keys: Vec<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct FaunaGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct FaunaGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Fauna<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Fauna<S>,
 }
 
-impl<'a> Fauna<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, FaunaRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Fauna<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, FaunaRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -71,18 +78,17 @@ pub struct FaunaRecord;
 impl XrpcResp for FaunaRecord {
     const NSID: &'static str = "app.gainforest.organization.observations.fauna";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = FaunaGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = FaunaGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<FaunaGetRecordOutput<'_>> for Fauna<'_> {
-    fn from(output: FaunaGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<FaunaGetRecordOutput<S>> for Fauna<S> {
+    fn from(output: FaunaGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Fauna<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Fauna<S> {
     const NSID: &'static str = "app.gainforest.organization.observations.fauna";
     type Record = FaunaRecord;
 }
@@ -92,7 +98,7 @@ impl Collection for FaunaRecord {
     type Record = FaunaRecord;
 }
 
-impl<'a> LexiconSchema for Fauna<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Fauna<S> {
     fn nsid() -> &'static str {
         "app.gainforest.organization.observations.fauna"
     }
@@ -154,7 +160,7 @@ pub mod fauna_state {
 /// Builder for constructing an instance of this type
 pub struct FaunaBuilder<'a, S: fauna_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<Vec<CowStr<'a>>>),
+    _fields: (Option<Datetime>, Option<Vec<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -203,7 +209,7 @@ where
     /// Set the `gbifTaxonKeys` field (required)
     pub fn gbif_taxon_keys(
         mut self,
-        value: impl Into<Vec<CowStr<'a>>>,
+        value: impl Into<Vec<S>>,
     ) -> FaunaBuilder<'a, fauna_state::SetGbifTaxonKeys<S>> {
         self._fields.1 = Option::Some(value.into());
         FaunaBuilder {
@@ -229,13 +235,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Fauna<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Fauna<'a> {
         Fauna {
             created_at: self._fields.0.unwrap(),
             gbif_taxon_keys: self._fields.1.unwrap(),

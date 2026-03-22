@@ -10,29 +10,46 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::actor::ProfileViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetContributors<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetContributors<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// Defaults to `true`.
     #[serde(default = "_default_include_cascaded")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_cascaded: Option<bool>,
     #[serde(borrow)]
-    pub resource: AtUri<'a>,
+    pub resource: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetContributorsOutput<'a> {
-    #[serde(borrow)]
-    pub contributors: Vec<ProfileViewBasic<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetContributorsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub contributors: Vec<ProfileViewBasic<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for sh.weaver.edit.getContributors
@@ -40,11 +57,12 @@ pub struct GetContributorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetContributorsResponse {
     const NSID: &'static str = "sh.weaver.edit.getContributors";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetContributorsOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetContributorsOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetContributors<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetContributors<S> {
     const NSID: &'static str = "sh.weaver.edit.getContributors";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetContributorsResponse;
@@ -55,7 +73,7 @@ pub struct GetContributorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetContributorsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.edit.getContributors";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetContributors<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetContributors<S>;
     type Response = GetContributorsResponse;
 }
 
@@ -98,7 +116,7 @@ pub mod get_contributors_state {
 /// Builder for constructing an instance of this type
 pub struct GetContributorsBuilder<'a, S: get_contributors_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<bool>, Option<AtUri<'a>>),
+    _fields: (Option<bool>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -141,7 +159,7 @@ where
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetContributorsBuilder<'a, get_contributors_state::SetResource<S>> {
         self._fields.1 = Option::Some(value.into());
         GetContributorsBuilder {

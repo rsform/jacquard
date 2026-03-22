@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -26,38 +28,45 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "sh.tangled.string", tag = "$type")]
-pub struct TangledString<'a> {
-    #[serde(borrow)]
-    pub contents: CowStr<'a>,
+#[serde(
+    rename_all = "camelCase",
+    rename = "sh.tangled.string",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TangledString<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub contents: S,
     pub created_at: Datetime,
-    #[serde(borrow)]
-    pub description: CowStr<'a>,
-    #[serde(borrow)]
-    pub filename: CowStr<'a>,
+    pub description: S,
+    pub filename: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TangledStringGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TangledStringGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: TangledString<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: TangledString<S>,
 }
 
-impl<'a> TangledString<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TangledStringRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> TangledString<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TangledStringRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -68,18 +77,18 @@ pub struct TangledStringRecord;
 impl XrpcResp for TangledStringRecord {
     const NSID: &'static str = "sh.tangled.string";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TangledStringGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TangledStringGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TangledStringGetRecordOutput<'_>> for TangledString<'_> {
-    fn from(output: TangledStringGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TangledStringGetRecordOutput<S>>
+for TangledString<S> {
+    fn from(output: TangledStringGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for TangledString<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for TangledString<S> {
     const NSID: &'static str = "sh.tangled.string";
     type Record = TangledStringRecord;
 }
@@ -89,7 +98,7 @@ impl Collection for TangledStringRecord {
     type Record = TangledStringRecord;
 }
 
-impl<'a> LexiconSchema for TangledString<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TangledString<S> {
     fn nsid() -> &'static str {
         "sh.tangled.string"
     }
@@ -166,79 +175,74 @@ pub mod tangled_string_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Description;
         type Filename;
-        type CreatedAt;
         type Contents;
+        type CreatedAt;
+        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Description = Unset;
         type Filename = Unset;
-        type CreatedAt = Unset;
         type Contents = Unset;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Description = Set<members::description>;
-        type Filename = S::Filename;
-        type CreatedAt = S::CreatedAt;
-        type Contents = S::Contents;
+        type CreatedAt = Unset;
+        type Description = Unset;
     }
     ///State transition - sets the `filename` field to Set
     pub struct SetFilename<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFilename<S> {}
     impl<S: State> State for SetFilename<S> {
-        type Description = S::Description;
         type Filename = Set<members::filename>;
+        type Contents = S::Contents;
         type CreatedAt = S::CreatedAt;
-        type Contents = S::Contents;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Description = S::Description;
-        type Filename = S::Filename;
-        type CreatedAt = Set<members::created_at>;
-        type Contents = S::Contents;
     }
     ///State transition - sets the `contents` field to Set
     pub struct SetContents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContents<S> {}
     impl<S: State> State for SetContents<S> {
-        type Description = S::Description;
         type Filename = S::Filename;
-        type CreatedAt = S::CreatedAt;
         type Contents = Set<members::contents>;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Filename = S::Filename;
+        type Contents = S::Contents;
+        type CreatedAt = Set<members::created_at>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Filename = S::Filename;
+        type Contents = S::Contents;
+        type CreatedAt = S::CreatedAt;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `filename` field
         pub struct filename(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `contents` field
         pub struct contents(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `description` field
+        pub struct description(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TangledStringBuilder<'a, S: tangled_string_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<Datetime>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -268,7 +272,7 @@ where
     /// Set the `contents` field (required)
     pub fn contents(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TangledStringBuilder<'a, tangled_string_state::SetContents<S>> {
         self._fields.0 = Option::Some(value.into());
         TangledStringBuilder {
@@ -306,7 +310,7 @@ where
     /// Set the `description` field (required)
     pub fn description(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TangledStringBuilder<'a, tangled_string_state::SetDescription<S>> {
         self._fields.2 = Option::Some(value.into());
         TangledStringBuilder {
@@ -325,7 +329,7 @@ where
     /// Set the `filename` field (required)
     pub fn filename(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TangledStringBuilder<'a, tangled_string_state::SetFilename<S>> {
         self._fields.3 = Option::Some(value.into());
         TangledStringBuilder {
@@ -339,10 +343,10 @@ where
 impl<'a, S> TangledStringBuilder<'a, S>
 where
     S: tangled_string_state::State,
-    S::Description: tangled_string_state::IsSet,
     S::Filename: tangled_string_state::IsSet,
-    S::CreatedAt: tangled_string_state::IsSet,
     S::Contents: tangled_string_state::IsSet,
+    S::CreatedAt: tangled_string_state::IsSet,
+    S::Description: tangled_string_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TangledString<'a> {
@@ -357,10 +361,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TangledString<'a> {
         TangledString {
             contents: self._fields.0.unwrap(),

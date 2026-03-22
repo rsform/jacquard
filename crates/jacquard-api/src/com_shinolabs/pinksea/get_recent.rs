@@ -10,8 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
 
@@ -27,12 +30,20 @@ pub struct GetRecent {
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetRecentOutput<'a> {
-    #[serde(borrow)]
-    pub oekaki: Vec<HydratedOekaki<'a>>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetRecentOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub oekaki: Vec<HydratedOekaki<S>>,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for com.shinolabs.pinksea.getRecent
@@ -40,8 +51,8 @@ pub struct GetRecentResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecentResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getRecent";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetRecentOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetRecentOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
 impl jacquard_common::xrpc::XrpcRequest for GetRecent {
@@ -55,7 +66,7 @@ pub struct GetRecentRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecentRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getRecent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetRecent;
+    type Request<S: Bos<str> + AsRef<str>> = GetRecent;
     type Response = GetRecentResponse;
 }
 

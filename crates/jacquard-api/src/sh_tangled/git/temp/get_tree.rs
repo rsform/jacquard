@@ -10,12 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Datetime};
-use jacquard_derive::{IntoStatic, lexicon, open_union};
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
@@ -24,67 +26,79 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::sh_tangled::git::temp::get_tree;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct LastCommit<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct LastCommit<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub author: Option<get_tree::Signature<'a>>,
+    pub author: Option<get_tree::Signature<S>>,
     ///Commit hash
-    #[serde(borrow)]
-    pub hash: CowStr<'a>,
+    pub hash: S,
     ///Commit message
-    #[serde(borrow)]
-    pub message: CowStr<'a>,
+    pub message: S,
     ///Commit timestamp
     pub when: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTree<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTree<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `""`.
     #[serde(default = "_default_path")]
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub path: Option<CowStr<'a>>,
+    pub path: Option<S>,
     #[serde(borrow)]
-    pub r#ref: CowStr<'a>,
+    pub r#ref: S,
     #[serde(borrow)]
-    pub repo: AtUri<'a>,
+    pub repo: AtUri<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetTreeOutput<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetTreeOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Parent directory path
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub dotdot: Option<CowStr<'a>>,
-    #[serde(borrow)]
-    pub files: Vec<get_tree::TreeEntry<'a>>,
+    pub dotdot: Option<S>,
+    pub files: Vec<get_tree::TreeEntry<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub last_commit: Option<get_tree::LastCommit<'a>>,
+    pub last_commit: Option<get_tree::LastCommit<S>>,
     ///The parent path in the tree
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub parent: Option<CowStr<'a>>,
+    pub parent: Option<S>,
     ///Readme for this file tree
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub readme: Option<get_tree::Readme<'a>>,
+    pub readme: Option<get_tree::Readme<S>>,
     ///The git reference used
-    #[serde(borrow)]
-    pub r#ref: CowStr<'a>,
+    pub r#ref: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[open_union]
 #[derive(
     Serialize,
     Deserialize,
@@ -93,28 +107,29 @@ pub struct GetTreeOutput<'a> {
     PartialEq,
     Eq,
     thiserror::Error,
-    miette::Diagnostic,
-    IntoStatic
+    miette::Diagnostic
 )]
 
 #[serde(tag = "error", content = "message")]
-#[serde(bound(deserialize = "'de: 'a"))]
-pub enum GetTreeError<'a> {
+pub enum GetTreeError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<CowStr<'a>>),
+    RepoNotFound(Option<SmolStr>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(Option<CowStr<'a>>),
+    RefNotFound(Option<SmolStr>),
     /// Path not found in repository tree
     #[serde(rename = "PathNotFound")]
-    PathNotFound(Option<CowStr<'a>>),
+    PathNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<CowStr<'a>>),
+    InvalidRequest(Option<SmolStr>),
+    /// Catch-all for unknown error codes.
+    #[serde(untagged)]
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
-impl core::fmt::Display for GetTreeError<'_> {
+impl core::fmt::Display for GetTreeError {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::RepoNotFound(msg) => {
@@ -145,58 +160,78 @@ impl core::fmt::Display for GetTreeError<'_> {
                 }
                 Ok(())
             }
-            Self::Unknown(err) => write!(f, "Unknown error: {:?}", err),
+            Self::Other { error, message } => {
+                write!(f, "{}", error)?;
+                if let Some(msg) = message {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
         }
     }
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct Readme<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Readme<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Contents of the readme file
-    #[serde(borrow)]
-    pub contents: CowStr<'a>,
+    pub contents: S,
     ///Name of the readme file
-    #[serde(borrow)]
-    pub filename: CowStr<'a>,
+    pub filename: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Signature<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Signature<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Author email
-    #[serde(borrow)]
-    pub email: CowStr<'a>,
+    pub email: S,
     ///Author name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Author timestamp
     pub when: Datetime,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TreeEntry<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TreeEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub last_commit: Option<get_tree::LastCommit<'a>>,
+    pub last_commit: Option<get_tree::LastCommit<S>>,
     ///File mode
-    #[serde(borrow)]
-    pub mode: CowStr<'a>,
+    pub mode: S,
     ///Relative file or directory name
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///File size in bytes
     pub size: i64,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> LexiconSchema for LastCommit<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for LastCommit<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.getTree"
     }
@@ -216,11 +251,12 @@ pub struct GetTreeResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTreeResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getTree";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetTreeOutput<'de>;
-    type Err<'de> = GetTreeError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetTreeOutput<S>;
+    type Err = GetTreeError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetTree<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetTree<S> {
     const NSID: &'static str = "sh.tangled.git.temp.getTree";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTreeResponse;
@@ -231,11 +267,11 @@ pub struct GetTreeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTreeRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getTree";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetTree<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetTree<S>;
     type Response = GetTreeResponse;
 }
 
-impl<'a> LexiconSchema for Readme<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Readme<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.getTree"
     }
@@ -250,7 +286,7 @@ impl<'a> LexiconSchema for Readme<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Signature<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Signature<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.getTree"
     }
@@ -265,7 +301,7 @@ impl<'a> LexiconSchema for Signature<'a> {
     }
 }
 
-impl<'a> LexiconSchema for TreeEntry<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for TreeEntry<S> {
     fn nsid() -> &'static str {
         "sh.tangled.git.temp.getTree"
     }
@@ -290,49 +326,49 @@ pub mod last_commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type When;
         type Hash;
+        type When;
         type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type When = Unset;
         type Hash = Unset;
+        type When = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type When = Set<members::when>;
-        type Hash = S::Hash;
-        type Message = S::Message;
     }
     ///State transition - sets the `hash` field to Set
     pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHash<S> {}
     impl<S: State> State for SetHash<S> {
-        type When = S::When;
         type Hash = Set<members::hash>;
+        type When = S::When;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Hash = S::Hash;
+        type When = Set<members::when>;
         type Message = S::Message;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
-        type When = S::When;
         type Hash = S::Hash;
+        type When = S::When;
         type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `when` field
-        pub struct when(());
         ///Marker type for the `hash` field
         pub struct hash(());
+        ///Marker type for the `when` field
+        pub struct when(());
         ///Marker type for the `message` field
         pub struct message(());
     }
@@ -341,12 +377,7 @@ pub mod last_commit_state {
 /// Builder for constructing an instance of this type
 pub struct LastCommitBuilder<'a, S: last_commit_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<get_tree::Signature<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<get_tree::Signature<S>>, Option<S>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -370,12 +401,12 @@ impl<'a> LastCommitBuilder<'a, last_commit_state::Empty> {
 
 impl<'a, S: last_commit_state::State> LastCommitBuilder<'a, S> {
     /// Set the `author` field (optional)
-    pub fn author(mut self, value: impl Into<Option<get_tree::Signature<'a>>>) -> Self {
+    pub fn author(mut self, value: impl Into<Option<get_tree::Signature<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
-    pub fn maybe_author(mut self, value: Option<get_tree::Signature<'a>>) -> Self {
+    pub fn maybe_author(mut self, value: Option<get_tree::Signature<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -389,7 +420,7 @@ where
     /// Set the `hash` field (required)
     pub fn hash(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LastCommitBuilder<'a, last_commit_state::SetHash<S>> {
         self._fields.1 = Option::Some(value.into());
         LastCommitBuilder {
@@ -408,7 +439,7 @@ where
     /// Set the `message` field (required)
     pub fn message(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> LastCommitBuilder<'a, last_commit_state::SetMessage<S>> {
         self._fields.2 = Option::Some(value.into());
         LastCommitBuilder {
@@ -441,8 +472,8 @@ where
 impl<'a, S> LastCommitBuilder<'a, S>
 where
     S: last_commit_state::State,
-    S::When: last_commit_state::IsSet,
     S::Hash: last_commit_state::IsSet,
+    S::When: last_commit_state::IsSet,
     S::Message: last_commit_state::IsSet,
 {
     /// Build the final struct
@@ -458,10 +489,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> LastCommit<'a> {
         LastCommit {
             author: self._fields.0,
@@ -720,44 +748,44 @@ pub mod get_tree_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Ref;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Ref = S::Ref;
+        type Repo = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Repo = S::Repo;
         type Ref = Set<members::r#ref>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Ref = S::Ref;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetTreeBuilder<'a, S: get_tree_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _fields: (Option<S>, Option<S>, Option<AtUri<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -781,12 +809,12 @@ impl<'a> GetTreeBuilder<'a, get_tree_state::Empty> {
 
 impl<'a, S: get_tree_state::State> GetTreeBuilder<'a, S> {
     /// Set the `path` field (optional)
-    pub fn path(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn path(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `path` field to an Option value (optional)
-    pub fn maybe_path(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_path(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -800,7 +828,7 @@ where
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> GetTreeBuilder<'a, get_tree_state::SetRef<S>> {
         self._fields.1 = Option::Some(value.into());
         GetTreeBuilder {
@@ -819,7 +847,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> GetTreeBuilder<'a, get_tree_state::SetRepo<S>> {
         self._fields.2 = Option::Some(value.into());
         GetTreeBuilder {
@@ -833,8 +861,8 @@ where
 impl<'a, S> GetTreeBuilder<'a, S>
 where
     S: get_tree_state::State,
-    S::Repo: get_tree_state::IsSet,
     S::Ref: get_tree_state::IsSet,
+    S::Repo: get_tree_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetTree<'a> {
@@ -857,57 +885,57 @@ pub mod signature_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Email;
-        type When;
         type Name;
+        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Email = Unset;
-        type When = Unset;
         type Name = Unset;
+        type When = Unset;
     }
     ///State transition - sets the `email` field to Set
     pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEmail<S> {}
     impl<S: State> State for SetEmail<S> {
         type Email = Set<members::email>;
+        type Name = S::Name;
         type When = S::When;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type Email = S::Email;
-        type When = Set<members::when>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Email = S::Email;
-        type When = S::When;
         type Name = Set<members::name>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Email = S::Email;
+        type Name = S::Name;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `email` field
         pub struct email(());
-        ///Marker type for the `when` field
-        pub struct when(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `when` field
+        pub struct when(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SignatureBuilder<'a, S: signature_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _fields: (Option<S>, Option<S>, Option<Datetime>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -937,7 +965,7 @@ where
     /// Set the `email` field (required)
     pub fn email(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SignatureBuilder<'a, signature_state::SetEmail<S>> {
         self._fields.0 = Option::Some(value.into());
         SignatureBuilder {
@@ -956,7 +984,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> SignatureBuilder<'a, signature_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         SignatureBuilder {
@@ -990,8 +1018,8 @@ impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
     S::Email: signature_state::IsSet,
-    S::When: signature_state::IsSet,
     S::Name: signature_state::IsSet,
+    S::When: signature_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Signature<'a> {
@@ -1005,10 +1033,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Signature<'a> {
         Signature {
             email: self._fields.0.unwrap(),
@@ -1080,12 +1105,7 @@ pub mod tree_entry_state {
 /// Builder for constructing an instance of this type
 pub struct TreeEntryBuilder<'a, S: tree_entry_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<get_tree::LastCommit<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-    ),
+    _fields: (Option<get_tree::LastCommit<S>>, Option<S>, Option<S>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1111,13 +1131,13 @@ impl<'a, S: tree_entry_state::State> TreeEntryBuilder<'a, S> {
     /// Set the `last_commit` field (optional)
     pub fn last_commit(
         mut self,
-        value: impl Into<Option<get_tree::LastCommit<'a>>>,
+        value: impl Into<Option<get_tree::LastCommit<S>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `last_commit` field to an Option value (optional)
-    pub fn maybe_last_commit(mut self, value: Option<get_tree::LastCommit<'a>>) -> Self {
+    pub fn maybe_last_commit(mut self, value: Option<get_tree::LastCommit<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1131,7 +1151,7 @@ where
     /// Set the `mode` field (required)
     pub fn mode(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TreeEntryBuilder<'a, tree_entry_state::SetMode<S>> {
         self._fields.1 = Option::Some(value.into());
         TreeEntryBuilder {
@@ -1150,7 +1170,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TreeEntryBuilder<'a, tree_entry_state::SetName<S>> {
         self._fields.2 = Option::Some(value.into());
         TreeEntryBuilder {
@@ -1200,10 +1220,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> TreeEntry<'a> {
         TreeEntry {
             last_commit: self._fields.0,

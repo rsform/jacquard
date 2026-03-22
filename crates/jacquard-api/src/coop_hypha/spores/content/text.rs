@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,40 +29,42 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Custom content block for spores.garden sites
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "coop.hypha.spores.content.text",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct Text<'a> {
+pub struct Text<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Block content
-    #[serde(borrow)]
-    pub content: CowStr<'a>,
+    pub content: S,
     ///Creation timestamp
     pub created_at: Datetime,
     ///Content format
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub format: Option<TextFormat<'a>>,
+    pub format: Option<TextFormat<S>>,
     ///Block title
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub title: Option<CowStr<'a>>,
+    pub title: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Content format
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TextFormat<'a> {
+pub enum TextFormat<S: Bos<str> + AsRef<str> = DefaultStr> {
     Markdown,
     Html,
     Text,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> TextFormat<'a> {
+impl<S: Bos<str> + AsRef<str>> TextFormat<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Markdown => "markdown",
@@ -69,72 +73,57 @@ impl<'a> TextFormat<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for TextFormat<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "markdown" => Self::Markdown,
             "html" => Self::Html,
             "text" => Self::Text,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for TextFormat<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "markdown" => Self::Markdown,
-            "html" => Self::Html,
-            "text" => Self::Text,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for TextFormat<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for TextFormat<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for TextFormat<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for TextFormat<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for TextFormat<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for TextFormat<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for TextFormat<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for TextFormat<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for TextFormat<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for TextFormat<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for TextFormat<'_> {
-    type Output = TextFormat<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for TextFormat<S> {
+    type Output = TextFormat<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             TextFormat::Markdown => TextFormat::Markdown,
@@ -148,22 +137,23 @@ impl jacquard_common::IntoStatic for TextFormat<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TextGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TextGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Text<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Text<S>,
 }
 
-impl<'a> Text<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TextRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Text<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TextRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -174,18 +164,17 @@ pub struct TextRecord;
 impl XrpcResp for TextRecord {
     const NSID: &'static str = "coop.hypha.spores.content.text";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TextGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TextGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TextGetRecordOutput<'_>> for Text<'_> {
-    fn from(output: TextGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TextGetRecordOutput<S>> for Text<S> {
+    fn from(output: TextGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Text<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Text<S> {
     const NSID: &'static str = "coop.hypha.spores.content.text";
     type Record = TextRecord;
 }
@@ -195,7 +184,7 @@ impl Collection for TextRecord {
     type Record = TextRecord;
 }
 
-impl<'a> LexiconSchema for Text<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Text<S> {
     fn nsid() -> &'static str {
         "coop.hypha.spores.content.text"
     }
@@ -266,49 +255,44 @@ pub mod text_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Content;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
         type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TextBuilder<'a, S: text_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-        Option<TextFormat<'a>>,
-        Option<CowStr<'a>>,
-    ),
+    _fields: (Option<S>, Option<Datetime>, Option<TextFormat<S>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -338,7 +322,7 @@ where
     /// Set the `content` field (required)
     pub fn content(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TextBuilder<'a, text_state::SetContent<S>> {
         self._fields.0 = Option::Some(value.into());
         TextBuilder {
@@ -370,12 +354,12 @@ where
 
 impl<'a, S: text_state::State> TextBuilder<'a, S> {
     /// Set the `format` field (optional)
-    pub fn format(mut self, value: impl Into<Option<TextFormat<'a>>>) -> Self {
+    pub fn format(mut self, value: impl Into<Option<TextFormat<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `format` field to an Option value (optional)
-    pub fn maybe_format(mut self, value: Option<TextFormat<'a>>) -> Self {
+    pub fn maybe_format(mut self, value: Option<TextFormat<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -383,12 +367,12 @@ impl<'a, S: text_state::State> TextBuilder<'a, S> {
 
 impl<'a, S: text_state::State> TextBuilder<'a, S> {
     /// Set the `title` field (optional)
-    pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
-    pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_title(mut self, value: Option<S>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -397,8 +381,8 @@ impl<'a, S: text_state::State> TextBuilder<'a, S> {
 impl<'a, S> TextBuilder<'a, S>
 where
     S: text_state::State,
-    S::CreatedAt: text_state::IsSet,
     S::Content: text_state::IsSet,
+    S::CreatedAt: text_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Text<'a> {
@@ -411,13 +395,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Text<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Text<'a> {
         Text {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

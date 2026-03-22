@@ -10,25 +10,41 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
-use jacquard_derive::{IntoStatic, lexicon};
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
-pub struct GetLaunchToken<'a> {
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetLaunchToken<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(borrow)]
-    pub aud: Did<'a>,
+    pub aud: Did<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
-pub struct GetLaunchTokenOutput<'a> {
-    #[serde(borrow)]
-    pub token: CowStr<'a>,
+#[serde(
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct GetLaunchTokenOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub token: S,
+    #[serde(flatten)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.ocho.server.getLaunchToken
@@ -36,11 +52,12 @@ pub struct GetLaunchTokenResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLaunchTokenResponse {
     const NSID: &'static str = "app.ocho.server.getLaunchToken";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = GetLaunchTokenOutput<'de>;
-    type Err<'de> = jacquard_common::xrpc::GenericError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = GetLaunchTokenOutput<S>;
+    type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<'a> jacquard_common::xrpc::XrpcRequest for GetLaunchToken<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+for GetLaunchToken<S> {
     const NSID: &'static str = "app.ocho.server.getLaunchToken";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLaunchTokenResponse;
@@ -51,7 +68,7 @@ pub struct GetLaunchTokenRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLaunchTokenRequest {
     const PATH: &'static str = "/xrpc/app.ocho.server.getLaunchToken";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<'de> = GetLaunchToken<'de>;
+    type Request<S: Bos<str> + AsRef<str>> = GetLaunchToken<S>;
     type Response = GetLaunchTokenResponse;
 }
 
@@ -90,7 +107,7 @@ pub mod get_launch_token_state {
 /// Builder for constructing an instance of this type
 pub struct GetLaunchTokenBuilder<'a, S: get_launch_token_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -120,7 +137,7 @@ where
     /// Set the `aud` field (required)
     pub fn aud(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> GetLaunchTokenBuilder<'a, get_launch_token_state::SetAud<S>> {
         self._fields.0 = Option::Some(value.into());
         GetLaunchTokenBuilder {

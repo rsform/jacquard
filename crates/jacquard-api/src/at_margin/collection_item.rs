@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,41 +29,49 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// Associates an annotation with a collection
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "at.margin.collectionItem", tag = "$type")]
-pub struct CollectionItem<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "at.margin.collectionItem",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollectionItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///AT URI of the annotation, highlight, or bookmark
-    #[serde(borrow)]
-    pub annotation: AtUri<'a>,
+    pub annotation: AtUri<S>,
     ///AT URI of the collection
-    #[serde(borrow)]
-    pub collection: AtUri<'a>,
+    pub collection: AtUri<S>,
     pub created_at: Datetime,
     ///Sort order within the collection
     #[serde(skip_serializing_if = "Option::is_none")]
     pub position: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct CollectionItemGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct CollectionItemGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: CollectionItem<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: CollectionItem<S>,
 }
 
-impl<'a> CollectionItem<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, CollectionItemRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> CollectionItem<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, CollectionItemRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -72,18 +82,18 @@ pub struct CollectionItemRecord;
 impl XrpcResp for CollectionItemRecord {
     const NSID: &'static str = "at.margin.collectionItem";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = CollectionItemGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = CollectionItemGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<CollectionItemGetRecordOutput<'_>> for CollectionItem<'_> {
-    fn from(output: CollectionItemGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<CollectionItemGetRecordOutput<S>>
+for CollectionItem<S> {
+    fn from(output: CollectionItemGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for CollectionItem<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for CollectionItem<S> {
     const NSID: &'static str = "at.margin.collectionItem";
     type Record = CollectionItemRecord;
 }
@@ -93,7 +103,7 @@ impl Collection for CollectionItemRecord {
     type Record = CollectionItemRecord;
 }
 
-impl<'a> LexiconSchema for CollectionItem<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionItem<S> {
     fn nsid() -> &'static str {
         "at.margin.collectionItem"
     }
@@ -127,58 +137,58 @@ pub mod collection_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Collection;
         type Annotation;
+        type Collection;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Collection = Unset;
         type Annotation = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Collection = S::Collection;
-        type Annotation = S::Annotation;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type CreatedAt = S::CreatedAt;
-        type Collection = Set<members::collection>;
-        type Annotation = S::Annotation;
+        type Collection = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `annotation` field to Set
     pub struct SetAnnotation<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnnotation<S> {}
     impl<S: State> State for SetAnnotation<S> {
-        type CreatedAt = S::CreatedAt;
-        type Collection = S::Collection;
         type Annotation = Set<members::annotation>;
+        type Collection = S::Collection;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Annotation = S::Annotation;
+        type Collection = Set<members::collection>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Annotation = S::Annotation;
+        type Collection = S::Collection;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `annotation` field
         pub struct annotation(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CollectionItemBuilder<'a, S: collection_item_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<AtUri<'a>>, Option<AtUri<'a>>, Option<Datetime>, Option<i64>),
+    _fields: (Option<AtUri<S>>, Option<AtUri<S>>, Option<Datetime>, Option<i64>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -208,7 +218,7 @@ where
     /// Set the `annotation` field (required)
     pub fn annotation(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> CollectionItemBuilder<'a, collection_item_state::SetAnnotation<S>> {
         self._fields.0 = Option::Some(value.into());
         CollectionItemBuilder {
@@ -227,7 +237,7 @@ where
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
-        value: impl Into<AtUri<'a>>,
+        value: impl Into<AtUri<S>>,
     ) -> CollectionItemBuilder<'a, collection_item_state::SetCollection<S>> {
         self._fields.1 = Option::Some(value.into());
         CollectionItemBuilder {
@@ -273,9 +283,9 @@ impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
 impl<'a, S> CollectionItemBuilder<'a, S>
 where
     S: collection_item_state::State,
-    S::CreatedAt: collection_item_state::IsSet,
-    S::Collection: collection_item_state::IsSet,
     S::Annotation: collection_item_state::IsSet,
+    S::Collection: collection_item_state::IsSet,
+    S::CreatedAt: collection_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionItem<'a> {
@@ -290,10 +300,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> CollectionItem<'a> {
         CollectionItem {
             annotation: self._fields.0.unwrap(),

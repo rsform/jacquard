@@ -10,10 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{Did, AtUri, Nsid, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -30,130 +31,170 @@ use crate::at_inlay::ViaValtown;
 use crate::at_inlay::component;
 /// Component rendered by calling a remote XRPC endpoint
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BodyExternal<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BodyExternal<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///DID of the service hosting this component
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Component rendered by the host from a serialized element tree
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct BodyTemplate<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct BodyTemplate<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Serialized element tree with bindings
-    #[serde(borrow)]
-    pub node: Data<'a>,
+    pub node: Data<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Component record - declares an implementation of a type
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "at.inlay.component", tag = "$type")]
-pub struct Component<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "at.inlay.component",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Component<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///How this component is rendered. Omit for primitives rendered by the host.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub body: Option<ComponentBody<'a>>,
+    pub body: Option<ComponentBody<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     ///Ordered list of pack URIs (import stack). First pack that exports an NSID wins.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub imports: Option<Vec<AtUri<'a>>>,
+    pub imports: Option<Vec<AtUri<S>>>,
     ///NSID this component implements (also the XRPC procedure)
-    #[serde(borrow)]
-    pub r#type: Nsid<'a>,
+    pub r#type: Nsid<S>,
     ///Last update timestamp. Set by the publish flow to bust cached responses.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     ///Platform-managed deployment metadata
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub via: Option<ViaValtown<'a>>,
+    pub via: Option<ViaValtown<S>>,
     ///What data this component views and which prop receives it
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub view: Option<component::View<'a>>,
+    pub view: Option<component::View<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ComponentBody<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ComponentBody<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "at.inlay.component#bodyExternal")]
-    BodyExternal(Box<component::BodyExternal<'a>>),
+    BodyExternal(Box<component::BodyExternal<S>>),
     #[serde(rename = "at.inlay.component#bodyTemplate")]
-    BodyTemplate(Box<component::BodyTemplate<'a>>),
+    BodyTemplate(Box<component::BodyTemplate<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ComponentGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ComponentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Component<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Component<S>,
 }
 
 /// Declares what data this component views and which prop receives it.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct View<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct View<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Data types this view accepts.
-    #[serde(borrow)]
-    pub accepts: Vec<ViewAcceptsItem<'a>>,
+    pub accepts: Vec<ViewAcceptsItem<S>>,
     ///Which component prop receives the view data.
-    #[serde(borrow)]
-    pub prop: CowStr<'a>,
+    pub prop: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(tag = "$type", bound(deserialize = "'de: 'a"))]
-pub enum ViewAcceptsItem<'a> {
+#[serde(
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub enum ViewAcceptsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(rename = "at.inlay.component#viewRecord")]
-    ViewRecord(Box<component::ViewRecord<'a>>),
+    ViewRecord(Box<component::ViewRecord<S>>),
     #[serde(rename = "at.inlay.component#viewPrimitive")]
-    ViewPrimitive(Box<component::ViewPrimitive<'a>>),
+    ViewPrimitive(Box<component::ViewPrimitive<S>>),
 }
 
 /// View accepts a primitive value type.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewPrimitive<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ViewPrimitive<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///String format constraint. Only applies when type is 'string'.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub format: Option<ViewPrimitiveFormat<'a>>,
+    pub format: Option<ViewPrimitiveFormat<S>>,
     ///Lexicon primitive type.
-    #[serde(borrow)]
-    pub r#type: ViewPrimitiveType<'a>,
+    pub r#type: ViewPrimitiveType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// String format constraint. Only applies when type is 'string'.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ViewPrimitiveFormat<'a> {
+pub enum ViewPrimitiveFormat<S: Bos<str> + AsRef<str> = DefaultStr> {
     AtUri,
     Did,
     Datetime,
@@ -165,10 +206,10 @@ pub enum ViewPrimitiveFormat<'a> {
     Language,
     RecordKey,
     Tid,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ViewPrimitiveFormat<'a> {
+impl<S: Bos<str> + AsRef<str>> ViewPrimitiveFormat<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::AtUri => "at-uri",
@@ -185,11 +226,9 @@ impl<'a> ViewPrimitiveFormat<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ViewPrimitiveFormat<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "at-uri" => Self::AtUri,
             "did" => Self::Did,
             "datetime" => Self::Datetime,
@@ -201,72 +240,51 @@ impl<'a> From<&'a str> for ViewPrimitiveFormat<'a> {
             "language" => Self::Language,
             "record-key" => Self::RecordKey,
             "tid" => Self::Tid,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ViewPrimitiveFormat<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "at-uri" => Self::AtUri,
-            "did" => Self::Did,
-            "datetime" => Self::Datetime,
-            "uri" => Self::Uri,
-            "handle" => Self::Handle,
-            "at-identifier" => Self::AtIdentifier,
-            "nsid" => Self::Nsid,
-            "cid" => Self::Cid,
-            "language" => Self::Language,
-            "record-key" => Self::RecordKey,
-            "tid" => Self::Tid,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ViewPrimitiveFormat<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ViewPrimitiveFormat<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ViewPrimitiveFormat<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ViewPrimitiveFormat<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ViewPrimitiveFormat<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ViewPrimitiveFormat<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ViewPrimitiveFormat<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ViewPrimitiveFormat<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ViewPrimitiveFormat<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ViewPrimitiveFormat<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ViewPrimitiveFormat<'_> {
-    type Output = ViewPrimitiveFormat<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ViewPrimitiveFormat<S> {
+    type Output = ViewPrimitiveFormat<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ViewPrimitiveFormat::AtUri => ViewPrimitiveFormat::AtUri,
@@ -288,17 +306,17 @@ impl jacquard_common::IntoStatic for ViewPrimitiveFormat<'_> {
 /// Lexicon primitive type.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ViewPrimitiveType<'a> {
+pub enum ViewPrimitiveType<S: Bos<str> + AsRef<str> = DefaultStr> {
     String,
     Integer,
     Boolean,
     Blob,
     CidLink,
     Bytes,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> ViewPrimitiveType<'a> {
+impl<S: Bos<str> + AsRef<str>> ViewPrimitiveType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::String => "string",
@@ -310,78 +328,60 @@ impl<'a> ViewPrimitiveType<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for ViewPrimitiveType<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "string" => Self::String,
             "integer" => Self::Integer,
             "boolean" => Self::Boolean,
             "blob" => Self::Blob,
             "cid-link" => Self::CidLink,
             "bytes" => Self::Bytes,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for ViewPrimitiveType<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "string" => Self::String,
-            "integer" => Self::Integer,
-            "boolean" => Self::Boolean,
-            "blob" => Self::Blob,
-            "cid-link" => Self::CidLink,
-            "bytes" => Self::Bytes,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for ViewPrimitiveType<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ViewPrimitiveType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for ViewPrimitiveType<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for ViewPrimitiveType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for ViewPrimitiveType<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for ViewPrimitiveType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for ViewPrimitiveType<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for ViewPrimitiveType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for ViewPrimitiveType<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for ViewPrimitiveType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for ViewPrimitiveType<'_> {
-    type Output = ViewPrimitiveType<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for ViewPrimitiveType<S> {
+    type Output = ViewPrimitiveType<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             ViewPrimitiveType::String => ViewPrimitiveType::String,
@@ -397,29 +397,32 @@ impl jacquard_common::IntoStatic for ViewPrimitiveType<'_> {
 
 /// View accepts individual records of a collection. Omit collection for a generic record view. When rkey is present, the component accepts bare DIDs (expanded to full AT URIs) and appears on identity pages.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewRecord<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ViewRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///The collection this component views. Omit for any-collection.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub collection: Option<Nsid<'a>>,
+    pub collection: Option<Nsid<S>>,
     ///The record key, baked from the collection's lexicon at authoring time. Presence enables DID expansion and identity page routing.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub rkey: Option<CowStr<'a>>,
+    pub rkey: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Component<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ComponentRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Component<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ComponentRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<'a> LexiconSchema for BodyExternal<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BodyExternal<S> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
@@ -434,7 +437,7 @@ impl<'a> LexiconSchema for BodyExternal<'a> {
     }
 }
 
-impl<'a> LexiconSchema for BodyTemplate<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for BodyTemplate<S> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
@@ -456,18 +459,17 @@ pub struct ComponentRecord;
 impl XrpcResp for ComponentRecord {
     const NSID: &'static str = "at.inlay.component";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ComponentGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ComponentGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ComponentGetRecordOutput<'_>> for Component<'_> {
-    fn from(output: ComponentGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ComponentGetRecordOutput<S>> for Component<S> {
+    fn from(output: ComponentGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Component<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Component<S> {
     const NSID: &'static str = "at.inlay.component";
     type Record = ComponentRecord;
 }
@@ -477,7 +479,7 @@ impl Collection for ComponentRecord {
     type Record = ComponentRecord;
 }
 
-impl<'a> LexiconSchema for Component<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Component<S> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
@@ -514,7 +516,7 @@ impl<'a> LexiconSchema for Component<'a> {
     }
 }
 
-impl<'a> LexiconSchema for View<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for View<S> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
@@ -551,7 +553,7 @@ impl<'a> LexiconSchema for View<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ViewPrimitive<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViewPrimitive<S> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
@@ -587,7 +589,7 @@ impl<'a> LexiconSchema for ViewPrimitive<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ViewRecord<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViewRecord<S> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
@@ -647,7 +649,7 @@ pub mod body_external_state {
 /// Builder for constructing an instance of this type
 pub struct BodyExternalBuilder<'a, S: body_external_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Did<'a>>,),
+    _fields: (Option<Did<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -677,7 +679,7 @@ where
     /// Set the `did` field (required)
     pub fn did(
         mut self,
-        value: impl Into<Did<'a>>,
+        value: impl Into<Did<S>>,
     ) -> BodyExternalBuilder<'a, body_external_state::SetDid<S>> {
         self._fields.0 = Option::Some(value.into());
         BodyExternalBuilder {
@@ -703,7 +705,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BodyExternal<'a> {
         BodyExternal {
             did: self._fields.0.unwrap(),
@@ -1047,7 +1049,7 @@ pub mod body_template_state {
 /// Builder for constructing an instance of this type
 pub struct BodyTemplateBuilder<'a, S: body_template_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Data<'a>>,),
+    _fields: (Option<Data<S>>,),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1077,7 +1079,7 @@ where
     /// Set the `node` field (required)
     pub fn node(
         mut self,
-        value: impl Into<Data<'a>>,
+        value: impl Into<Data<S>>,
     ) -> BodyTemplateBuilder<'a, body_template_state::SetNode<S>> {
         self._fields.0 = Option::Some(value.into());
         BodyTemplateBuilder {
@@ -1103,7 +1105,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> BodyTemplate<'a> {
         BodyTemplate {
             node: self._fields.0.unwrap(),
@@ -1148,14 +1150,14 @@ pub mod component_state {
 pub struct ComponentBuilder<'a, S: component_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<ComponentBody<'a>>,
+        Option<ComponentBody<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Vec<AtUri<'a>>>,
-        Option<Nsid<'a>>,
+        Option<S>,
+        Option<Vec<AtUri<S>>>,
+        Option<Nsid<S>>,
         Option<Datetime>,
-        Option<ViaValtown<'a>>,
-        Option<component::View<'a>>,
+        Option<ViaValtown<S>>,
+        Option<component::View<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -1180,12 +1182,12 @@ impl<'a> ComponentBuilder<'a, component_state::Empty> {
 
 impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     /// Set the `body` field (optional)
-    pub fn body(mut self, value: impl Into<Option<ComponentBody<'a>>>) -> Self {
+    pub fn body(mut self, value: impl Into<Option<ComponentBody<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `body` field to an Option value (optional)
-    pub fn maybe_body(mut self, value: Option<ComponentBody<'a>>) -> Self {
+    pub fn maybe_body(mut self, value: Option<ComponentBody<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1206,12 +1208,12 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
 
 impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1219,12 +1221,12 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
 
 impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     /// Set the `imports` field (optional)
-    pub fn imports(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
+    pub fn imports(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `imports` field to an Option value (optional)
-    pub fn maybe_imports(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
+    pub fn maybe_imports(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1238,7 +1240,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<Nsid<'a>>,
+        value: impl Into<Nsid<S>>,
     ) -> ComponentBuilder<'a, component_state::SetType<S>> {
         self._fields.4 = Option::Some(value.into());
         ComponentBuilder {
@@ -1264,12 +1266,12 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
 
 impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     /// Set the `via` field (optional)
-    pub fn via(mut self, value: impl Into<Option<ViaValtown<'a>>>) -> Self {
+    pub fn via(mut self, value: impl Into<Option<ViaValtown<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `via` field to an Option value (optional)
-    pub fn maybe_via(mut self, value: Option<ViaValtown<'a>>) -> Self {
+    pub fn maybe_via(mut self, value: Option<ViaValtown<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -1277,12 +1279,12 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
 
 impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     /// Set the `view` field (optional)
-    pub fn view(mut self, value: impl Into<Option<component::View<'a>>>) -> Self {
+    pub fn view(mut self, value: impl Into<Option<component::View<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `view` field to an Option value (optional)
-    pub fn maybe_view(mut self, value: Option<component::View<'a>>) -> Self {
+    pub fn maybe_view(mut self, value: Option<component::View<S>>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -1310,7 +1312,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Component<'a> {
         Component {
             body: self._fields.0,
@@ -1373,7 +1375,7 @@ pub mod view_state {
 /// Builder for constructing an instance of this type
 pub struct ViewBuilder<'a, S: view_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Vec<ViewAcceptsItem<'a>>>, Option<CowStr<'a>>),
+    _fields: (Option<Vec<ViewAcceptsItem<S>>>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -1403,7 +1405,7 @@ where
     /// Set the `accepts` field (required)
     pub fn accepts(
         mut self,
-        value: impl Into<Vec<ViewAcceptsItem<'a>>>,
+        value: impl Into<Vec<ViewAcceptsItem<S>>>,
     ) -> ViewBuilder<'a, view_state::SetAccepts<S>> {
         self._fields.0 = Option::Some(value.into());
         ViewBuilder {
@@ -1422,7 +1424,7 @@ where
     /// Set the `prop` field (required)
     pub fn prop(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ViewBuilder<'a, view_state::SetProp<S>> {
         self._fields.1 = Option::Some(value.into());
         ViewBuilder {
@@ -1448,10 +1450,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
-    ) -> View<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> View<'a> {
         View {
             accepts: self._fields.0.unwrap(),
             prop: self._fields.1.unwrap(),

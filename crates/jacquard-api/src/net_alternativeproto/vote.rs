@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,30 +30,37 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A user vote on a submission to AlternativeProto. Each user may cast one vote per submission.
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "net.alternativeproto.vote", tag = "$type")]
-pub struct Vote<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "net.alternativeproto.vote",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Vote<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Timestamp when the vote was cast
     pub created_at: Datetime,
     ///Vote direction: 'up' for positive/quality, 'down' for negative/irrelevant
-    #[serde(borrow)]
-    pub direction: VoteDirection<'a>,
+    pub direction: VoteDirection<S>,
     ///Strong reference (AT URI + CID) to the submission record being voted on
-    #[serde(borrow)]
-    pub subject: StrongRef<'a>,
+    pub subject: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Vote direction: 'up' for positive/quality, 'down' for negative/irrelevant
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VoteDirection<'a> {
+pub enum VoteDirection<S: Bos<str> + AsRef<str> = DefaultStr> {
     Up,
     Down,
-    Other(CowStr<'a>),
+    Other(S),
 }
 
-impl<'a> VoteDirection<'a> {
+impl<S: Bos<str> + AsRef<str>> VoteDirection<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Up => "up",
@@ -59,70 +68,56 @@ impl<'a> VoteDirection<'a> {
             Self::Other(s) => s.as_ref(),
         }
     }
-}
-
-impl<'a> From<&'a str> for VoteDirection<'a> {
-    fn from(s: &'a str) -> Self {
-        match s {
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
             "up" => Self::Up,
             "down" => Self::Down,
-            _ => Self::Other(CowStr::from(s)),
+            _ => Self::Other(s),
         }
     }
 }
 
-impl<'a> From<String> for VoteDirection<'a> {
-    fn from(s: String) -> Self {
-        match s.as_str() {
-            "up" => Self::Up,
-            "down" => Self::Down,
-            _ => Self::Other(CowStr::from(s)),
-        }
-    }
-}
-
-impl<'a> core::fmt::Display for VoteDirection<'a> {
+impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VoteDirection<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<'a> AsRef<str> for VoteDirection<'a> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for VoteDirection<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<'a> serde::Serialize for VoteDirection<'a> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: Bos<str> + AsRef<str>> Serialize for VoteDirection<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(self.as_str())
     }
 }
 
-impl<'de, 'a> serde::Deserialize<'de> for VoteDirection<'a>
-where
-    'de: 'a,
-{
+impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+for VoteDirection<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let s = <&'de str>::deserialize(deserializer)?;
-        Ok(Self::from(s))
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
     }
 }
 
-impl<'a> Default for VoteDirection<'a> {
+impl<S: Bos<str> + AsRef<str> + Default> Default for VoteDirection<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl jacquard_common::IntoStatic for VoteDirection<'_> {
-    type Output = VoteDirection<'static>;
+impl<S: Bos<str> + AsRef<str>> IntoStatic for VoteDirection<S> {
+    type Output = VoteDirection<DefaultStr>;
     fn into_static(self) -> Self::Output {
         match self {
             VoteDirection::Up => VoteDirection::Up,
@@ -135,22 +130,23 @@ impl jacquard_common::IntoStatic for VoteDirection<'_> {
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct VoteGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct VoteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Vote<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Vote<S>,
 }
 
-impl<'a> Vote<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, VoteRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Vote<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, VoteRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -161,18 +157,17 @@ pub struct VoteRecord;
 impl XrpcResp for VoteRecord {
     const NSID: &'static str = "net.alternativeproto.vote";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = VoteGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = VoteGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<VoteGetRecordOutput<'_>> for Vote<'_> {
-    fn from(output: VoteGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<VoteGetRecordOutput<S>> for Vote<S> {
+    fn from(output: VoteGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Vote<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Vote<S> {
     const NSID: &'static str = "net.alternativeproto.vote";
     type Record = VoteRecord;
 }
@@ -182,7 +177,7 @@ impl Collection for VoteRecord {
     type Record = VoteRecord;
 }
 
-impl<'a> LexiconSchema for Vote<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Vote<S> {
     fn nsid() -> &'static str {
         "net.alternativeproto.vote"
     }
@@ -207,58 +202,58 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
         type Direction;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
         type Direction = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
-        type Direction = S::Direction;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
         type Direction = S::Direction;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `direction` field to Set
     pub struct SetDirection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDirection<S> {}
     impl<S: State> State for SetDirection<S> {
-        type CreatedAt = S::CreatedAt;
         type Subject = S::Subject;
         type Direction = Set<members::direction>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type Direction = S::Direction;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `direction` field
         pub struct direction(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct VoteBuilder<'a, S: vote_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<Datetime>, Option<VoteDirection<'a>>, Option<StrongRef<'a>>),
+    _fields: (Option<Datetime>, Option<VoteDirection<S>>, Option<StrongRef<S>>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -307,7 +302,7 @@ where
     /// Set the `direction` field (required)
     pub fn direction(
         mut self,
-        value: impl Into<VoteDirection<'a>>,
+        value: impl Into<VoteDirection<S>>,
     ) -> VoteBuilder<'a, vote_state::SetDirection<S>> {
         self._fields.1 = Option::Some(value.into());
         VoteBuilder {
@@ -326,7 +321,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<StrongRef<'a>>,
+        value: impl Into<StrongRef<S>>,
     ) -> VoteBuilder<'a, vote_state::SetSubject<S>> {
         self._fields.2 = Option::Some(value.into());
         VoteBuilder {
@@ -340,9 +335,9 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
-    S::CreatedAt: vote_state::IsSet,
     S::Subject: vote_state::IsSet,
     S::Direction: vote_state::IsSet,
+    S::CreatedAt: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
@@ -354,13 +349,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Vote<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Vote<'a> {
         Vote {
             created_at: self._fields.0.unwrap(),
             direction: self._fields.1.unwrap(),

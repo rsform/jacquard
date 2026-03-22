@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -30,50 +32,60 @@ use crate::pub_leaflet::publication::Theme;
 use crate::site_standard::theme::basic::Basic;
 use crate::site_standard::publication;
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "site.standard.publication", tag = "$type")]
-pub struct Publication<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "site.standard.publication",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Publication<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub basic_theme: Option<Basic<'a>>,
+    pub basic_theme: Option<Basic<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub description: Option<CowStr<'a>>,
+    pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub icon: Option<BlobRef<'a>>,
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub icon: Option<BlobRef<S>>,
+    pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub preferences: Option<publication::Preferences<'a>>,
+    pub preferences: Option<publication::Preferences<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub theme: Option<Theme<'a>>,
-    #[serde(borrow)]
-    pub url: UriValue<'a>,
+    pub theme: Option<Theme<S>>,
+    pub url: UriValue<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct PublicationGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct PublicationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Publication<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Publication<S>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct Preferences<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Preferences<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_show_comments")]
@@ -94,13 +106,13 @@ pub struct Preferences<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_show_recommends")]
     pub show_recommends: Option<bool>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<'a> Publication<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, PublicationRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Publication<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, PublicationRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -111,18 +123,17 @@ pub struct PublicationRecord;
 impl XrpcResp for PublicationRecord {
     const NSID: &'static str = "site.standard.publication";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = PublicationGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = PublicationGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<PublicationGetRecordOutput<'_>> for Publication<'_> {
-    fn from(output: PublicationGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<PublicationGetRecordOutput<S>> for Publication<S> {
+    fn from(output: PublicationGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Publication<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Publication<S> {
     const NSID: &'static str = "site.standard.publication";
     type Record = PublicationRecord;
 }
@@ -132,7 +143,7 @@ impl Collection for PublicationRecord {
     type Record = PublicationRecord;
 }
 
-impl<'a> LexiconSchema for Publication<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Publication<S> {
     fn nsid() -> &'static str {
         "site.standard.publication"
     }
@@ -231,7 +242,7 @@ impl<'a> LexiconSchema for Publication<'a> {
     }
 }
 
-impl<'a> LexiconSchema for Preferences<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Preferences<S> {
     fn nsid() -> &'static str {
         "site.standard.publication"
     }
@@ -256,37 +267,37 @@ pub mod publication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Name;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Name = S::Name;
+        type Url = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Url = S::Url;
         type Name = Set<members::name>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Name = S::Name;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -294,13 +305,13 @@ pub mod publication_state {
 pub struct PublicationBuilder<'a, S: publication_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<Basic<'a>>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<CowStr<'a>>,
-        Option<publication::Preferences<'a>>,
-        Option<Theme<'a>>,
-        Option<UriValue<'a>>,
+        Option<Basic<S>>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<S>,
+        Option<publication::Preferences<S>>,
+        Option<Theme<S>>,
+        Option<UriValue<S>>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -325,12 +336,12 @@ impl<'a> PublicationBuilder<'a, publication_state::Empty> {
 
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `basicTheme` field (optional)
-    pub fn basic_theme(mut self, value: impl Into<Option<Basic<'a>>>) -> Self {
+    pub fn basic_theme(mut self, value: impl Into<Option<Basic<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `basicTheme` field to an Option value (optional)
-    pub fn maybe_basic_theme(mut self, value: Option<Basic<'a>>) -> Self {
+    pub fn maybe_basic_theme(mut self, value: Option<Basic<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -338,12 +349,12 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
 
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_description(mut self, value: Option<S>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -351,12 +362,12 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
 
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `icon` field (optional)
-    pub fn icon(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `icon` field to an Option value (optional)
-    pub fn maybe_icon(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_icon(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -370,7 +381,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> PublicationBuilder<'a, publication_state::SetName<S>> {
         self._fields.3 = Option::Some(value.into());
         PublicationBuilder {
@@ -385,7 +396,7 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `preferences` field (optional)
     pub fn preferences(
         mut self,
-        value: impl Into<Option<publication::Preferences<'a>>>,
+        value: impl Into<Option<publication::Preferences<S>>>,
     ) -> Self {
         self._fields.4 = value.into();
         self
@@ -393,7 +404,7 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `preferences` field to an Option value (optional)
     pub fn maybe_preferences(
         mut self,
-        value: Option<publication::Preferences<'a>>,
+        value: Option<publication::Preferences<S>>,
     ) -> Self {
         self._fields.4 = value;
         self
@@ -402,12 +413,12 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
 
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `theme` field (optional)
-    pub fn theme(mut self, value: impl Into<Option<Theme<'a>>>) -> Self {
+    pub fn theme(mut self, value: impl Into<Option<Theme<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
-    pub fn maybe_theme(mut self, value: Option<Theme<'a>>) -> Self {
+    pub fn maybe_theme(mut self, value: Option<Theme<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -421,7 +432,7 @@ where
     /// Set the `url` field (required)
     pub fn url(
         mut self,
-        value: impl Into<UriValue<'a>>,
+        value: impl Into<UriValue<S>>,
     ) -> PublicationBuilder<'a, publication_state::SetUrl<S>> {
         self._fields.6 = Option::Some(value.into());
         PublicationBuilder {
@@ -435,8 +446,8 @@ where
 impl<'a, S> PublicationBuilder<'a, S>
 where
     S: publication_state::State,
-    S::Url: publication_state::IsSet,
     S::Name: publication_state::IsSet,
+    S::Url: publication_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Publication<'a> {
@@ -454,10 +465,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> Publication<'a> {
         Publication {
             basic_theme: self._fields.0,
@@ -617,7 +625,7 @@ fn _default_preferences_show_recommends() -> Option<bool> {
     Some(true)
 }
 
-impl Default for Preferences<'_> {
+impl Default for Preferences {
     fn default() -> Self {
         Self {
             show_comments: Some(true),

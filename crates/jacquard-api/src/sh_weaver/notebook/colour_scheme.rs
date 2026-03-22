@@ -10,13 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,98 +29,92 @@ use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 /// A colour palette for notebook theming
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     rename = "sh.weaver.notebook.colourScheme",
-    tag = "$type"
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
 )]
-pub struct ColourScheme<'a> {
-    #[serde(borrow)]
-    pub colours: ColourSchemeColours<'a>,
+pub struct ColourScheme<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub colours: ColourSchemeColours<S>,
     ///Human-readable name for the colour scheme
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+    pub name: S,
     ///Whether this is a dark or light colour scheme
-    #[serde(borrow)]
-    pub variant: CowStr<'a>,
+    pub variant: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
-pub struct ColourSchemeColours<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ColourSchemeColours<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Primary background for page/frame
-    #[serde(borrow)]
-    pub base: CowStr<'a>,
+    pub base: S,
     ///Border/divider colour
-    #[serde(borrow)]
-    pub border: CowStr<'a>,
+    pub border: S,
     ///Emphasized text (bold, important)
-    #[serde(borrow)]
-    pub emphasis: CowStr<'a>,
+    pub emphasis: S,
     ///Error state colour
-    #[serde(borrow)]
-    pub error: CowStr<'a>,
+    pub error: S,
     ///Selection/highlight colour
-    #[serde(borrow)]
-    pub highlight: CowStr<'a>,
+    pub highlight: S,
     ///Hyperlink colour
-    #[serde(borrow)]
-    pub link: CowStr<'a>,
+    pub link: S,
     ///De-emphasized text (disabled, metadata)
-    #[serde(borrow)]
-    pub muted: CowStr<'a>,
+    pub muted: S,
     ///Tertiary background for popovers/dialogs
-    #[serde(borrow)]
-    pub overlay: CowStr<'a>,
+    pub overlay: S,
     ///Primary brand/accent colour
-    #[serde(borrow)]
-    pub primary: CowStr<'a>,
+    pub primary: S,
     ///Secondary accent colour
-    #[serde(borrow)]
-    pub secondary: CowStr<'a>,
+    pub secondary: S,
     ///Medium emphasis text (comments, labels)
-    #[serde(borrow)]
-    pub subtle: CowStr<'a>,
+    pub subtle: S,
     ///Success state colour
-    #[serde(borrow)]
-    pub success: CowStr<'a>,
+    pub success: S,
     ///Secondary background for panels/cards
-    #[serde(borrow)]
-    pub surface: CowStr<'a>,
+    pub surface: S,
     ///Tertiary accent colour
-    #[serde(borrow)]
-    pub tertiary: CowStr<'a>,
+    pub tertiary: S,
     ///Primary readable text colour
-    #[serde(borrow)]
-    pub text: CowStr<'a>,
+    pub text: S,
     ///Warning state colour
-    #[serde(borrow)]
-    pub warning: CowStr<'a>,
+    pub warning: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct ColourSchemeGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct ColourSchemeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: ColourScheme<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: ColourScheme<S>,
 }
 
-impl<'a> ColourScheme<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, ColourSchemeRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> ColourScheme<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, ColourSchemeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -129,18 +125,17 @@ pub struct ColourSchemeRecord;
 impl XrpcResp for ColourSchemeRecord {
     const NSID: &'static str = "sh.weaver.notebook.colourScheme";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ColourSchemeGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = ColourSchemeGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<ColourSchemeGetRecordOutput<'_>> for ColourScheme<'_> {
-    fn from(output: ColourSchemeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<ColourSchemeGetRecordOutput<S>> for ColourScheme<S> {
+    fn from(output: ColourSchemeGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for ColourScheme<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for ColourScheme<S> {
     const NSID: &'static str = "sh.weaver.notebook.colourScheme";
     type Record = ColourSchemeRecord;
 }
@@ -150,7 +145,7 @@ impl Collection for ColourSchemeRecord {
     type Record = ColourSchemeRecord;
 }
 
-impl<'a> LexiconSchema for ColourScheme<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ColourScheme<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.colourScheme"
     }
@@ -165,7 +160,7 @@ impl<'a> LexiconSchema for ColourScheme<'a> {
     }
 }
 
-impl<'a> LexiconSchema for ColourSchemeColours<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for ColourSchemeColours<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.colourScheme"
     }
@@ -426,57 +421,57 @@ pub mod colour_scheme_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Colours;
-        type Variant;
         type Name;
+        type Variant;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Colours = Unset;
-        type Variant = Unset;
         type Name = Unset;
+        type Variant = Unset;
     }
     ///State transition - sets the `colours` field to Set
     pub struct SetColours<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetColours<S> {}
     impl<S: State> State for SetColours<S> {
         type Colours = Set<members::colours>;
+        type Name = S::Name;
         type Variant = S::Variant;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `variant` field to Set
-    pub struct SetVariant<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVariant<S> {}
-    impl<S: State> State for SetVariant<S> {
-        type Colours = S::Colours;
-        type Variant = Set<members::variant>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Colours = S::Colours;
-        type Variant = S::Variant;
         type Name = Set<members::name>;
+        type Variant = S::Variant;
+    }
+    ///State transition - sets the `variant` field to Set
+    pub struct SetVariant<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVariant<S> {}
+    impl<S: State> State for SetVariant<S> {
+        type Colours = S::Colours;
+        type Name = S::Name;
+        type Variant = Set<members::variant>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `colours` field
         pub struct colours(());
-        ///Marker type for the `variant` field
-        pub struct variant(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `variant` field
+        pub struct variant(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ColourSchemeBuilder<'a, S: colour_scheme_state::State> {
     _state: PhantomData<fn() -> S>,
-    _fields: (Option<ColourSchemeColours<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _fields: (Option<ColourSchemeColours<S>>, Option<S>, Option<S>),
     _lifetime: PhantomData<&'a ()>,
 }
 
@@ -506,7 +501,7 @@ where
     /// Set the `colours` field (required)
     pub fn colours(
         mut self,
-        value: impl Into<ColourSchemeColours<'a>>,
+        value: impl Into<ColourSchemeColours<S>>,
     ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetColours<S>> {
         self._fields.0 = Option::Some(value.into());
         ColourSchemeBuilder {
@@ -525,7 +520,7 @@ where
     /// Set the `name` field (required)
     pub fn name(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetName<S>> {
         self._fields.1 = Option::Some(value.into());
         ColourSchemeBuilder {
@@ -544,7 +539,7 @@ where
     /// Set the `variant` field (required)
     pub fn variant(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetVariant<S>> {
         self._fields.2 = Option::Some(value.into());
         ColourSchemeBuilder {
@@ -559,8 +554,8 @@ impl<'a, S> ColourSchemeBuilder<'a, S>
 where
     S: colour_scheme_state::State,
     S::Colours: colour_scheme_state::IsSet,
-    S::Variant: colour_scheme_state::IsSet,
     S::Name: colour_scheme_state::IsSet,
+    S::Variant: colour_scheme_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ColourScheme<'a> {
@@ -574,10 +569,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
+        extra_data: BTreeMap<SmolStr, Data<'a>>,
     ) -> ColourScheme<'a> {
         ColourScheme {
             colours: self._fields.0.unwrap(),

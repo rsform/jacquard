@@ -10,14 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, DefaultStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
+use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
 use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -27,59 +29,62 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 
-#[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", rename = "computer.aesthetic.tape", tag = "$type")]
-pub struct Tape<'a> {
+#[serde(
+    rename_all = "camelCase",
+    rename = "computer.aesthetic.tape",
+    tag = "$type",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct Tape<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Permanent link to view on aesthetic.computer (e.g., https://aesthetic.computer/!a3x)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub ac_url: Option<CowStr<'a>>,
+    pub ac_url: Option<S>,
     ///Short alphanumeric code for easy lookup (e.g., 'a3x')
-    #[serde(borrow)]
-    pub code: CowStr<'a>,
+    pub code: S,
     ///MongoDB ObjectId reference for bi-directional sync
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub r#ref: Option<CowStr<'a>>,
+    pub r#ref: Option<S>,
     ///The unique slug identifier for this tape (e.g., wand-1729177200000)
-    #[serde(borrow)]
-    pub slug: CowStr<'a>,
+    pub slug: S,
     ///Thumbnail image from midpoint frame, 3x scaled with nearest neighbor (max 1MB)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub thumbnail: Option<BlobRef<'a>>,
+    pub thumbnail: Option<BlobRef<S>>,
     ///MP4 video with 3x pixel scaling and audio soundtrack (max 50MB)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub video: Option<BlobRef<'a>>,
+    pub video: Option<BlobRef<S>>,
     ///ISO 8601 timestamp when the tape was created
     pub when: Datetime,
     ///Direct URL to download the original ZIP file with frames and audio
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub zip_url: Option<CowStr<'a>>,
+    pub zip_url: Option<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-pub struct TapeGetRecordOutput<'a> {
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + Bos<str> + AsRef<str>",
+        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+    )
+)]
+pub struct TapeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
-    pub cid: Option<Cid<'a>>,
-    #[serde(borrow)]
-    pub uri: AtUri<'a>,
-    #[serde(borrow)]
-    pub value: Tape<'a>,
+    pub cid: Option<Cid<S>>,
+    pub uri: AtUri<S>,
+    pub value: Tape<S>,
 }
 
-impl<'a> Tape<'a> {
-    pub fn uri(
-        uri: impl Into<CowStr<'a>>,
-    ) -> Result<RecordUri<'a, TapeRecord>, UriError> {
-        RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
+impl<S: Bos<str> + AsRef<str>> Tape<S> {
+    pub fn uri(uri: S) -> Result<RecordUri<S, TapeRecord>, UriError> {
+        RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
@@ -90,18 +95,17 @@ pub struct TapeRecord;
 impl XrpcResp for TapeRecord {
     const NSID: &'static str = "computer.aesthetic.tape";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = TapeGetRecordOutput<'de>;
-    type Err<'de> = RecordError<'de>;
+    type Output<S: Bos<str> + AsRef<str>> = TapeGetRecordOutput<S>;
+    type Err = RecordError;
 }
 
-impl From<TapeGetRecordOutput<'_>> for Tape<'_> {
-    fn from(output: TapeGetRecordOutput<'_>) -> Self {
-        use jacquard_common::IntoStatic;
-        output.value.into_static()
+impl<S: Bos<str> + AsRef<str>> From<TapeGetRecordOutput<S>> for Tape<S> {
+    fn from(output: TapeGetRecordOutput<S>) -> Self {
+        output.value
     }
 }
 
-impl Collection for Tape<'_> {
+impl<S: Bos<str> + AsRef<str>> Collection for Tape<S> {
     const NSID: &'static str = "computer.aesthetic.tape";
     type Record = TapeRecord;
 }
@@ -111,7 +115,7 @@ impl Collection for TapeRecord {
     type Record = TapeRecord;
 }
 
-impl<'a> LexiconSchema for Tape<'a> {
+impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tape<S> {
     fn nsid() -> &'static str {
         "computer.aesthetic.tape"
     }
@@ -215,50 +219,50 @@ pub mod tape_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Code;
-        type Slug;
         type When;
+        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Code = Unset;
-        type Slug = Unset;
         type When = Unset;
+        type Slug = Unset;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
         type Code = Set<members::code>;
+        type When = S::When;
         type Slug = S::Slug;
-        type When = S::When;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Code = S::Code;
-        type Slug = Set<members::slug>;
-        type When = S::When;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
         type Code = S::Code;
-        type Slug = S::Slug;
         type When = Set<members::when>;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Code = S::Code;
+        type When = S::When;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `code` field
         pub struct code(());
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `when` field
         pub struct when(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
     }
 }
 
@@ -266,14 +270,14 @@ pub mod tape_state {
 pub struct TapeBuilder<'a, S: tape_state::State> {
     _state: PhantomData<fn() -> S>,
     _fields: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<BlobRef<'a>>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<S>,
+        Option<BlobRef<S>>,
+        Option<BlobRef<S>>,
         Option<Datetime>,
-        Option<CowStr<'a>>,
+        Option<S>,
     ),
     _lifetime: PhantomData<&'a ()>,
 }
@@ -298,12 +302,12 @@ impl<'a> TapeBuilder<'a, tape_state::Empty> {
 
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `acUrl` field (optional)
-    pub fn ac_url(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn ac_url(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `acUrl` field to an Option value (optional)
-    pub fn maybe_ac_url(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_ac_url(mut self, value: Option<S>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -317,7 +321,7 @@ where
     /// Set the `code` field (required)
     pub fn code(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TapeBuilder<'a, tape_state::SetCode<S>> {
         self._fields.1 = Option::Some(value.into());
         TapeBuilder {
@@ -330,12 +334,12 @@ where
 
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `ref` field (optional)
-    pub fn r#ref(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn r#ref(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
-    pub fn maybe_ref(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_ref(mut self, value: Option<S>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -349,7 +353,7 @@ where
     /// Set the `slug` field (required)
     pub fn slug(
         mut self,
-        value: impl Into<CowStr<'a>>,
+        value: impl Into<S>,
     ) -> TapeBuilder<'a, tape_state::SetSlug<S>> {
         self._fields.3 = Option::Some(value.into());
         TapeBuilder {
@@ -362,12 +366,12 @@ where
 
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
-    pub fn thumbnail(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn thumbnail(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
-    pub fn maybe_thumbnail(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_thumbnail(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -375,12 +379,12 @@ impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
 
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `video` field (optional)
-    pub fn video(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
+    pub fn video(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
-    pub fn maybe_video(mut self, value: Option<BlobRef<'a>>) -> Self {
+    pub fn maybe_video(mut self, value: Option<BlobRef<S>>) -> Self {
         self._fields.5 = value;
         self
     }
@@ -407,12 +411,12 @@ where
 
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `zipUrl` field (optional)
-    pub fn zip_url(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
+    pub fn zip_url(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `zipUrl` field to an Option value (optional)
-    pub fn maybe_zip_url(mut self, value: Option<CowStr<'a>>) -> Self {
+    pub fn maybe_zip_url(mut self, value: Option<S>) -> Self {
         self._fields.7 = value;
         self
     }
@@ -422,8 +426,8 @@ impl<'a, S> TapeBuilder<'a, S>
 where
     S: tape_state::State,
     S::Code: tape_state::IsSet,
-    S::Slug: tape_state::IsSet,
     S::When: tape_state::IsSet,
+    S::Slug: tape_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tape<'a> {
@@ -440,13 +444,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<'a>,
-        >,
-    ) -> Tape<'a> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Tape<'a> {
         Tape {
             ac_url: self._fields.0,
             code: self._fields.1.unwrap(),
